@@ -1,4 +1,4 @@
-From 529f2786d622c14e10b4d812573a219c78f7056f Mon Sep 17 00:00:00 2001
+From cbad1ba874c5ddcb9752f8de19e7d46bd6d552c3 Mon Sep 17 00:00:00 2001
 From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Date: Fri, 16 Nov 2018 10:58:32 +0200
 Subject: [PATCH] fec: limit TX queues to prevent TX starvation crash
@@ -16,13 +16,13 @@ prevent starvation.
 Issue: ALB-2941
 Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 ---
- arch/arm64/boot/dts/freescale/s32v234.dtsi | 2 +-
+ arch/arm64/boot/dts/freescale/fsl-s32v234.dtsi | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/boot/dts/freescale/s32v234.dtsi b/arch/arm64/boot/dts/freescale/s32v234.dtsi
-index 3edfd9f..9ca712a 100644
---- a/arch/arm64/boot/dts/freescale/s32v234.dtsi
-+++ b/arch/arm64/boot/dts/freescale/s32v234.dtsi
+diff --git a/arch/arm64/boot/dts/freescale/fsl-s32v234.dtsi b/arch/arm64/boot/dts/freescale/fsl-s32v234.dtsi
+index b51aff929bf0..0479231b3ca4 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-s32v234.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-s32v234.dtsi
 @@ -271,7 +271,7 @@
  				clock-names = "ipg", "ahb", "ptp",
  					      "enet_clk_ref",
@@ -33,5 +33,5 @@ index 3edfd9f..9ca712a 100644
  				status = "disabled";
  			};
 -- 
-2.7.4
+2.21.0
 

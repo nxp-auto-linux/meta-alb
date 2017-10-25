@@ -1,0 +1,10 @@
+diff -Naur 4.2.1-r3/securetty 4.2.1-r3_modified/securetty
+--- 4.2.1-r3/securetty	2016-09-26 14:48:20.602656400 +0700
++++ 4.2.1-r3_modified/securetty	2016-09-26 15:01:45.910654702 +0700
+@@ -236,3 +236,6 @@
+ vc/61
+ vc/62
+ vc/63
++#s32v234 serial ports
++ttyLF0
++ttyLF1

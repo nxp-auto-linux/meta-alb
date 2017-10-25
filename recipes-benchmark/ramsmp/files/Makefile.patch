@@ -1,0 +1,18 @@
+diff -Naur ramsmp-3.5.0/Makefile ramsmp-3.5.0_modified/Makefile
+--- ramsmp-3.5.0/Makefile	1970-01-01 08:00:00.000000000 +0800
++++ ramsmp-3.5.0_modified/Makefile	2016-09-27 18:43:07.564328501 +0700
+@@ -0,0 +1,14 @@
++
++all: generic
++
++generic: ramsmp.c fltmem.c fltmark.c intmem.c intmark.c
++	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o ramsmp
++
++i386: ramsmp-3.5.0/ramsmp.c ramsmp-3.5.0/i386/*.s ramsmp-3.5.0/i386/cpuinfo/*.s
++	$(CC) $(CFLAGS) -DI386_ASM $(LDFLAGS) $^ -o ramsmp
++
++x86_64: ramsmp-3.5.0/ramsmp.c ramsmp-3.5.0/amd64/*.s
++	$(CC) $(CFLAGS) -DAMD64_ASM $(LDFLAGS) $^ -o ramsmp
++
++clean:
++	rm -f *.o ramsmp

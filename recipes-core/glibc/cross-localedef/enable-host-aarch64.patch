@@ -1,0 +1,13 @@
+diff --git a/localedef/config.guess b/localedef/config.guess
+index 61f2e4c..9834a43 100644
+--- a/localedef/config.guess
++++ b/localedef/config.guess
+@@ -820,7 +820,7 @@ EOF
+     i*86:Minix:*:*)
+ 	echo ${UNAME_MACHINE}-pc-minix
+ 	exit 0 ;;
+-    arm*:Linux:*:*)
++    arm*:Linux:*:* | aarch*:Linux:*:*)
+ 	echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit 0 ;;
+     cris:Linux:*:*)

@@ -1,1 +1,31 @@
-OpenEmbedded/Yocto BSP layer for NXP Auto Linux BSP platforms
+OpenEmbedded/Yocto BSP layer for Freescale's S32V platforms
+==========================================================
+
+This layer provides support for Freescale's S32V platforms for use with
+OpenEmbedded and/or Yocto.
+
+This layer depends on:
+
+URI: git://git.openembedded.org/openembedded-core
+branch: master
+revision: HEAD
+
+URI: git://git.freescale.com/ppc/sdk/meta-fsl-arm.git
+branch: ???
+revision: HEAD
+
+
+meta-fsl-networking (to be removed/lessened)
+meta-fsl-toolchain
+
+EULA
+----
+
+Some SoC depends on libraries and packages that are covered by
+Freescale EULA. To have the right to use those binaries in your images
+you need to read and accept the EULA at EULA.txt file.
+
+In order to accept it, you should add, in your local.conf file:
+
+ACCEPT_FSL_EULA = "1"
+

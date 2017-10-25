@@ -1,0 +1,13 @@
+SUMMARY = "ICC Linux for s32v234 - A5x (Linux) to A5x (Linux) over PCIe"
+
+require icc-linux.inc
+SRCBRANCH = "develop"
+SRCREV = "355de47db535f72be57ca6716fbc82c06932d1c2"
+
+EXTRA_OEMAKE_ls2080abluebox = "CONFIG=RC"
+EXTRA_OEMAKE_ls2084abluebox = "CONFIG=RC"
+EXTRA_OEMAKE_ls2084abbmini = "CONFIG=RC"
+EXTRA_OEMAKE_s32v234pcie = "CONFIG=EP"
+EXTRA_OEMAKE_s32v234bbmini = "CONFIG=EP"
+EXTRA_OEMAKE_s32v234evb = "CONFIG=RC"
+EXTRA_OEMAKE_s32v234evb28899 = "CONFIG=RC"

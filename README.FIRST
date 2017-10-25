@@ -1,0 +1,122 @@
+First time setup
+================
+
+Run ./deploy.sh
+Run ./poky/scripts/host-prepare.sh
+
+Creating Build Directories and Testing the Installation
+=======================================================
+
+Now you can create a build directory in the SDK root with, e.g.,
+
+ source poky/fsl-setup-poky -m s32v234evb
+
+If targeting the EVB board. For PCIE, TMDP or BlueBox Mini boards, 
+use s32v234pcie, s32v234tmdp or s32v234bbmini respectively.
+
+When this is done, a "bitbake <imagename>", e.g.,
+
+ bitbake fsl-image-s32v2xx
+
+would be enough to completely build u-boot, kernel, modules, and a
+rootfs ready to be deployed. Look for a build result in
+<builddirectory>/tmp/deploy/images/.
+The .sdcard format creates an image with all necessary partitions and
+loads the bootloader, kernel and rootfs to this image. You can just low
+level copy the data on this file to the SD card device using dd as on
+the following command example:
+
+ sudo dd if=<image name>.sdcard of=/dev/sd<partition> bs=1M && sync
+
+Ensure that any partitions on the card are properly
+unmounted before writing the card image, or you may have a corrupted card
+image in the end. Also ensure to properly "sync" the filesystem before
+ejecting the card to ensure all data has been written.
+
+Note that builds with bitbake accumulate in the deployment directory.
+You may want to delete older irrelevant images after repeated builds.
+The very first build ever will take very long because a lot of
+one-time house keeping and building has to happen. You want to
+have a powerful build machine.
+
+Note the SOURCE_THIS file to be used when going back to building
+with a new shell.
+
+To deploy any rootfs to the target, simply "tar -xzf" the resulting
+compressed tar archive as root(!) to the destination partition.
+
+Adding extra space to rootfs
+============================
+If you want to add more extra space to the rootfs, add the following line
+to your local.conf file:
+
+IMAGE_ROOTFS_EXTRA_SPACE = "<SIZE_IN_KB>" (Example: "1048576" for 1G extra space)
+IMAGE_OVERHEAD_FACTOR = "1.0"
+
+Images provided
+===============
+
+NOTE: For the most convenient development environment, use of
+fsl-image-s32v2xx below is suggested.
+Production embedded projects would likely use much smaller images.
+
+fsl-image-s32v2xx
+-----------------
+
+This image is equivalent to the fsl-image-core. This means that the
+rootfs is fairly reasonable in completeness for basic efforts and
+contains sufficient amount of basic tools for remote connection and
+mounting of NFS or other drives, but it will not be full featured for
+self-hosting.
+
+fsl-image-full-s32v2xx
+----------------------
+This is equivalent to the fsl-image-full. It includes native
+toolchains among other things. See comments for fsl-image-s32v2xx.
+
+
+Adding GPU drivers to S32V234 rootfs
+====================================
+
+The downloads folder (included in the delivered Yocto_s32v*.tar.gz package) contains GPU drivers:
+Yocto_s32v*.tar.gz
+  |___ Yocto_s32v*
+        |___ meta-fsl-s32v
+        |___ meta-fsl-arm
+        |___ ...
+        |___ downloads
+              |___ gpu_drivers
+                    |___ Galcore_kernel_module
+                    |___ Vivante_userspace_libraries_and_demo
+                    |___ Vivante_VTK
+                    |___ Readme.txt
+
+To add GPU drivers to S32V234 rootfs, follow the steps as below:
+
+- Add the following line in your chosen image script (e.g. meta-fsl-s32v/images/fsl-image-s32v2xx.bb):
+    IMAGE_INSTALL += "gpu-viv-bin-s32v2xx"
+- You also need to confirm that you accept NXP's EULA by adding the following to the build folder's conf/local.conf
+  (e.g. build_s32v234evb_release/conf/local.conf):
+    ACCEPT_FSL_EULA = "1"
+- [Optional] if different gpu drivers other than the defaults are intended to be used then FSL_LOCAL_MIRROR 
+   should be updated as below (e.g. build_s32v234evb_release/conf/local.conf):
+     FSL_LOCAL_MIRROR = "file://<path_to_gpu_drivers>"
+   
+
+Tips and tricks
+===============
+
+- SRCREV and SRC_URI override
+    An easy way to override the SRCREV and SRC_URI for any project without changing recipes is to specify it in
+    conf/local.conf using:
+    SRC_URI_pn-<recipe> = "<new-src-uri-value>"
+    SRCREV_pn-<recipe> = "<commit-id>"
+
+    S32V2XX Linux Kernel example :
+    SRC_URI_pn-linux-s32v2xx = "git://sw-stash.freescale.net/scm/alb/linux.git;protocol=http;branch=develop"
+    SRCREV_pn-linux-s32v2xx = "${AUTOREV}"
+
+- Build Yocto BSP on Ubuntu 16.04
+    Currently, there is no support for Ubuntu 16.04. However, the workaround described below can be used.
+    Add in your local.conf the following line for Ubuntu 16.04, 64-bit:
+    BUILD_LDFLAGS_prepend_pn-qemu-native = " -Wl,-rpath-link,/lib/x86_64-linux-gnu "

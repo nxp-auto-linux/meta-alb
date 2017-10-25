@@ -1,0 +1,63 @@
+/*
+ * Copyright (C) 2016, Freescale Semiconductor
+ *
+ * Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+ *
+ * This file is licensed under the terms of the GNU General Public
+ * License version 2.  This program is licensed "as is" without any
+ * warranty of any kind, whether express or implied.
+ */
+
+/dts-v1/;
+
+/ {
+	description = "Image file for the S32V234 Linux Kernel";
+	#address-cells = <1>;
+
+	images {
+		kernel@1 {
+			description = "ARM64 Linux kernel";
+			data = /incbin/("./Image");
+			type = "kernel";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x80080000>;
+			entry = <0x80080000>;
+
+			/**
+			 * The signature is generated using uboot by calling 'genmac' command
+			 * Please see 'Sign and authenticate the other images used at runtime'
+			 * section from User Manual for more details.
+			 */
+			signature@1 {
+				algo = "cmac";
+				value = "\xa2\x35\x89\x6b\xe0\xeb\x8f\x07\xb5\x36\xc3\x82\x01\xb4\x91\xcf";
+			};
+		};
+
+		fdt@1 {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("s32v234.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			compression = "none";
+			load = <0x82000000>;
+
+			signature@1 {
+				algo = "cmac";
+				value = "\xc1\x33\x5f\x9b\xa0\xa8\xb6\x3a\x23\x37\x1c\x26\xeb\xb5\xab\x3b";
+			};
+
+		};
+	};
+
+	configurations {
+		default = "config@1";
+		config@1 {
+			description = "Boot Linux kernel";
+			kernel = "kernel@1";
+			fdt = "fdt@1";
+		};
+	};
+};

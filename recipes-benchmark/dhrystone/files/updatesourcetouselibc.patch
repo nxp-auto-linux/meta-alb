@@ -1,0 +1,70 @@
+diff -Naur dhrystone-2.1/dhry_1.c dhrystone-2.1_modified/dhry_1.c
+--- dhrystone-2.1/dhry_1.c	1989-07-25 23:54:31.000000000 +0700
++++ dhrystone-2.1_modified/dhry_1.c	2016-09-22 15:10:32.173762878 +0700
+@@ -16,7 +16,10 @@
+  */
+ 
+ #include "dhry.h"
+-
++#ifdef USE_LIBC
++#include <string.h>
++#include <stdlib.h>
++#endif
+ /* Global Variables: */
+ 
+ Rec_Pointer     Ptr_Glob,
+@@ -27,8 +30,9 @@
+                 Ch_2_Glob;
+ int             Arr_1_Glob [50];
+ int             Arr_2_Glob [50] [50];
+-
++#ifndef USE_LIBC
+ extern char     *malloc ();
++#endif
+ Enumeration     Func_1 ();
+   /* forward declaration necessary since Enumeration may not simply be int */
+ 
+@@ -45,13 +49,17 @@
+ 
+ #ifdef TIMES
+ struct tms      time_info;
++#ifndef USE_LIBC
+ extern  int     times ();
++#endif
+                 /* see library function "times" */
+ #define Too_Small_Time (2*HZ)
+                 /* Measurements should last at least about 2 seconds */
+ #endif
+ #ifdef TIME
++#ifndef USE_LIBC
+ extern long     time();
++#endif
+                 /* see library function "time"  */
+ #define Too_Small_Time 2
+                 /* Measurements should last at least 2 seconds */
+@@ -221,7 +229,11 @@
+   printf ("Arr_2_Glob[8][7]:    %d\n", Arr_2_Glob[8][7]);
+   printf ("        should be:   Number_Of_Runs + 10\n");
+   printf ("Ptr_Glob->\n");
+-  printf ("  Ptr_Comp:          %d\n", (int) Ptr_Glob->Ptr_Comp);
++#ifdef USE_LIBC
++  printf ("  Ptr_Comp:          %d\n", (long) Ptr_Glob->Ptr_Comp);
++#else
++  printf ("  Ptr_Comp:          %d\n", (int) Ptr_Glob->Ptr_Comp);  
++#endif
+   printf ("        should be:   (implementation-dependent)\n");
+   printf ("  Discr:             %d\n", Ptr_Glob->Discr);
+   printf ("        should be:   %d\n", 0);
+@@ -232,7 +244,11 @@
+   printf ("  Str_Comp:          %s\n", Ptr_Glob->variant.var_1.Str_Comp);
+   printf ("        should be:   DHRYSTONE PROGRAM, SOME STRING\n");
+   printf ("Next_Ptr_Glob->\n");
+-  printf ("  Ptr_Comp:          %d\n", (int) Next_Ptr_Glob->Ptr_Comp);
++#ifdef USE_LIBC
++  printf ("  Ptr_Comp:          %d\n", (long) Next_Ptr_Glob->Ptr_Comp);
++#else
++  printf ("  Ptr_Comp:          %d\n", (int) Next_Ptr_Glob->Ptr_Comp);  
++#endif
+   printf ("        should be:   (implementation-dependent), same as above\n");
+   printf ("  Discr:             %d\n", Next_Ptr_Glob->Discr);
+   printf ("        should be:   %d\n", 0);

@@ -1,0 +1,512 @@
+#!/bin/sh
+#
+# FSL Build Enviroment Setup Script
+#
+# Copyright (C) 2011-2015 Freescale Semiconductor
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+if [ -z "$ZSH_NAME" ] && echo "$0" |grep -q "fsl-setup-poky"; then
+    echo "Error: This script needs to be sourced."
+    SCRIPT_PATH=`readlink -f $0`
+    if [ "`readlink $SHELL`" = "dash" ];then
+        echo "Try run command \"set -- -h; . $SCRIPT_PATH\" to get help."
+    else
+        echo "Try run command \". $SCRIPT_PATH -h\" to get help."
+    fi
+    unset SCRIPT_PATH
+    exit 1
+else
+    # POKY_DIR is the diretory where this script locates
+    if [ -n "$BASH_SOURCE" ]; then
+        POKY_DIR="`dirname $BASH_SOURCE`"
+    elif [ -n "$ZSH_NAME" ]; then
+        POKY_DIR="`dirname $0`"
+    else
+        POKY_DIR="`pwd`"
+    fi
+    POKY_DIR=`readlink -f "$POKY_DIR"`
+fi
+
+if [ "$(whoami)" = "root" ]; then
+    echo "ERROR: do not use the BSP as root. Exiting..."
+    unset POKY_DIR
+	return 1
+fi
+
+# check if sevaral essential host pkgs are available
+if [ -z "`which xz`" -o -z "`which chrpath`" -o -z "`which gcc`" -o -z "`which make`" ];then
+    echo "
+    ERROR: Please run script '${POKY_DIR}/scripts/host-prepare.sh' first.
+    "
+    unset POKY_DIR
+    return 1
+fi
+
+# Check if meta-fsl-ppc layer exists
+if [ -e ${POKY_DIR}/meta-fsl-ppc ]; then
+    PPC_LAYER_PATH="${POKY_DIR}/meta-fsl-ppc"
+elif [ -e ${POKY_DIR}/../meta-fsl-ppc ]; then
+    PPC_LAYER_PATH="${POKY_DIR}/../meta-fsl-ppc"
+fi
+
+# Check if meta-fsl-arm layer exists
+if [ -e ${POKY_DIR}/meta-fsl-arm ]; then
+    ARM_LAYER_PATH="${POKY_DIR}/meta-fsl-arm"
+elif [ -e ${POKY_DIR}/../meta-fsl-arm ]; then
+    ARM_LAYER_PATH="${POKY_DIR}/../meta-fsl-arm"
+fi
+
+if [ "x$PPC_LAYER_PATH" = x"" ] && [ "x$ARM_LAYER_PATH" = x"" ]; then
+    echo "WARNING: neither of meta-fsl-{ppc,arm} layer locates at ${POKY_DIR} or ${POKY_DIR}/../"
+fi
+
+# Check if meta-fsl-networking layer exists
+if [ -e ${POKY_DIR}/meta-fsl-networking ]; then
+    NETWORKING_LAYER_PATH="${POKY_DIR}/meta-fsl-networking"
+elif [ -e ${POKY_DIR}/../meta-fsl-networking ]; then
+    NETWORKING_LAYER_PATH="${POKY_DIR}/../meta-fsl-networking"
+fi
+
+# Check if meta-fsl-multimedia layer exists
+if [ -e ${POKY_DIR}/meta-fsl-multimedia ]; then
+    MULTIMEDIA_LAYER_PATH="${POKY_DIR}/meta-fsl-multimedia"
+elif [ -e ${POKY_DIR}/../meta-fsl-multimedia ]; then
+    MULTIMEDIA_LAYER_PATH="${POKY_DIR}/../meta-fsl-multimedia"
+fi
+
+# Check if meta-fsl-local-sdk layer exists
+if [ -e ${POKY_DIR}/../meta-fsl-local-sdk ]; then
+    LOCALSDK_LAYER_PATH="${POKY_DIR}/../meta-fsl-local-sdk"
+elif [ -e ${POKY_DIR}/../../meta-fsl-local-sdk ]; then
+    LOCALSDK_LAYER_PATH="${POKY_DIR}/../../meta-fsl-local-sdk"
+fi
+
+# Check if meta-fsl-s32v layer exists
+if [ -e ${POKY_DIR}/../meta-fsl-s32v ]; then
+    S32V_LAYER_PATH="${POKY_DIR}/../meta-fsl-s32v"
+elif [ -e ${POKY_DIR}/../../meta-fsl-s32v ]; then
+    S32V_LAYER_PATH="${POKY_DIR}/../../meta-fsl-s32v"
+fi
+
+if [ -e "$PPC_LAYER_PATH" ]; then
+    if [ -e "$LOCALSDK_LAYER_PATH" ]; then
+        QORIQ_PPC_MACHINE="`ls ${PPC_LAYER_PATH}/conf/machine ${LOCALSDK_LAYER_PATH}/conf/machine | grep "\.conf" | sed s/\.conf//g | xargs echo`"
+    else
+        QORIQ_PPC_MACHINE="`ls ${PPC_LAYER_PATH}/conf/machine | grep "\.conf" | sed s/\.conf//g | xargs echo`"
+    fi
+fi
+if [ -e "$ARM_LAYER_PATH" ]; then
+    if [ -e "${MULTIMEDIA_LAYER_PATH}" ]; then
+        IMX_ARM_MACHINE="`ls ${ARM_LAYER_PATH}/conf/machine | grep -v "^include" | grep -v "^ls" | sed s/\.conf//g | xargs echo`"
+    elif [ -e "${NETWORKING_LAYER_PATH}" ]; then
+        if [ -e "${S32V_LAYER_PATH}/conf/machine" ]; then
+            LS_ARM_MACHINE="`ls ${ARM_LAYER_PATH}/conf/machine ${S32V_LAYER_PATH}/conf/machine | grep "^\(ls2\|s32\)" | sed s/\.conf//g | xargs echo`"
+        elif [ -e "${LOCALSDK_LAYER_PATH}/conf/machine" ]; then
+            LS_ARM_MACHINE="`ls ${ARM_LAYER_PATH}/conf/machine ${LOCALSDK_LAYER_PATH}/conf/machine | grep "^\(ls2\|s32\)" | sed s/\.conf//g | xargs echo`"
+	else
+            LS_ARM_MACHINE="`ls ${ARM_LAYER_PATH}/conf/machine | grep "^\(ls2\|s32\)" | sed s/\.conf//g | xargs echo`"
+        fi
+    fi
+fi
+
+usage()
+{
+    echo "Usage: . $POKY_DIR/fsl-setup-poky <-m machine>"
+    if [ -n "$QORIQ_PPC_MACHINE" ]; then
+        echo "    Supported QorIQ(powerpc) machines: $QORIQ_PPC_MACHINE"
+    fi
+    if [ -n "$IMX_ARM_MACHINE" ]; then
+        echo "    Supported IMX(arm) machines: $IMX_ARM_MACHINE"
+    fi
+    if [ -n "$LS_ARM_MACHINE" ]; then
+        echo "    Supported layerscape(arm) and S32V(arm) machines: $LS_ARM_MACHINE"
+    fi
+    echo "    Optional parameters:
+    * [-j jobs]:  number of jobs for make to spawn during the compilation stage.
+    * [-t tasks]: number of BitBake tasks that can be issued in parallel.
+    * [-d path]:  non-default path of DL_DIR (downloaded source)
+    * [-c path]:  non-default path of SSTATE_DIR (shared state Cache)
+    * [-b path]:  non-default path of project folder (build_\${machine}_release)
+    * [-s string]:  append an extra string to project folder
+    * [-l]:       lite mode. To help conserve disk space, deletes the building
+                  directory once the package is built.
+    * [-p]:       append fsl cache and source mirrors (For FSL Internal Use Only)
+    * [-h]:       help
+    "
+
+    if [ "`readlink $SHELL`" = "dash" ];then
+        echo "
+You are using dash which not pass args when being sourced.
+To workaround this limitation, use \"set -- args\" prior to
+sourcing this script. For exmaple:
+    \$ set -- -m p4080ds -j 3 -t 2
+    \$ . $POKY_DIR/fsl-setup-poky
+        "
+    fi
+}
+
+prompt_message ()
+{
+    echo "Run the following commands to start a build:"
+    local i=''
+
+    if echo "$IMX_ARM_MACHINE" |egrep -q "(${MACHINE}$|${MACHINE} +)"; then
+        if [ -e "${MULTIMEDIA_LAYER_PATH}" ]; then
+            for i in `find ${MULTIMEDIA_LAYER_PATH}/ -name "fsl-image-*.bb"`;do
+                i=${i##*/};i=${i%.bb};
+                echo "    bitbake $i";
+            done
+        fi
+    else
+        if [ -e "${NETWORKING_LAYER_PATH}" ]; then
+            if [ -e "${S32V_LAYER_PATH}" ]; then
+                for i in `find ${S32V_LAYER_PATH}/ -name "fsl-image-*.bb"`;do
+                    i=${i##*/};i=${i%.bb};
+                    echo "    bitbake $i";
+                done
+            else
+                for i in `find ${NETWORKING_LAYER_PATH}/ -name "fsl-image-*.bb"`;do
+                    i=${i##*/};i=${i%.bb};
+                    echo "    bitbake $i";
+                done
+            fi
+        fi
+    fi
+
+    echo "To return to this build environment later please run:"
+    echo "    . $PROJECT_DIR/SOURCE_THIS"
+}
+
+clean_up()
+{
+    unset POKY_DIR PPC_LAYER_PATH ARM_LAYER_PATH NETWORKING_LAYER_PATH \
+        MULTIMEDIA_LAYER_PATH IMX_ARM_MACHINE QORIQ_PPC_MACHINE LS_ARM_MACHINE PROJECT_DIR MACHINE \
+        setup_flag setup_j setup_t setup_lite setup_mirrors setup_help \
+        setup_string setup_build_path setup_dl_path setup_sstate_path \
+		setup_error SKIP_CONFIG user_input APPEND_LAYER_LIST layer append_layer \
+        OLD_OPTIND DISTRO CPUS JOBS THREADS ARCH EULA LOCALSDK_LAYER_PATH S32V_LAYER_PATH
+    unset -f prompt_message usage clean_up
+}
+
+if [ $# -lt 2 ];then
+    usage && clean_up
+    return 1
+fi
+
+# get command line options
+OLD_OPTIND=$OPTIND
+while getopts "m:j:t:s:b:d:c:lph" setup_flag
+do
+    case $setup_flag in
+        m) MACHINE="$OPTARG";
+           ;;
+        j) setup_j="$OPTARG";
+           ;;
+        t) setup_t="$OPTARG";
+           ;;
+        l) setup_lite='true';
+           ;;
+        p) setup_mirrors='true';
+           ;;
+        h) setup_help='true';
+           ;;
+        s) setup_string="$OPTARG";
+           ;;
+        b) setup_build_path="$OPTARG";
+           ;;
+        d) setup_dl_path="$OPTARG";
+           ;;
+        c) setup_sstate_path="$OPTARG";
+           ;;
+        ?) setup_error='true';
+           ;;
+    esac
+done
+OPTIND=$OLD_OPTIND
+
+# check the "-h" and other not supported options
+if test $setup_error || test $setup_help; then
+    usage && clean_up && return 1
+fi
+
+# Check machine name
+if [ -n "$MACHINE" ] && echo "$QORIQ_PPC_MACHINE" |egrep -q "(${MACHINE}$|${MACHINE} +)"; then
+    DISTRO="fsl-networking"
+    APPEND_LAYER_LIST=" \
+		meta-fsl-ppc \
+		meta-fsl-toolchain \
+		meta-fsl-networking \
+		meta-fsl-security \
+		meta-fsl-testing \
+		meta-virtualization \
+		meta-fsl-local-sdk \
+		meta-oe/meta-oe \
+		meta-oe/meta-networking \
+		meta-oe/meta-webserver \
+		meta-oe/meta-ruby \
+		meta-oe/meta-filesystems \
+		meta-java \
+		meta-cloud-services/meta-openstack \
+		meta-cloud-services/meta-openstack-compute-deploy \
+		meta-cloud-services/meta-openstack-controller-deploy \
+		meta-cloud-services/meta-openstack-qemu \
+    "
+elif [ -n "$MACHINE" ] && echo "$IMX_ARM_MACHINE" |egrep -q "(${MACHINE}$|${MACHINE} +)"; then
+    DISTRO="poky"
+    APPEND_LAYER_LIST="meta-fsl-arm meta-fsl-local-sdk meta-oe/meta-oe meta-fsl-multimedia"
+elif [ -n "$MACHINE" ] && echo "$LS_ARM_MACHINE" |egrep -q "(${MACHINE}$|${MACHINE} +)"; then
+    DISTRO="fsl-networking"
+    if echo "$MACHINE" |egrep -q "(ls2|s32)"; then
+        APPEND_LAYER_LIST=" \
+		meta-fsl-arm \
+		meta-fsl-networking \
+		meta-fsl-toolchain \
+		meta-virtualization \
+		meta-fsl-local-sdk \
+                meta-fsl-s32v \
+		meta-oe/meta-oe \
+		meta-oe/meta-networking \
+		meta-oe/meta-python \
+		meta-oe/meta-webserver \
+		meta-oe/meta-filesystems \
+		meta-linaro/meta-linaro \
+		meta-linaro/meta-aarch64 \
+		meta-linaro/meta-linaro-toolchain \
+		meta-cloud-services \
+		meta-cloud-services/meta-openstack \
+		meta-cloud-services/meta-openstack-controller-deploy \
+		meta-fsl-bnsp \
+		meta-fsl-ssp \
+		meta-fsl-tcpoffload \
+		meta-fsl-openflow-base \
+		meta-fsl-openflow-premium \
+        "
+    else
+        APPEND_LAYER_LIST="meta-fsl-arm meta-fsl-networking meta-fsl-toolchain meta-virtualization \
+            meta-fsl-local-sdk meta-oe/meta-oe meta-oe/meta-networking meta-oe/toolchain-layer \
+            meta-linaro/meta-linaro-toolchain"
+    fi
+else
+    echo "ERROR: Specified an invalid machine type!"
+    usage && clean_up && return 1
+fi
+
+# set default jobs and threads
+CPUS=`grep -c processor /proc/cpuinfo`
+#JOBS="$CPUS"
+JOBS="4"
+#THREADS="$CPUS"
+THREADS="4"
+
+# check optional jobs and threads
+if [ -n "$setup_j" ] && echo "$setup_j" | egrep -q "^[0-9]+$"; then
+    JOBS=$setup_j
+fi
+if [ -n "$setup_t" ] && echo "$setup_t" | egrep -q "^[0-9]+$"; then
+    THREADS=$setup_t
+fi
+
+# set project folder location and name
+if test $setup_build_path; then
+    PROJECT_DIR=`pwd`/${setup_build_path}
+else
+    PROJECT_DIR=`pwd`/build_${MACHINE}_release
+fi
+if test $setup_string; then
+    PROJECT_DIR=${PROJECT_DIR}_${setup_string}
+fi
+PROJECT_DIR=`readlink -f "$PROJECT_DIR"`
+
+# check if project folder was created before
+if [ -e "$PROJECT_DIR/conf/local.conf" ]; then
+    echo "$PROJECT_DIR was created before. Override its configuration files? Y|n"
+    read user_input
+    if [ -z "$user_input" ] || echo $user_input |grep -q "^[Yy]";then
+        SKIP_CONFIG="0"
+        mv -f $PROJECT_DIR/conf/local.conf $PROJECT_DIR/conf/local.conf.bak ||true
+        mv -f $PROJECT_DIR/conf/bblayers.conf $PROJECT_DIR/conf/bblayers.conf.bak ||true
+        mv -f $PROJECT_DIR/conf/hob-pre.conf $PROJECT_DIR/conf/hob-pre.conf.bak ||true
+    else
+        SKIP_CONFIG="1"
+    fi
+fi
+
+# source oe-init-build-env to init build env
+cd $POKY_DIR
+set -- $PROJECT_DIR
+. ./oe-init-build-env > /dev/null
+
+# check result of sourcing oe-init-build-env
+if [ "`pwd -P`" != "$BUILDDIR" ];then
+	clean_up && return 1
+fi
+
+if [ "x${SKIP_CONFIG}" = "x1" ]; then
+    echo "Your configuration files at $PROJECT_DIR/conf/ has not been touched."
+    prompt_message && clean_up
+    return
+else
+	# add layers
+	for layer in $(eval echo $APPEND_LAYER_LIST); do
+        append_layer=""
+        if [ -e ${POKY_DIR}/${layer} ]; then
+            append_layer="${POKY_DIR}/${layer}"
+        elif [ -e ${POKY_DIR}/../${layer} ]; then
+            append_layer="${POKY_DIR}/../${layer}"
+        elif [ "x${layer}" = "xmeta-fsl-local-sdk" ] && [ -e ${POKY_DIR}/../../${layer} ]; then
+            append_layer="${POKY_DIR}/../../${layer}"
+        fi
+        if [ -n "${append_layer}" ]; then
+            append_layer=`readlink -f $append_layer`
+            awk '/  \"/ && !x {print "'"  ${append_layer}"' \\"; x=1} 1' conf/bblayers.conf > conf/bblayers.conf~
+            mv conf/bblayers.conf~ conf/bblayers.conf
+        fi
+    done
+
+    # setup machine/distro
+    sed -e "s,MACHINE ??=.*,MACHINE ??= '$MACHINE',g" \
+        -e "s,DISTRO ?=.*,DISTRO ?= '$DISTRO',g" \
+        -i conf/local.conf
+
+    # setup dl_dir
+    echo "# Source download dir" >> conf/local.conf
+    if test $setup_dl_path; then
+        echo "DL_DIR = \"$setup_dl_path\"" >> conf/local.conf
+    else
+        echo "DL_DIR = \"$PROJECT_DIR/../sources\"" >> conf/local.conf
+    fi
+    echo >> conf/local.conf
+
+    # setup cache dir
+    echo "# The sstate-cache dir" >> conf/local.conf
+    if test $setup_sstate_path; then
+        echo "SSTATE_DIR = \"$setup_sstate_path\"" >> conf/local.conf
+    else
+        echo "SSTATE_DIR = \"$PROJECT_DIR/../sstate-cache\"" >> conf/local.conf
+    fi
+    echo >> conf/local.conf
+
+    # mirror host specific sstate-cache to common native directory
+    cat >> conf/local.conf <<-EOF
+	INHERIT += "own-mirrors"
+	SSTATE_MIRRORS = "file://.*/(.*)/(.*) file://\${SSTATE_DIR}/native/\\1/\\2 \\n"
+EOF
+
+    cat >> conf/local.conf <<-EOF
+	# Parallelism Options
+	BB_NUMBER_THREADS = "$THREADS"
+	PARALLEL_MAKE = "-j $JOBS"
+
+	# use xz instead of gzip for sstate-cache
+	SSTATE_PKG_SUFFIX = "txz"
+	SSTATE_PKG_TARZIPPROG = "xz"
+
+	# whiteliste restricted license
+	LICENSE_FLAGS_WHITELIST = "non-commercial_netperf"
+
+	# copy the license.manifest to the image
+	COPY_LIC_MANIFEST = "1"
+
+	# disable network check as we support offline build with sdk iso
+	CONNECTIVITY_CHECK_URIS = ""
+EOF
+
+    # setup fsl private mirrors
+    if [ ! -z "$setup_mirrors" ];then
+        echo "# Packages source and sstate-cache mirrors" >> conf/local.conf
+        cat >> conf/local.conf <<-EOF
+		SOURCE_MIRROR_URL = "http://nas101.am.freescale.net/yocto/downloads/"
+		SSTATE_MIRRORS += "file://(.*)/(.*) http://nas101.am.freescale.net/yocto/sstate-cache/\\1/\\2 \\n"
+		SSTATE_MIRRORS += "file://.*/(.*)/(.*) http://nas101.am.freescale.net/yocto/sstate-cache/native/\\1/\\2 \\n"
+EOF
+    fi
+
+    # option to enable lite mode for now
+    if test $setup_lite; then
+        echo "# delete sources after build" >> conf/local.conf
+        echo "INHERIT += \"rm_work\"" >> conf/local.conf
+        echo >> conf/local.conf
+    fi
+
+    # set meta-oe layer with lowest priority
+    if [ -e ${POKY_DIR}/meta-oe/meta-oe ] || [ -e ${POKY_DIR}/../meta-oe/meta-oe ]; then
+        echo "BBFILE_PRIORITY_openembedded-layer = \"1\"" >> conf/local.conf
+        echo >> conf/local.conf
+    fi
+
+    if echo "$MACHINE" |egrep -q "^(b4|p5|t1|t2|t4)"; then
+        # disable prelink for e5500/e6500
+        sed -i s/image-mklibs.image-prelink/image-mklibs/g conf/local.conf
+    fi
+
+    if echo "$IMX_ARM_MACHINE" |egrep -q "(${MACHINE}$|${MACHINE} +)"; then
+        # Handle EULA setting
+        if [ -z "$EULA" ] && ! grep -q '^ACCEPT_FSL_EULA\s*=' conf/local.conf; then
+            EULA='ask'
+            cat <<-EOF
+
+			Some SoC depends on libraries and packages that are covered by
+			Freescale EULA. To have the right to use those binaries in your images
+			you need to read and accept the EULA that will be displayed.
+
+EOF
+        sleep 4
+
+        more -d ${ARM_LAYER_PATH}/EULA
+        echo
+        while [ "$EULA" = "ask" ]; do
+            echo "Do you accept the EULA you just read? (y/n) "
+            read REPLY
+            case "$REPLY" in
+                y|Y)
+                echo "EULA has been accepted."
+                EULA="1"
+                ;;
+                n|N)
+                echo "EULA has not been accepted."
+                EULA="0"
+                ;;
+            esac
+        done
+        fi
+        if grep -q '^ACCEPT_FSL_EULA\s*=' conf/local.conf; then
+            sed -i "s/^#*ACCEPT_FSL_EULA\s*=.*/ACCEPT_FSL_EULA = \"$EULA\"/g" conf/local.conf
+        else
+            echo "ACCEPT_FSL_EULA = \"$EULA\"" >> conf/local.conf
+        fi
+    fi
+
+    echo "# add uboot image types to hob" >> conf/hob-pre.conf
+    echo "INHERIT += \"image_types_uboot\"" >> conf/hob-pre.conf
+    echo >> conf/hob-pre.conf
+
+    # make an empty hob-post.conf to avoid message about missing file
+    echo >> conf/hob-post.conf
+
+    # make a SOURCE_THIS file
+    if ! [ -e SOURCE_THIS ];then
+        echo "#!/bin/sh" >> SOURCE_THIS
+        echo "cd ${POKY_DIR}" >> SOURCE_THIS
+        echo "set -- $PROJECT_DIR" >> SOURCE_THIS
+        echo ". ./oe-init-build-env > /dev/null" >> SOURCE_THIS
+        echo "echo \"Back to build project $PROJECT_DIR.\"" >> SOURCE_THIS
+    fi
+
+fi
+
+prompt_message
+cd $PROJECT_DIR
+clean_up

@@ -1,0 +1,29 @@
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2085a-rdb.dts b/arch/arm64/boot/dts/freescale/fsl-ls2085a-rdb.dts
+index 3837b22..152aeae 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2085a-rdb.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2085a-rdb.dts
+@@ -62,7 +62,7 @@
+ 		reg = <0x75>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+-		status = "disabled";
++		i2c-mux-never-disable;
+ 		i2c@1 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+@@ -91,7 +91,14 @@
+ };
+ 
+ &i2c2 {
+-	status = "disabled";
++	status = "okay";
++	pca9547@77 {
++		compatible = "nxp,pca9547";
++		reg = <0x77>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++		i2c-mux-never-disable;
++	};
+ };
+ 
+ &i2c3 {

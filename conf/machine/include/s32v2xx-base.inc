@@ -49,9 +49,6 @@ MIRRORS += " \
 # Include downloads folder
 FSL_LOCAL_MIRROR ?= "file://${TOPDIR}/../downloads"
 
-# add source mirror to git.freescale.com
-SOURCE_MIRROR_URL ?= "http://git.freescale.com/source/"
-
 # Specific jpeg package
 PREFERRED_PROVIDER_jpeg = "libjpeg-turbo"
 PREFERRED_PROVIDER_jpeg-native = "libjpeg-turbo-native"

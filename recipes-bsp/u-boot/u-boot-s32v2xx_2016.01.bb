@@ -22,7 +22,7 @@ DEFAULT_PREFERENCE = "-1"
 SCMVERSION = "y"
 LOCALVERSION = ""
 
-SRC_URI = "git://git.freescale.com/auto/u-boot.git;protocol=git;branch=master"
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 #SRC_URI = "git://sw-stash.freescale.net/scm/alb/u-boot.git;protocol=http;branch=develop"
 #SRCREV = "${AUTOREV}"
 #SRC_URI = "git://sw-stash.freescale.net/scm/alb/u-boot.git;protocol=http;branch=develop;tag=efe143d62a0f7eabca968bf4cc340f4d96938e37"

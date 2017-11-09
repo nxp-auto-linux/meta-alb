@@ -1,6 +1,6 @@
 require recipes-kernel/linux/linux-s32v2xx.inc
 
-SRC_URI = "git://git.freescale.com/auto/linux.git;protocol=git;branch=master"
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master"
 
 # If a different repo or revision is needed, use the SRC_URI and SRCREV override mechanism.
 # See layer README.FIRST for details.

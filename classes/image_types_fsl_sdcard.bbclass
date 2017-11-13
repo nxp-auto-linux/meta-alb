@@ -84,6 +84,7 @@ BOOTDD_VOLUME_ID ?= "boot_${MACHINE}"
 
 # Boot partition size [in KiB]
 BOOT_SPACE ?= "8192"
+BOOT_SPACE_s32v234evb ?= "20480"
 
 # Barebox environment size [in KiB]
 BAREBOX_ENV_SPACE ?= "512"
@@ -107,6 +108,8 @@ SDCARD_GENERATION_COMMAND_mx5 = "generate_imx_sdcard"
 SDCARD_GENERATION_COMMAND_mx6 = "generate_imx_sdcard"
 SDCARD_GENERATION_COMMAND_vf = "generate_imx_sdcard"
 SDCARD_GENERATION_COMMAND_s32v2xx = "generate_imx_sdcard"
+
+SDCARD_ADD_INITRAMFS_s32v234evb = "add_initramfs"
 
 add_initramfs() {
         mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot ::/rootfs.uimg

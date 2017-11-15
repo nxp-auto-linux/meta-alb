@@ -106,6 +106,17 @@ To add GPU drivers to S32V234 rootfs, follow the steps as below:
 Tips and tricks
 ===============
 
+- Use CAF mirrors instead of git.freescale.com
+	An easy way to change the existing mirrors is to add the following line in conf/local.conf file:
+	PREMIRRORS_prepend = "\
+<current-mirror-url>  <new-mirror-url> \n "
+	
+	S32V2XX Linux Kernel examples :
+	PREMIRRORS_prepend = "\
+git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master  https://bitbucket.sw.nxp.com/scm/alb/linux.git;protocol=http;branch=develop \n "
+	PREMIRRORS_prepend = "\
+http://git.freescale.com/git/cgit.cgi/auto/linux.git;protocol=https;branch=master  git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master \n "
+
 - SRCREV and SRC_URI override
     An easy way to override the SRCREV and SRC_URI for any project without changing recipes is to specify it in
     conf/local.conf using:

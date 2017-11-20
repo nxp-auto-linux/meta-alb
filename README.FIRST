@@ -113,9 +113,10 @@ Tips and tricks
 	
 	S32V2XX Linux Kernel examples :
 	PREMIRRORS_prepend = "\
-git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master  https://bitbucket.sw.nxp.com/scm/alb/linux.git;protocol=http;branch=develop \n "
+git://source.codeaurora.org/external/autobsps32/linux;protocol=https  git://bitbucket.sw.nxp.com/scm/alb/linux.git;protocol=https;branch=alb/master \n "
+
 	PREMIRRORS_prepend = "\
-http://git.freescale.com/git/cgit.cgi/auto/linux.git;protocol=https;branch=master  git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master \n "
+git://sw-stash.freescale.net/scm/alb/linux.git;protocol=https  git://bitbucket.sw.nxp.com/scm/alb/linux.git;protocol=https;branch=develop \n "
 
 - SRCREV and SRC_URI override
     An easy way to override the SRCREV and SRC_URI for any project without changing recipes is to specify it in

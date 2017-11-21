@@ -41,6 +41,15 @@ do_compile_append() {
             for binary in ${UBOOT_BINARIES}; do
                 k=`expr $k + 1`
                 if [ $j -eq $i ] && [ $k -eq $i ]; then
+                    # Generate an u-boot image which can be flashed and booted via QSPI
+                    if [ "qspi" = "${type}" ];then
+                        cp -r ${S}/tools/s32v234-qspi/ ${B}/${config}/tools/s32v234-qspi/
+                        cd ${B}/${config}/tools/s32v234-qspi/
+                        oe_runmake
+                        cp ${B}/${config}/tools/s32v234-qspi/${binary}.qspi ${B}/${config}/${binary}
+                        cp ${B}/${config}/${binary} ${B}/${config}/u-boot-${type}.${UBOOT_SUFFIX}
+                        cd -
+                    fi
                     cp ${config}/${binary} ${config}/u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX}
                 fi
             done

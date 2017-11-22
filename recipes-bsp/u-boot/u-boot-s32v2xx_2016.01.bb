@@ -28,7 +28,7 @@ SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https
 #SRC_URI = "git://sw-stash.freescale.net/scm/alb/u-boot.git;protocol=http;branch=develop;tag=efe143d62a0f7eabca968bf4cc340f4d96938e37"
 
 # bsp15.0
-SRCREV = "5c2fb7f29dd3988666ec9752cae444ea1bb3ae17"
+SRCREV = "ea5ec85041f4fde751415fd6eccc5409aaefb6fb"
 
 inherit cml1
 

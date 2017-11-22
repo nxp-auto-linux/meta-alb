@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
 SRC_URI = "git://sw-stash.freescale.net/scm/alb/alb-demos.git;branch=develop;protocol=http"
 
 S = "${WORKDIR}/git"
-SRCREV = "9a15f519b43aceda6fa5466ced1c92f41ee733b3"
+SRCREV = "28323d167ac06318077a1c9532048a3c0bd57e33"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 

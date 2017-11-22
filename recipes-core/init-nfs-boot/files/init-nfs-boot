@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright 2017 NXP
 # Boot Linux from ramdisk, start networking services, insert kernel modules
 # Boot actual rootfs from NFS, as provided by command line parameters
 
@@ -118,7 +119,7 @@ if [ "$ip" ] && [ "$device" ]; then
     if [ -r "/var/run/udhcpc.$device.pid" ]; then
         kill -9 $(cat /var/run/udhcpc.$device.pid)
     fi
-    ifconfig "$device" "$ip" "${netmask:+netmask $netmask}"
+    ifconfig "$device" "$ip" ${netmask:+netmask $netmask}
     if [ "x$gwip" != "x" ]; then
         ip route add default via $gwip dev $device
     fi

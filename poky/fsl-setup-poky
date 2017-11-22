@@ -403,6 +403,7 @@ else
     cat >> conf/local.conf <<-EOF
 	INHERIT += "own-mirrors"
 	SSTATE_MIRRORS = "file://.*/(.*)/(.*) file://\${SSTATE_DIR}/native/\\1/\\2 \\n"
+	PREMIRRORS_prepend = " git://sw-stash.freescale.net/  git://bitbucket.sw.nxp.com/;protocol=https \n "
 EOF
 
     cat >> conf/local.conf <<-EOF

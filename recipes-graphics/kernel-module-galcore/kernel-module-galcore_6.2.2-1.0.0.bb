@@ -9,17 +9,15 @@ SECTION = "libs"
 LICENSE = "GPL-2.0"
 
 PROVIDES += "kernel-module-galcore"
-SRC_URI = "${FSL_LOCAL_MIRROR}/gpu_drivers/Galcore_kernel_module/galcore_s32v234_6.2.2.tar.gz \
-	   file://COPYING \
-	   file://Makefile \
-	   file://build.sh \
-	  "
+SRC_URI = " git://source.codeaurora.org/external/autobsps32/galcore;branch=alb/master;protocol=https "
+SRCREV = "958bb57e23202104b5f903728e124418f021cfe1"
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=6731edef2727e51a061f498b5d6a282a"
+
+LIC_FILES_CHKSUM = "file://GPLv2;md5=fcb02dc552a041dee27e4b85c7396067"
 
 PR = "r0"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/git"
 
 # MACHINE_EXTRA_RRECOMMENDS += "kernel-module-galcore"
 

@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8c0323a6a5e94cd2a72b8fb935e90fcd"
 
 inherit module
 
-SRC_URI = "git://sw-stash.freescale.net/scm/~b36037/icc-linux.git;protocol=http;branch=${SRCBRANCH}"
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/icc-linux;branch=alb/master;protocol=https;branch=alb/master"
 
 export INSTALL_MOD_DIR="kernel/icc-linux"
 

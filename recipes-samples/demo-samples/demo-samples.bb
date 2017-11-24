@@ -3,12 +3,14 @@
 # the readme file of the yocto layer.
 #
 
-LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://COPYING;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
-SRC_URI = "git://sw-stash.freescale.net/scm/alb/alb-demos.git;branch=develop;protocol=http"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=d1fe458e57ae72e9abc9aff2684690d0"
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/alb-demos;branch=alb/master;protocol=https"
+
+SRC_URI[md5sum] = "fb105258940e1a6730f8db534b2f9b37"
 
 S = "${WORKDIR}/git"
-SRCREV = "9a15f519b43aceda6fa5466ced1c92f41ee733b3"
+SRCREV = "fddce98e559d44f136cbc716ddff69831243d29e"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 

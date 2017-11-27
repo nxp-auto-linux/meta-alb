@@ -10,7 +10,7 @@ SRC_URI = "git://source.codeaurora.org/external/autobsps32/alb-demos;branch=alb/
 SRC_URI[md5sum] = "fb105258940e1a6730f8db534b2f9b37"
 
 S = "${WORKDIR}/git"
-SRCREV = "fddce98e559d44f136cbc716ddff69831243d29e"
+SRCREV = "28323d167ac06318077a1c9532048a3c0bd57e33"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 

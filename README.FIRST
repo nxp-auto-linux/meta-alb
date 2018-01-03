@@ -1,0 +1,51 @@
+OpenEmbedded/Yocto Linux BSP for NXP Auto platforms
+===================================================
+
+First time setup
+================
+
+If you haven't installed any Linux BSP before, run ./poky/scripts/host-prepare.sh
+
+Creating Build Directories and Testing the Installation
+=======================================================
+
+Now you can create a build directory in the SDK root with, e.g.,
+
+ . setup-env -D fsl-s32 -e meta-alb -m s32v234evb
+
+When this is done, a "bitbake <imagename>", e.g.,
+
+ bitbake u-boot
+ bitbake virtual/kernel
+
+would build u-boot and the linux kernel, respectivelly.
+
+ bitbake fsl-image-s32v2xx
+
+would be enough to completely build u-boot, kernel, modules, and a
+rootfs ready to be deployed. Look for a build result in
+<builddirectory>/tmp/deploy/images/.
+The .sdcard format creates an image with all necessary partitions and 
+loads the bootloader, kernel and rootfs to this image. You can just low 
+level copy the data on this file to the SD card device using dd as on 
+the following command example:
+
+ sudo dd if=<image name>.sdcard of=/dev/sd<partition> bs=1M && sync
+ 
+Ensure that any partitions on the card are properly 
+unmounted before writing the card image, or you may have a corrupted card 
+image in the end. Also ensure to properly "sync" the filesystem before 
+ejecting the card to ensure all data has been written.
+
+Note that builds with bitbake accumulate in the deployment directory.
+You may want to delete older irrelevant images after repeated builds.
+The very first build ever will take very long because a lot of
+one-time house keeping and building has to happen. You want to
+have a powerful build machine.
+
+Note the SOURCE_THIS file to be used when going back to building
+with a new shell.
+
+To deploy any rootfs to the target, simply "tar -xzf" the resulting
+compressed tar archive as root(!) to the destination partition.
+

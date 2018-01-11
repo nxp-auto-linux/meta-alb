@@ -1,6 +1,7 @@
 require conf/machine/include/soc-family.inc
 require conf/machine/include/arm/arch-arm64.inc
 
+SOC_FAMILY = "s32"
 
 # Provides the common settings for S32 targets
 # Machines may include this file directly, if little to no changes are
@@ -31,8 +32,6 @@ MACHINE_FEATURES ?= "pci ext2 ext3 serial"
 MACHINE_EXTRA_RRECOMMENDS += "udev-extraconf kernel-modules"
 
 EXTRA_IMAGEDEPENDS += "u-boot cst-native"
-
-MACHINEOVERRIDES =. "s32:"
 
 # Sub-architecture support
 MACHINE_SOCARCH_SUFFIX ?= ""

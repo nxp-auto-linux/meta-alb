@@ -1,3 +1,7 @@
+require recipes-bsp/u-boot/u-boot.inc
+inherit fsl-u-boot-localversion
+DESCRIPTION = "U-boot provided by NXP with focus on S32 chipsets"
+PROVIDES = "virtual/bootloader u-boot"
 
 LICENSE = "GPLv2 & BSD-3-Clause & BSD-2-Clause & LGPL-2.0 & LGPL-2.1"
 LIC_FILES_CHKSUM = " \
@@ -7,11 +11,6 @@ LIC_FILES_CHKSUM = " \
     file://Licenses/lgpl-2.0.txt;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
     file://Licenses/lgpl-2.1.txt;md5=4fbd65380cdd255951079008b364516c \
 "
-
-require recipes-bsp/u-boot/u-boot.inc
-inherit fsl-u-boot-localversion
-DESCRIPTION = "U-boot provided by NXP with focus on S32 chipsets"
-PROVIDES += "u-boot"
 
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native"
@@ -23,12 +22,12 @@ SRCREV = "177623fd342a5344a581d44893a33c272a083f64"
 
 SRC_URI += "file://fix-build-error-under-gcc6.patch"
 
-DEFAULT_PREFERENCE = "-1"
-
-UBOOT_LOCALVERSION = "${SDK_VERSION}"
-
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}" V=1'
 EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
+
+inherit fsl-u-boot-localversion
+SCMVERSION = "y"
+LOCALVERSION = ""
 
 USRC ?= ""
 S = '${@base_conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
@@ -46,46 +45,6 @@ do_compile_append() {
                 fi
             done
             unset k
-        done
-        unset j
-    done
-    unset i
-}
-
-do_install(){
-    cd ${S}
-    install -d ${D}/boot
-    unset i j
-    for config in ${UBOOT_MACHINE}; do
-        i=`expr $i + 1`;
-        for type in ${UBOOT_CONFIG}; do
-            j=`expr $j + 1`;
-            if [ $j -eq $i ]; then
-                install ${config}/u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${D}/boot/
-                ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${D}/boot/u-boot-${type}.${UBOOT_SUFFIX}
-                ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${D}/boot/${UBOOT_SYMLINK}
-                ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${D}/boot/${UBOOT_BINARY}
-            fi
-        done
-        unset j
-    done
-    unset i
-}
-
-do_deploy(){
-    cd ${S}
-    install -d ${DEPLOYDIR}
-    unset i j
-    for config in ${UBOOT_MACHINE}; do
-        i=`expr $i + 1`;
-        for type in ${UBOOT_CONFIG}; do
-            j=`expr $j + 1`;
-            if [ $j -eq $i ]; then
-                install ${config}/u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${DEPLOYDIR}/
-                ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${DEPLOYDIR}/u-boot-${type}.${UBOOT_SUFFIX}
-                ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${DEPLOYDIR}/${UBOOT_SYMLINK}
-                ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${DEPLOYDIR}/${UBOOT_BINARY}
-            fi
         done
         unset j
     done

@@ -10,23 +10,31 @@ SOC_FAMILY = "s32"
 # created for various families (e.g. s32v-base.inc, s32g-base.inc etc)
 
 KERNEL_IMAGETYPE ?= "Image"
+
 UBOOT_MACHINE ?= "${MACHINE}_config"
+UBOOT_MACHINE_SDCARD ?= "${MACHINE}"
 
-
-# S32V BSP default providers
+# S32 BSP default providers
 PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/kernel = "linux-s32"
 
-# ??? TODO to check
-#IMAGE_FSTYPES += "ext3 sdcard"
-#SDCARD_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.ext3"
-#IMAGE_FSTYPES_remove = "jffs2 ubi ext2.gz ext2.gz.u-boot"
+UBOOT_BOOTSPACE_SEEK ?= "8"
+UBOOT_SUFFIX ?= "s32"
+UBOOT_KERNEL_IMAGETYPE ?= "Image"
+UBOOT_ENTRYPOINT ?= "80080000"
 
-#IMAGE_CLASSES += "image_types_uboot"
+# we do not want to have getty running on tty1 as we run
+# auto-serial-console there USE_VT = "0"
+SERIAL_CONSOLE = "115200 ttyLF0"
 
 SOC_DEFAULT_IMAGE_FSTYPES = "tar.gz"
 IMAGE_FSTYPES ?= "${SOC_DEFAULT_IMAGE_FSTYPES}"
+
+IMAGE_FSTYPES += "ext3"
+#IMAGE_FSTYPES += "sdcard"
+#SDCARD_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.ext3"
+#IMAGE_CLASSES += "image_types_uboot"
 
 MACHINE_FEATURES ?= "pci ext2 ext3 serial"
 MACHINE_EXTRA_RRECOMMENDS += "udev-extraconf kernel-modules"
@@ -40,4 +48,3 @@ MACHINE_SOCARCH_SUFFIX_s32 = "-s32"
 MACHINE_ARCH_FILTER = "virtual/kernel"
 
 INHERIT += "fsl-dynamic-packagearch"
-

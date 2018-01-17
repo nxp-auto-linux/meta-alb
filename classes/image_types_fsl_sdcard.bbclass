@@ -167,6 +167,46 @@ generate_fsl_lsch3_sdcard () {
         dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${SDCARD_BINARY_SPACE} \* 1024)
 }
 
+generate_imx_sdcard () {
+	# Create partition table
+	parted -s ${SDCARD} mklabel msdos
+	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
+	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ $ROOTFS_SIZE)
+	parted ${SDCARD} print
+
+	# Burn bootloader
+	case "${IMAGE_BOOTLOADER}" in
+		imx-bootlets)
+		bberror "The imx-bootlets is not supported for i.MX based machines"
+		exit 1
+		;;
+		u-boot)
+		if [ -n "${SPL_BINARY}" ]; then
+			dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=2 bs=512
+			dd if=${DEPLOY_DIR_IMAGE}/u-boot-${MACHINE}.${UBOOT_SUFFIX_SDCARD} of=${SDCARD} conv=notrunc seek=69 bs=1K
+		else
+			dd if=${DEPLOY_DIR_IMAGE}/u-boot-${MACHINE}.${UBOOT_SUFFIX_SDCARD} of=${SDCARD} conv=notrunc seek=${UBOOT_BOOTSPACE_SEEK} bs=512
+		fi
+		;;
+		barebox)
+		dd if=${DEPLOY_DIR_IMAGE}/barebox-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 skip=1 bs=512
+		dd if=${DEPLOY_DIR_IMAGE}/bareboxenv-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 bs=512k
+		;;
+		"")
+		;;
+		*)
+		bberror "Unknown IMAGE_BOOTLOADER value"
+		exit 1
+		;;
+	esac
+
+	_generate_boot_image 1
+
+	# Burn Partition
+	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+}
+
 generate_sdcardimage_entry() {
         FLASHIMAGE_FILE="$1"
         FLASHIMAGE_FILE_OFFSET_NAME="$2"

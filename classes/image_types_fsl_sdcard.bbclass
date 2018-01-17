@@ -190,9 +190,26 @@ IMAGE_CMD_sdcard () {
 		exit 1
 	fi
 
+	if [ -n "${UBOOT_BOOTSPACE_OFFSET}" ]; then
+		UBOOT_BOOTSPACE_OFFSET=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET})
+	else
+		UBOOT_BOOTSPACE_OFFSET=$(expr ${UBOOT_BOOTSPACE_SEEK} \* 512)
+	fi
+
 	# Align boot partition and calculate total SD card image size
 	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE} + ${IMAGE_ROOTFS_ALIGNMENT} - 1)
 	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE_ALIGNED} - ${BOOT_SPACE_ALIGNED} % ${IMAGE_ROOTFS_ALIGNMENT})
+
+	# If the size has not been preset, we default to flash image
+	# sizes if available turned into [KiB] or to a hardcoded mini
+	# default of 4MB.
+	if [ -z "${SDCARD_BINARY_SPACE}" ]; then
+		if [ -n "${FLASHIMAGE_SIZE}" ]; then
+			SDCARD_BINARY_SPACE=$(expr ${FLASHIMAGE_SIZE} \* 1024)
+		else
+			SDCARD_BINARY_SPACE=4096
+		fi
+	fi
 	SDCARD_SIZE=$(expr ${IMAGE_ROOTFS_ALIGNMENT} + ${BOOT_SPACE_ALIGNED} + $ROOTFS_SIZE + ${IMAGE_ROOTFS_ALIGNMENT})
 
 	# Initialize a sparse file
@@ -211,3 +228,4 @@ IMAGE_CMD_sdcard () {
 
 	${SDCARD_GENERATION_COMMAND}
 }
+

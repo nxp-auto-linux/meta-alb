@@ -73,6 +73,7 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
 "
 SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
+SDCARD_GENERATION_COMMAND_s32 = "generate_imx_sdcard"
 
 #
 # Create an image that can by written onto a SD card using dd for use

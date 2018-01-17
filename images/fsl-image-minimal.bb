@@ -26,4 +26,4 @@ IMAGE_INSTALL_append_fsl-lsch3 += " \
     restool \
 "
 
-IMAGE_FSTYPES = "tar.gz"
+IMAGE_FSTYPES ?= "tar.gz"

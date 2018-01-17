@@ -32,9 +32,14 @@ SOC_DEFAULT_IMAGE_FSTYPES = "tar.gz"
 IMAGE_FSTYPES ?= "${SOC_DEFAULT_IMAGE_FSTYPES}"
 
 IMAGE_FSTYPES += "ext3"
-#IMAGE_FSTYPES += "sdcard"
-#SDCARD_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.ext3"
 #IMAGE_CLASSES += "image_types_uboot"
+
+# Specific definitions for .sdcard image generation
+IMAGE_FSTYPES += "sdcard"
+SDCARD_ROOTFS = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ext3"
+UBOOT_TYPE_SDCARD = "${MACHINE}"
+UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
+IMAGE_CLASSES += "image_types_fsl_sdcard"
 
 MACHINE_FEATURES ?= "pci ext2 ext3 serial"
 MACHINE_EXTRA_RRECOMMENDS += "udev-extraconf kernel-modules"

@@ -19,7 +19,7 @@
 #
 # Add options for the script
 # Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
-# Copyright (C) 2016,2017 NXP Semiconductor
+# Copyright (C) 2016-2018 NXP Semiconductor
 #  Modifications by:
 #          Heinz Wrobel <heinz.wrobel@nxp.com>
 #          Ionut Vicovan <ionut.vicovan@nxp.com>
@@ -73,7 +73,7 @@ PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
 local i=''
-echo "Welcome to Freescale QorIQ SDK (Reference Distro)
+echo "Welcome to NXP Auto Linux BSP (Reference Distro)
 
 The Yocto Project has extensive documentation about OE including a
 reference manual which can be found at:
@@ -86,9 +86,13 @@ You can now run 'bitbake <target>'
 "
     echo "Targets specific to NXP:"
     for layer in $(eval echo $LAYER_LIST); do
-	for i in `ls ${ROOTDIR}/sources/$layer/recipes-*/images/fsl*.bb 2>/dev/null`;do
-	    i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
-            echo "    $i";
+        for i in `ls ${ROOTDIR}/sources/$layer/recipes-*/images/fsl*.bb 2>/dev/null`;do
+            i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
+                echo "    $i";
+        done
+        for i in `ls ${ROOTDIR}/sources/$layer/images/fsl*.bb 2>/dev/null`;do
+            i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
+                echo "    $i";
         done
     done
 

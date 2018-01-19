@@ -5,6 +5,10 @@ SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;
 # BSP15.0
 SRCREV = "2433cb4d0d533a6556f229b9974ef96063884394"
 
+DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += " \
+    ${THISDIR}/linux-s32/build/blueboxconfig_s32v234pcie \
+"
+
 DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "${THISDIR}/linux-s32/build/vnet_s32.cfg"
 
 # LXC configuration

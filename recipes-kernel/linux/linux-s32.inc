@@ -26,11 +26,11 @@ do_preconfigure_prepend() {
     # add config fragments
     for deltacfg in ${DELTA_KERNEL_DEFCONFIG}; do
         if [ -f "${deltacfg}" ]; then
-            ${S}/scripts/kconfig/merge_config.sh -m .config ${deltacfg}
+            ${S}/scripts/kconfig/merge_config.sh -m ${B}/.config ${deltacfg}
         elif [ -f "${WORKDIR}/${deltacfg}" ]; then
-            ${S}/scripts/kconfig/merge_config.sh -m .config ${WORKDIR}/${deltacfg}
+            ${S}/scripts/kconfig/merge_config.sh -m ${B}/.config ${WORKDIR}/${deltacfg}
         elif [ -f "${S}/arch/${ARCH}/configs/${deltacfg}" ]; then
-            ${S}/scripts/kconfig/merge_config.sh -m .config \
+            ${S}/scripts/kconfig/merge_config.sh -m ${B}/.config \
                 ${S}/arch/${ARCH}/configs/${deltacfg}
         fi
     done

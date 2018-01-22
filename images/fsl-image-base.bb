@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017,2018 NXP
+# Copyright 2017-2018 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -22,8 +22,17 @@ IMAGE_INSTALL += " \
     setserial \
 "
 
+# Add pciutils package
+IMAGE_INSTALL += "pciutils"
+
+# Add iputils package, for ping support
+IMAGE_INSTALL += "iputils"
+
 IMAGE_INSTALL_append_fsl-lsch3 += " \
     restool \
 "
+
+# Support for SJA1105 swich under Linux
+IMAGE_INSTALL_append_s32v2xx = " sja1105 "
 
 IMAGE_FSTYPES ?= "tar.gz"

@@ -1,0 +1,145 @@
+#!/bin/bash
+# Boot Linux from ramdisk, start networking services, insert kernel modules
+# Boot actual rootfs from NFS, as provided by command line parameters
+
+# Mount the root device if it exists
+nfsmountroot( )
+{
+    if [ -z "$nfsroot" ]; then
+        echo "Did not specify \"nfsroot=\" option."
+        return
+    fi
+
+    if [ "${readonly}" = "y" ]; then
+        roflag=-r
+    else
+        roflag=-w
+    fi
+
+    echo -n "Attempting to mount ${nfsroot} on ${rootmnt}... "
+    mount.nfs ${roflag} ${nfsrootopts} ${nfsroot} ${rootmnt} 2>/dev/null
+    mountstatus=$?
+    if [ "${mountstatus}" = "0" ]; then
+        echo "Succeeded mounting ${nfsroot}"
+    else
+        echo "Failed to mount ${nfsroot}"
+        return
+    fi
+
+    if [ -x "${rootmnt}/${init}" ]; then
+        umount /sys /proc
+        exec switch_root ${rootmnt} "${init}"
+    fi
+}
+
+[ -d /dev ] || mkdir -m 0755 /dev
+[ -d /root ] || mkdir -m 0700 /root
+[ -d /sys ] || mkdir /sys
+[ -d /proc ] || mkdir /proc
+[ -d /tmp ] || mkdir /tmp
+mkdir -p /var/lock
+
+mount -t proc -o nodev,noexec,nosuid proc /proc
+mount -t sysfs -o nodev,noexec,nosuid sysfs /sys
+
+ln -sf /proc/mounts /etc/mtab
+
+#Create device nodes
+[ -e /dev/console ] || mknod -m 0600 /dev/console c 5 1
+[ -e /dev/null ] || mknod /dev/null c 1 3
+mdev -s
+
+[ -e /dev/pts ] || mkdir /dev/pts
+mount -t devpts -o noexec,nosuid,mode=0620 devpts /dev/pts
+
+#Defaults
+init="/sbin/init"
+nfsroot=
+nfsrootopts=
+root=
+rootmnt="/newroot"
+readonly=y
+
+ip=
+serverip=
+hwip=
+netmask=
+hostname=
+device=
+autoconf=
+dns0=
+dns1=
+
+
+if [ -f "/etc/hostname" ] ; then
+    /bin/hostname -F /etc/hostname > /dev/null 2>&1
+fi
+
+#Parse command line options
+for i in $(cat /proc/cmdline); do
+    case $i in
+        init=*)
+            init=${i#init=}
+            ;;
+        ip=*)
+            aux=${i#ip=}
+            IFS=':' read -r ip serverip gwip netmask hostname device autoconf dns0 dsn1 <<< "$aux"
+            unset aux
+            ;;
+        nfsroot=*)
+            nfsroot=${i#nfsroot=}
+            nfsrootopts=$(echo $nfsroot | cut -s -f 2- -d ',')
+            nfsroot=$(echo $nfsroot | cut -f 1 -d ',')
+            nfsrootopts=${nfsrootopts:+-o ${nfsrootopts}}
+            ;;
+        root=*)
+            root=${i#root=}
+            ;;
+        rootflags=*)
+            rootflags="-o ${i#rootflags=}"
+            ;;
+        rootfstype=*)
+            rootfstype="${i#rootfstype=}"
+            ;;
+        ro)
+            readonly=y
+            ;;
+        rw)
+            readonly=n
+            ;;
+    esac
+done
+
+/etc/init.d/rpcbind start
+/etc/init.d/networking start
+
+if [ "$ip" ] && [ "$device" ]; then
+    # Stop DHCP to assign U-BOOT address
+    if [ -r "/var/run/udhcpc.$device.pid" ]; then
+        kill -9 $(cat /var/run/udhcpc.$device.pid)
+    fi
+    ifconfig "$device" "$ip" ${netmask:+netmask $netmask}
+    if [ "x$gwip" != "x" ]; then
+        ip route add default via $gwip dev $device
+    fi
+fi
+
+if [ -x /etc/init.d/sja1105.sh ]; then
+    /etc/init.d/sja1105.sh
+    # Wait for sja to finish programming
+    if lsmod | grep -q "^sja1105\b"; then
+        while [ "$(lsmod | grep "^sja1105\b" | awk '{ print $3}')" != "0" ]; do
+            sleep 1
+        done
+    fi
+fi
+
+mkdir $rootmnt
+
+# Mount final root filesystem - if any
+nfsmountroot
+
+# Otherwise, stick in initramfs environment as final root filesystem
+echo " "
+echo "Falling to initramfs"
+exec /sbin/init

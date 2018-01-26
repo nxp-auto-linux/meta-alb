@@ -11,7 +11,8 @@ SOC_FAMILY = "s32"
 
 KERNEL_IMAGETYPE ?= "Image"
 
-UBOOT_MACHINE ?= "${MACHINE}_config"
+UBOOT_CONFIG ?= "sdcard"
+UBOOT_CONFIG[sdcard] = "${MACHINE}_config,,u-boot.${UBOOT_SUFFIX}"
 UBOOT_MACHINE_SDCARD ?= "${MACHINE}"
 
 # S32 BSP default providers

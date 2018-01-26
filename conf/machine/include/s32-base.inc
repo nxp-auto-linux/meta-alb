@@ -20,6 +20,9 @@ UBOOT_BOOTSPACE_SEEK ?= "8"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"
 UBOOT_ENTRYPOINT ?= "80080000"
 
+#s32 has no hardware clock
+MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
+
 # we do not want to have getty running on tty1 as we run
 # auto-serial-console there USE_VT = "0"
 SERIAL_CONSOLE = "115200 ttyLF0"

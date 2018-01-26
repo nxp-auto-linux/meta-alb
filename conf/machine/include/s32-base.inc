@@ -11,17 +11,12 @@ SOC_FAMILY = "s32"
 
 KERNEL_IMAGETYPE ?= "Image"
 
-UBOOT_CONFIG ?= "sdcard"
-UBOOT_CONFIG[sdcard] = "${MACHINE}_config,,u-boot.${UBOOT_SUFFIX}"
-UBOOT_MACHINE_SDCARD ?= "${MACHINE}"
-
 # S32 BSP default providers
 PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/kernel = "linux-s32"
 
 UBOOT_BOOTSPACE_SEEK ?= "8"
-UBOOT_SUFFIX ?= "s32"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"
 UBOOT_ENTRYPOINT ?= "80080000"
 
@@ -31,21 +26,12 @@ SERIAL_CONSOLE = "115200 ttyLF0"
 
 SOC_DEFAULT_IMAGE_FSTYPES = "tar.gz"
 IMAGE_FSTYPES ?= "${SOC_DEFAULT_IMAGE_FSTYPES}"
-
-IMAGE_FSTYPES += "ext3"
-#IMAGE_CLASSES += "image_types_uboot"
-
-# Specific definitions for .sdcard image generation
-IMAGE_FSTYPES += "sdcard"
-SDCARD_ROOTFS = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ext3"
-UBOOT_TYPE_SDCARD = "${MACHINE}"
-UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
-IMAGE_CLASSES += "image_types_fsl_sdcard"
+IMAGE_FSTYPES += "cpio.gz"
 
 MACHINE_FEATURES ?= "pci ext2 ext3 serial"
 MACHINE_EXTRA_RRECOMMENDS += "udev-extraconf kernel-modules"
 
-EXTRA_IMAGEDEPENDS += "u-boot cst-native"
+EXTRA_IMAGEDEPENDS += "u-boot-s32 cst-native"
 
 # Sub-architecture support
 MACHINE_SOCARCH_SUFFIX ?= ""

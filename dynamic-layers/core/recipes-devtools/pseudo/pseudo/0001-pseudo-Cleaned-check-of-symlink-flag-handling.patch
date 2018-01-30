@@ -1,0 +1,25 @@
+From 0281d36a6bc26d51b772ee74c70bd913b2d302bd Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Sat, 20 Jan 2018 23:09:08 +0100
+Subject: [PATCH] pseudo: Cleaned check of symlink flag handling
+
+---
+ pseudo_util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pseudo_util.c b/pseudo_util.c
+index 4854413..64cc549 100644
+--- a/pseudo_util.c
++++ b/pseudo_util.c
+@@ -668,7 +668,7 @@ pseudo_append_element(char *newpath, char *root, size_t allocated, char **pcurre
+ 	*current = '\0';
+ 	/* now, the moment of truth... is that a symlink? */
+ 	/* if lstat fails, that's fine -- nonexistent files aren't symlinks */
+-	if (!leave_this) {
++	if (!(leave_this & AT_SYMLINK_NOFOLLOW)) {
+ 		int is_link;
+ 		is_link = (pseudo_real_lstat) && (pseudo_real_lstat(newpath, &buf) != -1) && S_ISLNK(buf.st_mode);
+ 		if (link_recursion >= PSEUDO_MAX_LINK_RECURSION && is_link) {
+-- 
+2.15.1
+

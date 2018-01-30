@@ -1,0 +1,66 @@
+From 8bec876d0d30fac2fa4cd7c0f573e06659b4bb48 Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Wed, 24 Jan 2018 08:17:22 +0100
+Subject: [PATCH] qemu: Removed broken capset patch and cleaned utimensat patch
+
+My previous attempt to deal with capset was just broken.
+This reverts to the original setup. The utimensat patch was
+incorrectly commented and could have been easier. So now
+it is easier.
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ linux-user/syscall.c | 23 +++--------------------
+ 1 file changed, 3 insertions(+), 20 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index a8c8034..a00d939 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -241,14 +241,6 @@ static type name (type1 arg1)				\
+ 	return syscall(__NR_##name, arg1);		\
+ }
+ 
+-#define _libc_syscall2(type,name,namelibc,type1,arg1,type2,arg2)	\
+-static type name (type1 arg1,type2 arg2)				\
+-{									\
+-	if (do_libcsyscall)						\
+-		return namelibc(arg1, arg2);				\
+-	return syscall(__NR_##name, arg1, arg2);			\
+-}
+-
+ #define _libc_syscall3(type,name,namelibc,type1,arg1,type2,arg2,type3,arg3)	\
+ static type name (type1 arg1,type2 arg2,type3 arg3)				\
+ {										\
+@@ -332,7 +324,7 @@ _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
+           void *, arg);
+ _syscall2(int, capget, struct __user_cap_header_struct *, header,
+           struct __user_cap_data_struct *, data);
+-_libc_syscall2(int, capset,capset, struct __user_cap_header_struct *, header,
++_syscall2(int, capset, struct __user_cap_header_struct *, header,
+           struct __user_cap_data_struct *, data);
+ #if defined(TARGET_NR_ioprio_get) && defined(__NR_ioprio_get)
+ _syscall2(int, ioprio_get, int, which, int, who)
+@@ -614,17 +606,8 @@ static int sys_getcwd1(char *buf, size_t size)
+ 
+ #ifdef TARGET_NR_utimensat
+ #if defined(__NR_utimensat)
+-/* utimensat has an awful prototype that passes a structure.
+- * This complicates life if you want to use either libc or the syscall.
+- * We can't use _syscall4() here.
+- */
+-static int sys_utimensat(int dirfd, const char *pathname,
+-                         const struct timespec times[2], int flags)
+-{
+-	if (do_libcsyscall)
+-		return utimensat(dirfd, pathname, times, flags);
+-	return syscall(__NR_utimensat, dirfd, pathname, &times[0], flags);
+-}
++#define __NR_sys_utimensat __NR_utimensat
++_libc_syscall4(int,sys_utimensat,utimensat,int,dirfd,const char*,pathname,const struct timespec *,times,int,flags);
+ #else
+ static int sys_utimensat(int dirfd, const char *pathname,
+                          const struct timespec times[2], int flags)
+-- 
+2.15.1
+

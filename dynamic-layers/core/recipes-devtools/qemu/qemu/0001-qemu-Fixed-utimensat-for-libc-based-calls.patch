@@ -1,0 +1,42 @@
+From 84af9c86cf862124350cff2b6a67a9f354d3e49f Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Wed, 24 Jan 2018 07:11:39 +0100
+Subject: [PATCH] qemu: Fixed utimensat() for libc based calls
+
+Turns out that "touch" on Linux ends up with all NULL path for
+utimensat(). The std libc does not translate this into
+futimens() as the Linux syscall would do, so we need to translate
+manually.
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ linux-user/syscall.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 3abdb81..a8c8034 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11789,8 +11789,17 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+                 target_to_host_timespec(ts+1, arg3+sizeof(struct target_timespec));
+                 tsp = ts;
+             }
+-            if (!arg2)
+-                ret = get_errno(sys_utimensat(arg1, NULL, tsp, arg4));
++            if (!arg2) {
++                /* Special solution to overcome a problem for the libc
++                 * based implementation, so that we don't get EINVAL.
++                 * libc is a bit restrictive there and non-Linux'ish.
++                 * The need is a Linux'ism as it seems.
++                 */
++                if (do_libcsyscall)
++                    ret = get_errno(futimens(arg1, tsp));
++                else
++                    ret = get_errno(sys_utimensat(arg1, NULL, tsp, arg4));
++            }
+             else {
+                 if (!(p = lock_user_string(arg2))) {
+                     ret = -TARGET_EFAULT;
+-- 
+2.15.1
+

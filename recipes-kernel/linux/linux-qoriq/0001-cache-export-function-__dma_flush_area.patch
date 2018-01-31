@@ -1,0 +1,25 @@
+From 11fa75800f094c24e2dd79d512da02c7032edaef Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Fri, 12 Jan 2018 11:53:41 +0100
+Subject: [PATCH] cache: export function __dma_flush_area
+
+Needed by virtual ethernet over PCIe driver.
+
+Signed-off-by: Vicovan Ionut-Valentin-VCVV001 <Ionut.Vicovan@nxp.com>
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ arch/arm64/mm/flush.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/mm/flush.c b/arch/arm64/mm/flush.c
+index 8377329..96d82c4 100644
+--- a/arch/arm64/mm/flush.c
++++ b/arch/arm64/mm/flush.c
+@@ -92,3 +92,4 @@ void flush_dcache_page(struct page *page)
+  * Additional functions defined in assembly.
+  */
+ EXPORT_SYMBOL(flush_icache_range);
++EXPORT_SYMBOL(__dma_flush_area);
+-- 
+1.8.3.1
+

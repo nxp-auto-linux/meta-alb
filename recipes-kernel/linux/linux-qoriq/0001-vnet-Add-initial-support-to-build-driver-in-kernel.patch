@@ -1,0 +1,39 @@
+From b0ff6acfd354345f95e340e8c35035c8bf97618b Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Fri, 12 Jan 2018 09:27:58 +0100
+Subject: [PATCH] vnet: Add initial support to build driver in kernel
+
+adapted to kernel 4.9
+
+Signed-off-by: Catalina Radu <catalina.radu@nxp.com>
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ drivers/net/Kconfig  | 2 ++
+ drivers/net/Makefile | 3 +++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index 95c32f2..0695dd7 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -451,4 +451,6 @@ config FUJITSU_ES
+ 
+ source "drivers/net/hyperv/Kconfig"
+ 
++source "drivers/net/vnet/Kconfig"
++
+ endif # NETDEVICES
+diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+index 7336cbd..8140799 100644
+--- a/drivers/net/Makefile
++++ b/drivers/net/Makefile
+@@ -72,3 +72,6 @@ obj-$(CONFIG_HYPERV_NET) += hyperv/
+ obj-$(CONFIG_NTB_NETDEV) += ntb_netdev.o
+ 
+ obj-$(CONFIG_FUJITSU_ES) += fjes/
++
++obj-$(CONFIG_VNET_S32) += vnet/s32/
++obj-$(CONFIG_VNET_LS2) += vnet/ls/
+-- 
+1.8.3.1
+

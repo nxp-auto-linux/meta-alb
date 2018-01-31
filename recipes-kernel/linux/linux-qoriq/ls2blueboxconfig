@@ -1,0 +1,14 @@
+#
+# Platform selection
+#
+CONFIG_LS2085A_ERRATA_ERR008585=y
+CONFIG_LS2085A_ERRATA_TKT269926=y
+
+
+
+#
+# Native drivers
+#
+CONFIG_SENSORS_W83793=y
+
+

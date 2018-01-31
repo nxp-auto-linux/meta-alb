@@ -1,0 +1,46 @@
+From ffebc77aabb502f5316f5244817a25201d2fdcfb Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Mon, 24 Apr 2017 22:13:29 +0200
+Subject: [PATCH] kernel: Added phy ioctl support to the DPAA2 dpmac driver
+
+This is needed to debug PHY registers while Linux is up and running.
+Setting CONFIG_FSL_DPAA2_MAC_NETDEVS will make the dpmac's
+available to the user and then the ioctl will permit checking on
+the phy setup
+---
+ drivers/staging/fsl-dpaa2/mac/mac.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/staging/fsl-dpaa2/mac/mac.c b/drivers/staging/fsl-dpaa2/mac/mac.c
+index 8820692d522c..92c16045fa58 100644
+--- a/drivers/staging/fsl-dpaa2/mac/mac.c
++++ b/drivers/staging/fsl-dpaa2/mac/mac.c
+@@ -151,6 +151,17 @@ done:
+ 	return 0;
+ }
+ 
++static int dpaa2_mac_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
++{
++	/*if (!netif_running(netdev))
++		return -EINVAL;*/
++
++	if (!netdev->phydev)
++		return -ENODEV;
++
++	return phy_mii_ioctl(netdev->phydev, rq, cmd);
++}
++
+ static int dpaa2_mac_get_settings(struct net_device *netdev,
+ 				  struct ethtool_cmd *cmd)
+ {
+@@ -318,6 +329,7 @@ static const struct net_device_ops dpaa2_mac_ndo_ops = {
+ 	.ndo_open		= &dpaa2_mac_open,
+ 	.ndo_stop		= &dpaa2_mac_stop,
+ 	.ndo_get_stats64	= &dpaa2_mac_get_stats,
++	.ndo_do_ioctl		= &dpaa2_mac_ioctl,
+ };
+ 
+ static const struct ethtool_ops dpaa2_mac_ethtool_ops = {
+-- 
+2.12.2
+

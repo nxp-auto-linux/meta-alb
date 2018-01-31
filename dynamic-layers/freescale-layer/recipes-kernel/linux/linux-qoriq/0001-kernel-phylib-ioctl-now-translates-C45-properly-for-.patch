@@ -1,0 +1,78 @@
+From d45d0d720a1e629ded99361ebc9d0dc3311d6232 Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Fri, 12 Jan 2018 11:25:47 +0100
+Subject: [PATCH] kernel: phylib ioctl now translates C45 properly for r/w of 
+ registers
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ drivers/net/phy/phy.c | 35 ++++++++++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 4ce0fac..2f8438e 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -481,21 +481,38 @@ int phy_mii_ioctl(struct phy_device *phydev, struct ifreq *ifr, int cmd)
+ 	struct mii_ioctl_data *mii_data = if_mii(ifr);
+ 	u16 val = mii_data->val_in;
+ 	bool change_autoneg = false;
++	int phy_id = mii_data->phy_id;
++	u32 reg_num = mii_data->reg_num;
++
++	/* The traditional ioctl format only permits passing
++	 * 16 bit values. All MMD accesses with Clause 45 need the
++	 * new reg_num format though that depends on MII_ADDR_C45.
++	 * As we can't change the ioctl API for Clause 45, we just
++	 * rework the parameters in this case. Note how our local
++	 * variables support 32 bits just in case. We ignore the
++	 * prtad as the phydev is predetermined anyway for a given
++	 * driver using the phylib.
++	 */
++	if (mdio_phy_id_is_c45(phy_id)) {
++		reg_num |= MII_ADDR_C45 | (mdio_phy_id_devad(phy_id) << 16);
++		phy_id = phydev->mdio.addr;
++	}
+ 
+ 	switch (cmd) {
+ 	case SIOCGMIIPHY:
+-		mii_data->phy_id = phydev->mdio.addr;
++		/* Backwards compatibility: Still modify the input! */
++		mii_data->phy_id = phy_id = phydev->mdio.addr;
+ 		/* fall through */
+ 
+ 	case SIOCGMIIREG:
+ 		mii_data->val_out = mdiobus_read(phydev->mdio.bus,
+-						 mii_data->phy_id,
+-						 mii_data->reg_num);
++						 phy_id,
++						 reg_num);
+ 		return 0;
+ 
+ 	case SIOCSMIIREG:
+-		if (mii_data->phy_id == phydev->mdio.addr) {
+-			switch (mii_data->reg_num) {
++		if (phy_id == phydev->mdio.addr) {
++			switch (reg_num) {
+ 			case MII_BMCR:
+ 				if ((val & (BMCR_RESET | BMCR_ANENABLE)) == 0) {
+ 					if (phydev->autoneg == AUTONEG_ENABLE)
+@@ -527,11 +544,11 @@ int phy_mii_ioctl(struct phy_device *phydev, struct ifreq *ifr, int cmd)
+ 			}
+ 		}
+ 
+-		mdiobus_write(phydev->mdio.bus, mii_data->phy_id,
+-			      mii_data->reg_num, val);
++		mdiobus_write(phydev->mdio.bus, phy_id,
++			      reg_num, val);
+ 
+-		if (mii_data->phy_id == phydev->mdio.addr &&
+-		    mii_data->reg_num == MII_BMCR &&
++		if (phy_id == phydev->mdio.addr &&
++		    reg_num == MII_BMCR &&
+ 		    val & BMCR_RESET)
+ 			return phy_init_hw(phydev);
+ 
+-- 
+1.8.3.1
+

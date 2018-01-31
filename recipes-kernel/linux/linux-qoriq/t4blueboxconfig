@@ -1,0 +1,9 @@
+
+
+
+#
+# Native drivers
+#
+CONFIG_SENSORS_W83793=y
+
+

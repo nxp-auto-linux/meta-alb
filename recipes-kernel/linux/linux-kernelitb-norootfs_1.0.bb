@@ -1,0 +1,18 @@
+#
+# This is a generic recipe to generate an .itb image containing
+# just the kernel and dtb to install as boot image into /boot
+# Technically, this could be part of the standard kernel build
+# mechanisms, but hacking them in a layer is more complicated
+# than providing a generic recipe.
+#
+DESCRIPTION = "Linux kernel ITB generation without rootfs"
+SECTION = "kernel"
+LICENSE = "GPL-2.0"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+
+# Default: No rootfs to be included in the itb
+# No ramdisk is required for any boot of a full rootfs
+ITB_ROOTFS_TYPE = ""
+ITB_ROOTFS_NAME_EXT = ""
+
+require linux-kernelitb.inc

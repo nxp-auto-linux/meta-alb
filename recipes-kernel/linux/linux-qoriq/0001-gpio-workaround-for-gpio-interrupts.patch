@@ -1,0 +1,35 @@
+From 2a8177aa9f28b78b757d62a3d5abb43b87dbd193 Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin-VCVV001 <Ionut.Vicovan@nxp.com>
+Date: Tue, 19 Sep 2017 16:01:14 +0300
+Subject: [PATCH 1/2] gpio: workaround for gpio interrupts
+
+Two gpio controllers share the same interrupt (0 and 1, 2 and 3).
+A bug in GPIO driver does not allow to use interrupts on both
+controllers and it seems that the last interrupt controller would
+overwrite the previous one.
+This workaround just disables the last controller to allow handling
+interrupts on the third.
+
+Signed-off-by: Vicovan Ionut-Valentin-VCVV001 <Ionut.Vicovan@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
+index 6472bb2..bf4d057 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
+@@ -106,6 +106,10 @@
+ 	status = "disabled";
+ };
+ 
++&gpio3 {
++	status = "disabled";
++};
++
+ &sata0 {
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

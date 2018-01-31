@@ -1,0 +1,85 @@
+#
+# This is the default NOR flash environment shipped for the LS2 side of the BlueBox Mini
+#
+#----------------------------------------------------------------------
+# The following macros with angle brackets will be automagically
+# replaced when building the binary environment:
+#       <fdt_name>      Basename of KERNEL_DEVICETREE
+#       <kernel_name>   UBOOT_KERNEL_IMAGETYPE if it has been set,
+#                       otherwise KERNEL_IMAGETYPE
+#       <machine>       MACHINE
+#----------------------------------------------------------------------
+#
+baudrate=115200
+boot_from_flash=run loadcmd_flash && run mc_loadlinuxdpl && run bootcmd_flash
+bootcmd=run bootcmd_debug; \
+        mmc dev ${mmcdev}; \
+        if run loadbootscript; then \
+                run bootscript; \
+        elif test -n "$enablenfs" && test $enablenfs -gt 0 && run loadcmd_nfs; then \
+		run mc_loadlinuxdpl && run bootcmd_nfs; \
+        elif run loadcmd_sdhc; then \
+                run mc_loadlinuxdpl && run bootcmd_sdhc; \
+        elif run loadcmd_ssd; then \
+                run mc_loadlinuxdpl && run bootcmd_ssd; \
+        elif run loadcmd_flash; then \
+                run mc_loadlinuxdpl && run bootcmd_flash; \
+        else echo Automatic boot failed.; \
+        fi;
+bootcmd_debug=true
+bootcmd_flash=echo Booting ITB from NOR flash...; setenv bootdev ram0; setenv bootargsextra ramdisk_size=$ramdisk_size; run setbootargs; bootm $kernel_load
+bootcmd_ssd=echo Booting ITB from SSD ...; setenv bootdev sda${scsipart}; setenv bootargsextra noinitrd; run setbootargs; bootm $kernel_load -
+bootcmd_sdhc=echo Booting ITB from SDHC...; setenv bootdev mmcblk0p${mmcpart}; setenv bootargsextra noinitrd; run setbootargs; bootm $kernel_load -
+bootcmd_nfs=echo Booting ITB via NFS...; setenv bootdev nfs; setenv bootargsextra rw nfsroot=$serverip:$rootpath ip=$ipaddr:$serverip:$gatewayip:$netmask:$hostname:$netdev:off; run setbootargs; bootm $kernel_load -
+bootdelay=3
+bootscript=echo Running bootscript from mmc ...; source
+dpc_addr=0x580800000
+consoledev=ttyS1
+dpl_addr=0x580700000
+ethact=DPMAC5@xgmii
+ethprime=DPMAC5@xgmii
+factoryprep=ext2load mmc 0:2 90000000 boot/bbdeployimage.itb; source 90000000:ls2factoryprep
+fdt_high=0xa0000000
+fdt_load=0xa2000000
+gatewayip=192.168.2.1
+hwconfig=fsl_ddr:bank_intlv=auto
+initrd_high=0xffffffffffffffff
+ipaddr=192.168.2.100
+loadcmd_flash=echo Loading from flash at $kernel_start...; cp.b $kernel_start $kernel_load $kernel_size
+
+
+loadcmd_ssd=echo Searching for boot image on SSD...; scsi scan && ext2load scsi ${scsidev}:${scsipart} $kernel_load $kernel_name
+loadcmd_sdhc=echo Searching for boot image on SD-Card...; mmc rescan && mmc info && ext2load mmc ${mmcdev}:${mmcpart} $kernel_load $kernel_name
+loadcmd_nfs=echo Searching for NFS boot image via TFTP...; tftp $kernel_load $machine/$kernel_name;
+
+mcinitcmd=fsl_mc start mc $mc_addr $dpc_addr
+mc_loadlinuxdpl=fsl_mc apply dpl $dpl_addr
+
+machine=<machine>
+midfan=mw.b 5200000c0 28
+mmcdev=0
+mmcpart=2
+#kernel_addr=0x100000
+kernel_load=0xa0000000
+kernel_name=boot/kernel.itb
+kernel_size=0x02a00000
+kernel_start=0x581100000
+loadaddr=0x80100000
+netdev=ni0
+loadbootscript=mmc rescan && fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};
+mc_addr=0x580300000
+netmask=255.255.255.0
+progfile=tftp $loadaddr $file && protect off $addr +$filesize && erase $addr +$filesize && cp.b $loadaddr $addr $filesize && cmp.b $loadaddr $addr $filesize
+ramdisk_addr=0x800000
+ramdisk_size=0x2000000
+rootpath=/opt/nfsroot/$machine
+script=boot.scr
+scsidev=0
+scsidevs=1
+scsipart=1
+serverip=192.168.2.1
+setbootargs=setenv bootargs console=$consoledev,$baudrate root=/dev/$bootdev earlycon=uart8250,mmio,0x21c0600 default_hugepagesz=2m hugepages=512 $bootargsextra $bootargs_debug
+silentfan=mw.b 5200000c0 0
+stderr=serial
+stdin=serial
+stdout=serial

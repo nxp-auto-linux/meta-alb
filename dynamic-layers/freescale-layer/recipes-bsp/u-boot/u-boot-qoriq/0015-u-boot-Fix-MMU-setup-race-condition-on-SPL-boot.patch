@@ -1,0 +1,37 @@
+From 598e3bbf972ef590930ec2804b619bc06ebf2ebd Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Sun, 23 Apr 2017 23:31:45 +0200
+Subject: [PATCH 15/17] u-boot: Fix MMU setup race condition on SPL boot
+
+---
+ arch/arm/cpu/armv8/fsl-layerscape/cpu.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm/cpu/armv8/fsl-layerscape/cpu.c b/arch/arm/cpu/armv8/fsl-layerscape/cpu.c
+index 35b5f0c457..6e2cb11e1c 100644
+--- a/arch/arm/cpu/armv8/fsl-layerscape/cpu.c
++++ b/arch/arm/cpu/armv8/fsl-layerscape/cpu.c
+@@ -217,7 +217,20 @@ int arch_cpu_init(void)
+ 	icache_enable();
+ 	__asm_invalidate_dcache_all();
+ 	__asm_invalidate_tlb_all();
++#if defined(CONFIG_SPL)
++	/* If we get here when the SPL has loaded us, then the MMU is
++	 * already enabled. The problem is that the setup function
++	 * then runs while the MMU is enabled and reads from the
++	 * tables while we are clearing and rewriting them. We have
++	 * two choices: #1 Not redo the setup, or #2 redo the setup,
++	 * hope that nothing bad happens and clearing bad TLBs and
++	 * data cache. We go for #1
++	 */
++	if (!(get_sctlr() & CR_M))
++		early_mmu_setup();
++#else
+ 	early_mmu_setup();
++#endif
+ 	set_sctlr(get_sctlr() | CR_C);
+ 	return 0;
+ }
+-- 
+2.12.2
+

@@ -1,0 +1,28 @@
+From 73baad3312366d1923094c625f4eae021e3a7983 Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Sun, 23 Apr 2017 21:23:17 +0200
+Subject: [PATCH 04/17] u-boot: Add config info for thermal based early fan
+ control on LS2080A RDB
+
+---
+ include/configs/ls2080ardb.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/configs/ls2080ardb.h b/include/configs/ls2080ardb.h
+index 5f02c8aa5a..c46c062977 100644
+--- a/include/configs/ls2080ardb.h
++++ b/include/configs/ls2080ardb.h
+@@ -280,6 +280,10 @@ unsigned long get_board_sys_clk(void);
+ 
+ /* I2C bus multiplexer */
+ #define I2C_MUX_CH_DEFAULT      0x8
++#define I2C_MUX_CH_ADT7481      0xb
++#define I2C_MUX_CH_WINBOND      0xd
++
++#define CONFIG_INIT_I2C_DEVICES_F
+ 
+ /* SPI */
+ #ifdef CONFIG_FSL_DSPI
+-- 
+2.12.2
+

@@ -1,0 +1,116 @@
+From 96a9553e3de7ced388d89b67b7c52565863e26ba Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Mon, 24 Apr 2017 01:53:54 +0200
+Subject: [PATCH] u-boot: Special config for LS2080ARDB with LS2084A silicon
+
+---
+ arch/arm/dts/Makefile            |  1 +
+ arch/arm/dts/fsl-ls2084a-rdb.dts | 35 ++++++++++++++++++++++++++++++++++
+ configs/ls2084ardb_defconfig     | 41 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+)
+ create mode 100644 arch/arm/dts/fsl-ls2084a-rdb.dts
+ create mode 100644 configs/ls2084ardb_defconfig
+
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 7fc94b3318..e5da8836e0 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -140,6 +140,7 @@ dtb-$(CONFIG_LS102XA) += ls1021a-qds-duart.dtb \
+ 	ls1021a-twr-duart.dtb ls1021a-twr-lpuart.dtb
+ dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
+ 	fsl-ls2080a-rdb.dtb \
++	fsl-ls2084a-rdb.dtb \
+ 	fsl-ls2084a-bbmini.dtb
+ dtb-$(CONFIG_FSL_LSCH2) += fsl-ls1043a-qds-duart.dtb \
+ 	fsl-ls1043a-qds-lpuart.dtb \
+diff --git a/arch/arm/dts/fsl-ls2084a-rdb.dts b/arch/arm/dts/fsl-ls2084a-rdb.dts
+new file mode 100644
+index 0000000000..08174b5717
+--- /dev/null
++++ b/arch/arm/dts/fsl-ls2084a-rdb.dts
+@@ -0,0 +1,35 @@
++/*
++ * Freescale ls2084a RDB board device tree source
++ *
++ * Copyright 2013-2015 Freescale Semiconductor, Inc.
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++/dts-v1/;
++
++#include "fsl-ls2084a.dtsi"
++
++/ {
++	model = "Freescale Layerscape 2080A RDB Board with LS2084A silicon";
++	compatible = "fsl,ls2080a-rdb", "fsl,ls2080a";
++
++	aliases {
++		spi1 = &dspi;
++	};
++};
++
++&dspi {
++	bus-num = <0>;
++	status = "okay";
++
++	dflash0: n25q512a {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "spi-flash";
++		spi-max-frequency = <3000000>;
++		spi-cpol;
++		spi-cpha;
++		reg = <0>;
++	};
++};
+diff --git a/configs/ls2084ardb_defconfig b/configs/ls2084ardb_defconfig
+new file mode 100644
+index 0000000000..60b8bccd5a
+--- /dev/null
++++ b/configs/ls2084ardb_defconfig
+@@ -0,0 +1,41 @@
++CONFIG_ARM=y
++CONFIG_ARMV8_SET_SMPEN=y
++CONFIG_TARGET_LS2080ARDB=y
++CONFIG_DEFAULT_DEVICE_TREE="fsl-ls2084a-rdb"
++# CONFIG_SYS_MALLOC_F is not set
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_OF_BOARD_SETUP=y
++CONFIG_OF_STDOUT_VIA_ALIAS=y
++CONFIG_SYS_EXTRA_OPTIONS="SYS_FSL_DDR4, LS2080A"
++CONFIG_BOOTDELAY=10
++CONFIG_HUSH_PARSER=y
++CONFIG_CMD_GREPENV=y
++CONFIG_CMD_MMC=y
++CONFIG_CMD_SF=y
++CONFIG_CMD_I2C=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_DHCP=y
++CONFIG_CMD_MII=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EXT2=y
++CONFIG_CMD_FAT=y
++CONFIG_OF_CONTROL=y
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_DM=y
++CONFIG_DM_SPI_FLASH=y
++CONFIG_NETDEVICES=y
++CONFIG_E1000=y
++CONFIG_SYS_NS16550=y
++CONFIG_DM_SPI=y
++CONFIG_FSL_DSPI=y
++CONFIG_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_DWC3=y
++CONFIG_USB_STORAGE=y
++CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
++CONFIG_PCI=y
++CONFIG_DM_PCI=y
++CONFIG_DM_PCI_COMPAT=y
++CONFIG_PCIE_LAYERSCAPE=y
+-- 
+2.12.2
+

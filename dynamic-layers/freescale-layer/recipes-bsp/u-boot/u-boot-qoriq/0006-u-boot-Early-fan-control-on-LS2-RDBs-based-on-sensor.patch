@@ -1,0 +1,185 @@
+From 61bbf741a0d0e16ad23b60de9fb5536ff9314530 Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Sun, 23 Apr 2017 21:28:10 +0200
+Subject: [PATCH 06/17] u-boot: Early fan control on LS2 RDBs based on sensor
+ input
+
+---
+ board/freescale/ls2080ardb/ls2080ardb.c | 161 ++++++++++++++++++++++++++++++++
+ 1 file changed, 161 insertions(+)
+
+diff --git a/board/freescale/ls2080ardb/ls2080ardb.c b/board/freescale/ls2080ardb/ls2080ardb.c
+index a38b0d55b4..38c765e1d4 100644
+--- a/board/freescale/ls2080ardb/ls2080ardb.c
++++ b/board/freescale/ls2080ardb/ls2080ardb.c
+@@ -197,6 +197,167 @@ int board_init(void)
+ 	return 0;
+ }
+ 
++static void fancontrol(int percent)
++{
++	int winbond;
++	u8 byte;
++	int i;
++	u8 fanspeed;
++
++	if(percent < 0)
++		percent = 0;
++	if(percent > 100)
++		percent = 100;
++	fanspeed = (percent * 0x3f) / 100;
++
++	/* On Rev D boards, pullup resistors put it at the wrong
++	 * address, so we probe the proper Winbond address.
++	 * On Rev E, the proper 0x2f address should be used.
++	 */
++	winbond = (i2c_probe(0x2f) == 0) ? 0x2f : 0x2c;
++
++	select_i2c_ch_pca9547(I2C_MUX_CH_WINBOND);
++
++	/* Set the fan speed directly */
++	for (i = 0xb3; i <= 0xb8; i++) {
++		if (i2c_read(winbond, i, 1, &byte, 1) == 0) {
++			i2c_write(winbond, i, 1, &fanspeed, 1);
++		}
++	}
++
++	select_i2c_ch_pca9547(I2C_MUX_CH_DEFAULT);
++
++}
++
++static void fancontrol_f(void)
++{
++	int winbond;
++	s8 wt1, wt2, at1, at2;
++	u8 byte, status1, status2;
++	int percent;
++	int maxtemp;
++	int i;
++
++	/* We want to be quick about fan control to keep the noise
++	 * down initially.
++	 */
++
++	/* Let's read the ADT sensors and the Winbond sensors and
++	 * determine the likely approximate max chip temp first
++	 */
++
++	/* On Rev D boards, pullup resistors put it at the wrong
++	 * address, so we probe the proper Winbond address.
++	 * On Rev E, the proper 0x2f address should be used.
++	 */
++	winbond = (i2c_probe(0x2f) == 0) ? 0x2f : 0x2c;
++
++	select_i2c_ch_pca9547(I2C_MUX_CH_WINBOND);
++
++	/* On Rev D boards, pullup resistors put it at the wrong
++	 * address, so we probe the proper option.
++	 * On Rev E, the proper 0x2f address should be used.
++	 */
++	winbond = (i2c_probe(0x2f) == 0) ? 0x2f : 0x2c;
++
++	/* Reset the Winbond page to 0 as we don't know the
++	 * prior setting in all cases
++	 */
++	byte = 0x80;
++	i2c_write(winbond, 0x00, 1, &byte, 1);
++
++	/* preset pin and function selection properly for the RDB
++	 * for Rev D boards (which won't hurt on Rev E)
++	 */
++	byte = 0x01;
++	i2c_write(winbond, 0x58, 1, &byte, 1);
++	byte = 0x03;
++	i2c_write(winbond, 0x5c, 1, &byte, 1);
++
++	/* Enable OVT for the Winbond to support Rev E boards
++	 * or modified Rev D boards
++	 */
++	for (i = 0; i < 6; i++) {
++		/* Lower the critical defaults a bit to be on
++		 * the safe side
++		 */
++		byte = 95;
++		i2c_write(winbond, 0x78 + (i * 4), 1, &byte, 1);
++		byte = 90;
++		i2c_write(winbond, 0x79 + (i * 4), 1, &byte, 1);
++	}
++	byte = 0x7e;
++	i2c_write(winbond, 0x51, 1, &byte, 1);
++	byte = 0x01;
++	i2c_write(winbond, 0x52, 1, &byte, 1);
++
++	/* When reading sensors, faulty I2C reads default to max temp
++	 * to be on the safe side for fan speed!
++	 * Winbond defaults to -128C for disconnected sensors.
++	 * ADT shows disconnected sensors separately.
++	 */
++	if (i2c_read(winbond, 0x1c, 1, (u8 *)&wt1, 1)) {
++		wt1 = 127;
++	}
++	if (i2c_read(winbond, 0x1d, 1, (u8 *)&wt2, 1)) {
++		wt2 = 127;
++	}
++
++	select_i2c_ch_pca9547(I2C_MUX_CH_ADT7481);
++	if (i2c_read(0x4c, 0x02, 1, &status1, 1)) {
++		status1 = 0x04;
++	}
++	if (i2c_read(0x4c, 0x23, 1, &status2, 1)) {
++		status2 = 0x04;
++	}
++	if (i2c_read(0x4c, 0x01, 1, (u8 *)&at1, 1)) {
++		at1 = 127;
++	}
++	if (i2c_read(0x4c, 0x30, 1, (u8 *)&at2, 1)){
++		at2 = 127;
++	}
++	at1 = (status1 & 0x04) ? -128 : at1;
++	at2 = (status2 & 0x04) ? -128 : at2;
++	select_i2c_ch_pca9547(I2C_MUX_CH_DEFAULT);
++
++	/* If all sensors show disconnected values, we go to full
++	 * speed fans to be safe. The assumption here is that the
++	 * system does not boot at precisely 0C for all sensors.
++	 */
++	if(at1 == -128 && at2 == -128 &&
++	   wt1 == -128 && wt2 == -128) {
++		wt1 = 127;
++	}
++
++	maxtemp = wt1;
++	if (wt2 > maxtemp) maxtemp = wt2;
++	if (at1 > maxtemp) maxtemp = at1;
++	if (at2 > maxtemp) maxtemp = at2;
++
++	/* Now we know the current maximum SoC temp. We base fan
++	 * speed on that one with a simple approach.
++	 * Minimum speed is chosen to support multiple fan types
++	 * which may not easily start up otherwise.
++	 */
++	percent = 28;
++	if (maxtemp > 75) percent = 50;
++	else if (maxtemp > 80) percent = 75;
++	else if (maxtemp > 82) percent = 100;
++
++	printf("Fan control: Speed set to %d%% based on temp of %dC\n",
++	       percent, maxtemp);
++
++	fancontrol(percent);
++
++}
++
++int board_init_i2c_devices_f(void)
++{
++	fancontrol_f();
++
++	return 0;
++}
++
+ int board_early_init_f(void)
+ {
+ 	fsl_lsch3_early_init_f();
+-- 
+2.12.2
+

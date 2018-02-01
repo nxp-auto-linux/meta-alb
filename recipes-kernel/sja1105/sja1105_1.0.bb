@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=cd21f59260ac175d0ec640af2d326f44"
 inherit module
 
 SRC_URI = "git://bitbucket.sw.nxp.com/scm/alb/sja1105x.git;branch=develop;protocol=https"
-SRCREV = "120019a4df79576e9713846dbf7d0a49c27d9067"
+SRCREV = "9265a11cac996688b8bdf900e00689a52342cb18"
 
 S = "${WORKDIR}/git"
 DESTDIR = "${D}{prefix}"

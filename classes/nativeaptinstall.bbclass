@@ -60,7 +60,13 @@ APTGET_CHROOT_DIR ?= "${D}"
 # Set this to anything but 0 to skip performing apt-get upgrade
 APTGET_SKIP_UPGRADE ?= "0"
 
-DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils"
+# Set this to anything but 0 to skip performing apt-get clean at the end
+APTGET_SKIP_CACHECLEAN ?= "0"
+
+APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${MACHINE}"
+APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
+
+DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native"
 
 # script and function references which reside in a different location
 # in staging, or references that have to be taken from chroot afterall.
@@ -182,6 +188,16 @@ END_USER
 		done
 	fi
 
+	# Yocto environment. If we kept apt packages privately from
+	# a prior run, prepopulate the package cache locally to avoid
+	# costly downloads
+	if [ -e "${APTGET_DL_CACHE}" ]; then
+		mkdir -p "${APTGET_CACHE_DIR}"
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
+		rsync -v -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
+	fi
+
 	# Before we can play with the package manager in any
 	# meaningful way, we need to sync the database.
 	if [ -n "${APTGET_EXTRA_SOURCE_PACKAGES}" ]; then
@@ -277,6 +293,18 @@ fakeroot do_shell_update_append() {
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install ${APTGET_EXTRA_PACKAGES_LAST}
 	fi
 
+	# Once we have done the installation, save off the package
+	# cache locally for repeated use of recipe building
+	if [ -e "${APTGET_CACHE_DIR}" ]; then
+		mkdir -p "${APTGET_DL_CACHE}"
+		rsync -v -d -u -t --include *.deb "${APTGET_CACHE_DIR}/" "${APTGET_DL_CACHE}" 
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
+	fi
+
+	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy clean
+	fi
+
 	set +x
 }
 
@@ -288,24 +316,23 @@ APTGET_ALL_PACKAGES = "${APTGET_EXTRA_PACKAGES} \
 	${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} \
 "
 python () {
-	allpackages = d.getVar('APTGET_ALL_PACKAGES', True)
-	pn = d.getVar('PN', True)
-	trans = d.getVar('APTGET_YOCTO_TRANSLATION', True)
-	if allpackages and pn and trans:
-		packagelist = allpackages.split()
-		translations = trans.split()
-		rprov = d.getVar('RPROVIDES_%s' % pn, True)
-		if rprov:
-			rprovides = rprov.split()
-			for p in packagelist:
-				for t in trans.split():
-					pkg,yocto = t.split(":")
-					if p == pkg:
-						yoctopackages = yocto.split(",")
-						for i in yocto.split(","):
-							if i not in rprovides:
-								rprovides.append(i)
-					else:
-						rprovides.append(p)
-			d.setVar('RPROVIDES_%s' % pn, ' '.join(rprovides))
+	pn = (d.getVar('PN', True) or "")
+	packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
+	translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()
+
+	rprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
+	for p in packagelist:
+		appendp = True
+		for t in translations:
+			pkg,yocto = t.split(":")
+			if p == pkg:
+				for i in yocto.split(","):
+					if i not in rprovides:
+						bb.debug(1, 'Adding RPROVIDES_%s = "%s"' % (pn, i))
+						rprovides.append(i)
+						appendp = False
+		if appendp:
+			rprovides.append(p)
+	if rprovides:
+		d.setVar('RPROVIDES_%s' % pn, ' '.join(rprovides))
 }

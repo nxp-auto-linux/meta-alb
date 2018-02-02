@@ -1,0 +1,67 @@
+From 8dfb1986698394eca4c77f66d634bd3fadf4445c Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 17 May 2017 11:30:14 +0200
+Subject: [PATCH] rcw: Enabled %dont64bswapcrc to avoid swap on endianess
+ changes on the fly
+
+---
+ rcw.py | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/rcw.py b/rcw.py
+index ef50e6f..0a3fcff 100755
+--- a/rcw.py
++++ b/rcw.py
+@@ -562,6 +562,9 @@ def create_binary():
+     endianess64b = 0
+     if 'littleendian64b' in vars and int(vars['littleendian64b'], 0):
+         endianess64b = 1
++    dont64bswapcrc = 0
++    if 'dont64bswapcrc' in vars and int(vars['dont64bswapcrc'], 0):
++        dont64bswapcrc = 1
+     bits = 0L
+ 
+     # Magic hack. If a pbi is specified and we didn't set the size,
+@@ -667,10 +670,15 @@ def create_binary():
+         binary += struct.pack(endianess + 'L', crc)
+ 
+     if endianess64b:
++        l = len(binary)
++        if dont64bswapcrc and options.pbl:
++            l -= 8
+         newbinary = ''
+-        for i in range(0, len(binary), 8):
++        for i in range(0, l, 8):
+                 x64 = struct.unpack('>Q', binary[i:i + 8])[0]
+                 newbinary += struct.pack('<Q', x64)
++        if l < len(binary):
++                newbinary += binary[i+8:i+16]
+         binary = newbinary
+ 
+     return binary
+@@ -703,12 +711,21 @@ def create_source():
+                 newbinary += struct.pack('<L', x32)
+         binary = newbinary
+ 
++    dont64bswapcrc = 0
++    if 'dont64bswapcrc' in vars and int(vars['dont64bswapcrc'], 0):
++        dont64bswapcrc = 1
++
+     # Re-sort words in 64b quads
+     if 'littleendian64b' in vars and int(vars['littleendian64b'], 0):
++        l = len(binary)
++        if dont64bswapcrc and l > (size / 8):
++            l -= 8
+         newbinary = ''
+-        for i in range(0, len(binary), 8):
++        for i in range(0, l, 8):
+                 x64 = struct.unpack('>Q', binary[i:i + 8])[0]
+                 newbinary += struct.pack('<Q', x64)
++        if l < len(binary):
++                newbinary += binary[i+8:i+16]
+         binary = newbinary
+ 
+     # Insert the #include statement for the RCWI file.  We assume that the
+-- 
+1.7.12.4
+

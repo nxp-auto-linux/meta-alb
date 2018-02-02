@@ -1,0 +1,42 @@
+From 95963a7b47f95427c58a94fd8f654db4cb58f2a5 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 25 Oct 2017 10:59:30 +0200
+Subject: [PATCH] rcw: Enabled A-008851 workaround for Gen3 RCW on LS1046ARDB
+
+---
+ ls1046ardb/pex_gen3_link.rcw | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/ls1046ardb/pex_gen3_link.rcw b/ls1046ardb/pex_gen3_link.rcw
+index 2d8f545..56c64ea 100644
+--- a/ls1046ardb/pex_gen3_link.rcw
++++ b/ls1046ardb/pex_gen3_link.rcw
+@@ -5,10 +5,25 @@
+  * PCIe3 GEN3_RELATED_OFF register: 0x0360_0890 little endian
+  * ALTCBAR Register (SCFG_ALTCBAR): 0x0157_0158 big endian
+  * PBL is also big endian block on LS1046A
++ *
++ * Errata A-008851 and A-010477
+  */
+ 
+ .pbi
+ write 0x570158, 0x00000300
++awrite 0x4008bc,0x01000000
++awrite 0x5008bc,0x01000000
++awrite 0x6008bc,0x01000000
++awrite 0x400154,0x47474747
++awrite 0x400158,0x47474747
++awrite 0x500154,0x47474747
++awrite 0x500158,0x47474747
++awrite 0x600154,0x47474747
++awrite 0x600158,0x47474747
++awrite 0x4008bc,0x00000000
++awrite 0x5008bc,0x00000000
++awrite 0x6008bc,0x00000000
++
+ awrite 0x400890, 0x01048000
+ awrite 0x500890, 0x01048000
+ awrite 0x600890, 0x01048000
+-- 
+1.7.12.4
+

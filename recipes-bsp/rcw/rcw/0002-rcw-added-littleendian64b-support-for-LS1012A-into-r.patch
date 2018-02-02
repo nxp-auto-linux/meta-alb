@@ -1,0 +1,41 @@
+From c28395a00b2aa6a6ffb469abbe01a1d3717f2cd0 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 17 May 2017 09:38:00 +0200
+Subject: [PATCH 2/2] rcw: added littleendian64b support for LS1012A into
+ rcw.py
+
+---
+ rcw.py | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/rcw.py b/rcw.py
+index 1e374ad..ef50e6f 100755
+--- a/rcw.py
++++ b/rcw.py
+@@ -559,6 +559,9 @@ def create_binary():
+     endianess = ">"
+     if 'littleendian' in vars and int(vars['littleendian'], 0):
+         endianess = "<"
++    endianess64b = 0
++    if 'littleendian64b' in vars and int(vars['littleendian64b'], 0):
++        endianess64b = 1
+     bits = 0L
+ 
+     # Magic hack. If a pbi is specified and we didn't set the size,
+@@ -663,6 +666,13 @@ def create_binary():
+         binary += cmd
+         binary += struct.pack(endianess + 'L', crc)
+ 
++    if endianess64b:
++        newbinary = ''
++        for i in range(0, len(binary), 8):
++                x64 = struct.unpack('>Q', binary[i:i + 8])[0]
++                newbinary += struct.pack('<Q', x64)
++        binary = newbinary
++
+     return binary
+ 
+ # Create a source file from a binary and a .rcwi file
+-- 
+1.7.12.4
+

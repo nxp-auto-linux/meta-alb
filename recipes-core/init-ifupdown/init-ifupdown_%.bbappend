@@ -7,8 +7,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 SRC_URI += "file://interfaces"
 
 do_install_ubuntu () {
-       install -d ${D}${sysconfdir}/network
-       install -m 0644 ${WORKDIR}/interfaces ${D}${sysconfdir}/network/interfaces
+       install -d ${D}${sysconfdir}/network/interfaces.d
+       install -m 0644 ${WORKDIR}/interfaces ${D}${sysconfdir}/network/interfaces.d
 }
 
 # If we provide netbase package from Ubuntu, RCONFLICTS

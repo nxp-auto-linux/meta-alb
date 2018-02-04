@@ -1,0 +1,1 @@
+COMPATIBLE_MACHINE_fsl-lsch3_append = "|(ls2080a|ls2084a|ls2088a)"

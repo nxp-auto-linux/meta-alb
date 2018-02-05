@@ -1,0 +1,32 @@
+From 1ab12ead1b55f6159b57c387bdecbd026171c7ca Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Wed, 31 Jan 2018 07:25:16 +0100
+Subject: [PATCH 1/4] qemu: Verbatim backport of
+ qemu.git-024949caf32805f4cc3e7d363a80084b47aac1f6.patch
+
+No change to the original patch at all.
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ linux-user/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 95241cc..34fbaa2 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -113,9 +113,9 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+ /* Make sure everything is in a consistent state for calling fork().  */
+ void fork_start(void)
+ {
+-    cpu_list_lock();
+-    qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
+     mmap_fork_start();
++    qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
++    cpu_list_lock();
+ }
+ 
+ void fork_end(int child)
+-- 
+2.15.1
+

@@ -11,9 +11,6 @@ APTGET_SKIP_UPGRADE = "1"
 
 ROOTFS_POSTPROCESS_COMMAND_append = "do_shell_update; do_update_host; do_update_dhcp_timeout;"
 
-# Do not run "run-postinsts" on the Ubuntu rootfs
-ROOTFS_PKGMANAGE_BOOTSTRAP = ""
-
 # This must be added first as it provides the foundation for
 # subsequent modifications to the rootfs
 IMAGE_INSTALL += "\

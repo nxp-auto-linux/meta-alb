@@ -1,7 +1,6 @@
 # Downconfigure Yocto environment to not pull in local things
 IMAGE_LINGUAS = ""
 SDK_RDEPENDS = ""
-ROOTFS_PKGMANAGE_BOOTSTRAP = ""
 POKY_DEFAULT_EXTRA_RDEPENDS = ""
 INITRAMFS_IMAGE = ""
 

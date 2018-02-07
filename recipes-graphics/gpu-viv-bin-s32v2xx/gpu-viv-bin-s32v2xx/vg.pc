@@ -1,0 +1,11 @@
+# Copyright 2018 NXP
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: vg
+Description: Freescale gpu-viv-bin-mx6q implementation of OpenVG
+Version: 1.1
+Libs: -L${libdir} -lOpenVG -lEGL -lGAL
+Cflags: -I${includedir}/ -DEGL_API_FB=1

@@ -1,0 +1,11 @@
+# Copyright 2018 NXP
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: egl
+Description: Freescale gpu-viv-bin-sac58r implementation of EGL
+Version: 5.0.11
+Libs: -L${libdir} -lEGL
+Cflags: -I${includedir}/ -D__linux__ -DEGL_API_FB=1 -DEGL_API_WL=1 -DWL_EGL_PLATFORM=1 -DLINUX

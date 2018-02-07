@@ -1,0 +1,11 @@
+# Copyright 2018 NXP
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: glesv2
+Description: Freescale gpu-viv-bin-sac58r implementation of OpenGL ESv2
+Version: 5.0.11
+Libs: -L${libdir} -lGLESv2 -lEGL -lGAL
+Cflags: -I${includedir}/

@@ -18,7 +18,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native"
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
 # BSP15.0
-SRCREV = "177623fd342a5344a581d44893a33c272a083f64"
+SRCREV = "72a6731fc381766c26a6c776227261627558a28b"
 
 SRC_URI += "file://fix-build-error-under-gcc6.patch"
 

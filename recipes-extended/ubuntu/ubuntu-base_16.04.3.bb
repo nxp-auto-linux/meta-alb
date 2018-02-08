@@ -50,7 +50,7 @@ APTGET_EXTRA_PACKAGES = "\
 # - python*, bc, db*: kernel-devsrc has scripts
 # Note how we translate Ubuntu names into Yocto names for proper
 # handling.
-APTGET_EXTRA_PACKAGES = "\
+APTGET_EXTRA_PACKAGES += "\
 	xz-utils \
 	python3.5 python bc db5.3 \
 	libffi6 \
@@ -131,6 +131,11 @@ fakeroot do_shell_update() {
 	# the dependency problem. UNDERSTAND AND FIX!
 	rm -f "${APTGET_CHROOT_DIR}/usr/lib/gnupg/gpgkeys_ldap"
 
+	# The default ubuntu-base rootfs does not do filesystem
+	# fixes on boot. Given the nature of the BlueBox, we want
+	# to enable that by default
+	sed -i "s/^#*FSCKFIX\s*=.*/FSCKFIX=yes/g" "${APTGET_CHROOT_DIR}/etc/default/rcS"
+
 	set +x
 }
 
@@ -172,7 +177,7 @@ python prep_xattr_postinst() {
 }
 PACKAGEFUNCS =+ "prep_xattr_postinst"
 
-COMPATIBLE = "ubuntu"
+COMPATIBLE_MACHINE = "ubuntu"
 
 # We should not have a single PROVIDES entry as this package
 # does not provide anything for build time of any other package!
@@ -196,20 +201,23 @@ RPROVIDES_${PN}_ubuntu += "\
 	libcap2 \
 	libblkid1 \
 	libfdisk1 \
+	libffi6 \
 	libmount1 \
 	libncurses5 \
 	libncursesw5 \
 	libpam \
+	libpanelw5 \
 	libsmartcols1 \
+	libtic5 \
 	libtinfo5 \
 	libuuid1 \
 	libz1 \
 	ncurses-terminfo-base \
+	netbase \
 	pam-plugin-deny \
 	pam-plugin-permit \
 	pam-plugin-unix \
 	pam-plugin-warn \
-	netbase \
 	update-alternatives \
 "
 

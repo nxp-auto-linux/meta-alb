@@ -1,0 +1,42 @@
+From 7c327f5cfcae5fa515c7a299616fac1e5a9925ae Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Wed, 31 Jan 2018 07:56:32 +0100
+Subject: [PATCH 4/4] qemu: Backport of
+ qemu.git-06065c451f10c7ef62cfb575a87f323a70ae1c9e
+
+No change to the original patch
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ linux-user/main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 34fbaa2..9857d6e 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -113,6 +113,7 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+ /* Make sure everything is in a consistent state for calling fork().  */
+ void fork_start(void)
+ {
++    start_exclusive();
+     mmap_fork_start();
+     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
+     cpu_list_lock();
+@@ -133,9 +134,13 @@ void fork_end(int child)
+         qemu_mutex_init(&tcg_ctx.tb_ctx.tb_lock);
+         qemu_init_cpu_list();
+         gdbserver_fork(thread_cpu);
++        /* qemu_init_cpu_list() takes care of reinitializing the
++         * exclusive state, so we don't need to end_exclusive() here.
++         */
+     } else {
+         qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
+         cpu_list_unlock();
++        end_exclusive();
+     }
+ }
+ 
+-- 
+2.15.1
+

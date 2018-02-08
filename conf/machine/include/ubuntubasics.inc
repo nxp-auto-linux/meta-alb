@@ -1,7 +1,6 @@
 # Downconfigure Yocto environment to not pull in local things
 IMAGE_LINGUAS = ""
 SDK_RDEPENDS = ""
-ROOTFS_PKGMANAGE_BOOTSTRAP = ""
 POKY_DEFAULT_EXTRA_RDEPENDS = ""
 INITRAMFS_IMAGE = ""
 
@@ -17,6 +16,7 @@ DISTRO_FEATURES_remove = "sysvinit bluez5"
 DISTRO_FEATURES_append = " systemd"
 DISTRO_FEATURES_append += "docker"
 VIRTUAL-RUNTIME_init_manager = "systemd"
+IMAGE_FSTYPES_remove = "cpio.gz tar.gz"
 
 # Turns out that we want the Yocto recipes as default provider, but
 # then we must ensure they do not get deployed to avoid pollution of

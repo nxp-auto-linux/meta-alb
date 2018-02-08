@@ -1,0 +1,135 @@
+From 0410eaaf7086e96d521b9e8eb44f2be670fb4259 Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Wed, 31 Jan 2018 07:40:00 +0100
+Subject: [PATCH 2/4] qemu: Backport of
+ qemu.git-a78b1299f1bbb9608e3e3a36a7f16cf700a2789d
+
+No change to the original patch
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ user-exec.c | 33 ++++++++++++---------------------
+ 1 file changed, 12 insertions(+), 21 deletions(-)
+
+diff --git a/user-exec.c b/user-exec.c
+index 2a975ea..3cf17a3 100644
+--- a/user-exec.c
++++ b/user-exec.c
+@@ -54,12 +54,13 @@ static void cpu_exit_tb_from_sighandler(CPUState *cpu, sigset_t *old_set)
+    the effective address of the memory exception. 'is_write' is 1 if a
+    write caused the exception and otherwise 0'. 'old_set' is the
+    signal set which should be restored */
+-static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
++static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
+                                     int is_write, sigset_t *old_set)
+ {
+     CPUState *cpu = current_cpu;
+     CPUClass *cc;
+     int ret;
++    unsigned long address = (unsigned long)info->si_addr;
+ 
+     /* For synchronous signals we expect to be coming from the vCPU
+      * thread (so current_cpu should be valid) and either from running
+@@ -180,7 +181,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+ #endif
+     pc = EIP_sig(uc);
+     trapno = TRAP_sig(uc);
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
++    return handle_cpu_signal(pc, info,
+                              trapno == 0xe ?
+                              (ERROR_sig(uc) >> 1) & 1 : 0,
+                              &MASK_sig(uc));
+@@ -226,7 +227,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+ #endif
+ 
+     pc = PC_sig(uc);
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
++    return handle_cpu_signal(pc, info,
+                              TRAP_sig(uc) == 0xe ?
+                              (ERROR_sig(uc) >> 1) & 1 : 0,
+                              &MASK_sig(uc));
+@@ -306,8 +307,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+         is_write = 1;
+     }
+ #endif
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
+-                             is_write, &uc->uc_sigmask);
++    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+ 
+ #elif defined(__alpha__)
+@@ -337,8 +337,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+         is_write = 1;
+     }
+ 
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
+-                             is_write, &uc->uc_sigmask);
++    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+ #elif defined(__sparc__)
+ 
+@@ -397,8 +396,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+             break;
+         }
+     }
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
+-                             is_write, sigmask);
++    return handle_cpu_signal(pc, info, is_write, sigmask);
+ }
+ 
+ #elif defined(__arm__)
+@@ -431,9 +429,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+      * later processor; on v5 we will always report this as a read).
+      */
+     is_write = extract32(uc->uc_mcontext.error_code, 11, 1);
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
+-                             is_write,
+-                             &uc->uc_sigmask);
++    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+ 
+ #elif defined(__aarch64__)
+@@ -460,8 +456,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+                 /* Ignore bits 23 & 24, controlling indexing.  */
+                 || (insn & 0x3a400000) == 0x28000000); /* C3.3.7,14-16 */
+ 
+-    return handle_cpu_signal(pc, (uintptr_t)info->si_addr,
+-                             is_write, &uc->uc_sigmask);
++    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+ 
+ #elif defined(__ia64)
+@@ -494,9 +489,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+     default:
+         break;
+     }
+-    return handle_cpu_signal(ip, (unsigned long)info->si_addr,
+-                             is_write,
+-                             (sigset_t *)&uc->uc_sigmask);
++    return handle_cpu_signal(ip, info, is_write, (sigset_t *)&uc->uc_sigmask);
+ }
+ 
+ #elif defined(__s390__)
+@@ -548,8 +541,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+         }
+         break;
+     }
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
+-                             is_write, &uc->uc_sigmask);
++    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+ 
+ #elif defined(__mips__)
+@@ -564,8 +556,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+ 
+     /* XXX: compute is_write */
+     is_write = 0;
+-    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
+-                             is_write, &uc->uc_sigmask);
++    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+ 
+ #else
+-- 
+2.15.1
+

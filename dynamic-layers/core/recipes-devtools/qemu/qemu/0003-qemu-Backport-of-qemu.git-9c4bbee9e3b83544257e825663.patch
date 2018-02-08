@@ -1,0 +1,106 @@
+From e8ac255f7056e8641403d34d18dfd28a22c4e66b Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Wed, 31 Jan 2018 07:53:27 +0100
+Subject: [PATCH 3/4] qemu: Backport of
+ qemu.git-9c4bbee9e3b83544257e82566342c29e15a88637
+
+No functional change to the original patch
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ accel/tcg/translate-all.c     | 51 ++++++++++++++++++++++-------------
+ user-exec.c                   | 13 ++++++++-
+ 3 files changed, 107 insertions(+), 20 deletions(-)
+ create mode 100644 accel/tcg/translate-all.c.rej
+
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 37ecafa..277d4d1 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2179,27 +2179,40 @@ int page_unprotect(target_ulong address, uintptr_t pc)
+ 
+     /* if the page was really writable, then we change its
+        protection back to writable */
+-    if ((p->flags & PAGE_WRITE_ORG) && !(p->flags & PAGE_WRITE)) {
+-        host_start = address & qemu_host_page_mask;
+-        host_end = host_start + qemu_host_page_size;
+-
+-        prot = 0;
++    if (p->flags & PAGE_WRITE_ORG) {
+         current_tb_invalidated = false;
+-        for (addr = host_start ; addr < host_end ; addr += TARGET_PAGE_SIZE) {
+-            p = page_find(addr >> TARGET_PAGE_BITS);
+-            p->flags |= PAGE_WRITE;
+-            prot |= p->flags;
+-
+-            /* and since the content will be modified, we must invalidate
+-               the corresponding translated code. */
+-            current_tb_invalidated |= tb_invalidate_phys_page(addr, pc);
+-#ifdef DEBUG_TB_CHECK
+-            tb_invalidate_check(addr);
++        if (p->flags & PAGE_WRITE) {
++            /* If the page is actually marked WRITE then assume this is because
++             * this thread raced with another one which got here first and
++             * set the page to PAGE_WRITE and did the TB invalidate for us.
++             */
++#ifdef TARGET_HAS_PRECISE_SMC
++            TranslationBlock *current_tb = tb_find_pc(pc);
++            if (current_tb) {
++                current_tb_invalidated = current_tb->invalid;
++            }
+ #endif
+-        }
+-        mprotect((void *)g2h(host_start), qemu_host_page_size,
+-                 prot & PAGE_BITS);
+-
++        } else {
++            host_start = address & qemu_host_page_mask;
++            host_end = host_start + qemu_host_page_size;
++
++            prot = 0;
++            for (addr = host_start; addr < host_end; addr += TARGET_PAGE_SIZE) {
++                p = page_find(addr >> TARGET_PAGE_BITS);
++                p->flags |= PAGE_WRITE;
++                prot |= p->flags;
++                /* and since the content will be modified, we must invalidate
++                   the corresponding translated code. */
++                current_tb_invalidated |= tb_invalidate_phys_page(addr, pc);
++
++#ifdef DEBUG_TB_CHECK
++                    tb_invalidate_check(addr);
++#endif
++
++            }
++            mprotect((void *)g2h(host_start), qemu_host_page_size,
++                     prot & PAGE_BITS);
++         }
+         mmap_unlock();
+         /* If current TB was invalidated return to main loop */
+         return current_tb_invalidated ? 2 : 1;
+diff --git a/user-exec.c b/user-exec.c
+index 3cf17a3..c5809c6 100644
+--- a/user-exec.c
++++ b/user-exec.c
+@@ -80,7 +80,18 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
+            pc, address, is_write, *(unsigned long *)old_set);
+ #endif
+     /* XXX: locking issue */
+-    if (is_write && h2g_valid(address)) {
++    /* Note that it is important that we don't call page_unprotect() unless
++     * this is really a "write to nonwriteable page" fault, because
++     * page_unprotect() assumes that if it is called for an access to
++     * a page that's writeable this means we had two threads racing and
++     * another thread got there first and already made the page writeable;
++     * so we will retry the access. If we were to call page_unprotect()
++     * for some other kind of fault that should really be passed to the
++     * guest, we'd end up in an infinite loop of retrying the faulting
++     * access.
++     */
++    if (is_write && info->si_signo == SIGSEGV && info->si_code == SEGV_ACCERR &&
++        h2g_valid(address)) {
+         switch (page_unprotect(h2g(address), pc)) {
+         case 0:
+             /* Fault not caused by a page marked unwritable to protect
+-- 
+2.15.1
+

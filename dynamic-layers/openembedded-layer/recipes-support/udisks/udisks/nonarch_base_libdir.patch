@@ -1,0 +1,16 @@
+diff -Naur udisks-1.0.4.orig/configure.ac udisks-1.0.4/configure.ac
+--- udisks-1.0.4.orig/configure.ac	2015-04-22 14:05:19.000000000 +0200
++++ udisks-1.0.4/configure.ac	2015-04-22 17:31:42.196034947 +0200
+@@ -228,10 +228,10 @@
+ fi
+ 
+ if test "$prefix" = "/usr" -o "$prefix" = "/usr/local" ; then
+-  slashlibdir=/lib
++  slashlibdir=${nonarch_base_libdir}
+   slashsbindir=/sbin
+ else
+-  slashlibdir=$prefix/lib
++  slashlibdir=$prefix${nonarch_base_libdir}
+   slashsbindir=$prefix/sbin
+ fi
+ AC_SUBST(slashlibdir)

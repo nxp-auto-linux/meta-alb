@@ -1,0 +1,18 @@
+diff --git a/networking/ifupdown.c b/networking/ifupdown.c
+index 7ca7ad8..2c2725b 100644
+--- a/networking/ifupdown.c
++++ b/networking/ifupdown.c
+@@ -526,11 +526,11 @@ static const struct dhcp_client_t ext_dhcp_clients[] = {
+ 		"true",
+ 	},
+ 	{ "dhcpcd",
+-		"dhcpcd[[ -h %hostname%]][[ -i %vendor%]][[ -I %client%]][[ -l %leasetime%]] %iface%",
++		"dhcpcd[[ -h %hostname%]][[ -i %vendor%]][[ -I %client%]][[ -l %leasetime%]] %dhcpcd_opts% %iface%",
+ 		"dhcpcd -k %iface%",
+ 	},
+ 	{ "dhclient",
+-		"dhclient -pf /var/run/dhclient.%iface%.pid %iface%",
++		"dhclient -pf /var/run/dhclient.%iface%.pid %dhclient_opts% %iface%",
+ 		"kill -9 `cat /var/run/dhclient.%iface%.pid` 2>/dev/null",
+ 	},
+ 	{ "pump",

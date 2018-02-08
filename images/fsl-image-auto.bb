@@ -5,7 +5,6 @@
 require images/fsl-image-base.bb
 require images/fsl-image-core-common.inc
 include images/fsl-image-s32-common.inc
-include images/fsl-dpaa2.inc
 
 inherit distro_features_check
 

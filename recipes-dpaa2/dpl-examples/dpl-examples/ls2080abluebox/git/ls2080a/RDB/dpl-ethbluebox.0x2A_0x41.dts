@@ -1,0 +1,533 @@
+/*
+ * Copyright 2016 Freescale Semiconductor, Inc.
+ * Copyright 2017 NXP
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the above-listed copyright holders nor the
+ *     names of any contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *
+ * ALTERNATIVELY, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") as published by the Free Software
+ * Foundation, either version 2 of that License or (at your option) any
+ * later version.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ * BlueBox DPL featuring SerDes 0x2A_0x41.
+ * This DPL defines four network interfaces mapped to the ETH0-3 copper ports
+ * and all four optical ports to permit flexibility without looking at
+ * overall performance limits.
+ * This together with the available DPMCP objects should be enough to boot Linux
+ * and to allow the dynamic addition of other objects to the Linux container,
+ * using the 'restool' utility.
+ */
+
+/dts-v1/;
+/ {
+	dpl-version = <10>;
+	/*****************************************************************
+	 * Containers
+	 *****************************************************************/
+	containers {
+		dprc@1 {
+			compatible = "fsl,dprc";
+			parent = "none";
+			options = "DPRC_CFG_OPT_SPAWN_ALLOWED" , "DPRC_CFG_OPT_ALLOC_ALLOWED", "DPRC_CFG_OPT_IRQ_CFG_ALLOWED";
+			objects {
+				/* ------------- MACs --------------*/
+				obj_set@dpmac {
+					type = "dpmac";
+					ids = <1 2 3 4 5 6 7 8>;
+				};
+
+				/* ------------ DPNIs --------------*/
+				obj_set@dpni {
+					type = "dpni";
+					ids = <0 1 2 3 4 5 6 7>;
+				};
+
+				/* ------------ DPBPs --------------*/
+				/* One per DPNI */
+				obj_set@dpbp {
+					type = "dpbp";
+					ids = <0 1 2 3 4 5 6 7>;
+				};
+
+				/* ------------ DPIOs --------------*/
+				/* One per running GPP */
+				obj_set@dpio {
+					type = "dpio";
+					ids = <0 1 2 3 4 5 6 7>;
+				};
+
+				/* ------------ DPMCPs --------------*/
+				/* One per DPNI, one per DPMAC,
+				 * one per DPDMAI, one per TBD
+				 */
+				obj_set@dpmcp {
+					type = "dpmcp";
+					ids = <1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28>;
+				};
+
+				/* ------------ DPCON --------------*/
+				/* One per DPIO, one per DPNI */
+				obj_set@dpcon {
+					type = "dpcon";
+					ids = <0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63>;
+				};
+
+				/* ------------ DPDMAI --------------*/
+				/* One DMA interface */
+				obj@801 {
+					obj_name="dpdmai@1";
+				};
+			};
+		};
+	};
+
+	/*****************************************************************
+	 * Objects
+	 *****************************************************************/
+	objects {
+		/* ------------ DPNI --------------*/
+		dpni@0 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+		dpni@1 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+		dpni@2 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+		dpni@3 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+		dpni@4 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+		dpni@5 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+		dpni@6 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+		dpni@7 {
+			options = "";
+			num_queues = <1>;
+			num_tcs = <1>;
+		};
+
+		/* ------------ DPBP --------------*/
+		dpbp@0 {
+		};
+		dpbp@1 {
+		};
+		dpbp@2 {
+		};
+		dpbp@3 {
+		};
+		dpbp@4 {
+		};
+		dpbp@5 {
+		};
+		dpbp@6 {
+		};
+		dpbp@7 {
+		};
+
+		/* ------------ DPIO --------------*/
+		dpio@0 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+		dpio@1 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+		dpio@2 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+		dpio@3 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+		dpio@4 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+		dpio@5 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+		dpio@6 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+		dpio@7 {
+			channel_mode = "DPIO_LOCAL_CHANNEL";
+			num_priorities = <8>;
+		};
+
+		/* NB: for MC 10.1.x-10.2.x, DPDMAI must be
+		 * defined before anything else, or
+		 * MC might not work as expected.
+		 */
+		/* ------------ DPDMAI --------------*/
+		dpdmai@1 {
+			priorities = <2 5>;
+		};
+
+		/* ------------ DPMAC --------------*/
+
+		dpmac@1 {
+		};
+		dpmac@2 {
+		};
+		dpmac@3 {
+		};
+		dpmac@4 {
+		};
+		dpmac@5 {
+		};
+		dpmac@6 {
+		};
+		dpmac@7 {
+		};
+		dpmac@8 {
+		};
+
+		/* ------------ DPMCP --------------*/
+		dpmcp@1 {
+		};
+		dpmcp@2 {
+		};
+		dpmcp@3 {
+		};
+		dpmcp@4 {
+		};
+		dpmcp@5 {
+		};
+		dpmcp@6 {
+		};
+		dpmcp@7 {
+		};
+		dpmcp@8 {
+		};
+		dpmcp@9 {
+		};
+		dpmcp@10 {
+		};
+		dpmcp@11 {
+		};
+		dpmcp@12 {
+		};
+		dpmcp@13 {
+		};
+		dpmcp@14 {
+		};
+		dpmcp@15 {
+		};
+		dpmcp@16 {
+		};
+		dpmcp@17 {
+		};
+		dpmcp@18 {
+		};
+		dpmcp@19 {
+		};
+		dpmcp@20 {
+		};
+		dpmcp@21 {
+		};
+		dpmcp@22 {
+		};
+		dpmcp@23 {
+		};
+		dpmcp@24 {
+		};
+		dpmcp@25 {
+		};
+		dpmcp@26 {
+		};
+		dpmcp@27 {
+		};
+		dpmcp@28 {
+		};
+
+		/* ------------ DPCON --------------*/
+		/* Using 2-WQ channels with DPNIs with support for a single traffic-class */
+		dpcon@0 {
+			num_priorities=<2>;
+		};
+		dpcon@1 {
+			num_priorities=<2>;
+		};
+		dpcon@2 {
+			num_priorities=<2>;
+		};
+		dpcon@3 {
+			num_priorities=<2>;
+		};
+		dpcon@4 {
+			num_priorities=<2>;
+		};
+		dpcon@5 {
+			num_priorities=<2>;
+		};
+		dpcon@6 {
+			num_priorities=<2>;
+		};
+		dpcon@7 {
+			num_priorities=<2>;
+		};
+		dpcon@8 {
+			num_priorities=<2>;
+		};
+		dpcon@9 {
+			num_priorities=<2>;
+		};
+		dpcon@10 {
+			num_priorities=<2>;
+		};
+		dpcon@11 {
+			num_priorities=<2>;
+		};
+		dpcon@12 {
+			num_priorities=<2>;
+		};
+		dpcon@13 {
+			num_priorities=<2>;
+		};
+		dpcon@14 {
+			num_priorities=<2>;
+		};
+		dpcon@15 {
+			num_priorities=<2>;
+		};
+		dpcon@16 {
+			num_priorities=<2>;
+		};
+		dpcon@17 {
+			num_priorities=<2>;
+		};
+		dpcon@18 {
+			num_priorities=<2>;
+		};
+		dpcon@19 {
+			num_priorities=<2>;
+		};
+		dpcon@20 {
+			num_priorities=<2>;
+		};
+		dpcon@21 {
+			num_priorities=<2>;
+		};
+		dpcon@22 {
+			num_priorities=<2>;
+		};
+		dpcon@23 {
+			num_priorities=<2>;
+		};
+		dpcon@24 {
+			num_priorities=<2>;
+		};
+		dpcon@25 {
+			num_priorities=<2>;
+		};
+		dpcon@26 {
+			num_priorities=<2>;
+		};
+		dpcon@27 {
+			num_priorities=<2>;
+		};
+		dpcon@28 {
+			num_priorities=<2>;
+		};
+		dpcon@29 {
+			num_priorities=<2>;
+		};
+		dpcon@30 {
+			num_priorities=<2>;
+		};
+		dpcon@31 {
+			num_priorities=<2>;
+		};
+		dpcon@32 {
+			num_priorities=<2>;
+		};
+		dpcon@33 {
+			num_priorities=<2>;
+		};
+		dpcon@34 {
+			num_priorities=<2>;
+		};
+		dpcon@35 {
+			num_priorities=<2>;
+		};
+		dpcon@36 {
+			num_priorities=<2>;
+		};
+		dpcon@37 {
+			num_priorities=<2>;
+		};
+		dpcon@38 {
+			num_priorities=<2>;
+		};
+		dpcon@39 {
+			num_priorities=<2>;
+		};
+		dpcon@40 {
+			num_priorities=<2>;
+		};
+		dpcon@41 {
+			num_priorities=<2>;
+		};
+		dpcon@42 {
+			num_priorities=<2>;
+		};
+		dpcon@43 {
+			num_priorities=<2>;
+		};
+		dpcon@44 {
+			num_priorities=<2>;
+		};
+		dpcon@45 {
+			num_priorities=<2>;
+		};
+		dpcon@46 {
+			num_priorities=<2>;
+		};
+		dpcon@47 {
+			num_priorities=<2>;
+		};
+		dpcon@48 {
+			num_priorities=<2>;
+		};
+		dpcon@49 {
+			num_priorities=<2>;
+		};
+		dpcon@50 {
+			num_priorities=<2>;
+		};
+		dpcon@51 {
+			num_priorities=<2>;
+		};
+		dpcon@52 {
+			num_priorities=<2>;
+		};
+		dpcon@53 {
+			num_priorities=<2>;
+		};
+		dpcon@54 {
+			num_priorities=<2>;
+		};
+		dpcon@55 {
+			num_priorities=<2>;
+		};
+		dpcon@56 {
+			num_priorities=<2>;
+		};
+		dpcon@57 {
+			num_priorities=<2>;
+		};
+		dpcon@58 {
+			num_priorities=<2>;
+		};
+		dpcon@59 {
+			num_priorities=<2>;
+		};
+		dpcon@60 {
+			num_priorities=<2>;
+		};
+		dpcon@61 {
+			num_priorities=<2>;
+		};
+		dpcon@62 {
+			num_priorities=<2>;
+		};
+		dpcon@63 {
+			num_priorities=<2>;
+		};
+	};
+
+	/*****************************************************************
+	 * Connections
+	 *****************************************************************/
+	connections {
+		connection@1{
+			/* 1st copper port (ETH4 on the RDB chassis) */
+			endpoint1 = "dpni@4";
+			endpoint2 = "dpmac@1";
+		};
+		connection@2{
+			/* 2nd copper port (ETH5 on the RDB chassis) */
+			endpoint1 = "dpni@5";
+			endpoint2 = "dpmac@2";
+		};
+		connection@3{
+			/* 3rd copper port (ETH6 on the RDB chassis) */
+			endpoint1 = "dpni@6";
+			endpoint2 = "dpmac@3";
+		};
+		connection@4{
+			/* 4th copper port (ETH7 on the RDB chassis) */
+			endpoint1 = "dpni@7";
+			endpoint2 = "dpmac@4";
+		};
+		connection@5{
+			/* 1st copper port (ETH0 on the RDB chassis) */
+			endpoint1 = "dpni@0";
+			endpoint2 = "dpmac@5";
+		};
+		connection@6{
+			/* 2nd copper port (ETH1 on the RDB chassis) */
+			endpoint1 = "dpni@1";
+			endpoint2 = "dpmac@6";
+		};
+		connection@7{
+			/* 3rd copper port (ETH2 on the RDB chassis) */
+			endpoint1 = "dpni@2";
+			endpoint2 = "dpmac@7";
+		};
+		connection@8{
+			/* 4th copper port (ETH3 on the RDB chassis) */
+			endpoint1 = "dpni@3";
+			endpoint2 = "dpmac@8";
+		};
+	};
+};

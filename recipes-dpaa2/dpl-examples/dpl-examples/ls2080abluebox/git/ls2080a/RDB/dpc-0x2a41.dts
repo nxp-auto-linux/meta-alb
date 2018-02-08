@@ -1,0 +1,91 @@
+/*
+ * Copyright 2016 Freescale Semiconductor, Inc.
+ * Copyright 2017 NXP
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the above-listed copyright holders nor the
+ *     names of any contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *
+ * ALTERNATIVELY, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") as published by the Free Software
+ * Foundation, either version 2 of that License or (at your option) any
+ * later version.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ * DPC for ls2080a RDB boards featuring SerDes 0x2A_0x41.
+ * This DPC defines one network interface mapped on the ETH0 copper port.
+ * This together with the available DPMCP objects should be enough to boot Linux
+ * and to allow the dynamic addition of other objects to the Linux container,
+ * using the 'restool' utility.
+ */
+/dts-v1/;
+/* DPC */
+/ {
+	resources {
+		icid_pools {
+			icid_pool@1 {
+				num = <100>;
+				base_icid = <0>;
+			};
+		};
+	};
+	mc_general {
+		log {
+			mode = "LOG_MODE_ON";
+			level = "LOG_LEVEL_WARNING";
+		};
+		console {
+			mode = "CONSOLE_MODE_OFF";
+			uart_id = <2>;
+		};
+	};
+	controllers {
+		qbman {
+			/* Transform this number of 8-WQ channels into
+			 * four times as many 2-WQ channels. This is to allow
+			 * for the creation of more DPCON objects, albeit with
+			 * fewer priorities supported.
+			 */
+			wq_ch_conversion = <24>;
+		};
+	};
+	board_info {
+		/* For RDB SerDes 0x2a_41 */
+		ports {
+			/* AQR PHYs */
+			mac@5 {
+				link_type = "MAC_LINK_TYPE_PHY";
+			};
+			mac@6 {
+				link_type = "MAC_LINK_TYPE_PHY";
+			};
+			mac@7 {
+				link_type = "MAC_LINK_TYPE_PHY";
+			};
+			mac@8 {
+				link_type = "MAC_LINK_TYPE_PHY";
+			};
+		};
+	};
+};

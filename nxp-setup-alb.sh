@@ -139,7 +139,7 @@ usage() {
     * [-m machine]: the target machine to be built.
     * [-b path]:    non-default path of project build folder.
     * [-e layers]:  extra layer names
-    * [-D distro]:  override the default distro selection
+    * [-D distro]:  override the default distro selection ($DEFAULT_DISTRO)
     * [-j jobs]:    number of jobs for make to spawn during the compilation stage.
     * [-t tasks]:   number of BitBake tasks that can be issued in parallel.
     * [-d path]:    non-default path of DL_DIR (downloaded source)
@@ -203,6 +203,8 @@ LAYER_LIST=" \
     \
     meta-freescale \
     \
+    meta-alb \
+    \
     $extra_layers \
 "
 
@@ -221,9 +223,15 @@ if test $setup_error || test $setup_h; then
     usage && clean_up && return
 fi
 
+DEFAULT_DISTRO="fsl-auto"
+
 unset DISTRO
 if [ -n "$distro_override" ]; then
     DISTRO="$distro_override";
+fi
+
+if [ -z "$DISTRO" ]; then
+    DISTRO="$DEFAULT_DISTRO"
 fi
 
 # Check the machine type specified
@@ -238,10 +246,6 @@ if [ -n "${MACHINE}" ]; then
     done
 else
     usage && clean_up && return
-fi
-
-if [ -z "$DISTRO" ]; then
-    DISTRO="fsl-qoriq"
 fi
 
 if [ -n "${MACHINELAYER}" ]; then 

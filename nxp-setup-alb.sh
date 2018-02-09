@@ -24,7 +24,12 @@
 #          Heinz Wrobel <heinz.wrobel@nxp.com>
 #          Ionut Vicovan <ionut.vicovan@nxp.com>
 
-PROGNAME="setup-env"
+# Use hardcoded name of the script here, do not attempt to determine it.
+# It is the safest way, since we want to support all shells
+# and practice showed that there is no simple generic way to get the
+# script name when sourced (we can't rely on using built-in variables
+# $0, $_, $BASH_SOURCE since they behave differently or are not always available)
+PROGNAME="nxp-setup-alb.sh"
 
 # This defines which machine conf files we ignore for the underlying SDK
 MACHINEEXCLUSION="^imx|^twr"

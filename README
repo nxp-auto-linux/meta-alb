@@ -6,7 +6,7 @@ Creating Build Directories and Testing the Installation
 
 You can create a build directory in the BSP root with command:
 
-$ . setup-env -D fsl-auto -e meta-alb -m <machine>
+$ . nxp-setup-alb.sh -D fsl-auto -e meta-alb -m <machine>
 
 where <machine> can be any of the following NXP targets:
 s32v234evb, s32v234bbmini, etc.

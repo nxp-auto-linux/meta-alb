@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=cd21f59260ac175d0ec640af2d326f44"
 
 inherit module
 
-SRC_URI = "git://bitbucket.sw.nxp.com/scm/alb/sja1105x.git;branch=develop;protocol=https"
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
 SRCREV = "9265a11cac996688b8bdf900e00689a52342cb18"
 
 S = "${WORKDIR}/git"

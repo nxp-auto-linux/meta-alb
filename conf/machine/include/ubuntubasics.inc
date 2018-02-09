@@ -59,4 +59,32 @@ DISTRO_NEVER_WRITE_PACKAGE = "\
 	zlib \
 "
 
+# Avoid the warning reporting for recipes that RDEPENDS on ubuntu-base
+# The workaround is to INSANE_SKIP build-deps for these recipes
+require conf/machine/include/set_insane_skip.inc
+SET_INSANE_SKIP_VALUE = " build-deps "
+SET_INSANE_SKIP_LIST = "\
+	flex \
+	sqlite3 \
+	db-bin \
+	ncurses \
+	ncurses-libticw \
+	ncurses-libpanel \
+	ncurses-libncurses \
+	ncurses-libncursesw \
+	ncurses-libpanelw \
+	ncurses-libformw \
+	ncurses-libtic \
+	ncurses-libmenu \
+	ncurses-libmenuw \
+	ncurses-libform \
+	ncurses-tools \
+	openssl \
+	python3 \
+	python3-ctypes \
+	python3-misc \
+	python3-sqlite3 \
+	python3-curses \
+"
+
 require conf/machine/include/ubuntutcconf.inc

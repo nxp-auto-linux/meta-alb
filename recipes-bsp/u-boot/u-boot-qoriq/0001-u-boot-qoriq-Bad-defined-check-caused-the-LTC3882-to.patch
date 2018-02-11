@@ -1,0 +1,27 @@
+From a948ce0f7002797ff07533560e1f600234c2f2b2 Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Fri, 9 Feb 2018 21:22:15 +0100
+Subject: [PATCH] u-boot-qoriq: Bad defined() check caused the LTC3882 to be
+ ignored for VID
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ board/freescale/common/vid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/board/freescale/common/vid.c b/board/freescale/common/vid.c
+index b8faf350d2..96144a8e39 100644
+--- a/board/freescale/common/vid.c
++++ b/board/freescale/common/vid.c
+@@ -76,7 +76,7 @@ static int find_vid_chip_on_i2c(void)
+ 			return i2caddress;
+ 	}
+ #endif
+-#if defined(CONFIG_VOL_MONITOR_LTC3882)
++#if defined(CONFIG_VOL_MONITOR_LTC3882_READ) || defined(CONFIG_VOL_MONITOR_LTC3882_SET)
+ 	int i2caddress = I2C_VOL_MONITOR_ADDR;
+ 	int ret;
+ 	u8 buf[8];
+-- 
+2.15.1
+

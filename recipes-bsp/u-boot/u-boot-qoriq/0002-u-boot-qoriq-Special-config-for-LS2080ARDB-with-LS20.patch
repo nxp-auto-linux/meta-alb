@@ -21,7 +21,7 @@ index d14c662ddb..ad3182a0b5 100644
  dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
  	fsl-ls2080a-rdb.dtb \
  	fsl-ls2081a-rdb.dtb \
-++	fsl-ls2084a-rdb.dtb \
++	fsl-ls2084a-rdb.dtb \
  	fsl-ls2084a-bbmini.dtb \
  	fsl-ls2088a-rdb-qspi.dtb \
  	fsl-ls1088a-rdb.dtb \

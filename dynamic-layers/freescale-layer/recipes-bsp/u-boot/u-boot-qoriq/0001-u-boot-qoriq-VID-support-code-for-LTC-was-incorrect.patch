@@ -1,7 +1,7 @@
 From 8c2d7a681e5289fa223ce75ab66d5ac51853f13f Mon Sep 17 00:00:00 2001
 From: nxa15299 <Heinz.Wrobel@nxp.com>
 Date: Sun, 11 Feb 2018 17:25:07 +0100
-Subject: [PATCH] iu-boot-qoriq: VID support code for LTC was incorrectly
+Subject: [PATCH] u-boot-qoriq: VID support code for LTC was incorrectly
  ported from EAR3
 
 Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>

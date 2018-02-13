@@ -46,6 +46,16 @@ SRC_URI_append_t4bluebox += " \
     file://enablegfxhwt4.cfg \
 "
 
+# pci vdev sources
+SRC_URI_append_ls1043ardb += " \
+    git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=pci-vdev;name=pci-vdev;destsuffix=git/drivers/pci/pci-vdev \
+    file://0001-Add-support-for-building-NXP-VETH-module.patch \
+    file://0001-LS1043A-Adjust-device-tree-ranges-for-PCIe.patch \
+    file://pci-vdev.cfg \
+"
+
+SRCREV_pci-vdev = "26b0de749789c22779820051ea7992860abca19e"
+
 # Note how our lxc.cfg comes *AFTER* containers.config to add to it
 COMMONDELTA_KERNEL_DEFCONFIG = "enablepktgen.cfg iptables.cfg iso9660.cfg enableusbcan.cfg containers.config lxc.cfg"
 DELTA_KERNEL_DEFCONFIG_append_ls2 = " ls2blueboxconfig dpaa2qdma.cfg dpaa2debugfs.cfg ${COMMONDELTA_KERNEL_DEFCONFIG}"
@@ -55,4 +65,5 @@ DELTA_KERNEL_DEFCONFIG_append_ls2084abbmini = " vnet_ls2.cfg"
 DELTA_KERNEL_DEFCONFIG_append_t4bluebox = " t4blueboxconfig ${COMMONDELTA_KERNEL_DEFCONFIG}"
 #DELTA_KERNEL_DEFCONFIG_append_t4bluebox = " enablegfxhwt4.cfg"
 DELTA_KERNEL_DEFCONFIG_append_ls1043ardb = " ${COMMONDELTA_KERNEL_DEFCONFIG}"
+DELTA_KERNEL_DEFCONFIG_append_ls1043ardb += " pci-vdev.cfg"
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.cfg', '', d)}"

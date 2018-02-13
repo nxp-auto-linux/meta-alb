@@ -1,0 +1,30 @@
+From 86a444ae61e4c61087e62fd0bcd78512ada3b1e9 Mon Sep 17 00:00:00 2001
+From: Bogdan Folea <bogdan.folea@nxp.com>
+Date: Wed, 14 Mar 2018 13:44:06 +0200
+Subject: [PATCH] [LS1043A] Adjust device tree ranges for PCIe
+
+- update PCI bus address to 0x80000000 for PCIe bus 2
+- change AXI bus address to 0x4880000000 for PCIe bus 2
+- increase address range to 0x80000000 for PCIe bus 2
+
+Signed-off-by: Bogdan Folea <bogdan.folea@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi
+index ef7c0a2..da1fbc6 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi
+@@ -832,7 +832,7 @@
+ 			num-lanes = <2>;
+ 			bus-range = <0x0 0xff>;
+ 			ranges = <0x81000000 0x0 0x00000000 0x48 0x00010000 0x0 0x00010000   /* downstream I/O */
+-				  0x82000000 0x0 0x40000000 0x48 0x40000000 0x0 0x40000000>; /* non-prefetchable memory */
++				  0x82000000 0x0 0x80000000 0x48 0x80000000 0x0 0x80000000>; /* non-prefetchable memory */
+ 			msi-parent = <&msi1>, <&msi2>, <&msi3>;
+ 			#interrupt-cells = <1>;
+ 			interrupt-map-mask = <0 0 0 7>;
+-- 
+1.9.1
+

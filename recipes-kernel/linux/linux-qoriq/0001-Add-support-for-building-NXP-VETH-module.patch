@@ -1,0 +1,34 @@
+From 64423d68fe951552550ad7d2cbd9d552ded5c30e Mon Sep 17 00:00:00 2001
+From: Valentin Ciocoi-radulescu <valentin.ciocoi@nxp.com>
+Date: Thu, 15 Mar 2018 20:23:09 +0200
+Subject: [PATCH] Add support for building NXP VETH module
+
+Signed-off-by: Valentin Ciocoi-radulescu <valentin.ciocoi@nxp.com>
+---
+ drivers/pci/Kconfig  | 2 ++
+ drivers/pci/Makefile | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+index 73de4ef..7fe7999 100644
+--- a/drivers/pci/Kconfig
++++ b/drivers/pci/Kconfig
+@@ -119,3 +119,5 @@ config PCI_LABEL
+ 	select NLS
+ 
+ source "drivers/pci/host/Kconfig"
++
++source "drivers/pci/pci-vdev/Kconfig"
+diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
+index be3f631..3faee7f 100644
+--- a/drivers/pci/Makefile
++++ b/drivers/pci/Makefile
+@@ -62,3 +62,5 @@ ccflags-$(CONFIG_PCI_DEBUG) := -DDEBUG
+ 
+ # PCI host controller drivers
+ obj-y += host/
++
++obj-$(CONFIG_NXP_VETH) += pci-vdev/
+-- 
+2.7.4
+

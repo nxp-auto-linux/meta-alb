@@ -26,5 +26,8 @@ IMAGE_INSTALL += "dhrystone ramsmp"
 # TODO: add them to the RDEPENDS list in the OpenMPI demo recipe
 IMAGE_INSTALL += "imagemagick gnuplot mpich mpich-dev"
 
+# Supporting complex evaluation scenarios
+IMAGE_INSTALL += "openssl-misc"
+
 # Increase the freespace
 IMAGE_ROOTFS_EXTRA_SPACE ?= "54000"

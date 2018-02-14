@@ -4,7 +4,7 @@ require conf/machine/include/soc-family.inc
 
 SOC_FAMILY_prepend = "fsl-lsch3:ls2:ls208xa:"
 
-IMAGE_FSTYPES = "tar.gz ext3 ext3.gz"
+IMAGE_FSTYPES = "tar.gz ext3"
 
 EXTRA_IMAGECMD_ext3 = "-i 4096 -L ${IMAGE_NAME}"
 
@@ -26,4 +26,13 @@ UBOOT_ENTRYPOINT = "0x80080000"
 # specifies an addition of "sdcard" to IMAGE_FSTYPES.
 # Note that we can not boot U-Boot from SD Card on BB Classic
 IMAGE_CLASSES += "image_types_fsl_sdcard"
+SDCARD_ROOTFS ?= "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ext3"
+UBOOT_TYPE_SDCARD ?= "${MACHINE}"
+UBOOT_SUFFIX_SDCARD ?= "${UBOOT_SUFFIX}"
+
+# 64 MB boot partition
+BOOT_SPACE = "65536"
+
+# Other types of images
 IMAGE_CLASSES += "image_types_fsl_itb image_types_fsl_flashimage"
+

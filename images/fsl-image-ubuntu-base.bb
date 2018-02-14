@@ -67,17 +67,6 @@ IMAGE_INSTALL_append += "\
     init-ifupdown \
 "
 
-# Minimum support for LS2 and S32V specific elements.
-IMAGE_INSTALL_append_ls2084abbmini += "\
-    dpl-examples-image \
-    restool \
-"
-
-# We want easy installation of the BlueBox image to the target
-DEPENDS_append_ls2084abbmini = " \
-    bbdeployscripts \
-"
-
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234bbmini += "\
     sja1105 \

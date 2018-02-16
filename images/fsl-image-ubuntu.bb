@@ -8,13 +8,10 @@ require fsl-image-ubuntu-base.bb
 #   bazel \
 #"
 
-## FIX!
-#IMAGE_INSTALL_append_ls2084abbmini += " \
-#    kvaser \
-#"
+IMAGE_INSTALL_append_ls2084abbmini += " \
+    kvaser \
+"
 
-#    openjdk-8-jdk \
-#
 APTGET_EXTRA_PACKAGES += " \
     aptitude \
     openjdk-8-jdk \

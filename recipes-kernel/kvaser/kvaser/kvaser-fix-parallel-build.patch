@@ -1,0 +1,51 @@
+From 18eabd76edcdf22ab1b53fc51aad08572b20fc56 Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Thu, 7 Dec 2017 18:11:39 +0200
+Subject: [PATCH 2/2] kvaser: fix parallel build
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ Makefile                     | 14 +++++++-------
+ common/osif_functions_user.c |  1 -
+ 2 files changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ff6aa2d..7654922 100644
+--- a/Makefile
++++ b/Makefile
+@@ -89,25 +89,25 @@ linlib:
+ common:
+ 	@cd ./common; $(MAKE) kv_module
+ 
+-pcican:
++pcican: common
+ 	@cd ./pcican; $(MAKE) kv_module
+ 
+-pcican2:
++pcican2: common
+ 	@cd ./pcican2; $(MAKE) kv_module
+ 
+-usbcanII:
++usbcanII: common
+ 	@cd ./usbcanII; $(MAKE) kv_module
+ 
+-leaf:
++leaf: common
+ 	@cd ./leaf; $(MAKE) kv_module
+ 
+-mhydra:
++mhydra: common
+ 	@cd ./mhydra; $(MAKE) kv_module
+ 
+-virtualcan:
++virtualcan: common
+ 	@cd ./virtualcan; $(MAKE) kv_module
+ 
+-pciefd:
++pciefd: common
+ 	@cd ./pciefd; $(MAKE) kv_module
+ 
+ install: $(DRIVERS)
+-- 
+2.7.4
+

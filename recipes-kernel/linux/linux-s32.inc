@@ -19,23 +19,24 @@ KERNEL_LD_append = " ${TOOLCHAIN_OPTIONS}"
 S = "${WORKDIR}/git"
 do_preconfigure_prepend() {
     mkdir -p ${B}
+    cd ${B}
     # copy desired defconfig so we pick it up for the real kernel_do_configure
-    cp ${KERNEL_DEFCONFIG} ${B}/.config
+    cp ${KERNEL_DEFCONFIG} .config
 
     # During development we want to do easy config overrides
     # add config fragments
     for deltacfg in ${DELTA_KERNEL_DEFCONFIG}; do
         if [ -f "${deltacfg}" ]; then
-            ${S}/scripts/kconfig/merge_config.sh -m ${B}/.config ${deltacfg}
+            ${S}/scripts/kconfig/merge_config.sh -m .config ${deltacfg}
         elif [ -f "${WORKDIR}/${deltacfg}" ]; then
-            ${S}/scripts/kconfig/merge_config.sh -m ${B}/.config ${WORKDIR}/${deltacfg}
+            ${S}/scripts/kconfig/merge_config.sh -m .config ${WORKDIR}/${deltacfg}
         elif [ -f "${S}/arch/${ARCH}/configs/${deltacfg}" ]; then
-            ${S}/scripts/kconfig/merge_config.sh -m ${B}/.config \
+            ${S}/scripts/kconfig/merge_config.sh -m .config \
                 ${S}/arch/${ARCH}/configs/${deltacfg}
         fi
     done
     # copy .config to defconfig as required by fsl-kernel-localversion
-    cp ${B}/.config ${WORKDIR}/defconfig
+    cp .config ${WORKDIR}/defconfig
 }
 
 # Fix the dtc compile issue if DTC related options are not enabled in defconfig

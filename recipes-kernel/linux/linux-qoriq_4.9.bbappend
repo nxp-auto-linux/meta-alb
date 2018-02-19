@@ -6,7 +6,6 @@ COMMONSRC_URI = " \
 \
 	file://0001-cache-export-function-__dma_flush_area.patch \
 	file://0002-dtb-add-shared-mem-block-as-reserved-memory-node.patch \
-	file://0001-vnet-Fixed-up-cache-flush-to-use-kernel-4.9-API.patch \
 \
     file://blueboxconfig \
     file://enablepktgen.cfg \
@@ -33,7 +32,7 @@ SRC_URI_append_ls2084abbmini += " \
     file://vnet_ls2.cfg \
     file://0001-vnet-Added-support-for-S32V-with-encryption-enabled.patch \
 "
-SRCREV_vnet = "0a4dfebd961466f43e45047078a0c0e433a4470c"
+SRCREV_vnet = "8e87af5ef37abe67f43a46e3bda49cffb8eeb8f9"
 
 # Optional to simplify Ethernet debug
 #SRC_URI_append_ls2 += " \

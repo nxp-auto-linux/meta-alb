@@ -11,6 +11,10 @@ SRC_URI += "\
 	file://0007-u-boot-Fix-LS2-derivative-detection-with-AIOP-or-3rd.patch \
 	file://0009-u-boot-Fix-personality-check-for-LS2r1-core-startup-.patch \
 	file://0014-u-boot-Major-rework-of-the-VID-support.patch \
+	file://0001-u-boot-qoriq-Bad-defined-check-caused-the-LTC3882-to.patch \
+	file://0001-u-boot-qoriq-VID-support-code-for-LTC-was-incorrect.patch \
+	file://0001-u-boot-qoriq-VID-code-blocked-interrupts.patch \
+	file://0002-u-boot-qoriq-Reworked-VID-parameters-based-on-IR-LTC.patch \
 	file://0015-u-boot-Fix-MMU-setup-race-condition-on-SPL-boot.patch \
 \
 	file://0001-u-boot-First-attempt-to-add-GIC-support-for-ARMv8-ne.patch \

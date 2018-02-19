@@ -1,38 +1,40 @@
-From 96a9553e3de7ced388d89b67b7c52565863e26ba Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Mon, 24 Apr 2017 01:53:54 +0200
-Subject: [PATCH] u-boot: Special config for LS2080ARDB with LS2084A silicon
+From 547d8bfd1cefb35fb5ffb1a87d985ee669313b9d Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Mon, 12 Feb 2018 10:16:31 +0100
+Subject: [PATCH 2/2] u-boot-qoriq: Special config for LS2080ARDB with LS2084A
+ silicon
 
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
 ---
  arch/arm/dts/Makefile            |  1 +
- arch/arm/dts/fsl-ls2084a-rdb.dts | 35 ++++++++++++++++++++++++++++++++++
- configs/ls2084ardb_defconfig     | 41 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 77 insertions(+)
+ arch/arm/dts/fsl-ls2084a-rdb.dts | 35 +++++++++++++++++++++++++++++
+ configs/ls2084ardb_defconfig     | 48 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 84 insertions(+)
  create mode 100644 arch/arm/dts/fsl-ls2084a-rdb.dts
  create mode 100644 configs/ls2084ardb_defconfig
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 7fc94b3318..e5da8836e0 100644
+index d14c662ddb..ad3182a0b5 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -140,6 +140,7 @@ dtb-$(CONFIG_LS102XA) += ls1021a-qds-duart.dtb \
- 	ls1021a-twr-duart.dtb ls1021a-twr-lpuart.dtb
+@@ -186,6 +186,7 @@ dtb-$(CONFIG_ARCH_LS1021A) += ls1021a-qds-duart.dtb \
  dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
  	fsl-ls2080a-rdb.dtb \
+ 	fsl-ls2081a-rdb.dtb \
 +	fsl-ls2084a-rdb.dtb \
- 	fsl-ls2084a-bbmini.dtb
- dtb-$(CONFIG_FSL_LSCH2) += fsl-ls1043a-qds-duart.dtb \
- 	fsl-ls1043a-qds-lpuart.dtb \
+ 	fsl-ls2084a-bbmini.dtb \
+ 	fsl-ls2088a-rdb-qspi.dtb \
+ 	fsl-ls1088a-rdb.dtb \
 diff --git a/arch/arm/dts/fsl-ls2084a-rdb.dts b/arch/arm/dts/fsl-ls2084a-rdb.dts
 new file mode 100644
-index 0000000000..08174b5717
+index 0000000000..bf16b4af93
 --- /dev/null
 +++ b/arch/arm/dts/fsl-ls2084a-rdb.dts
 @@ -0,0 +1,35 @@
 +/*
-+ * Freescale ls2084a RDB board device tree source
++ * NXP ls2084a RDB board device tree source
 + *
-+ * Copyright 2013-2015 Freescale Semiconductor, Inc.
++ * Copyright 2013-2018 NXP Semiconductor, Inc.
 + *
 + * SPDX-License-Identifier:	GPL-2.0+
 + */
@@ -42,7 +44,7 @@ index 0000000000..08174b5717
 +#include "fsl-ls2084a.dtsi"
 +
 +/ {
-+	model = "Freescale Layerscape 2080A RDB Board with LS2084A silicon";
++	model = "NXP Layerscape 2080A RDB Board with LS2084A silicon";
 +	compatible = "fsl,ls2080a-rdb", "fsl,ls2080a";
 +
 +	aliases {
@@ -66,23 +68,25 @@ index 0000000000..08174b5717
 +};
 diff --git a/configs/ls2084ardb_defconfig b/configs/ls2084ardb_defconfig
 new file mode 100644
-index 0000000000..60b8bccd5a
+index 0000000000..a42c9babbe
 --- /dev/null
 +++ b/configs/ls2084ardb_defconfig
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,48 @@
 +CONFIG_ARM=y
-+CONFIG_ARMV8_SET_SMPEN=y
 +CONFIG_TARGET_LS2080ARDB=y
++CONFIG_FSL_LS_PPA=y
 +CONFIG_DEFAULT_DEVICE_TREE="fsl-ls2084a-rdb"
 +# CONFIG_SYS_MALLOC_F is not set
 +CONFIG_FIT=y
 +CONFIG_FIT_VERBOSE=y
 +CONFIG_OF_BOARD_SETUP=y
 +CONFIG_OF_STDOUT_VIA_ALIAS=y
-+CONFIG_SYS_EXTRA_OPTIONS="SYS_FSL_DDR4, LS2080A"
 +CONFIG_BOOTDELAY=10
 +CONFIG_HUSH_PARSER=y
++CONFIG_CMD_BOOTI=y
 +CONFIG_CMD_GREPENV=y
++CONFIG_CMD_EEPROM=y
++CONFIG_CMD_GPT=y
 +CONFIG_CMD_MMC=y
 +CONFIG_CMD_SF=y
 +CONFIG_CMD_I2C=y
@@ -93,24 +97,29 @@ index 0000000000..60b8bccd5a
 +CONFIG_CMD_CACHE=y
 +CONFIG_CMD_EXT2=y
 +CONFIG_CMD_FAT=y
++CONFIG_CMD_DATE=y
 +CONFIG_OF_CONTROL=y
 +CONFIG_NET_RANDOM_ETHADDR=y
 +CONFIG_DM=y
++CONFIG_FSL_CAAM=y
++CONFIG_MTD_NOR_FLASH=y
 +CONFIG_DM_SPI_FLASH=y
 +CONFIG_NETDEVICES=y
 +CONFIG_E1000=y
-+CONFIG_SYS_NS16550=y
-+CONFIG_DM_SPI=y
-+CONFIG_FSL_DSPI=y
-+CONFIG_USB=y
-+CONFIG_USB_XHCI_HCD=y
-+CONFIG_USB_XHCI_DWC3=y
-+CONFIG_USB_STORAGE=y
-+CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
 +CONFIG_PCI=y
 +CONFIG_DM_PCI=y
 +CONFIG_DM_PCI_COMPAT=y
 +CONFIG_PCIE_LAYERSCAPE=y
++CONFIG_SYS_NS16550=y
++CONFIG_DM_SPI=y
++CONFIG_FSL_DSPI=y
++CONFIG_USB=y
++CONFIG_DM_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_DWC3=y
++CONFIG_USB_STORAGE=y
++CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
++CONFIG_DISTRO_DEFAULTS=y
 -- 
-2.12.2
+2.15.1
 

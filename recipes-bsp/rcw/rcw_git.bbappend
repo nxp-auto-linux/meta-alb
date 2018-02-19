@@ -30,6 +30,8 @@ SRC_URI_append += " \
     file://0001-rcw-rcw.py-disassembler-now-deals-with-littleendian-.patch \
 \
     file://0001-rcw-Added-example-conversion-to-rcw.py-for-LS1088ARB.patch \
+\
+    file://0001-rcw.py-regexp-parser-was-broken-for-write.b1.patch \
 "
 
 # We want to reuse RCWs without duplication by being able to specify

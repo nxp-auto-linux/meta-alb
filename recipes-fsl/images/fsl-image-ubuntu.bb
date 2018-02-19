@@ -13,8 +13,6 @@ require fsl-image-ubuntu-base.bb
 #    kvaser \
 #"
 
-#    openjdk-8-jdk \
-#
 APTGET_EXTRA_PACKAGES += " \
     aptitude \
     openjdk-8-jdk \

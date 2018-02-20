@@ -1,1 +1,1 @@
-require gcc-fix-${PV}.inc
+require gcc-${PV}-fsl.inc

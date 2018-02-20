@@ -60,7 +60,8 @@ SDCARDIMAGE_EXTRA9_OFFSET ?= "${FLASHIMAGE_EXTRA9_OFFSET}"
 
 do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARD_RCW', True) and d.getVar('SDCARD_RCW', True) + ':do_deploy' or ''} \
-	${@d.getVar('INITRAMFS_IMAGE', True) and d.getVar('INITRAMFS_IMAGE', True) + ':do_rootfs' or ''} \
+	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER', True) + ':do_deploy' or ''} \
+	${@d.getVar('INITRAMFS_IMAGE', True) and d.getVar('INITRAMFS_IMAGE', True) + ':do_image_complete' or ''} \
 	${@d.getVar('UBOOT_ENV_SDCARD_OFFSET', True) and d.getVar('UBOOT_ENV_SDCARD', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA1', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA2', True) + ':do_deploy' or ''} \
@@ -76,6 +77,57 @@ SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
 SDCARD_GENERATION_COMMAND_s32 = "generate_imx_sdcard"
 
 #
+# Generate the boot image with the boot scripts and required Device Tree
+# files
+_generate_boot_image() {
+	local boot_part=$1
+
+	# Create boot partition image
+	BOOT_BLOCKS=$(LC_ALL=C parted -s ${SDCARD} unit b print \
+	                  | awk "/ $boot_part / { print substr(\$4, 1, length(\$4 -1)) / 1024 }")
+
+	# mkdosfs will sometimes use FAT16 when it is not appropriate,
+	# resulting in a boot failure from SYSLINUX. Use FAT32 for
+	# images larger than 512MB, otherwise let mkdosfs decide.
+	if [ $(expr $BOOT_BLOCKS / 1024) -gt 512 ]; then
+		FATSIZE="-F 32"
+	fi
+
+	rm -f ${WORKDIR}/boot.img
+	mkfs.vfat -n "${BOOTDD_VOLUME_ID}" -S 512 ${FATSIZE} -C ${WORKDIR}/boot.img $BOOT_BLOCKS
+
+	mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${UBOOT_KERNEL_IMAGETYPE}-${MACHINE}.bin ::/${UBOOT_KERNEL_IMAGETYPE}
+
+	# Copy boot scripts
+	for item in ${BOOT_SCRIPTS}; do
+		src=`echo $item | awk -F':' '{ print $1 }'`
+		dst=`echo $item | awk -F':' '{ print $2 }'`
+
+		mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/$src ::/$dst
+	done
+
+	# Copy device tree file
+	if test -n "${KERNEL_DEVICETREE}"; then
+		for DTS_FILE in ${KERNEL_DEVICETREE}; do
+			DTS_BASE_NAME=`basename ${DTS_FILE} | awk -F "." '{print $1}'`
+			if [ -e "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb" ]; then
+				kernel_bin="`readlink ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.bin`"
+				kernel_bin_for_dtb="`readlink ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb | sed "s,$DTS_BASE_NAME,${MACHINE},g;s,\.dtb$,.bin,g"`"
+				if [ $kernel_bin = $kernel_bin_for_dtb ]; then
+					mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb ::/${DTS_BASE_NAME}.dtb
+				fi
+			else
+				bbfatal "${DTS_FILE} does not exist."
+			fi
+		done
+	fi
+
+	# Copy extlinux.conf to images that have U-Boot Extlinux support.
+	if [ "${UBOOT_EXTLINUX}" = "1" ]; then
+		mmd -i ${WORKDIR}/boot.img ::/extlinux
+		mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/extlinux.conf ::/extlinux/extlinux.conf
+	fi
+}
 # Create an image that can by written onto a SD card using dd for use
 # with the Layerscape 2 family of devices
 #
@@ -101,77 +153,75 @@ SDCARD_GENERATION_COMMAND_s32 = "generate_imx_sdcard"
 # |                        |            |                        |                               |
 # 0                       64MiB   64MiB + 16MiB    64MiB + 16Mib + SDIMG_ROOTFS
 generate_fsl_lsch3_sdcard () {
-        # Create partition table
-        parted -s ${SDCARD} mklabel msdos
-        parted -s ${SDCARD} unit KiB mkpart primary fat32 ${SDCARD_BINARY_SPACE} $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED})
-        parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}     \+ $ROOTFS_SIZE)
-        parted ${SDCARD} print
+	# Create partition table
+	parted -s ${SDCARD} mklabel msdos
+	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${SDCARD_BINARY_SPACE} $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED})
+	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}     \+ $ROOTFS_SIZE)
+	parted ${SDCARD} print
 
-        # Fill RCW into the boot block
-        if [ -n "${SDCARD_RCW_NAME}" ]; then
-                dd if=${DEPLOY_DIR_IMAGE}/${SDCARD_RCW_NAME} of=${SDCARD} conv=notrunc seek=8 bs=512
-        fi
+	# Fill RCW into the boot block
+	if [ -n "${SDCARD_RCW_NAME}" ]; then
+	        dd if=${DEPLOY_DIR_IMAGE}/${SDCARD_RCW_NAME} of=${SDCARD} conv=notrunc seek=8 bs=512
+	fi
 
-        # Burn bootloader
-        case "${IMAGE_BOOTLOADER}" in
-                u-boot)
-                if [ -n "${SPL_BINARY}" ]; then
-                        dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
-                        dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
-                else
-                        dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
-                fi
-                if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" ]; then
-                        dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1
-                fi
-                ;;
-                "")
-                ;;
-                *)
-                bberror "Unknown IMAGE_BOOTLOADER value"
-                exit 1
-                ;;
-        esac
+	# Burn bootloader
+	case "${IMAGE_BOOTLOADER}" in
+	        u-boot)
+	        if [ -n "${SPL_BINARY}" ]; then
+	                dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
+	        else
+	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+	        fi
+	        if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" ]; then
+	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1
+	        fi
+	        ;;
+	        "")
+	        ;;
+	        *)
+	        bberror "Unknown IMAGE_BOOTLOADER value"
+	        exit 1
+	        ;;
+	esac
 
-        # Create boot partition image
-        BOOT_BLOCKS=$(LC_ALL=C parted -s ${SDCARD} unit b print \
-                          | awk '/ 1 / { print substr($4, 1, length($4 -1)) / 1024 }')
-        rm -f ${WORKDIR}/boot.img
-        mkfs.vfat -n "${BOOTDD_VOLUME_ID}" -S 512 -C ${WORKDIR}/boot.img $BOOT_BLOCKS
-        mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${UBOOT_KERNEL_IMAGETYPE}-${MACHINE}.bin ::/${UBOOT_KERNEL_IMAGETYPE}
+	_generate_boot_image 1
 
-        # Copy boot scripts
-        for item in ${BOOT_SCRIPTS}; do
-                src=`echo $item | awk -F':' '{ print $1 }'`
-                dst=`echo $item | awk -F':' '{ print $2 }'`
-
-                mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/$src ::/$dst
-        done
-
-        # Copy device tree file
-        if test -n "${KERNEL_DEVICETREE}"; then
-                for DTS_FILE in ${KERNEL_DEVICETREE}; do
-                        DTS_BASE_NAME=`basename ${DTS_FILE} | awk -F "." '{print $1}'`
-                        if [ -e "${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb" ]; then
-                                kernel_bin="`readlink ${KERNEL_IMAGETYPE}-${MACHINE}.bin`"
-                                kernel_bin_for_dtb="`readlink ${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb | sed "s,$DTS_BASE_NAME,${MACHINE},g;s,\.dtb$,.bin,g"`"
-                                if [ $kernel_bin = $kernel_bin_for_dtb ]; then
-                                        mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb ::/${DTS_BASE_NAME}.dtb
-                                fi
-                        fi
-                done
-        fi
-
-        # Burn Partition
-        dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${SDCARD_BINARY_SPACE} \* 1024)
-        dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${SDCARD_BINARY_SPACE} \* 1024)
+	# Burn Partition
+	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${SDCARD_BINARY_SPACE} \* 1024)
+	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${SDCARD_BINARY_SPACE} \* 1024)
 }
 
+#
+# Create an image that can by written onto a SD card using dd for use
+# with i.MX SoC family
+#
+# External variables needed:
+#   ${SDCARD_ROOTFS}    - the rootfs image to incorporate
+#   ${IMAGE_BOOTLOADER} - bootloader to use {u-boot, barebox}
+#
+# The disk layout used is:
+#
+#    0                      -> SDCARD_BINARY_SPACE            - reserved to bootloader (not partitioned)
+#    SDCARD_BINARY_SPACE    -> BOOT_SPACE                     - kernel and other data
+#    BOOT_SPACE             -> SDIMG_SIZE                     - rootfs
+#
+#                                                     Default Free space = 1.3x
+#                                                     Use IMAGE_OVERHEAD_FACTOR to add more space
+#                                                     <--------->
+#            4MiB               8MiB           SDIMG_ROOTFS                    4MiB
+# <-----------------------> <----------> <----------------------> <------------------------------>
+#  ------------------------ ------------ ------------------------ -------------------------------
+# | SDCARD_BINARY_SPACE    | BOOT_SPACE | ROOTFS_SIZE            |     IMAGE_ROOTFS_ALIGNMENT    |
+#  ------------------------ ------------ ------------------------ -------------------------------
+# ^                        ^            ^                        ^                               ^
+# |                        |            |                        |                               |
+# 0                      4096     4MiB +  8MiB       4MiB +  8Mib + SDIMG_ROOTFS   4MiB +  8MiB + SDIMG_ROOTFS + 4MiB
 generate_imx_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
-	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
-	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ $ROOTFS_SIZE)
+	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${SDCARD_BINARY_SPACE} $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED})
+	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED} \+ $ROOTFS_SIZE)
 	parted ${SDCARD} print
 
 	# Burn bootloader
@@ -203,8 +253,8 @@ generate_imx_sdcard () {
 	_generate_boot_image 1
 
 	# Burn Partition
-	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
-	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${SDCARD_BINARY_SPACE} \* 1024)
+	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${SDCARD_BINARY_SPACE} \* 1024)
 }
 
 generate_sdcardimage_entry() {
@@ -225,7 +275,7 @@ generate_sdcardimage_entry() {
 IMAGE_CMD_sdcard () {
 
 	if [ -z "${SDCARD_ROOTFS}" ]; then
-		bberror "SDCARD_ROOTFS is undefined. To use sdcard image from Freescale's BSP it needs to be defined."
+		bberror "SDCARD_ROOTFS is undefined. To create an SD card image with NXP's BSP, it needs to be defined."
 		exit 1
 	fi
 
@@ -249,22 +299,25 @@ IMAGE_CMD_sdcard () {
 			SDCARD_BINARY_SPACE=4096
 		fi
 	fi
-	SDCARD_SIZE=$(expr ${IMAGE_ROOTFS_ALIGNMENT} + ${BOOT_SPACE_ALIGNED} + $ROOTFS_SIZE + ${IMAGE_ROOTFS_ALIGNMENT})
+	SDCARD_SIZE=$(expr ${SDCARD_BINARY_SPACE} + ${BOOT_SPACE_ALIGNED} + $ROOTFS_SIZE + ${IMAGE_ROOTFS_ALIGNMENT})
+
+	cd ${SDCARD_DEPLOYDIR}
 
 	# Initialize a sparse file
 	dd if=/dev/zero of=${SDCARD} bs=1 count=0 seek=$(expr 1024 \* ${SDCARD_SIZE})
 
 	# Additional elements for the raw image, copying the approach of the flashimage class
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA1_FILE}" "SDCARDIMAGE_EXTRA1_OFFSET" "${SDCARDIMAGE_EXTRA1_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA2_FILE}" "SDCARDIMAGE_EXTRA2_OFFSET" "${SDCARDIMAGE_EXTRA2_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA3_FILE}" "SDCARDIMAGE_EXTRA3_OFFSET" "${SDCARDIMAGE_EXTRA3_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA4_FILE}" "SDCARDIMAGE_EXTRA4_OFFSET" "${SDCARDIMAGE_EXTRA4_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA5_FILE}" "SDCARDIMAGE_EXTRA5_OFFSET" "${SDCARDIMAGE_EXTRA5_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA6_FILE}" "SDCARDIMAGE_EXTRA6_OFFSET" "${SDCARDIMAGE_EXTRA6_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA7_FILE}" "SDCARDIMAGE_EXTRA7_OFFSET" "${SDCARDIMAGE_EXTRA7_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA8_FILE}" "SDCARDIMAGE_EXTRA8_OFFSET" "${SDCARDIMAGE_EXTRA8_OFFSET}" "${SDCARD}"
-        generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA9_FILE}" "SDCARDIMAGE_EXTRA9_OFFSET" "${SDCARDIMAGE_EXTRA9_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA1_FILE}" "SDCARDIMAGE_EXTRA1_OFFSET" "${SDCARDIMAGE_EXTRA1_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA2_FILE}" "SDCARDIMAGE_EXTRA2_OFFSET" "${SDCARDIMAGE_EXTRA2_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA3_FILE}" "SDCARDIMAGE_EXTRA3_OFFSET" "${SDCARDIMAGE_EXTRA3_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA4_FILE}" "SDCARDIMAGE_EXTRA4_OFFSET" "${SDCARDIMAGE_EXTRA4_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA5_FILE}" "SDCARDIMAGE_EXTRA5_OFFSET" "${SDCARDIMAGE_EXTRA5_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA6_FILE}" "SDCARDIMAGE_EXTRA6_OFFSET" "${SDCARDIMAGE_EXTRA6_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA7_FILE}" "SDCARDIMAGE_EXTRA7_OFFSET" "${SDCARDIMAGE_EXTRA7_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA8_FILE}" "SDCARDIMAGE_EXTRA8_OFFSET" "${SDCARDIMAGE_EXTRA8_OFFSET}" "${SDCARD}"
+	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA9_FILE}" "SDCARDIMAGE_EXTRA9_OFFSET" "${SDCARDIMAGE_EXTRA9_OFFSET}" "${SDCARD}"
 
 	${SDCARD_GENERATION_COMMAND}
+	cd -
 }
 

@@ -12,7 +12,7 @@ DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += " \
 DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "${THISDIR}/linux-s32/build/vnet_s32.cfg"
 
 # LXC configuration
-DELTA_KERNEL_DEFCONFIG_append = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', '${THISDIR}/linux-s32/build/containers_4.1.26.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', '${THISDIR}/linux-s32/build/containers_4.1.26.config', '', d)}"
 
 # add sources for virtual ethernet over PCIe
 SRC_URI_append_s32v234bbmini += "\

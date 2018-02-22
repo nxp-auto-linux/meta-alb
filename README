@@ -14,8 +14,10 @@ s32v234evb, s32v234bbmini, etc.
 When this is done, run command:
 $ bitbake <image-name>
 
-where <image-name> is any of the images fsl-image-auto, fsl-image-auto-full,
-to completely build u-boot, kernel, modules, and a rootfs ready to be deployed.
+where <image-name> is any of the images fsl-image-base, fsl-image-auto, or any
+of the images that the setup script reports as being available for the selected
+machine. This will completely build u-boot, kernel, modules, and a rootfs ready
+to be deployed.
 
 Look for a build result in
 `build_<machine>/tmp/deploy/images/`.

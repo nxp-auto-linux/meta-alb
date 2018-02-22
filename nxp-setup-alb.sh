@@ -19,7 +19,7 @@
 #
 # Add options for the script
 # Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
-# Copyright (C) 2016-2018 NXP Semiconductor
+# Copyright 2016-2018 NXP
 #  Modifications by:
 #          Heinz Wrobel <heinz.wrobel@nxp.com>
 #          Ionut Vicovan <ionut.vicovan@nxp.com>
@@ -393,7 +393,7 @@ if [ "$EULA" = "ask" ]; then
     cat <<EOF
 
 Proprietary and third party software is subject to agreement and compliance
-with, Freescale's End User License Agreement. To have the right to use these
+with, NXP's End User License Agreement. To have the right to use these
 binaries in your images, you must read and accept the following terms.  If
 there are conflicting terms embedded in the software, the terms embedded in
 the Software will control.

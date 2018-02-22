@@ -14,6 +14,9 @@ DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "${THISDIR}/linux-s32/build/vnet_
 # LXC configuration
 DELTA_KERNEL_DEFCONFIG_append = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', '${THISDIR}/linux-s32/build/containers_4.1.26.config', '', d)}"
 
+# Docker configuration
+DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', '${THISDIR}/linux-s32/build/docker.config', '', d)}"
+
 # add sources for virtual ethernet over PCIe
 SRC_URI_append_s32v234bbmini += "\
     git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=alb/master;name=vnet;destsuffix=git/drivers/net/vnet \

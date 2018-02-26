@@ -258,17 +258,17 @@ generate_imx_sdcard () {
 }
 
 generate_sdcardimage_entry() {
-        FLASHIMAGE_FILE="$1"
-        FLASHIMAGE_FILE_OFFSET_NAME="$2"
-        FLASHIMAGE_FILE_OFFSET=$(printf "%d" "$3")
-        FLASHIMAGE="$4"
-        if [ -n "${FLASHIMAGE_FILE}" ]; then
-                if [ -z "${FLASHIMAGE_FILE_OFFSET}" ]; then
-                        bberror "${FLASHIMAGE_FILE_OFFSET_NAME} is undefined. To use the 'sdcard' image it needs to be defined as byte offset."
+        GSDE_IMAGE_FILE="$1"
+        GSDE_IMAGE_FILE_OFFSET_NAME="$2"
+        GSDE_IMAGE_FILE_OFFSET=$(printf "%d" "$3")
+        GSDE_IMAGE="$4"
+        if [ -n "${GSDE_IMAGE_FILE}" ]; then
+                if [ -z "${GSDE_IMAGE_FILE_OFFSET}" ]; then
+                        bberror "${GSDE_IMAGE_FILE_OFFSET_NAME} is undefined. To use the 'sdcard' image it needs to be defined as byte offset."
                         exit 1
                 fi
-                bbnote "Generating sdcard entry at ${FLASHIMAGE_FILE_OFFSET} for ${FLASHIMAGE_FILE}"
-                dd if=${FLASHIMAGE_FILE} of=${FLASHIMAGE} conv=notrunc,fsync bs=1 seek=${FLASHIMAGE_FILE_OFFSET}
+                bbnote "Generating sdcard entry at ${GSDE_IMAGE_FILE_OFFSET} for ${GSDE_IMAGE_FILE}"
+                dd if=${DEPLOY_DIR_IMAGE}/${GSDE_IMAGE_FILE} of=${GSDE_IMAGE} conv=notrunc,fsync bs=32K oflag=seek_bytes seek=${GSDE_IMAGE_FILE_OFFSET}
         fi
 }
 

@@ -1,0 +1,13 @@
+diff --git a/Makefile.system b/Makefile.system
+index b89f60e..73e4cd5 100644
+--- a/Makefile.system
++++ b/Makefile.system
+@@ -1057,7 +1057,7 @@ endif
+ 
+ 
+ LIBDLLNAME   = $(LIBPREFIX).dll
+-LIBSONAME    = $(LIBNAME:.$(LIBSUFFIX)=.so)
++LIBSONAME    = $(LIBNAME:.$(LIBSUFFIX)=.so.$(MAJOR_VERSION))
+ LIBDYNNAME   = $(LIBNAME:.$(LIBSUFFIX)=.dylib)
+ LIBDEFNAME   = $(LIBNAME:.$(LIBSUFFIX)=.def)
+ LIBEXPNAME   = $(LIBNAME:.$(LIBSUFFIX)=.exp)

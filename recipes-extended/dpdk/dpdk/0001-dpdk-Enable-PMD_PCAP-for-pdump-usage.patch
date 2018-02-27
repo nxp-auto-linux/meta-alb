@@ -1,0 +1,25 @@
+From a8cf0bd2f2e952c564c55a8c3cfd49f35bf1bfd0 Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Sun, 25 Jun 2017 16:31:03 +0200
+Subject: [PATCH] dpdk: Enable PMD_PCAP for pdump usage
+
+---
+ config/common_base | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/common_base b/config/common_base
+index fed7b812..5db9cfbd 100644
+--- a/config/common_base
++++ b/config/common_base
+@@ -326,7 +326,7 @@ CONFIG_RTE_PMD_RING_MAX_TX_RINGS=16
+ #
+ # Compile software PMD backed by PCAP files
+ #
+-CONFIG_RTE_LIBRTE_PMD_PCAP=n
++CONFIG_RTE_LIBRTE_PMD_PCAP=y
+ 
+ #
+ # Compile link bonding PMD library
+-- 
+2.13.0
+

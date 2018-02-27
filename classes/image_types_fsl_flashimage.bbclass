@@ -25,14 +25,17 @@ FLASHIMAGE_UBOOT_FILE ?= '${FLASHIMAGE_UBOOT_BASENAME}${FLASHIMAGE_UBOOT_REALSUF
 FLASHIMAGE_KERNEL ?= "virtual/kernel"
 FLASHIMAGE_ROOTFS ?= ""
 FLASHIMAGE_ROOTFS_FILE ?= ""
+FLASHIMAGE_ROOTFS_SUFFIX ?= ""
 FLASHIMAGE ?= "${IMAGE_NAME}.flashimage"
 FLASHIMAGE_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
+
+IMAGE_TYPEDEP_flashimage_append = " ${FLASHIMAGE_ROOTFS_SUFFIX}"
 
 do_image_flashimage[depends] += " \
         ${@d.getVar('FLASHIMAGE_RESET_FILE', True) and d.getVar('FLASHIMAGE_RESET', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_UBOOT_FILE', True) and d.getVar('FLASHIMAGE_UBOOT', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_KERNEL_FILE', True) and d.getVar('FLASHIMAGE_KERNEL', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_ROOTFS_FILE', True) and d.getVar('FLASHIMAGE_ROOTFS', True) + ':do_deploy' or ''} \
+        ${@d.getVar('FLASHIMAGE_ROOTFS', True) and d.getVar('FLASHIMAGE_ROOTFS', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA1_FILE', True) and d.getVar('FLASHIMAGE_EXTRA1', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA2_FILE', True) and d.getVar('FLASHIMAGE_EXTRA2', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA3_FILE', True) and d.getVar('FLASHIMAGE_EXTRA3', True) + ':do_deploy' or ''} \
@@ -109,8 +112,14 @@ generate_flashimage() {
 
 IMAGE_CMD_flashimage () {
         if [ -z "${FLASHIMAGE_SIZE}" ]; then
-                bberror "FLASHIMAGE_SIZE is undefined. To use the 'flashimage' image it needs to be defined in MiB units."
-                exit 1
+                if [ -n "${FLASHIMAGE_ROOTFS_FILE}" ]; then
+                        FLASHIMAGE_ROOTFS_SIZE=$(stat -c%s ${FLASHIMAGE_ROOTFS_FILE})
+                        FLASHIMAGE_ROOTFS_SIZE_EXTRA=$(echo "$FLASHIMAGE_ROOTFS_SIZE+(16-$FLASHIMAGE_ROOTFS_SIZE%16)"| bc)
+                        FLASHIMAGE_SIZE=$(expr ${FLASHIMAGE_ROOTFS_OFFSET} + $FLASHIMAGE_ROOTFS_SIZE_EXTRA)
+                else
+                        bberror "FLASHIMAGE_SIZE is undefined. To use the 'flashimage' image it needs to be defined in MiB units."
+                        exit 1
+                fi
         fi
 
         # Initialize the image file with all 0xff to optimize flashing

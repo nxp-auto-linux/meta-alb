@@ -8,10 +8,9 @@ require recipes-fsl/images/${SDCARD_ROOTFS_IMAGE}.bb
 
 # We need the Aquantia firmware to properly image a BlueBox Mini
 # and we want phytool to be able to debug boards on bring up
-# FIX! POSSIBLE LEGAL ISSUE ABOUT FIRMWARE IMAGE DISTRIBUTION IN YOCTO?!
-IMAGE_INSTALL_append_ls2084abbmini += "\
-    aqr-firmware-image \
-"
+# The Aquantia binaries (bin and cld) must be downloaded 
+# separately.
+IMAGE_INSTALL_append_ls2084abbmini += "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware-image', '', d)}"
 
 IMAGE_INSTALL += "\
     phytool \
@@ -39,11 +38,11 @@ SDCARDIMAGE_EXTRA4_FILE_ls2084abbmini = "u-boot-flashenv-factory-${MACHINE}.bin"
 
 # For the factory reimaging SD card, we also add the AQR firmware
 # setup into the flash area for BlueBox Mini
-SDCARDIMAGE_EXTRA8_ls2084abbmini = "aqr-firmware"
-SDCARDIMAGE_EXTRA8_FILE_ls2084abbmini = "AQR-G2_v3.3.A-AQR_Freescale_AQR107_ID16066_VER554.cld"
+SDCARDIMAGE_EXTRA8_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware', '', d)}"
+SDCARDIMAGE_EXTRA8_FILE_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'AQR-G2_v3.3.A-AQR_Freescale_AQR107_ID16066_VER554.cld', '', d)}"
 SDCARDIMAGE_EXTRA8_OFFSET_ls2084abbmini = "0x00900000"
-SDCARDIMAGE_EXTRA9_ls2084abbmini = "aqr-firmware"
-SDCARDIMAGE_EXTRA9_FILE_ls2084abbmini = "aq_programming.bin"
+SDCARDIMAGE_EXTRA9_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware', '', d)}"
+SDCARDIMAGE_EXTRA9_FILE_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aq_programming.bin', '', d)}"
 SDCARDIMAGE_EXTRA9_OFFSET_ls2084abbmini = "0x00980000"
 
 COMPATIBLE_MACHINE = "ls2084abbmini"

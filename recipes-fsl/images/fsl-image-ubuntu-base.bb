@@ -29,7 +29,7 @@ IMAGE_INSTALL += "\
 
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior
-TODO_IMAGE_INSTALL += "\
+IMAGE_INSTALL_append_fsl-lsch3 += " \
    linux-kernelitb-norootfs-image \
 "
 

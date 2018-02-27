@@ -25,11 +25,11 @@ ITB_ROOTFS_SUFFIX ?= '${ITB_ROOTFS_TYPE}${@oe.utils.conditional("ITB_ROOTFS_COMP
 ITB_ROOTFS_REALSUFFIX ?= '${@oe.utils.conditional("ITB_ROOTFS_SUFFIX", "", "", ".${ITB_ROOTFS_SUFFIX}", d)}'
 ITB_ROOTFS_DIR ?= "${DEPLOY_DIR_IMAGE}"
 ITB_ROOTFS_DIR_SLASH ?= "${ITB_ROOTFS_DIR}/"
-ITB_ROOTFS_BASENAME ?= "${ITB_ROOTFS_BASENAME}-${MACHINE}"
+ITB_ROOTFS_BASENAME_MACHINE ?= "${ITB_ROOTFS_BASENAME}-${MACHINE}"
 IMAGE_TYPEDEP_itb ?= "${ITB_ROOTFS_SUFFIX}"
 
 #do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${@oe.utils.conditional("ITB_ROOTFS_TYPE", "", "", "${ITB_ROOTFS_BASENAME}:do_image_${ITB_ROOTFS_TYPE}", d)}'
-do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${ITB_ROOTFS_BASENAME}:do_deploy'
+do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${ITB_ROOTFS_BASENAME}:do_image_complete'
 
 # The ITB is defined by the image we are building, so we name it
 # based on the image.
@@ -131,7 +131,7 @@ IMAGE_CMD_itb () {
 		if [ -n "${ITB_ROOTFS_TYPE}" ]; then
 			echo >>${IIF} "        ramdisk@1 {"
 			echo >>${IIF} "            description = \"${MACHINE} Ramdisk\";"
-			echo >>${IIF} "            data = /incbin/(\"${ITB_ROOTFS_DIR_SLASH}${ITB_ROOTFS_BASENAME}${ITB_ROOTFS_REALSUFFIX}\");"
+			echo >>${IIF} "            data = /incbin/(\"${ITB_ROOTFS_DIR_SLASH}${ITB_ROOTFS_BASENAME_MACHINE}${ITB_ROOTFS_REALSUFFIX}\");"
 			echo >>${IIF} "            type = \"ramdisk\";"
 			echo >>${IIF} "            arch = \"${ITB_ARCH}\";"
 			echo >>${IIF} "            os = \"linux\";"

@@ -1,0 +1,84 @@
+#
+# This script can be run from U-Boot with the "source" command to
+# reimage the NOR and the Aquantia firmware on BlueBox Mini Rev B.
+# It assumes an SD card with factory image inserted into the LS2
+# SD slot.
+#
+# DANGER! NO WAY BACK ONCE THIS SCRIPT RUNS!
+#
+# <Heinz.Wrobel@nxp.com>
+#
+# where <platform> can be:
+#       - ls2084abbmini
+#
+# Preferred ITB script usage in U-Boot
+#
+# Script loading using:
+# - SD card
+#       ext2load mmc 0:2 90000000 bbdeployimage.itb
+#
+# Script sourcing
+#       source 90000000:ls2deployflash
+#
+#----------------------------------------------------------------------
+# Script configuration area
+#----------------------------------------------------------------------
+# nv env variables would hide hush variables
+setenv ok
+setenv shellscript
+setenv aqrprogrammer
+setenv aqrfirmware
+ok=0
+aqrprogrammer='aq_programming.bin'
+aqrfirmware='AQR-G2_v3.3.A-AQR_Freescale_AQR107_ID16066_VER554.cld'
+shellscript='bbdeployimage.sh'
+
+#----------------------------------------------------------------------
+echo ""
+echo "*** BlueBox Factory Prep Script ***"
+echo "*** YOU HAVE 5 SECONDS TO POWER DOWN IF YOU DONT WANT THIS! ***"
+echo ""
+sleep 5
+
+#----------------------------------------------------------------------
+# We determine the image file we need. This can be either
+# - BB Classic with LS2080A
+# - BB Classic with LS2084A
+# - BB Mini with LS2084A
+setenv bbminiok
+bbminiok=0
+if itest.b *0x520000000 -eq 0x41; then
+        # BB Mini
+        echo "This script is running on BlueBox Mini with LS2084A ..."
+        bbminiok=1
+fi
+
+#----------------------------------------------------------------------
+# We reflash the NOR if both banks show no RCW
+if test $bbminiok -eq 1; then
+	if itest.b *0x580000000 -eq 0xff; then
+		if itest.b *0x584000000 -eq 0xff; then
+			source 90000000:ls2deployflash
+		fi
+	fi
+fi
+
+#----------------------------------------------------------------------
+# Now do the AQR firmware flash. Unfortunately I can't check the
+# mdio registers in a script to be conditional about it
+if test $bbminiok -eq 1; then
+	if ext2load mmc 0:2 80100000 boot/$aqrprogrammer; then
+		if ext2load mmc 0:2 98000000 boot/$aqrfirmware; then
+			for phy in DPMAC5 DPMAC6 DPMAC7; do
+				echo "AQR107 on port $phy takes a few minutes ..."
+				go 80100000 $phy@xgmii 98000000 $filesize
+			done
+		fi
+	fi
+fi
+
+#----------------------------------------------------------------------
+echo "****************************************************************"
+echo "Done flashing NOR and AQR firmware!"
+echo "****************************************************************"
+

@@ -1,0 +1,38 @@
+/*
+ * Copyright (C) 2016-2017, NXP
+ * <Heinz.Wrobel@nxp.com>
+ */
+
+/dts-v1/;
+
+/ {
+    description = "BlueBox Image file for flash deployment";
+
+    images {
+        ls1nordeployflash@1 {
+            description = "LS1 NOR flash deployment script";
+            data = /incbin/("ls1nordeployimage.txt");
+            type = "script";
+            compression = "none";
+        };
+        ls2deployflash@1 {
+            description = "LS2 NOR flash deployment script";
+            data = /incbin/("ls2deployimage.txt");
+            type = "script";
+            compression = "none";
+        };
+        ls2factoryprep@1 {
+            description = "LS2 BB Mini factory deployment script";
+            data = /incbin/("ls2factoryprep.txt");
+            type = "script";
+            compression = "none";
+        };
+        t4deployflash@1 {
+            description = "T4 NOR flash deployment script";
+            data = /incbin/("t4deployimage.txt");
+            type = "script";
+            compression = "none";
+        };
+    };
+
+};

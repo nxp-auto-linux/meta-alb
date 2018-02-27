@@ -1,0 +1,256 @@
+#
+# This script can be run from U-Boot with the "source" command to
+# deploy the BlueBox image to NOR flash properly using one of the below
+# options:
+# - SD card (FAT partitioned)
+# - USB Stick (FAT partitioned)
+# - TFTP
+#
+# DANGER! NO WAY BACK ONCE THIS SCRIPT RUNS!
+#
+# <Heinz.Wrobel@nxp.com>
+#
+# SD-Card/USB stick preparation
+#       First partition must be FAT and must contain the compiled
+#       script image (.img and/or .itb) and
+#       the correct image for the box in question:
+#       fsl-image-blueboxt4nor-t4bluebox.flashimage
+# TFTP preparation
+#       TFTP exported directory must contain the compiled script image
+#       (.img and/or .itb) and
+#       fsl-image-blueboxt4nor-t4bluebox.flashimage
+#
+# Preferred ITB script usage in U-Boot
+#
+# Script loading using:
+# - MMC
+#       mmc rescan
+#       fatload mmc 0:1 10000000  bbdeployimage.itb
+# - USB
+#       usb reset
+#       fatload usb 0:1 10000000  bbdeployimage.itb
+# - TFTP
+#       tftp 10000000 bbdeployimage.itb
+#
+# Script sourcing
+#       source 10000000:t4deployflash
+#
+# Classic script usage (only in U-Boot <=2015.10!):
+#       mmc rescan
+#       fatload mmc 0:1 10000000  bbdeployimage-t4bluebox.img
+#       source 10000000
+#
+#----------------------------------------------------------------------
+# Script configuration area
+#----------------------------------------------------------------------
+# nv env variables would hide hush variables
+setenv file
+setenv neededfilesize
+setenv shellscript
+neededfilesize=08000000     # 128MiB
+shellscript='bbdeployimage.sh'
+
+# We support two banks, and split areas in each for Power Architecture.
+# If two banks or split areas are not needed, they can be set to the
+# same text value respectively without affecting the result
+# First address always must be the LOWEST!
+saddr_0_1=20000000
+daddr_0_1=e8000000
+ssize_0_1=03e00000
+saddr_0_2=27e00000
+daddr_0_2=efe00000
+ssize_0_2=00200000
+saddr_4_1=24000000
+daddr_4_1=ec000000
+ssize_4_1=03e00000
+saddr_4_2=23e00000
+daddr_4_2=ebe00000
+ssize_4_2=00200000
+
+#----------------------------------------------------------------------
+echo ""
+echo "*** BlueBox update script for T4240 NOR Flash ***"
+echo ""
+
+#----------------------------------------------------------------------
+file='fsl-image-blueboxt4nor-t4bluebox.flashimage'
+echo "We will search for the image $file ..."
+
+#----------------------------------------------------------------------
+# Check if setexpr is supported, which means possibly faster flash
+# updates.
+# Note that the weird indent is intentional as there appear to be
+# length limitations for continued lines in U-Boot. By reducing the
+# indent on complex setenv, we keep content length low.
+setenv cmd_flashblock '
+echo "Checking 0x$da:" "\\\\c";
+if cmp.b $sa $da $ss; then
+  ok=1;
+else
+  ok=0;
+  if test $verbose -gt 0; then echo "Erasing NOR..."; fi; if test 1$scripttest -lt 11; then erase $da +$ss; fi;
+  if test $verbose -gt 0; then echo "Flashing NOR..."; fi; if test 1$scripttest -lt 11; then cp.b $sa $da $ss; fi;
+  if test $verbose -gt 0; then echo "Comparing NOR to image..."; fi; if cmp.b $sa $da $ss; then ok=1; fi;
+fi;
+'
+if setexpr _hassetexpr 0 + 1; then
+        echo "setexpr command is available. Efficient flash method used ..."
+        setenv cmd_flashrange '
+verbose=0;
+breakwhile=0;
+ss=80000;
+echo "Erasing/Flashing/Comparing NOR in 0x$ss sized blocks...";
+offset=0;
+while test 0x$offset -lt 0x$ssize && test $breakwhile -eq 0; do
+  setexpr x $saddr + $offset;
+  sa=$x;
+  setexpr x $daddr + $offset;
+  da=$x;
+  run cmd_flashblock;
+  if test $ok -eq 0; then
+    echo "Failure at offset 0x$offset! ABORTING ...";
+    breakwhile=1;
+  fi;
+  setexpr x $offset + $ss;
+  offset=$x;
+done;'
+else
+        echo "setexpr command is unavailable. Standard flash method used ..."
+        setenv cmd_flashrange '
+verbose=1;
+ss=$ssize;
+sa=$saddr;
+da=$daddr;
+run cmd_flashblock;'
+fi
+setenv cmd_flashnorbank '
+echo "Unprotecting NOR..."; protect off $daddr +$ssize;
+run cmd_flashrange'
+
+#----------------------------------------------------------------------
+# We prepare for 128MiB even with a partial image to have always a
+# well defined result by prefilling the memory!
+mw.b $saddr_0_1 ff $neededfilesize
+
+# Now load the image file and check if it is the right size
+setenv ok
+ok=0
+
+# Start checking the image file on the SD card
+echo "Searching for image on SD card ..."
+mmc rescan
+mmc info
+echo "Checking first partition (FAT) ..."
+if fatload mmc 0:1 $saddr_0_1 $file; then
+	filesrc='cd /run/media/mmcblk0p1'
+        ok=1
+else
+	echo "Checking second partition (ext2) ..."
+        if ext2load mmc 0:2 $saddr_0_1 boot/$file; then
+	        filesrc='cd /run/media/mmcblk0p2/boot'
+                ok=1
+        fi
+fi
+
+if test $ok -eq 0; then
+        echo "Searching for image on USB stick ..."
+        # Fall back to USB if no file is available on SDHC
+        # If this script didn't come from USB, USB is not started
+        # and this will fail quickly
+        if usb storage; then
+                echo "Loading from USB (This may take about 60 seconds ...)"
+                if fatload usb 0:1 $saddr_0_1 $file; then
+			filesrc='cd /run/media/sdb1'
+                        ok=1
+                fi
+        fi
+        if test $ok -eq 0; then
+                echo "Searching for image using TFTP ..."
+                ping $serverip
+                if tftp $saddr_0_1 $file; then
+			filesrc='<get file via tftp from TFTP server>'
+                        ok=1
+                fi
+        fi
+fi
+
+if test $ok -gt 0; then
+        if test 0x$filesize -eq 0x$neededfilesize; then
+                ok=1
+        else
+                echo "Loaded NOR Flash Image is not exactly of $neededfilesize size! ABORTING ..."
+                ok=0
+        fi
+fi
+
+setenv bank
+setenv saddr
+setenv daddr
+setenv ssize
+setenv sa
+setenv da
+setenv ss
+for bank in 0 4; do
+        if test $ok -gt 0; then
+                # Trick to do dynamic U-Boot variable expansion
+                setenv x "saddr1=\$saddr_${bank}_1 daddr1=\$daddr_${bank}_1 ssize1=\$ssize_${bank}_1"; run x
+                setenv x "saddr2=\$saddr_${bank}_2 daddr2=\$daddr_${bank}_2 ssize2=\$ssize_${bank}_2"; run x
+                echo ""
+                echo "Checking if NOR Bank ${bank} needs an update..."
+                if cmp.b $saddr1 $daddr1 $ssize1 && cmp.b $saddr2 $daddr2 $ssize2; then
+                        ok=1
+                else
+                        echo "*** Updating NOR Bank ${bank} ***"
+                        saddr=$saddr1
+                        daddr=$daddr1
+                        ssize=$ssize1
+                        run cmd_flashnorbank
+                        echo "Protecting RCW in NOR..."; protect on $daddr +1;
+                        if test $ok -gt 0 && test $saddr1 -ne $saddr2; then
+                                saddr=$saddr2
+                                daddr=$daddr2
+                                ssize=$ssize2
+                                run cmd_flashnorbank
+                        fi
+                fi
+
+                if test $ok -gt 0; then
+                        echo "*** Update for NOR Bank ${bank} complete ***"
+                else
+                        echo ""
+                        echo "*** Update FAILED for NOR Bank ${bank} ***"
+                fi
+                echo ""
+        fi
+done
+
+if test $ok -gt 0; then
+        echo ""
+        echo ""
+        echo "The NOR flash is properly initialized now for the BlueBox!"
+        echo ""
+        echo ""
+        echo ""
+        echo "****************************************************************"
+        echo "Next step would be to prep the SSD properly."
+        echo 'Please "reset" now to reboot the board, abort into the command'
+        echo 'line of U-Boot with a keypress, and "run boot_from_flash".'
+        echo 'Log into the NOR flash Linux as "root".'
+        echo "Then"
+        echo "    $filesrc"
+        echo "and finally"
+        echo "    ./$shellscript"
+        echo "****************************************************************"
+else
+        echo ""
+        echo ""
+        echo "****************************************************************"
+        echo "****                    F A I L U R E                       ****"
+        echo "****************************************************************"
+        echo ""
+        echo ""
+        echo "Please retry/fix until at least one bank is properly flashed!"
+        echo "DO NOT RESET WITHOUT A FUNCTIONAL BANK or you need a JTAG"
+        echo "debugger to recover the board..."
+fi
+

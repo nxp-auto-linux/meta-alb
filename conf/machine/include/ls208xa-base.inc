@@ -8,7 +8,7 @@ IMAGE_FSTYPES = "tar.gz ext3"
 
 EXTRA_IMAGECMD_ext3 = "-i 4096 -L ${IMAGE_NAME}"
 
-EXTRA_IMAGEDEPENDS += "dpl-examples management-complex ppa"
+EXTRA_IMAGEDEPENDS += "mc-utils management-complex ppa"
 
 # No better place for this if it should stay in the layer
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"

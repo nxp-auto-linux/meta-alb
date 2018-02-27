@@ -4,6 +4,11 @@
 FORTRAN_append = ",fortran"
 
 #
+# We had libgfortran.a on meta-bluebox
+#
+DISABLE_STATIC = ""
+
+#
 # Enable building libbacktrace, required by libgfortran in gcc 6.x and 7.x
 #
 do_configure () {

@@ -67,7 +67,12 @@ generate_flashimage_entry() {
                         bberror "${FLASHIMAGE_FILE_OFFSET_NAME} is undefined. To use the 'flashimage' image it needs to be defined as byte offset."
                         exit 1
                 fi
-                FLASHIMAGE_FILE_SIZE=`stat -L -c "%s" "${DEPLOY_DIR_IMAGE}/${FLASHIMAGE_FILE}"`
+
+                if [ ! -e "${FLASHIMAGE_FILE}" ]; then
+                        FLASHIMAGE_FILE="${DEPLOY_DIR_IMAGE}/${FLASHIMAGE_FILE}"
+                fi
+
+                FLASHIMAGE_FILE_SIZE=`stat -L -c "%s" "${FLASHIMAGE_FILE}"`
                 FLASHIMAGE_MAX=$(printf "%d + %d\n" ${FLASHIMAGE_FILE_OFFSET} ${FLASHIMAGE_FILE_SIZE} | bc)
 
                 if [ "${FLASHIMAGE_BANK4}" = "yes" ]; then
@@ -78,14 +83,14 @@ generate_flashimage_entry() {
                 fi
 
                 bbnote "Generating flashimage entry at ${FLASHIMAGE_FILE_OFFSET} for ${FLASHIMAGE_FILE}"
-                dd if=${DEPLOY_DIR_IMAGE}/${FLASHIMAGE_FILE} of=${FLASHIMAGE} conv=notrunc,fsync bs=32K oflag=seek_bytes seek=${FLASHIMAGE_FILE_OFFSET}
+                dd if=${FLASHIMAGE_FILE} of=${FLASHIMAGE} conv=notrunc,fsync bs=32K oflag=seek_bytes seek=${FLASHIMAGE_FILE_OFFSET}
                 if [ "${FLASHIMAGE_BANK4}" = "yes" ]; then
                         # Really nasty hack to avoid the problem of expr return non-zero on zero results
                         # and it's inability to support any xor operation.
                         # This only works because our xor operation really is half the overall size.
                         FLASHIMAGE_TMP=$(printf "(%d + %d) %% %d\n" ${FLASHIMAGE_FILE_OFFSET} ${FLASHIMAGE_BANK4_XOR} ${FLASHIMAGE_SIZE_D} | bc)
                         bbnote "Generating flashimage entry at ${FLASHIMAGE_TMP} for ${FLASHIMAGE_FILE}"
-                        dd if=${DEPLOY_DIR_IMAGE}/${FLASHIMAGE_FILE} of=${FLASHIMAGE} conv=notrunc,fsync bs=32K oflag=seek_bytes seek=${FLASHIMAGE_TMP}
+                        dd if=${FLASHIMAGE_FILE} of=${FLASHIMAGE} conv=notrunc,fsync bs=32K oflag=seek_bytes seek=${FLASHIMAGE_TMP}
                 fi
         fi
 }
@@ -111,11 +116,15 @@ generate_flashimage() {
 }
 
 IMAGE_CMD_flashimage () {
+        # we expect image size in Mb
+        FLASH_IBS="1M"
         if [ -z "${FLASHIMAGE_SIZE}" ]; then
                 if [ -n "${FLASHIMAGE_ROOTFS_FILE}" ]; then
-                        FLASHIMAGE_ROOTFS_SIZE=$(stat -c%s ${FLASHIMAGE_ROOTFS_FILE})
+                        FLASHIMAGE_ROOTFS_SIZE=$(stat -L -c "%s" ${FLASHIMAGE_ROOTFS_FILE})
                         FLASHIMAGE_ROOTFS_SIZE_EXTRA=$(echo "$FLASHIMAGE_ROOTFS_SIZE+(16-$FLASHIMAGE_ROOTFS_SIZE%16)"| bc)
                         FLASHIMAGE_SIZE=$(expr ${FLASHIMAGE_ROOTFS_OFFSET} + $FLASHIMAGE_ROOTFS_SIZE_EXTRA)
+                        # computed size is not in Mb, so adjust the block size
+                        FLASH_IBS="1"
                 else
                         bberror "FLASHIMAGE_SIZE is undefined. To use the 'flashimage' image it needs to be defined in MiB units."
                         exit 1
@@ -124,7 +133,7 @@ IMAGE_CMD_flashimage () {
 
         # Initialize the image file with all 0xff to optimize flashing
         cd ${FLASHIMAGE_DEPLOYDIR}
-        dd if=/dev/zero ibs=1M count=$(printf "%d" ${FLASHIMAGE_SIZE}) | tr "\000" "\377" >${FLASHIMAGE} 
+        dd if=/dev/zero ibs=${FLASH_IBS} count=$(printf "%d" ${FLASHIMAGE_SIZE}) | tr "\000" "\377" >${FLASHIMAGE} 
         ln -sf ${FLASHIMAGE} ${IMAGE_LINK_NAME}.flashimage
 
         generate_flashimage

@@ -25,6 +25,9 @@
 #
 ROOTFS="/run/media/sda1"
 
+DESKTOP_IMAGE="fsl-image-blueboxdt"
+DEFAULT_IMAGE="fsl-image-auto"
+
 # Select the image file depending on the SoC we run on
 IMAGETYPE=unknown
 SOCTYPE=unknown
@@ -54,10 +57,10 @@ fi
 
 # We prefer the desktop enabled rootfs over the standard one
 if [ -z "$1" ]; then
-        if [ -f "fsl-image-blueboxdt-${SOCTYPE}${BLUEBOXNAME}.tar.gz" ]; then
-                ROOTFS_IMAGE=fsl-image-blueboxdt-${SOCTYPE}${BLUEBOXNAME}.tar.gz
+        if [ -f "${DESKTOP_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz" ]; then
+                ROOTFS_IMAGE=${DESKTOP_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz
         else
-                ROOTFS_IMAGE=fsl-image-bluebox-${SOCTYPE}${BLUEBOXNAME}.tar.gz
+                ROOTFS_IMAGE=${DEFAULT_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz
         fi
 else
         ROOTFS_IMAGE="$1"

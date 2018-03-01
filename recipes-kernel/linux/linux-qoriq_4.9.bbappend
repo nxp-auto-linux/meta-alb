@@ -31,6 +31,7 @@ SRC_URI_append_ls2084abbmini += " \
     file://0001-vnet-Add-initial-support-to-build-driver-in-kernel.patch \
     file://vnet_ls2.cfg \
     file://0001-vnet-Added-support-for-S32V-with-encryption-enabled.patch \
+    file://0001-vnet-remove-iommu-map-for-pcie-in-dts.patch \
 "
 SRCREV_vnet = "8e87af5ef37abe67f43a46e3bda49cffb8eeb8f9"
 

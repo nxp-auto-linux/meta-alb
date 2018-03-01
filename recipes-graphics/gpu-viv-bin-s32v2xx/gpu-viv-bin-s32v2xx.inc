@@ -9,6 +9,7 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=e4ea72ff91665efb91435921a29148b7"
 
 DEPENDS += "kernel-module-galcore"
+RDEPENDS_${PN} += "kernel-module-galcore"
 
 PROVIDES = "gpu-viv-bin-s32v2xx"
 RPROVIDES_${PN} = "gpu-viv-bin-s32v2xx"

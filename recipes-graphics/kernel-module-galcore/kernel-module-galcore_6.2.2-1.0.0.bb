@@ -8,7 +8,9 @@ DESCRIPTION = "GPU kernel module for s32v2xx"
 SECTION = "libs"
 LICENSE = "GPL-2.0"
 
-PROVIDES += "kernel-module-galcore"
+PROVIDES = "kernel-module-galcore${KERNEL_MODULE_PACKAGE_SUFFIX}"
+RPROVIDES_${PN} = "kernel-module-galcore${KERNEL_MODULE_PACKAGE_SUFFIX}"
+
 SRC_URI = " git://source.codeaurora.org/external/autobsps32/galcore;branch=alb/master;protocol=https "
 SRCREV = "27d109df067486855b6b58b8da9adff2200a003d"
 

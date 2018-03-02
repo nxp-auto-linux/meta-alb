@@ -41,6 +41,7 @@ mkdir -p /var/lock
 
 mount -t proc -o nodev,noexec,nosuid proc /proc
 mount -t sysfs -o nodev,noexec,nosuid sysfs /sys
+mount -t debugfs debugfs /sys/kernel/debug
 
 ln -sf /proc/mounts /etc/mtab
 

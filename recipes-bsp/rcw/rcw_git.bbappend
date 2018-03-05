@@ -38,3 +38,9 @@ SRC_URI_append += " \
 # a baseline hardware
 EXTRA_OEMAKE = "BOARDS=${@d.getVar('MACHINEBASELINE', True).replace('-64b','').replace('-${SITEINFO_ENDIANNESS}','')} DESTDIR=${D}/boot/rcw/"
 MACHINEBASELINE ?= "${MACHINE}"
+
+# We need some aliases for the BB image on standard eval boards to
+# avoid duplicating their RCW setups needlessly.
+M_ls1012abluebox = "ls1012ardb"
+M_ls1043abluebox = "ls1043ardb"
+M_ls1046abluebox = "ls1046ardb"

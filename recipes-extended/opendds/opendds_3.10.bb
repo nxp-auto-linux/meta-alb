@@ -9,7 +9,9 @@ inherit autotools
 S = "${WORKDIR}/OpenDDS-${PV}"
 B = "${S}"
 
-SRC_URI = "https://github.com/objectcomputing/OpenDDS/releases/download/DDS-3.10/OpenDDS-3.10.tar.gz"
+SRC_URI = "https://github.com/objectcomputing/OpenDDS/releases/download/DDS-3.10/OpenDDS-3.10.tar.gz \
+           file://0001-opendds-Make-Version.h-symlink-path-relative.patch \
+           "
 SRC_URI[md5sum] = "476572bdeb034f8d60b7490ce4595dd9"
 SRC_URI[sha256sum] = "824e900898e5d75f2875ead041bbef654a7a00cb59029f353df868e7fabff50f"
 
@@ -27,6 +29,8 @@ CONFIGUREOPTS = " --target=linux-cross \
 		  --prefix=${prefix} \
 		  --verbose \
 "
+
+DISABLE_STATIC = ""
 
 do_configure_prepend () {
 	# NOTE: You can't configure this recipe twice with different

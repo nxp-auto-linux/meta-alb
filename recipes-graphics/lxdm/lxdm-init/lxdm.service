@@ -1,0 +1,9 @@
+[Unit]
+Description=Xserver startup with lxdm as display manager
+
+[Service]
+EnvironmentFile=/etc/default/lxdm
+ExecStart=/usr/sbin/lxdm
+
+[Install]
+Alias=display-manager.service

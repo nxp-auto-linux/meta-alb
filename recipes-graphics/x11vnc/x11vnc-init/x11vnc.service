@@ -1,0 +1,9 @@
+[Unit]
+Description=x11vnc startup to permit headless use
+
+[Service]
+EnvironmentFile=/etc/default/x11vnc
+ExecStart=/usr/bin/x11vnc
+
+[Install]
+Alias=x11vnc.service

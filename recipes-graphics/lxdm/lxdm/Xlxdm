@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Very simple startup of ONLY the X server, so that we don't have to touch /usr/bin/X
+# This also filters the arguments passed, so that we don't pass bad args to the server
+XSERVER=/usr/bin/Xvfb
+
+. /etc/profile
+
+ARGS="-screen 0 1920x1080x24 "
+
+DISPLAY=':0'
+
+$XSERVER $DISPLAY $ARGS
+

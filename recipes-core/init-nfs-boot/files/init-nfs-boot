@@ -27,7 +27,7 @@ nfsmountroot( )
     fi
 
     if [ -x "${rootmnt}/${init}" ]; then
-        umount /sys /proc
+        umount /sys/kernel/debug /sys /proc
         exec switch_root ${rootmnt} "${init}"
     fi
 }

@@ -37,6 +37,9 @@ MACHINEEXCLUSION="^imx|^twr"
 # This should be done properly by checking the conf files, really
 ARMMACHINE="^ls|^s32"
 
+# Any bluebox machine type
+BBMACHINE=".+bbmini|.+bluebox"
+
 if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
     echo "ERROR: This script needs to be sourced."
     SCRIPT_PATH=`readlink -f $0`
@@ -209,13 +212,31 @@ LAYER_LIST=" \
     $extra_layers \
 "
 
+BBLAYERS=" \
+    meta-qoriq-demos \
+    meta-security \
+"
+
 # Really, conf files should be checked and not the machine name ...
 echo ${MACHINE} | egrep -q "${ARMMACHINE}"
 if [ $? -eq 0 ]; then
     LAYER_LIST="$LAYER_LIST \
         meta-linaro/meta-linaro-toolchain \
     "
+    # Add BBLAYERS for bluebox machines
+    echo ${MACHINE} | egrep -q "${BBMACHINE}"
+    if [ $? -eq 0 ]; then
+        for layer in $(eval echo $BBLAYERS); do
+            if [ -e "${ROOTDIR}/sources/${layer}" ]; then
+                LAYER_LIST="$LAYER_LIST \
+                    $layer \
+                "
+            fi
+        done
+    fi
 fi
+
+ 
 
 EULA_FILE="$FSLROOTDIR/EULA"
 

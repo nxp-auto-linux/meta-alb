@@ -1,7 +1,7 @@
 # A more complex image with customer required setup
 require fsl-image-ubuntu-base.bb
 
-#require kernel-source-debian.inc
+require kernel-source-debian.inc
 
 # Add the Bazel tool
 #IMAGE_INSTALL += "\

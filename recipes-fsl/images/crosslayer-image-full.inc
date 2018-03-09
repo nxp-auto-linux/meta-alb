@@ -21,3 +21,5 @@ do_rootfs[depends] += "fsl-image-networking:do_image_complete"
 
 IMAGE_FSTYPES := "${IMAGE_FSTYPESTEMP} ${IMAGE_FSTYPES}"
 IMAGE_FSTYPES_qoriq := "${IMAGE_FSTYPESTEMP} ${IMAGE_FSTYPES_qoriq}"
+
+IMAGE_FSTYPES_remove = "ext2.gz.u-boot jffs2 ubi"

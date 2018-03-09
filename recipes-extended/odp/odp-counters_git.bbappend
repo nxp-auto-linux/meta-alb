@@ -1,0 +1,1 @@
+COMPATIBLE_MACHINE_append = "|(ls2084a)"

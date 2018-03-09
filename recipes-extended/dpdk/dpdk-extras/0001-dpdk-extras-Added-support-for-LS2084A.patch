@@ -1,0 +1,56 @@
+From 5ad5b2486b3f017139c2a0942b3127cac956577c Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Fri, 12 Jan 2018 09:03:41 +0100
+Subject: [PATCH] dpdk-extras: Added support for LS2084A
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ dynamic_dpl.sh | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/dpaa2/dynamic_dpl.sh b/dpaa2/dynamic_dpl.sh
+index ed7ab54..4deb91b 100755
+--- a/dpaa2/dynamic_dpl.sh
++++ b/dpaa2/dynamic_dpl.sh
+@@ -183,12 +183,12 @@ get_dpni_parameters() {
+ 	then
+ 		if [ -e /sys/firmware/devicetree/base/compatible ]
+ 		then
+-			board_type=`grep -ao '1088\|2088\|2080\|2085' /sys/firmware/devicetree/base/compatible | head -1`
++			board_type=`grep -ao '1088\|2088\|2084\|2080\|2085' /sys/firmware/devicetree/base/compatible | head -1`
+ 		fi
+ 		if [ -z "$board_type" ]
+ 		then
+ 			echo "Unable to find the board type!"
+-			echo "Please enter the board type! (Accepted board type keywords: 1088/2088/2085/2080)"
++			echo "Please enter the board type! (Accepted board type keywords: 1088/2088/2084/2085/2080)"
+ 			read board_type
+ 		fi
+ 	else
+@@ -197,12 +197,12 @@ get_dpni_parameters() {
+ 
+ 	if [ \
+ 	     $board_type != "1088" -a $board_type != "2080" -a \
+-	     $board_type != "2085" -a $board_type != "2088" \
++	     $board_type != "2085" -a $board_type != "2088" -a $board_type != "2084" \
+ 	   ]
+ 	then
+ 		echo "  Invalid board type ${board_type} specified."
+ 		echo -n "  Only supported values are "
+-		echo "  1088|2080|2085|2088."
++		echo "  1088|2080|2084|2085|2088."
+ 		echo "  Not continuing ahead."
+ 		return 1;
+ 	fi
+@@ -221,7 +221,7 @@ get_dpni_parameters() {
+ 		if [[ $board_type == "1088" || $board_type == "2080" || $board_type == "2085" ]]
+ 		then
+ 			MAX_QOS=1
+-		elif [[ $board_type == "2088" ]]
++		elif [[ $board_type == "2088" || $board_type == "2084" ]]
+ 		then
+ 			# Setting MAX_QOS to default value on LS2088 = 64, as per restool v1.5
+ 			MAX_QOS=64
+-- 
+1.8.3.1
+

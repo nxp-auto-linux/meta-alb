@@ -1,0 +1,28 @@
+From e9d836546475ab028fe88ae7da79b94f145e0e3e Mon Sep 17 00:00:00 2001
+From: Larisa Grigore <Larisa.Grigore@nxp.com>
+Date: Mon, 3 Apr 2017 14:38:07 +0300
+Subject: [PATCH] Fix Makefile assignment
+
+---
+ Makefile.rule | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.rule b/Makefile.rule
+index 4ad9324..04e6935 100644
+--- a/Makefile.rule
++++ b/Makefile.rule
+@@ -6,9 +6,9 @@
+ # Default compiler
+ # Supports gcc & icc.
+ #
+- CC = gcc
++CC ?= gcc
+ # CC = icc
+- FC = gfortran
++FC ?= gfortran
+ 
+ #
+ # CPU architecture
+-- 
+1.9.1
+

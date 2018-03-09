@@ -1,0 +1,13 @@
+diff --git a/js/src/gc/Heap.h b/js/src/gc/Heap.h
+index f4dbcda..9c6af55 100644
+--- a/js/src/gc/Heap.h
++++ b/js/src/gc/Heap.h
+@@ -113,7 +113,7 @@ struct Cell
+ #if defined(SOLARIS) && (defined(__sparc) || defined(__sparcv9))
+ const size_t PageShift = 13;
+ const size_t ArenaShift = PageShift;
+-#elif defined(__powerpc__) || defined(__aarch64__)
++#elif defined(__aarch64__)
+ const size_t PageShift = 16;
+ const size_t ArenaShift = 12;
+ #else

@@ -10,3 +10,5 @@ SRC_URI += "\
 	file://0003-qemu-Backport-of-qemu.git-9c4bbee9e3b83544257e825663.patch \
 	file://0004-qemu-Backport-of-qemu.git-06065c451f10c7ef62cfb575a8.patch \
 "
+
+QEMU_TARGETS += "ppc64"

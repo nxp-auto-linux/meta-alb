@@ -59,12 +59,17 @@ IMAGE_INSTALL += " \
 #    ristretto \
 #"
 
+IMAGE_INSTALL += " \
+    geany \
+"
+
 # Ease of use for the desktop
 RDEPENDS_qt4-x11-free_remove = "qmmp"
-IMAGE_INSTALL += "\
-    geany \
+QT4_PACKAGES = " \
     qt4-x11-free\
     qt4-x11-free-dev\
 "
+
+IMAGE_INSTALL += "${@bb.utils.contains("BBFILE_COLLECTIONS", "qt4-layer", "${QT4_PACKAGES}", "", d)}"
 
 REQUIRED_DISTRO_FEATURES += "x11"

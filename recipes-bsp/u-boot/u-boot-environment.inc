@@ -26,10 +26,10 @@ do_compile () {
 	for envname in ${UBOOT_ENV_NAME}; do
 		sed -e "s#<machine>#${MACHINE}#" -e "s#<fdt_name>#$(basename `echo ${KERNEL_DEVICETREE} | awk '{ print $1 }'`)#" -e 's#<kernel_name>#${UBOOT_KERNEL_IMAGETYPE}#' -i ${S}/${envname}.txt
 		for envsize in ${UBOOT_ENV_IMAGE_SIZE}; do
-			if [[ "$envsize" == *:* ]]; then
+			if echo "$envsize" | grep ":"; then
 				suffix="-${envsize%:*}"
 				envsize="${envsize#*:}"
-				if [ -e "${envname}${suffix}"; then
+				if [ -e "${envname}${suffix}" ]; then
 					srcsuffix="$suffix"
 				else
 					srcsuffix=""
@@ -49,7 +49,7 @@ do_deploy () {
         cd ${DEPLOYDIR}
 	for envname in ${UBOOT_ENV_NAME}; do
 		for envsize in ${UBOOT_ENV_IMAGE_SIZE}; do
-			if [[ "$envsize" == *:* ]]; then
+			if echo "$envsize" | grep ":"; then
 				suffix="-${envsize%:*}"
 				envsize="${envsize#*:}"
 			else

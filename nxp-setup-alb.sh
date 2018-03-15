@@ -200,6 +200,7 @@ LAYER_LIST=" \
     meta-openembedded/meta-webserver \
     meta-openembedded/meta-perl \
     meta-openembedded/meta-xfce \
+    meta-virtualization \
     \
     meta-freescale \
     \

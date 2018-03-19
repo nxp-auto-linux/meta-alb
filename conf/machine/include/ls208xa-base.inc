@@ -2,7 +2,7 @@
 
 require conf/machine/include/soc-family.inc
 
-SOC_FAMILY_prepend = "fsl-lsch3:ls2:ls208xa:"
+SOC_FAMILY = "fsl-lsch3:ls2:ls208xa"
 
 IMAGE_FSTYPES = "tar.gz ext3"
 

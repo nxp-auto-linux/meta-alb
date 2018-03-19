@@ -11,6 +11,13 @@ PKGS=" gawk wget git-core diffstat unzip texinfo \
 # pkgs required for fsl use
 PKGS="$PKGS vim-common xz-utils tofrodos libstring-crc32-perl screen"
 
+if [ "$distro" = "Ubuntu" ]; then
+	if [ "$release" = "16.04" ]; then
+		# add pks for Ubuntu target: Ubuntu 16.04 toolchain
+		PKGS="$PKGS gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross"
+	fi
+fi
+
 echo "Now we're going to install all the other development packages needed to build Yocto, please wait"
 
 sudo apt-get $UPDATE_FLAG install $PKGS

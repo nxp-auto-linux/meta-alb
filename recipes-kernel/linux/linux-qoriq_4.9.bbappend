@@ -7,7 +7,6 @@ COMMONSRC_URI = " \
 	file://0001-gpio-workaround-for-gpio-interrupts.patch \
 \
 	file://0001-cache-export-function-__dma_flush_area.patch \
-	file://0002-dtb-add-shared-mem-block-as-reserved-memory-node.patch \
 \
     file://blueboxconfig \
     file://enablepktgen.cfg \
@@ -34,7 +33,7 @@ SRC_URI_append_ls2084abbmini += " \
     file://vnet_ls2.cfg \
     file://0001-vnet-remove-iommu-map-for-pcie-in-dts.patch \
 "
-SRCREV_vnet = "8e87af5ef37abe67f43a46e3bda49cffb8eeb8f9"
+SRCREV_vnet = "a7d9c2ccb0c6bb03d652dce5721f8aa416220ac7"
 
 # Optional to simplify Ethernet debug
 #SRC_URI_append_ls2 += " \

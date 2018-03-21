@@ -110,5 +110,5 @@ INSANE_SKIP_${PN} += "dev-so"
 INSANE_SKIP_${PN} += "ldflags"
 INSANE_SKIP_${PN}-dev += "ldflags"
 
-COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)"
+COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)"
 

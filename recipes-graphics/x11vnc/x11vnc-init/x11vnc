@@ -1,0 +1,51 @@
+#!/bin/sh
+# Begin /etc/rc.d/init.d/x11vnc
+
+### BEGIN INIT INFO
+# Provides:            x11vnc
+# Required-Start:      $local_fs
+# Should-Start:        $remote_fs $syslog
+# Required-Stop:       $local_fs
+# Should-Stop:         $remote_fs $syslog
+# Default-Start:       5
+# Default-Stop:        0 1 2 3 4 6
+# Short-Description:   Starts x11vnc.
+# Description:         Starts x11vnc as daemon.
+# X-LFS-Provided-By:   BLFS
+### END INIT INFO
+
+. /etc/init.d/functions
+
+BIN_FILE="/usr/bin/x11vnc"
+
+case $1 in
+   start)
+	[ "${VERBOSE}" != "no" ] && echo "Starting x11vnc..."
+	export WAITBG=1
+	start-stop-daemon --start --quiet --exec $BIN_FILE -- -display WAIT:0 -forever -bg
+	#evaluate_retval
+	;;
+
+   stop)
+	[ "${VERBOSE}" != "no" ] && echo "Stopping x11vnc..."
+ 	start-stop-daemon --stop --quiet --exec $BIN_FILE
+	#evaluate_retval
+	;;
+
+   restart)
+	$0 stop
+	sleep 2
+	$0 start
+	;;
+
+   status)
+        status ${BIN_FILE}
+        ;;
+
+   *)
+	echo "usage: $0 [start|stop|restart|status]"
+        exit 1
+	;;
+esac
+
+# End /etc/rc.d/init.d/x11vnc

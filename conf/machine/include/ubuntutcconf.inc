@@ -86,6 +86,25 @@ myshell_install_ext_toolchain() {
 }
 
 
+def run_cmd(d, cmd, *args):
+    import bb.process
+    import subprocess
+
+    args = [cmd] + list(args)
+    topdir = d.getVar('TOPDIR', True)
+    return bb.process.run(args, cwd=topdir, stderr=subprocess.PIPE)
+
+
+def get_version(d, gcc):
+    try:
+        stdout, stderr = run_cmd(d, gcc, '-v')
+    except bb.process.CmdError as exc:
+        bb.warn('Failed to execute external toolchain command')
+        return 'UNKNOWN'
+    else:
+        return stderr.splitlines()[-1]
+
+
 def ubuntu_ext_toolchain(d):
     arch = d.getVar("TARGET_ARCH", True)
     base = d.getVar("BASE_EXT_TC", True)
@@ -97,7 +116,11 @@ def ubuntu_ext_toolchain(d):
     if os.path.exists(host_tc) and os.path.exists(host_gcc):
         # Ubuntu host cross toolchain is installed on the host
         # bb.note("Using Ubuntu host cross toolchain %s" % host_gcc)
-        return True
+
+        # currently is supported only Ubuntu 5.4 version from Ubuntu 16.04
+        version = get_version(d, host_gcc)
+        if "Ubuntu/Linaro 5.4" in version and "ubuntu1~16.04" in version:
+            return True
 
     return False
 

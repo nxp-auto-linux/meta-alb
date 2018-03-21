@@ -1,0 +1,37 @@
+
+inherit linux-kernel-base
+
+KERNEL_VERSION_FULL = "${@get_kernelversion_file('${STAGING_KERNEL_BUILDDIR}')}"
+KERNEL_VERSION = "${@'${KERNEL_VERSION_FULL}'.split('+')[0]}"
+
+# override default deploy location for ubuntu to match ubuntu's convention for kernel source dir 
+KERNEL_SOURCE_DIR_ubuntu = "kernel-source-${KERNEL_VERSION}"
+KERNEL_SRC_PATH_ubuntu = "/usr/src/${KERNEL_SOURCE_DIR}"
+
+# deploy 'linux-headers-<version>-generic as symlink to KERNEL_SRC_PATH'
+KERNEL_HEADERS_DIR_ubuntu = "linux-headers-${KERNEL_VERSION}-generic"
+
+# Ubuntu does not have /bin/awk by default!
+BINAWK_FILES = "\
+    arch/arm/tools/gen-mach-types \
+    arch/sh/tools/gen-mach-types \
+    arch/x86/tools/distill.awk \
+    arch/x86/tools/gen-insn-attr-x86.awk \
+    scripts/ver_linux \
+    tools/objtool/arch/x86/insn/gen-insn-attr-x86.awk \
+    tools/perf/arch/x86/tests/gen-insn-x86-dat.awk \
+    tools/perf/util/intel-pt-decoder/gen-insn-attr-x86.awk \
+"
+
+do_install_append_ubuntu() {
+
+    cd "$kerneldir/.."
+    ln -s "${KERNEL_SOURCE_DIR}" "${KERNEL_HEADERS_DIR}"
+
+    # Ubuntu does not have /bin/awk by default!
+    for i in ${BINAWK_FILES}; do
+        sed -i s:#!/bin/awk:#!/usr/bin/awk:g ${D}${KERNEL_SRC_PATH}/$i
+    done
+}
+
+FILES_${PN}_append_ubuntu = " /usr/src/${KERNEL_HEADERS_DIR}"

@@ -38,4 +38,4 @@ do_install_append(){
 	install -m 0644 ${S}/build/sdk/drivers/galcore.ko ${D}/lib/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv/
 }
 
-COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)"
+COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)"

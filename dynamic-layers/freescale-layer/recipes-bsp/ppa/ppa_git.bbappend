@@ -1,7 +1,7 @@
 SRC_URI = "git://source.codeaurora.org/external/qoriq/qoriq-components/ppa-generic.git;nobranch=1 \
 "
 
-SRCREV = "f00e7ef29a0e14d9ab0ce31606e768c52e35609d"
+SRCREV = "e5641434f00d75634a285341d810df4261daf5de"
 
 PPA_PATH_ls1012a = "ls1012"
 PPA_PATH_ls1043a = "ls1043"

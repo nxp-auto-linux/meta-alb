@@ -34,7 +34,7 @@ FILES_${PN} += "${sysconfdir}/init.d/*"
 FILES_${PN} += "${sysconfdir}/rc5.d/*"
 FILES_${PN} += "${sysconfdir}/rc3.d/*"
 
-PROVIDES = "kernel-module-sja1105$pqrs{KERNEL_MODULE_PACKAGE_SUFFIX}"
+PROVIDES = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
 COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini"

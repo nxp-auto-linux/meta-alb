@@ -97,8 +97,9 @@ DEVLIBS = " \
         ${libdir}/libGLESv2_CM.so \
         ${libdir}/libGLESv2.so \
 "
-FILES_SOLIBSDEV="${base_libdir}/lib*.so ${DEVLIBS}"
+FILES_SOLIBSDEV="${base_libdir}/lib*.so"
 FILES_${PN} += "${STRANGELIBS}"
+FILES_${PN} += "${DEVLIBS}"
 # **** HACK END ****
 
 FILES_${PN} += "/opt"

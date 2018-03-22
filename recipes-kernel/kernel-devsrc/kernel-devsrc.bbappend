@@ -30,7 +30,9 @@ do_install_append_ubuntu() {
 
     # Ubuntu does not have /bin/awk by default!
     for i in ${BINAWK_FILES}; do
-        sed -i s:#!/bin/awk:#!/usr/bin/awk:g ${D}${KERNEL_SRC_PATH}/$i
+        if [ -f ${D}${KERNEL_SRC_PATH}/$i ]; then
+            sed -i s:#!/bin/awk:#!/usr/bin/awk:g ${D}${KERNEL_SRC_PATH}/$i
+        fi
     done
 }
 

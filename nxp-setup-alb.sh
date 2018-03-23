@@ -65,6 +65,23 @@ else
     fi
 fi
 
+SOURCESDIR="sources"
+
+# Validate by size that this file is (the same as) the original one in meta-alb
+ORIGINALFILE="`find \"$ROOTDIR/$SOURCESDIR\" -name $PROGNAME`"
+if [ -e "$ORIGINALFILE" ]; then
+
+    PROGSIZE=`ls -l "$ROOTDIR/$PROGNAME" | cut -d' ' -f 5`
+    ORIGINALSIZE=`ls -l "$ORIGINALFILE" | cut -d' ' -f 5`
+
+    if [ "$PROGSIZE" -ne "$ORIGINALSIZE" ]; then
+        echo "Found original script: \"$ORIGINALFILE\""
+        echo "WARNING: original script \"$ORIGINALFILE\" is different from the script you are running"
+        echo "Please update this script (\"$ROOTDIR/$PROGNAME\") or source directly \"$ORIGINALFILE\""
+        return
+    fi
+fi
+
 # Check if current user is root
 if [ "$(whoami)" = "root" ]; then
     echo "ERROR: Do not use the BSP as root. Exiting..."
@@ -72,11 +89,11 @@ if [ "$(whoami)" = "root" ]; then
     return
 fi
 
-OEROOTDIR=${ROOTDIR}/sources/poky
-if [ -e ${ROOTDIR}/sources/oe-core ]; then
-    OEROOTDIR=${ROOTDIR}/sources/oe-core
+OEROOTDIR=${ROOTDIR}/${SOURCESDIR}/poky
+if [ -e ${ROOTDIR}/${SOURCESDIR}/oe-core ]; then
+    OEROOTDIR=${ROOTDIR}/${SOURCESDIR}/oe-core
 fi
-FSLROOTDIR=${ROOTDIR}/sources/meta-freescale
+FSLROOTDIR=${ROOTDIR}/${SOURCESDIR}/meta-freescale
 PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
@@ -94,11 +111,11 @@ You can now run 'bitbake <target>'
 "
     echo "Targets specific to NXP:"
     for layer in $(eval echo $LAYER_LIST); do
-        for i in `ls ${ROOTDIR}/sources/$layer/recipes-*/images/fsl*.bb 2>/dev/null`;do
+        for i in `ls ${ROOTDIR}/${SOURCESDIR}/$layer/recipes-*/images/fsl*.bb 2>/dev/null`;do
             i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
                 echo "    $i";
         done
-        for i in `ls ${ROOTDIR}/sources/$layer/images/fsl*.bb 2>/dev/null`;do
+        for i in `ls ${ROOTDIR}/${SOURCESDIR}/$layer/images/fsl*.bb 2>/dev/null`;do
             i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
                 echo "    $i";
         done
@@ -128,8 +145,8 @@ usage() {
     if [ $? -eq 0 ]; then
         echo -n -e "\n    Supported machines: "
         for layer in $(eval echo $LAYER_LIST); do
-            if [ -d ${ROOTDIR}/sources/${layer}/conf/machine ]; then
-                echo -n -e "`ls ${ROOTDIR}/sources/${layer}/conf/machine | grep "\.conf" \
+            if [ -d ${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine ]; then
+                echo -n -e "`ls ${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine | grep "\.conf" \
                    | egrep -v "^${MACHINEEXCLUSION}" | sed s/\.conf//g | xargs echo` "
             fi
         done
@@ -227,7 +244,7 @@ if [ $? -eq 0 ]; then
     echo ${MACHINE} | egrep -q "${BBMACHINE}"
     if [ $? -eq 0 ]; then
         for layer in $(eval echo $BBLAYERS); do
-            if [ -e "${ROOTDIR}/sources/${layer}" ]; then
+            if [ -e "${ROOTDIR}/${SOURCESDIR}/${layer}" ]; then
                 LAYER_LIST="$LAYER_LIST \
                     $layer \
                 "
@@ -261,8 +278,8 @@ fi
 unset MACHINELAYER
 if [ -n "${MACHINE}" ]; then
     for layer in $(eval echo $LAYER_LIST); do
-        if [ -e ${ROOTDIR}/sources/${layer}/conf/machine/${MACHINE}.conf ]; then
-            MACHINELAYER="${ROOTDIR}/sources/${layer}"
+        if [ -e ${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine/${MACHINE}.conf ]; then
+            MACHINELAYER="${ROOTDIR}/${SOURCESDIR}/${layer}"
             break
         fi
     done
@@ -361,8 +378,8 @@ export PATH="`echo $PATH | sed 's/\(:.\|:\)*:/:/g;s/^.\?://;s/:.\?$//'`"
 # add layers
 for layer in $(eval echo $LAYER_LIST); do
     append_layer=""
-    if [ -e ${ROOTDIR}/sources/${layer} ]; then
-        append_layer="${ROOTDIR}/sources/${layer}"
+    if [ -e ${ROOTDIR}/${SOURCESDIR}/${layer} ]; then
+        append_layer="${ROOTDIR}/${SOURCESDIR}/${layer}"
     fi
     if [ -n "${append_layer}" ]; then
         append_layer=`readlink -f $append_layer`

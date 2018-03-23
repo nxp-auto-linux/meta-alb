@@ -71,6 +71,10 @@ IMAGE_INSTALL_append += "\
 IMAGE_INSTALL_append_s32v234bbmini += "\
     sja1105 \
 "
+IMAGE_INSTALL_append_s32v234evb += "\
+    sja1105 \
+"
+
 # This needs work to enable basic features without pulling in too much
 # Support for the S32V CAN interfaces under Linux
 #    canutils \

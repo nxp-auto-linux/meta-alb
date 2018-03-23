@@ -54,7 +54,7 @@ SRC_URI_append_ls1043ardb += " \
     file://pci-vdev.cfg \
 "
 
-SRCREV_pci-vdev = "26b0de749789c22779820051ea7992860abca19e"
+SRCREV_pci-vdev = "24470251f835e865a92e5f3eae5d5ae74d42849a"
 
 # Note how our lxc.cfg comes *AFTER* containers.config to add to it
 COMMONDELTA_KERNEL_DEFCONFIG = "enablepktgen.cfg iptables.cfg iso9660.cfg enableusbcan.cfg containers.config lxc.cfg"

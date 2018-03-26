@@ -41,3 +41,7 @@ IMAGE_INSTALL_append_t4bluebox = "\
     pcd-init \
 "
 
+# Support for SJA1105 swich under Linux
+IMAGE_INSTALL_append_s32v234bbmini += "\
+    sja1105 \
+"

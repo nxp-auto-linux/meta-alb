@@ -29,7 +29,7 @@ S = "${WORKDIR}/gpu-viv-bin-s32v234-6.2.2-hardfp"
 # Dummy entry to keep the recipe parser happy if we don't use this recipe
 FSL_LOCAL_MIRROR ?= "file://."
 
-SRC_URI = "${FSL_LOCAL_MIRROR}/gpu_drivers/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-6.2.2-hardfp.run;fsl-eula=true \
+SRC_URI = "${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-6.2.2-hardfp.run;fsl-eula=true \
            file://egl.pc \
            file://glesv2.pc \
            file://vg.pc \
@@ -102,14 +102,19 @@ FILES_${PN} += "${STRANGELIBS}"
 FILES_${PN} += "${DEVLIBS}"
 # **** HACK END ****
 
-FILES_${PN} += "/opt"
+PACKAGES += "${PN}-samples"
+
+FILES_${PN} += "/opt/fsl_tools"
 FILES_${PN} += "/usr"
 FILES_${PN} += "/etc"
+FILES_${PN}-samples += "/opt/viv_samples"
 
 INSANE_SKIP_${PN} += "dev-deps"
 INSANE_SKIP_${PN} += "dev-so"
 INSANE_SKIP_${PN} += "ldflags"
 INSANE_SKIP_${PN}-dev += "ldflags"
+INSANE_SKIP_${PN}-samples += "ldflags"
+INSANE_SKIP_${PN} += "already-stripped"
 
 COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)"
 

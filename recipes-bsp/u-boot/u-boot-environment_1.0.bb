@@ -27,3 +27,5 @@ SRC_URI_append_ls2084abbmini = " \
 "
 
 require u-boot-environment.inc
+
+COMPATIBLE_MACHINE ="(ls.*)|(t4bluebox)"

@@ -5,6 +5,7 @@
 # use fsl-image-auto/base instead.
 
 IMAGE_ROOTFS_REQ ?= "${@bb.utils.contains("BBFILE_COLLECTIONS", "qoriq-demos", "fsl-image-networking-full", "fsl-image-auto", d)}"
+EXTRA_REQUIRE_s32 = "${@bb.utils.contains("BBFILE_COLLECTIONS", "qoriq-demos", "fsl-image-s32-common.inc", "", d)}"
 
 IMAGE_ROOTFS_DEP ?= "${@bb.utils.contains("BBFILE_COLLECTIONS", "qoriq-demos", "fsl-image-networking", "fsl-image-base", d)}"
 

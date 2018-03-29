@@ -33,7 +33,7 @@ SRC_URI_append_ls2084abbmini += " \
     file://vnet_ls2.cfg \
     file://0001-vnet-remove-iommu-map-for-pcie-in-dts.patch \
 "
-SRCREV_vnet = "a7d9c2ccb0c6bb03d652dce5721f8aa416220ac7"
+SRCREV_vnet = "7d3c52dc3c6564e92bbbc0d0b6aa11e73174fed0"
 
 # Optional to simplify Ethernet debug
 #SRC_URI_append_ls2 += " \

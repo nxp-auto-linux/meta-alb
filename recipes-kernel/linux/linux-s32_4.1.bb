@@ -22,4 +22,4 @@ SRC_URI_append_s32v234bbmini += "\
     git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=alb/master;name=vnet;destsuffix=git/drivers/net/vnet \
     file://0001-vnet-Add-initial-support-to-build-driver-in-kernel.patch \
 "
-SRCREV_vnet = "a7d9c2ccb0c6bb03d652dce5721f8aa416220ac7"
+SRCREV_vnet = "7d3c52dc3c6564e92bbbc0d0b6aa11e73174fed0"

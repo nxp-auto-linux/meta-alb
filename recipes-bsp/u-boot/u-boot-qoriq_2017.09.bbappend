@@ -6,3 +6,6 @@ SRC_URI += "\
 	file://0001-u-boot-qoriq-Missing-USB-nodes-in-the-dts-for-the-ls.patch \
 	file://0002-u-boot-qoriq-Special-config-for-LS2080ARDB-with-LS20.patch \
 "
+
+SRCREV_ls1043ardb = "9f7df1b406ff11409021cd2112beedd6b57bb600"
+

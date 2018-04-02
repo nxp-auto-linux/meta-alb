@@ -20,7 +20,7 @@ do_install_append() {
 	install -d ${D}/${sysconfdir}/rc5.d
 	install -d ${D}/${sysconfdir}/rc3.d
 	install -m 755 ${WORKDIR}/sja1105.sh ${D}/${sysconfdir}/init.d/sja1105.sh
-	echo "insmod /lib/modules/\`uname -r\`/kernel/drivers/net/phy/nxp/nxp.ko" >> ${D}/${sysconfdir}/init.d/sja1105.sh
+	echo "lsmod | grep -q \"^nxp \"  > /dev/null || insmod /lib/modules/\`uname -r\`/kernel/drivers/net/phy/nxp/nxp.ko" >> ${D}/${sysconfdir}/init.d/sja1105.sh
 	ln -sf ../init.d/sja1105.sh      ${D}${sysconfdir}/rc5.d/S90sja1105.sh
 	ln -sf ../init.d/sja1105.sh      ${D}${sysconfdir}/rc3.d/S90sja1105.sh
 }

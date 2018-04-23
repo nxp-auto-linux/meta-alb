@@ -37,7 +37,6 @@ nfsmountroot( )
 [ -d /sys ] || mkdir /sys
 [ -d /proc ] || mkdir /proc
 [ -d /tmp ] || mkdir /tmp
-mkdir -p /var/lock
 
 mount -t proc -o nodev,noexec,nosuid proc /proc
 mount -t sysfs -o nodev,noexec,nosuid sysfs /sys

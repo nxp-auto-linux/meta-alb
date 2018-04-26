@@ -13,3 +13,13 @@ BACKPORTS += "\
 
 SRC_URI[r52.md5sum] = "2e74cc013418f1fc7464af814ffb65f3"
 SRC_URI[fortran.md5sum] = "586ff3d397202f3edd9caf85b70f8426"
+
+# Remove support for isl older than 0.15 and fix incorrect isl version hardcoded to 0.15 in gcc
+BACKPORTS += "\
+           file://0001-2017-02-13-Richard-Biener-rguenther-suse.de.patch \
+"
+
+
+# Configure gcc to use isl
+EXTRA_OECONF_BASE_remove = " --without-isl"
+NATIVEDEPS += " isl-native"

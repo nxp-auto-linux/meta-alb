@@ -6,6 +6,7 @@ SRCREV = "f121e2071eccc565889dd943b3219fbb9349cfcc"
 
 BACKPORTS += "\
            file://CVE-2016-6131.patch \
+           file://0001-fix-glibc-2.26-build-with-gcc-6.3.1.patch \
            https://source.codeaurora.org/external/s32ds/compiler/gnu_nxp/plain/gcc.6-3-1-linaro-backport-armv8r-cortex-r52;name=r52;apply=yes \
            https://source.codeaurora.org/external/s32ds/compiler/gnu_nxp/plain/gcc.fix_armv8-libgfortran;name=fortran;apply=yes \
 "

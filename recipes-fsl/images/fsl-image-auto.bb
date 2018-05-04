@@ -34,3 +34,6 @@ IMAGE_ROOTFS_EXTRA_SPACE ?= "54000"
 
 # Enable LXC features
 IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' lxc', '', d)}"
+
+# SFTP server
+IMAGE_INSTALL_append = " openssh openssh-sftp openssh-sftp-server "

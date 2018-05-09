@@ -25,7 +25,6 @@ SRC_URI += "file://fix-build-error-under-gcc6.patch"
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}" V=1'
 EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
 
-inherit fsl-u-boot-localversion
 SCMVERSION = "y"
 LOCALVERSION = ""
 
@@ -61,4 +60,5 @@ do_compile_append() {
 }
 
 PACKAGES += "${PN}-images"
-FILES_${PN}-images += "${FILES_${PN}}"
+FILES_${PN}-images += "/boot"
+COMPATIBLE_MACHINE = "s32"

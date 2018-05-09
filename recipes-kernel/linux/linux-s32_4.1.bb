@@ -5,18 +5,30 @@ SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;
 # BSP16.1
 SRCREV = "5334bf17f6ba70d541a5be74a89b8f8e229156ce"
 
+DELTA_KERNEL_DEFCONFIG_append_s32v234pcie += " \
+    blueboxconfig_s32v234pcie \
+"
+DELTA_KERNEL_DEFCONFIG_append_s32v234pciebcm += " \
+    blueboxconfig_s32v234pcie \
+"
 DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += " \
-    ${THISDIR}/linux-s32/build/blueboxconfig_s32v234pcie \
+    blueboxconfig_s32v234pcie \
 "
 
-DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "${THISDIR}/linux-s32/build/vnet_s32.cfg"
+DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "vnet_s32.cfg"
 
 # LXC configuration
-DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', '${THISDIR}/linux-s32/build/containers_4.1.26.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'containers_4.1.26.config', '', d)}"
 
 # Docker configuration
-DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', '${THISDIR}/linux-s32/build/docker.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
 
+SRC_URI += "\
+    file://build/blueboxconfig_s32v234pcie \
+    file://build/vnet_s32.cfg \
+    file://build/containers_4.1.26.config \
+    file://build/docker.config \
+"
 # add sources for virtual ethernet over PCIe
 SRC_URI_append_s32v234bbmini += "\
     git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=alb/master;name=vnet;destsuffix=git/drivers/net/vnet \

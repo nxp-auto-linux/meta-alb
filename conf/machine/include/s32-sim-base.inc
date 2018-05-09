@@ -1,6 +1,6 @@
 require conf/machine/include/s32-base.inc
 
-KERNEL_DEFCONFIG ?= "${S}/arch/arm64/configs/s32gen1_defconfig"
+KERNEL_DEFCONFIG ?= "s32gen1_defconfig"
 
 UBOOT_CONFIG = "cpio"
 UBOOT_SUFFIX ?= "bin"

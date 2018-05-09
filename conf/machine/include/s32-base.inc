@@ -43,9 +43,3 @@ MACHINE_SOCARCH_SUFFIX_s32 = "-s32"
 MACHINE_ARCH_FILTER = "virtual/kernel"
 
 INHERIT += "fsl-dynamic-packagearch"
-
-# On S32V, we support either pure SW rendering or HW assisted
-# rendering. Libraries come from different sources then.
-PREFERRED_PROVIDER_virtual/egl = "${@bb.utils.contains("DISTRO_FEATURES", "gpu", "gpu-viv-bin-s32v2xx", "mesa", d)}"
-PREFERRED_PROVIDER_virtual/libgles1 = "${@bb.utils.contains("DISTRO_FEATURES", "gpu", "gpu-viv-bin-s32v2xx", "mesa", d)}"
-PREFERRED_PROVIDER_virtual/libgles2 = "${@bb.utils.contains("DISTRO_FEATURES", "gpu", "gpu-viv-bin-s32v2xx", "mesa", d)}"

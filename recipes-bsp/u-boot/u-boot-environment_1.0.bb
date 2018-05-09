@@ -7,6 +7,9 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 PV = "1.0+fslgit"
 
+# if u-boot-flashenv not found in the supported targets, default to an empty env
+FILESEXTRAPATHS_append := "${THISDIR}/${PN}/empty-flashenv:"
+
 SRC_URI = "\
         file://u-boot-flashenv.txt \
 "
@@ -27,5 +30,3 @@ SRC_URI_append_ls2084abbmini = " \
 "
 
 require u-boot-environment.inc
-
-COMPATIBLE_MACHINE ="(ls.*)|(t4bluebox)"

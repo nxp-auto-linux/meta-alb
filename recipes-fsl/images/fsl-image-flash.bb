@@ -3,7 +3,6 @@
 #
 
 require recipes-fsl/images/fsl-image-base.bb
-inherit image_types_fsl_flashimage
 
 IMAGE_FSTYPES = "flashimage"
 

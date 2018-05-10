@@ -13,6 +13,9 @@ UBOOT_TYPE_SDCARD = "${MACHINE}"
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 IMAGE_CLASSES += "image_types_fsl_sdcard"
 
+# Permit later to optionally add flashimage to IMAGE_FSTYPES
+IMAGE_CLASSES += "image_types_fsl_flashimage"
+
 UBOOT_CONFIG ?= "sdcard"
 UBOOT_CONFIG[sdcard] = "${MACHINE}_config,,u-boot.${UBOOT_SUFFIX}"
 UBOOT_MACHINE_SDCARD ?= "${MACHINE}"

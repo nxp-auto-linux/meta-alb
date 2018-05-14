@@ -2,7 +2,6 @@ require recipes-kernel/linux/linux-s32.inc
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master"
 
-# BSP16.1
 SRCREV = "5334bf17f6ba70d541a5be74a89b8f8e229156ce"
 
 DELTA_KERNEL_DEFCONFIG_append_s32v234pcie += " \

@@ -37,6 +37,10 @@ MACHINEEXCLUSION="^imx|^twr"
 # This should be done properly by checking the conf files, really
 ARMMACHINE="^ls|^s32"
 
+
+DEFAULT_DISTRO="fsl-auto"
+COMPANY="NXP"
+
 # Any bluebox machine type
 BBMACHINE=".+bbmini|.+bluebox"
 
@@ -98,7 +102,7 @@ PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
 local i=''
-echo "Welcome to NXP Auto Linux BSP (Reference Distro)
+echo "Welcome to ${COMPANY} Auto Linux BSP (Reference Distro)
 
 The Yocto Project has extensive documentation about OE including a
 reference manual which can be found at:
@@ -109,7 +113,7 @@ For more information about OpenEmbedded see their website:
 
 You can now run 'bitbake <target>'
 "
-    echo "Targets specific to NXP:"
+    echo "Targets specific to ${COMPANY}:"
     for layer in $(eval echo $LAYER_LIST); do
         for i in `ls ${ROOTDIR}/${SOURCESDIR}/$layer/recipes-*/images/fsl*.bb 2>/dev/null`;do
             i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
@@ -264,7 +268,6 @@ if test $setup_error || test $setup_h; then
     usage && clean_up && return
 fi
 
-DEFAULT_DISTRO="fsl-auto"
 
 unset DISTRO
 if [ -n "$distro_override" ]; then
@@ -434,7 +437,7 @@ if [ "$EULA" = "ask" ]; then
     cat <<EOF
 
 Proprietary and third party software is subject to agreement and compliance
-with, NXP's End User License Agreement. To have the right to use these
+with, ${COMPANY}'s End User License Agreement. To have the right to use these
 binaries in your images, you must read and accept the following terms.  If
 there are conflicting terms embedded in the software, the terms embedded in
 the Software will control.

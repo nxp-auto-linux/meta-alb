@@ -226,6 +226,8 @@ LAYER_LIST=" \
     \
     meta-alb \
     \
+    meta-adas \
+    \
     $extra_layers \
 "
 

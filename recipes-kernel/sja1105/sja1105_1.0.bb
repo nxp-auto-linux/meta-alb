@@ -37,7 +37,7 @@ FILES_${PN} += "${sysconfdir}/rc3.d/*"
 PROVIDES = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
-COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini"
+COMPATIBLE_MACHINE = "${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 's32v234evb|s32v234bbmini', d)}"
 INHIBIT_PACKAGE_STRIP = "1"
 
 DEPENDS_append = " coreutils-native"

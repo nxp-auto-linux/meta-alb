@@ -69,10 +69,10 @@ IMAGE_INSTALL_append += "\
 
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234bbmini += "\
-    sja1105 \
+	${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'sja1105', d)} \
 "
 IMAGE_INSTALL_append_s32v234evb += "\
-    sja1105 \
+	${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'sja1105', d)} \
 "
 
 # This needs work to enable basic features without pulling in too much

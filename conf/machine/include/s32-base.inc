@@ -9,6 +9,15 @@ SOC_FAMILY = "s32"
 # Otherwise, intermediate include files should be
 # created for various families (e.g. s32v-base.inc, s32g-base.inc etc)
 
+# NXP Automotive uses gcc 6.3
+# For backwards compatibility, we should also support
+# gcc_linaro-4.9, binutils_linaro-2.25 and glibc_linaro-2.20 which currently
+# do not build on poky rocko
+GCCVERSION ?= "linaro-6.3"
+BINUVERSION ?= "2.29.1"
+GLIBCVERSION ?= "2.26"
+PREFERRED_VERSION_libgfortran ?= "linaro-6.3"
+
 KERNEL_IMAGETYPE ?= "Image"
 
 # S32 BSP default providers

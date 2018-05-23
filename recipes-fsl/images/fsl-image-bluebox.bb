@@ -40,8 +40,3 @@ IMAGE_INSTALL_append_t4bluebox += " \
 IMAGE_INSTALL_append_t4bluebox = "\
     pcd-init \
 "
-
-# Support for SJA1105 swich under Linux
-IMAGE_INSTALL_append_s32v234bbmini += "\
-	${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'sja1105', d)} \
-"

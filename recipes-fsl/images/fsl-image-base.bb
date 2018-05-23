@@ -4,7 +4,8 @@
 # The minimal rootfs with basic packages for boot up
 #
 
-include recipes-core/images/core-image-minimal.bb
+BASE_CORE_IMAGE ?= "recipes-core/images/core-image-minimal.bb"
+include ${BASE_CORE_IMAGE}
 
 IMAGE_INSTALL += " \
     kernel-image \

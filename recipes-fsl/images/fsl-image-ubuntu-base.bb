@@ -29,7 +29,7 @@ IMAGE_INSTALL += "\
 
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior
-IMAGE_INSTALL_append_fsl-lsch3 += " \
+IMAGE_INSTALL += "\
    linux-kernelitb-norootfs-image \
 "
 
@@ -65,6 +65,17 @@ DHCP_CONNECTION_TIMEOUT = "30"
 # Set up the network interfaces file only
 IMAGE_INSTALL_append += "\
     init-ifupdown \
+"
+
+# Minimum support for LS2 and S32V specific elements.
+IMAGE_INSTALL_append_fsl-lsch3 += "\
+    mc-utils-image \
+    restool \
+"
+
+# We want easy installation of the BlueBox image to the target
+DEPENDS_append_fsl-lsch3 = " \
+    bbdeployscripts \
 "
 
 # Support for SJA1105 swich under Linux

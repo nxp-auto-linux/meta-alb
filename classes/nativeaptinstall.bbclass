@@ -63,7 +63,7 @@ APTGET_SKIP_UPGRADE ?= "0"
 # Set this to anything but 0 to skip performing apt-get clean at the end
 APTGET_SKIP_CACHECLEAN ?= "0"
 
-APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${MACHINE}"
+APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${TRANSLATED_TARGET_ARCH}"
 APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
 
 DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native"

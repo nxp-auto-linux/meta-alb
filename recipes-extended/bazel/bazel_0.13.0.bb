@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 BAZEL_PACKAGE = "bazel-${PV}-dist"
 
 SRC_URI = "https://github.com/bazelbuild/bazel/releases/download/${PV}/${BAZEL_PACKAGE}.zip"
-SRC_URI[md5sum] = "2a27c31907993090e00887bbdf0df32f"
-SRC_URI[sha256sum] = "a084a9c5d843e2343bf3f319154a48abe3d35d52feb0ad45dec427a1c4ffc416"
+SRC_URI[md5sum] = "64a5124025c1618b550faec64a9b6fa3"
+SRC_URI[sha256sum] = "82e9035084660b9c683187618a29aa896f8b05b5f16ae4be42a80b5e5b6a7690"
 
 S = "${WORKDIR}"
 BAZEL_DEPLOY_DIR = "/opt/bazel"

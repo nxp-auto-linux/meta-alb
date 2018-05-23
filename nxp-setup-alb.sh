@@ -98,6 +98,7 @@ if [ -e ${ROOTDIR}/${SOURCESDIR}/oe-core ]; then
     OEROOTDIR=${ROOTDIR}/${SOURCESDIR}/oe-core
 fi
 FSLROOTDIR=${ROOTDIR}/${SOURCESDIR}/meta-freescale
+ALBROOTDIR=${ROOTDIR}/${SOURCESDIR}/meta-alb
 PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
@@ -261,7 +262,7 @@ fi
 
  
 
-EULA_FILE="$FSLROOTDIR/EULA"
+EULA_FILE="$ALBROOTDIR/EULA"
 
 # check the "-h" and other not supported options
 if test $setup_error || test $setup_h; then

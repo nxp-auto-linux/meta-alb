@@ -44,6 +44,9 @@ COMPANY="NXP"
 # Any bluebox machine type
 BBMACHINE=".+bbmini|.+bluebox"
 
+# Any s32v234* machine type
+S32V234MACHINE="s32v234.+"
+
 if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
     echo "ERROR: This script needs to be sourced."
     SCRIPT_PATH=`readlink -f $0`
@@ -184,6 +187,28 @@ usage() {
     fi
 }
 
+
+add_layers_for_machines()
+{
+    # add the layer specified in PARAM_LAYER_LIST only for the machines
+    # contained in PARAM_MACHINE_LIST
+
+    PARAM_LAYER_LIST=$1
+    PARAM_MACHINE_LIST=$2
+
+    echo ${MACHINE} | egrep -q "${PARAM_MACHINE_LIST}"
+    if [ $? -eq 0 ]; then
+        for layer in $(eval echo ${PARAM_LAYER_LIST}); do
+            if [ -e "${ROOTDIR}/${SOURCESDIR}/${layer}" ]; then
+                LAYER_LIST="$LAYER_LIST \
+                    $layer \
+                "
+            fi
+        done
+    fi
+}
+
+
 # parse the parameters
 OLD_OPTIND=$OPTIND
 while getopts "m:j:t:b:d:e:D:c:lh" setup_flag
@@ -231,8 +256,6 @@ LAYER_LIST=" \
     \
     meta-alb \
     \
-    meta-adas \
-    \
     $extra_layers \
 "
 
@@ -241,25 +264,21 @@ BBLAYERS=" \
     meta-security \
 "
 
+S32V234LAYERS=" \
+    meta-adas \
+"
+
 # Really, conf files should be checked and not the machine name ...
 echo ${MACHINE} | egrep -q "${ARMMACHINE}"
 if [ $? -eq 0 ]; then
     LAYER_LIST="$LAYER_LIST \
         meta-linaro/meta-linaro-toolchain \
     "
-    # Add BBLAYERS for bluebox machines
-    echo ${MACHINE} | egrep -q "${BBMACHINE}"
-    if [ $? -eq 0 ]; then
-        for layer in $(eval echo $BBLAYERS); do
-            if [ -e "${ROOTDIR}/${SOURCESDIR}/${layer}" ]; then
-                LAYER_LIST="$LAYER_LIST \
-                    $layer \
-                "
-            fi
-        done
-    fi
-fi
 
+    add_layers_for_machines "${S32V234LAYERS}" "${S32V234MACHINE}"
+    add_layers_for_machines "${BBLAYERS}" "${BBMACHINE}"
+
+fi
  
 
 EULA_FILE="$ALBROOTDIR/EULA"

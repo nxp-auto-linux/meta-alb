@@ -16,13 +16,23 @@ EXTRA_OEMAKE_append_s32v234evb = " MYPLATFORM=evb "
 EXTRA_OEMAKE_append_s32v234bbmini = " MYPLATFORM=bbmini "
 
 do_install_append() {
-	install -d ${D}/${sysconfdir}/modules-load.d
-	echo "sja1105pqrs" >> ${D}/${sysconfdir}/modules-load.d/sja1105pqrs.conf
-	echo "nxp" >> ${D}/${sysconfdir}/modules-load.d/nxp.conf
+	install -d ${D}/${sysconfdir}/init.d
+	install -d ${D}/${sysconfdir}/rc5.d
+	install -d ${D}/${sysconfdir}/rc3.d
+	install -m 755 ${WORKDIR}/sja1105.sh ${D}/${sysconfdir}/init.d/sja1105.sh
+	echo "lsmod | grep -q \"^nxp \"  > /dev/null || insmod /lib/modules/\`uname -r\`/kernel/drivers/net/phy/nxp/nxp.ko" >> ${D}/${sysconfdir}/init.d/sja1105.sh
+	ln -sf ../init.d/sja1105.sh      ${D}${sysconfdir}/rc5.d/S90sja1105.sh
+	ln -sf ../init.d/sja1105.sh      ${D}${sysconfdir}/rc3.d/S90sja1105.sh
 }
 
+SRC_URI += " \
+    file://sja1105.sh \
+"
+
 FILES_${PN} += "${base_libdir}/*"
-FILES_${PN} += "${sysconfdir}/modules-load.d/*"
+FILES_${PN} += "${sysconfdir}/init.d/*"
+FILES_${PN} += "${sysconfdir}/rc5.d/*"
+FILES_${PN} += "${sysconfdir}/rc3.d/*"
 
 PROVIDES = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"

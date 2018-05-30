@@ -29,7 +29,6 @@ UBOOT_ENTRYPOINT = "0x80080000"
 # Note that we can not boot U-Boot from SD Card on BB Classic
 IMAGE_CLASSES += "image_types_fsl_sdcard"
 SDCARD_ROOTFS ?= "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ext3"
-UBOOT_TYPE_SDCARD ?= "${MACHINE}"
 UBOOT_SUFFIX_SDCARD ?= "${UBOOT_SUFFIX}"
 
 # 64 MB boot partition

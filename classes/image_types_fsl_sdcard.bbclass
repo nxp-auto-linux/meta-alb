@@ -9,7 +9,7 @@ UBOOT_REALSUFFIX_SDCARD ?= ".${UBOOT_SUFFIX_SDCARD}"
 
 UBOOT_TYPE_SDCARD ?= "sdcard"
 UBOOT_BASENAME_SDCARD ?= "u-boot"
-UBOOT_NAME_SDCARD ?= "${UBOOT_BASENAME_SDCARD}-${UBOOT_TYPE_SDCARD}${UBOOT_REALSUFFIX_SDCARD}"
+UBOOT_NAME_SDCARD ?= "${UBOOT_BASENAME_SDCARD}-${MACHINE}${UBOOT_REALSUFFIX_SDCARD}-${UBOOT_TYPE_SDCARD}"
 UBOOT_KERNEL_IMAGETYPE ?= "${KERNEL_IMAGETYPE}"
 UBOOT_BOOTSPACE_SEEK ?= "2"
 
@@ -58,6 +58,14 @@ SDCARDIMAGE_EXTRA9 ?= "${FLASHIMAGE_EXTRA9}"
 SDCARDIMAGE_EXTRA9_FILE ?= "${FLASHIMAGE_EXTRA9_FILE}"
 SDCARDIMAGE_EXTRA9_OFFSET ?= "${FLASHIMAGE_EXTRA9_OFFSET}"
 
+SDCARD_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
+SDCARD = "${SDCARD_DEPLOYDIR}/${IMAGE_NAME}.rootfs.sdcard"
+
+# Set default alignment to 4MB [in KiB]
+BASE_IMAGE_ROOTFS_ALIGNMENT ?= "4096"
+SDCARD_BINARY_SPACE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
+IMAGE_ROOTFS_ALIGNMENT = "${SDCARD_BINARY_SPACE}"
+
 do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARD_RCW', True) and d.getVar('SDCARD_RCW', True) + ':do_deploy' or ''} \
 	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER', True) + ':do_deploy' or ''} \
@@ -74,6 +82,7 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
 "
 SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
+SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_fsl_lsch3_sdcard"
 SDCARD_GENERATION_COMMAND_s32 = "generate_imx_sdcard"
 
 #
@@ -128,6 +137,7 @@ _generate_boot_image() {
 		mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/extlinux.conf ::/extlinux/extlinux.conf
 	fi
 }
+
 # Create an image that can by written onto a SD card using dd for use
 # with the Layerscape 2 family of devices
 #
@@ -137,8 +147,8 @@ _generate_boot_image() {
 #
 # The disk layout used is:
 #
-#    0                      -> SDCARD_BINARY_SPACE            - reserved to bootloader (not partitioned)
-#    SDCARD_BINARY_SPACE    -> BOOT_SPACE                     - kernel and other data
+#    0                      -> IMAGE_ROOTFS_ALIGNMENT            - reserved to bootloader (not partitioned)
+#    IMAGE_ROOTFS_ALIGNMENT -> BOOT_SPACE                     - kernel and other data
 #    BOOT_SPACE             -> SDIMG_SIZE                     - rootfs
 #
 #                                                     Default Free space = 1.3x
@@ -147,7 +157,7 @@ _generate_boot_image() {
 #            64MiB              16MiB         SDIMG_ROOTFS
 # <-----------------------> <----------> <---------------------->
 #  ------------------------ ------------ ------------------------
-# | SDCARD_BINARY_SPACE    | BOOT_SPACE | ROOTFS_SIZE            |
+# | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            |
 #  ------------------------ ------------ ------------------------
 # ^                        ^            ^                        ^                               ^
 # |                        |            |                        |                               |
@@ -155,8 +165,8 @@ _generate_boot_image() {
 generate_fsl_lsch3_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
-	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${SDCARD_BINARY_SPACE} $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED})
-	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}     \+ $ROOTFS_SIZE)
+	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
+	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}     \+ $ROOTFS_SIZE)
 	parted ${SDCARD} print
 
 	# Fill RCW into the boot block
@@ -173,7 +183,7 @@ generate_fsl_lsch3_sdcard () {
 	        else
 	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
 	        fi
-	        if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" ]; then
+	        if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" -a -n "${UBOOT_ENV_SDCARD_FILE}" ]; then
 	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1
 	        fi
 	        ;;
@@ -188,8 +198,8 @@ generate_fsl_lsch3_sdcard () {
 	_generate_boot_image 1
 
 	# Burn Partition
-	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${SDCARD_BINARY_SPACE} \* 1024)
-	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${SDCARD_BINARY_SPACE} \* 1024)
+	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
 }
 
 #
@@ -202,8 +212,8 @@ generate_fsl_lsch3_sdcard () {
 #
 # The disk layout used is:
 #
-#    0                      -> SDCARD_BINARY_SPACE            - reserved to bootloader (not partitioned)
-#    SDCARD_BINARY_SPACE    -> BOOT_SPACE                     - kernel and other data
+#    0                      -> IMAGE_ROOTFS_ALIGNMENT         - reserved to bootloader (not partitioned)
+#    IMAGE_ROOTFS_ALIGNMENT -> BOOT_SPACE                     - kernel and other data
 #    BOOT_SPACE             -> SDIMG_SIZE                     - rootfs
 #
 #                                                     Default Free space = 1.3x
@@ -212,7 +222,7 @@ generate_fsl_lsch3_sdcard () {
 #            4MiB               8MiB           SDIMG_ROOTFS                    4MiB
 # <-----------------------> <----------> <----------------------> <------------------------------>
 #  ------------------------ ------------ ------------------------ -------------------------------
-# | SDCARD_BINARY_SPACE    | BOOT_SPACE | ROOTFS_SIZE            |     IMAGE_ROOTFS_ALIGNMENT    |
+# | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            |     IMAGE_ROOTFS_ALIGNMENT    |
 #  ------------------------ ------------ ------------------------ -------------------------------
 # ^                        ^            ^                        ^                               ^
 # |                        |            |                        |                               |
@@ -220,8 +230,8 @@ generate_fsl_lsch3_sdcard () {
 generate_imx_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
-	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${SDCARD_BINARY_SPACE} $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED})
-	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${SDCARD_BINARY_SPACE} \+ ${BOOT_SPACE_ALIGNED} \+ $ROOTFS_SIZE)
+	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
+	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ $ROOTFS_SIZE)
 	parted ${SDCARD} print
 
 	# Burn bootloader
@@ -232,10 +242,13 @@ generate_imx_sdcard () {
 		;;
 		u-boot)
 		if [ -n "${SPL_BINARY}" ]; then
-			dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=2 bs=512
-			dd if=${DEPLOY_DIR_IMAGE}/u-boot-${MACHINE}.${UBOOT_SUFFIX_SDCARD} of=${SDCARD} conv=notrunc seek=69 bs=1K
+			dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
 		else
-			dd if=${DEPLOY_DIR_IMAGE}/u-boot-${MACHINE}.${UBOOT_SUFFIX_SDCARD} of=${SDCARD} conv=notrunc seek=${UBOOT_BOOTSPACE_SEEK} bs=512
+			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+		fi
+		if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" -a -n "${UBOOT_ENV_SDCARD_FILE}" ]; then
+			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1
 		fi
 		;;
 		barebox)
@@ -253,8 +266,8 @@ generate_imx_sdcard () {
 	_generate_boot_image 1
 
 	# Burn Partition
-	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${SDCARD_BINARY_SPACE} \* 1024)
-	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${SDCARD_BINARY_SPACE} \* 1024)
+	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
 }
 
 generate_sdcardimage_entry() {
@@ -286,20 +299,20 @@ IMAGE_CMD_sdcard () {
 	fi
 
 	# Align boot partition and calculate total SD card image size
-	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE} + ${IMAGE_ROOTFS_ALIGNMENT} - 1)
-	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE_ALIGNED} - ${BOOT_SPACE_ALIGNED} % ${IMAGE_ROOTFS_ALIGNMENT})
+	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT} - 1)
+	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE_ALIGNED} - ${BOOT_SPACE_ALIGNED} % ${BASE_IMAGE_ROOTFS_ALIGNMENT})
 
 	# If the size has not been preset, we default to flash image
 	# sizes if available turned into [KiB] or to a hardcoded mini
 	# default of 4MB.
-	if [ -z "${SDCARD_BINARY_SPACE}" ]; then
+	if [ -z "${IMAGE_ROOTFS_ALIGNMENT}" ]; then
 		if [ -n "${FLASHIMAGE_SIZE}" ]; then
-			SDCARD_BINARY_SPACE=$(expr ${FLASHIMAGE_SIZE} \* 1024)
+			IMAGE_ROOTFS_ALIGNMENT=$(expr ${FLASHIMAGE_SIZE} \* 1024)
 		else
-			SDCARD_BINARY_SPACE=4096
+			IMAGE_ROOTFS_ALIGNMENT=${BASE_IMAGE_ROOTFS_ALIGNMENT}
 		fi
 	fi
-	SDCARD_SIZE=$(expr ${SDCARD_BINARY_SPACE} + ${BOOT_SPACE_ALIGNED} + $ROOTFS_SIZE + ${IMAGE_ROOTFS_ALIGNMENT})
+	SDCARD_SIZE=$(expr ${IMAGE_ROOTFS_ALIGNMENT} + ${BOOT_SPACE_ALIGNED} + $ROOTFS_SIZE + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
 
 	cd ${SDCARD_DEPLOYDIR}
 

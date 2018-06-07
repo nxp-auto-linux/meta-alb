@@ -17,9 +17,8 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
-SRCREV = "61ddb5d28521c165a3ea1a23984d8e2e68d8aea9"
+SRCREV = "44709d3a86e5cd36792f01f43b9e9d5ac0ef5256"
 
-SRC_URI += "file://fix-build-error-under-gcc6.patch"
 
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}" V=1'
 EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'

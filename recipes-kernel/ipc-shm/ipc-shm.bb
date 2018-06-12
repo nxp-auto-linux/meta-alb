@@ -18,8 +18,6 @@ DESTDIR="${D}"
 EXTRA_OEMAKE_append = " -C ./ipc-shm-sample INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} "
 MODULES_MODULE_SYMVERS_LOCATION = "ipc-shm-dev"
 
-PROVIDES = "kernel-module-ipc-shm${KERNEL_MODULE_PACKAGE_SUFFIX}"
-RPROVIDES_${PN} = "kernel-module-ipc-shm${KERNEL_MODULE_PACKAGE_SUFFIX}"
 PROVIDES += "kernel-module-ipc-shm-sample${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} += "kernel-module-ipc-shm-sample${KERNEL_MODULE_PACKAGE_SUFFIX}"
 PROVIDES += "kernel-module-ipc-shm-dev${KERNEL_MODULE_PACKAGE_SUFFIX}"

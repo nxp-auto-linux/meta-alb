@@ -17,7 +17,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
-SRCREV = "44709d3a86e5cd36792f01f43b9e9d5ac0ef5256"
+SRCREV = "f9c2318c8f6a61ee6aa03fdd2b107ea64e25bf3e"
 
 
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}" V=1'

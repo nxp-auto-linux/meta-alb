@@ -1,0 +1,28 @@
+From 994417515245b3b64e2154575ce65da3d57c0daf Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Mon, 25 Jun 2018 15:55:39 +0300
+Subject: [PATCH 1/1] pcie-s32v: kernel support for pcie demos (icc and user
+ space)
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/s32v234.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/s32v234.dtsi b/arch/arm64/boot/dts/freescale/s32v234.dtsi
+index b0b0747..c58cc10 100644
+--- a/arch/arm64/boot/dts/freescale/s32v234.dtsi
++++ b/arch/arm64/boot/dts/freescale/s32v234.dtsi
+@@ -764,4 +764,9 @@
+ 		reg = <0 0xc0000000 0 0x40000000>;
+ 	};
+ 
++	icc-linux {
++		compatible = "fsl,s32v234-icc";
++		memory-region = <&shared_memory>;
++	};
++
+ };
+-- 
+2.7.4
+

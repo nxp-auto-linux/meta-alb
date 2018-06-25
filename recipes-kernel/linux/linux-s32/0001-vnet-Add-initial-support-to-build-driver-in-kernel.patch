@@ -24,12 +24,13 @@ diff --git a/drivers/net/Makefile b/drivers/net/Makefile
 index e25fdd7..42756a3 100644
 --- a/drivers/net/Makefile
 +++ b/drivers/net/Makefile
-@@ -66,3 +66,5 @@ obj-$(CONFIG_USB_NET_DRIVERS) += usb/
+@@ -66,3 +66,6 @@ obj-$(CONFIG_USB_NET_DRIVERS) += usb/
  
- obj-$(CONFIG_HYPERV_NET) += hyperv/
- obj-$(CONFIG_NTB_NETDEV) += ntb_netdev.o
 +obj-$(CONFIG_VNET_S32) += vnet/s32/
 +obj-$(CONFIG_VNET_LS2) += vnet/ls/
++
+ obj-$(CONFIG_HYPERV_NET) += hyperv/
+ obj-$(CONFIG_NTB_NETDEV) += ntb_netdev.o
 -- 
 2.7.4
 

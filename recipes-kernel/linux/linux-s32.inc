@@ -66,5 +66,14 @@ do_deploy_append_s32() {
 
 FILES_kernel-image += "/boot/zImage*"
 
+# Support for TJA1100 and TJA1102 under Linux
+KERNEL_MODULE_AUTOLOAD_s32v234bbmini += "\
+    ${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'nxp', d)} \
+"
+
+KERNEL_MODULE_AUTOLOAD_s32v234evb += "\
+    ${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'nxp', d)} \
+"
+
 # make everything compatible for the time being
 COMPATIBLE_MACHINE_$MACHINE = "$MACHINE"

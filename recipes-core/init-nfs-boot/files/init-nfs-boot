@@ -109,6 +109,18 @@ for i in $(cat /proc/cmdline); do
     esac
 done
 
+lsmod | grep -q "^sja1105pqrs\b" > /dev/null ||
+    insmod /lib/modules/`uname -r`/kernel/drivers/spi/sja1105pqrs.ko
+lsmod | grep -q "^nxp\b" > /dev/null ||
+    insmod /lib/modules/`uname -r`/kernel/drivers/net/phy/nxp/nxp.ko
+
+# Wait for sja to finish programming
+if lsmod | grep -q "^sja1105pqrs\b"; then
+    while [ "$(lsmod | grep "^sja1105pqrs\b" | awk '{ print $3}')" != "0" ]; do
+        sleep 1
+    done
+fi
+
 /etc/init.d/rpcbind start
 /etc/init.d/networking start
 
@@ -120,16 +132,6 @@ if [ "$ip" ] && [ "$device" ]; then
     ifconfig "$device" "$ip" ${netmask:+netmask $netmask}
     if [ "x$gwip" != "x" ]; then
         ip route add default via $gwip dev $device
-    fi
-fi
-
-if [ -x /etc/init.d/sja1105.sh ]; then
-    /etc/init.d/sja1105.sh
-    # Wait for sja to finish programming
-    if lsmod | grep -q "^sja1105\b"; then
-        while [ "$(lsmod | grep "^sja1105\b" | awk '{ print $3}')" != "0" ]; do
-            sleep 1
-        done
     fi
 fi
 

@@ -6,8 +6,16 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 inherit module
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
-SRCREV = "f0c783abe9e6aad16f2188bff941e6a0e237cd56"
+SRC_URI_4.1 = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
+SRCREV_4.1 = "f0c783abe9e6aad16f2188bff941e6a0e237cd56"
+
+SRC_URI_4.14 = "git://bitbucket.sw.nxp.com/scm/alb/sja1105x.git;branch=develop-4.14;protocol=https"
+SRCREV_4.14 = "7ecff1e84b2251e37a019c0345d600e9a43c1a40"
+
+KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
+
+SRC_URI = '${@base_conditional("PREFERRED_VERSION_${KERNEL_NAME}", "4.14", "${SRC_URI_4.14}", "${SRC_URI_4.1}", d)}'
+SRCREV = '${@base_conditional("PREFERRED_VERSION_${KERNEL_NAME}", "4.14", "${SRCREV_4.14}", "${SRCREV_4.1}", d)}'
 
 S = "${WORKDIR}/git"
 DESTDIR = "${D}"
@@ -23,7 +31,7 @@ FILES_${PN} += "${sysconfdir}/modules-load.d/*"
 PROVIDES = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
-COMPATIBLE_MACHINE = "${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 's32v234evb|s32v234bbmini', d)}"
+COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini"
 INHIBIT_PACKAGE_STRIP = "1"
 
 DEPENDS_append = " coreutils-native"

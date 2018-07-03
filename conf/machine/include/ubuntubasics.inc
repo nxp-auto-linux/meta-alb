@@ -12,7 +12,7 @@ HOSTTOOLS += "chroot"
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"
 
-DISTRO_FEATURES_remove = "sysvinit bluez5"
+DISTRO_FEATURES_remove = "sysvinit"
 DISTRO_FEATURES_append = " systemd"
 DISTRO_FEATURES_append += "docker"
 VIRTUAL-RUNTIME_init_manager = "systemd"
@@ -31,10 +31,12 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 # the recipe.
 require conf/machine/include/nodistropackage.inc
 DISTRO_NEVER_WRITE_PACKAGE = "\
+	alsa-conf \
 	update-alternatives \
 	bash \
 	base-files \
 	bc \
+	bluez5 \
 	bzip2 \
 	coreutils \
 	db \

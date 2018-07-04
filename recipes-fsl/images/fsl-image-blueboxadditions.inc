@@ -24,7 +24,7 @@ IMAGE_INSTALL += " \
 "
 
 # We want easy installation of the BlueBox image to the target
-DEPENDS_append_ls2084abbmini = " \
+DEPENDS_append_fsl-lsch3 = " \
     bbdeployscripts \
 "
 

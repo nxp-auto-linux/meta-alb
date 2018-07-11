@@ -41,7 +41,6 @@ SERIAL_CONSOLE = "115200 ttyLF0"
 
 SOC_DEFAULT_IMAGE_FSTYPES = "tar.gz"
 IMAGE_FSTYPES ?= "${SOC_DEFAULT_IMAGE_FSTYPES}"
-IMAGE_FSTYPES += "cpio.gz"
 
 MACHINE_FEATURES ?= "pci ext2 ext3 serial"
 MACHINE_EXTRA_RRECOMMENDS += "udev-extraconf kernel-modules"

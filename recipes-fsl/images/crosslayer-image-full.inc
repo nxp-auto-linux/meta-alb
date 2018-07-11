@@ -16,9 +16,6 @@ require recipes-fsl/images/crosslayer-rootfs-full.inc
 #
 IMAGE_FSTYPESTEMP := "${IMAGE_FSTYPES}"
 
-# We don't need 'cpio.gz' when images are based on fsl-image-networking*
-IMAGE_FSTYPESTEMP_remove += "${@bb.utils.contains("IMAGE_ROOTFS_DEP_EXT", "cpio.gz", "", "cpio.gz", d)}"
-
 require recipes-fsl/images/${IMAGE_ROOTFS_REQ}.bb
 
 # Both appends below are required. First to fix the assignment in

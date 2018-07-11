@@ -14,7 +14,4 @@ EXTRA_REQUIRE_s32 = '${@base_conditional("IMAGE_ROOTFS_REQ", "fsl-image-auto", "
 
 IMAGE_ROOTFS_DEP ?= "${@bb.utils.contains("BBFILE_COLLECTIONS", "qoriq-demos", "fsl-image-networking", "fsl-image-base", d)}"
 
-IMAGE_ROOTFS_DEP_DEFAULT_EXT ?= "ext3"
-IMAGE_ROOTFS_DEP_DEFAULT_EXT_s32 = "cpio.gz"
-
-IMAGE_ROOTFS_DEP_EXT ?= "${@bb.utils.contains("BBFILE_COLLECTIONS", "qoriq-demos", "ext2.gz", "${IMAGE_ROOTFS_DEP_DEFAULT_EXT}", d)}"
+IMAGE_ROOTFS_DEP_EXT ?= "ext3.gz"

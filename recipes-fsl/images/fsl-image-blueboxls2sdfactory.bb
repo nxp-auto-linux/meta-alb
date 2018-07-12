@@ -2,9 +2,9 @@
 # This BlueBox is capable of directly booting the LS2 from SDHC,
 # which permits nearly fully automatic factory imaging.
 
-SDCARD_ROOTFS_IMAGE = "fsl-image-auto"
+FACTORY_SDCARD_ROOTFS_IMAGE ?= "fsl-image-auto"
 
-require recipes-fsl/images/${SDCARD_ROOTFS_IMAGE}.bb
+require recipes-fsl/images/${FACTORY_SDCARD_ROOTFS_IMAGE}.bb
 
 # We need the Aquantia firmware to properly image a BlueBox Mini
 # and we want phytool to be able to debug boards on bring up
@@ -21,8 +21,8 @@ IMAGE_INSTALL += "\
 # all elements to flash the NOR properly, but the point here
 # is that we use the exact image to enable flashing NOR.
 inherit fsl-rootfsimage
-do_rootfs[depends] += "fsl-image-blueboxbootflash:do_image_complete ${SDCARD_ROOTFS_IMAGE}:do_image_complete bbdeployscripts:do_deploy"
-IMAGE_ROOTFS_IMAGELIST = "fsl-image-blueboxbootflash-${MACHINE}.flashimage ${SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.itb bbdeployimage.sh bbreplacerootfs.sh"
+do_rootfs[depends] += "fsl-image-blueboxbootflash:do_image_complete ${FACTORY_SDCARD_ROOTFS_IMAGE}:do_image_complete bbdeployscripts:do_deploy"
+IMAGE_ROOTFS_IMAGELIST = "fsl-image-blueboxbootflash-${MACHINE}.flashimage ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.itb bbdeployimage.sh bbreplacerootfs.sh"
 
 # Generating an SDHC image to be directly booted with RCW=0x40
 IMAGE_FSTYPES_append = " sdcard"

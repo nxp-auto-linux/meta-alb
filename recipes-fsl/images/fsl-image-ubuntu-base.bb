@@ -80,10 +80,10 @@ DEPENDS_append_fsl-lsch3 = " \
 
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234bbmini += "\
-	${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'sja1105', d)} \
+    sja1105 \
 "
 IMAGE_INSTALL_append_s32v234evb += "\
-	${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'sja1105', d)} \
+    sja1105 \
 "
 
 # This needs work to enable basic features without pulling in too much

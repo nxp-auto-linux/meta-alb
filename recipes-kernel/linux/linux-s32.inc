@@ -68,11 +68,11 @@ FILES_kernel-image += "/boot/zImage*"
 
 # Support for TJA1100 and TJA1102 under Linux
 KERNEL_MODULE_AUTOLOAD_s32v234bbmini += "\
-    ${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'nxp', d)} \
+    nxp \
 "
 
 KERNEL_MODULE_AUTOLOAD_s32v234evb += "\
-    ${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'nxp', d)} \
+    nxp \
 "
 
 # make everything compatible for the time being

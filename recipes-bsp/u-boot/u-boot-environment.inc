@@ -22,8 +22,25 @@ UBOOT_ENV_PAD ?= "-p 0"
 
 UBOOT_KERNEL_IMAGETYPE ?= "${KERNEL_IMAGETYPE}"
 
+DEFAULT_ENV ?= ""
+DEFAULT_ENV_PATH ?= ""
+
 do_compile () {
 	for envname in ${UBOOT_ENV_NAME}; do
+		# Concatenate default environment from u-boot with environment file ${UBOOT_ENV_NAME}.txt
+		# In the future we should merge them, i.e. override variable definitions from 
+		# default environment with those from the environment file ${UBOOT_ENV_NAME}, so that
+		# ${UBOOT_ENV_NAME} would become sort of an environment "fragment"
+		if [ -n "${DEFAULT_ENV}" ]; then
+			DEFAULT_ENV_FILE="${DEFAULT_ENV_PATH}/${DEFAULT_ENV}.txt"
+			if [ -e "$DEFAULT_ENV_FILE" ]; then
+				cat "$DEFAULT_ENV_FILE" ${S}/${envname}.txt > ${S}/temp.txt
+				mv -f ${S}/temp.txt ${S}/${envname}.txt
+			fi
+		fi
+		# remove any empty lines which might break the environment
+		sed '/^[[:space:]]*$/d' -i ${S}/${envname}.txt
+
 		sed -e "s#<machine>#${MACHINE}#" -e "s#<fdt_name>#$(basename `echo ${KERNEL_DEVICETREE} | awk '{ print $1 }'`)#" -e 's#<kernel_name>#${UBOOT_KERNEL_IMAGETYPE}#' -i ${S}/${envname}.txt
 		for envsize in ${UBOOT_ENV_IMAGE_SIZE}; do
 			if echo "$envsize" | grep ":"; then
@@ -45,8 +62,8 @@ do_compile () {
 }
 
 do_deploy () {
-        mkdir -p ${DEPLOYDIR}
-        cd ${DEPLOYDIR}
+	mkdir -p ${DEPLOYDIR}
+	cd ${DEPLOYDIR}
 	for envname in ${UBOOT_ENV_NAME}; do
 		for envsize in ${UBOOT_ENV_IMAGE_SIZE}; do
 			if echo "$envsize" | grep ":"; then

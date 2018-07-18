@@ -10,10 +10,13 @@ PV = "1.0+fslgit"
 # if u-boot-flashenv not found in the supported targets, default to an empty env
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}/empty-flashenv:"
 
+UBOOT_ENV_NAME ?= "u-boot-flashenv"
 SRC_URI = "\
-        file://u-boot-flashenv.txt \
+        file://${UBOOT_ENV_NAME}.txt \
 "
-UBOOT_ENV_NAME = "u-boot-flashenv"
+
+#DEFAULT_ENV_s32 = "u-boot-default-flashenv"
+#DEFAULT_ENV_PATH_s32 = "${STAGING_DIR_TARGET}${datadir}/env/"
 
 # Turns out that some board configs use a different size in U-Boot.
 # If we do not want to override the board config with a different one,
@@ -30,3 +33,5 @@ SRC_URI_append_ls2084abbmini = " \
 "
 
 require u-boot-environment.inc
+
+DEPENDS_append_s32 = " u-boot-s32"

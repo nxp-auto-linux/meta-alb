@@ -15,7 +15,8 @@ UBOOT_BOOTSPACE_SEEK ?= "2"
 
 UBOOT_ENV_SDCARD_OFFSET ?= ""
 UBOOT_ENV_SDCARD ?= "u-boot-environment"
-UBOOT_ENV_SDCARD_FILE ?= "u-boot-flashenv-${MACHINE}.bin"
+UBOOT_ENV_NAME ??= "u-boot-flashenv"
+UBOOT_ENV_SDCARD_FILE ?= "${@d.getVar('UBOOT_ENV_NAME', True) and (d.getVar('UBOOT_ENV_NAME', True).split()[0] + '-${MACHINE}.bin') or ''}"
 
 # For integration of raw flash like elements we fall back to the same
 # variables as for the flash class. This permits using one set of

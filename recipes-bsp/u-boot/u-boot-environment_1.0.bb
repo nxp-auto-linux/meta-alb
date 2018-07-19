@@ -10,13 +10,20 @@ PV = "1.0+fslgit"
 # if u-boot-flashenv not found in the supported targets, default to an empty env
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}/empty-flashenv:"
 
-UBOOT_ENV_NAME ?= "u-boot-flashenv"
-SRC_URI = "\
-        file://${UBOOT_ENV_NAME}.txt \
+def uboot_env_get_uri_list(env_list):
+    result = ""
+    for file in env_list.split():
+        result += "file://" + file + ".txt "
+
+    return result
+
+UBOOT_ENV_NAME ??= "u-boot-flashenv"
+SRC_URI = " \
+    ${@uboot_env_get_uri_list(d.getVar('UBOOT_ENV_NAME', True))} \
 "
 
-#DEFAULT_ENV_s32 = "u-boot-default-flashenv"
-#DEFAULT_ENV_PATH_s32 = "${STAGING_DIR_TARGET}${datadir}/env/"
+DEFAULT_ENV_s32 ??= "u-boot-default-flashenv"
+DEFAULT_ENV_PATH_s32 ??= "${STAGING_DIR_TARGET}${datadir}/env/"
 
 # Turns out that some board configs use a different size in U-Boot.
 # If we do not want to override the board config with a different one,
@@ -28,10 +35,7 @@ UBOOT_ENV_IMAGE_SIZE_ls1012a = "262144"
 
 # For the factory image, we support a special environment
 UBOOT_ENV_NAME_append_ls2084abbmini = " u-boot-flashenv-factory"
-SRC_URI_append_ls2084abbmini = " \
-    file://u-boot-flashenv-factory.txt \
-"
 
 require u-boot-environment.inc
 
-DEPENDS_append_s32 = " u-boot-s32"
+DEPENDS_append_s32 = "${@base_conditional("DEFAULT_ENV", "", "" , " u-boot-s32", d)}"

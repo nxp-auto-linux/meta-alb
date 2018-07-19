@@ -6,16 +6,17 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 inherit module
 
-SRC_URI_4.1 = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
-SRCREV_4.1 = "f0c783abe9e6aad16f2188bff941e6a0e237cd56"
-
-SRC_URI_4.14 = "git://bitbucket.sw.nxp.com/scm/alb/sja1105x.git;branch=develop-4.14;protocol=https"
-SRCREV_4.14 = "7ecff1e84b2251e37a019c0345d600e9a43c1a40"
+# SJA for kernel 4.14
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
+SRCREV = "7ecff1e84b2251e37a019c0345d600e9a43c1a40"
 
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
+KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
 
-SRC_URI = '${@base_conditional("PREFERRED_VERSION_${KERNEL_NAME}", "4.14", "${SRC_URI_4.14}", "${SRC_URI_4.1}", d)}'
-SRCREV = '${@base_conditional("PREFERRED_VERSION_${KERNEL_NAME}", "4.14", "${SRCREV_4.14}", "${SRCREV_4.1}", d)}'
+# For older kernel versions, currently only 4.1 is supported
+OLD_KERNEL_INCLUDE = "sja1105-old-${KERNEL_VER}.inc"
+
+include ${OLD_KERNEL_INCLUDE}
 
 S = "${WORKDIR}/git"
 DESTDIR = "${D}"

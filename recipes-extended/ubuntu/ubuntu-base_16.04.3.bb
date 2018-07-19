@@ -226,6 +226,7 @@ RPROVIDES_${PN}_ubuntu += "\
 # but it is a good start.
 RPROVIDES_${PN}_ubuntu += "\
 adduser \
+alsa-conf \
 apt \
 base-files \
 base-passwd \
@@ -254,11 +255,13 @@ insserv \
 libacl1 \
 libapparmor1 \
 libapt-pkg5.0 \
+libasound2 \
 libattr1 \
 libaudit-common \
 libaudit1 \
 libblkid1 \
 libbz2-1.0 \
+libbz2.so.1 \
 libc-bin \
 libc6 \
 libcap2 \

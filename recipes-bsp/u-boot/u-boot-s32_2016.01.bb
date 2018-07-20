@@ -20,6 +20,12 @@ SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https
 SRCREV = "d0807e897f37f0a10a281dc572e752380e0ef968"
 
 
+# Support for generating default environment
+SRC_URI += " \
+    file://0001-env-Add-Makefile-rule-to-generate-default-environmen.patch \
+"
+SRC_URI += "file://get_default_envs.sh"
+
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}" V=1'
 EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
 
@@ -28,6 +34,11 @@ LOCALVERSION = ""
 
 USRC ?= ""
 S = '${@base_conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
+
+do_compile_prepend() {
+    cp "${WORKDIR}/get_default_envs.sh" "${S}/scripts"
+    chmod a+rx "${S}/scripts/get_default_envs.sh"
+}
 
 do_compile_append() {
     unset i j k
@@ -57,6 +68,21 @@ do_compile_append() {
     unset i
 }
 
-PACKAGES += "${PN}-images"
+ENV_STAGE_DIR = "${datadir}/env"
+
+do_install_append() {
+    mkdir -p ${D}${ENV_STAGE_DIR}
+    # we should have one config
+    for config in ${UBOOT_MACHINE}; do
+        # remove any empty lines which might break the environment
+        sed '/^[[:space:]]*$/d' -i ${B}/${config}/env-default.txt
+        # install our environment file to usr/share to have it staged by yocto
+        install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv.txt
+    done
+}
+
+PACKAGES += "${PN}-images ${PN}-default-env"
 FILES_${PN}-images += "/boot"
+FILES_${PN}-default-env += "${ENV_STAGE_DIR}"
+
 COMPATIBLE_MACHINE = "s32"

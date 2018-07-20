@@ -232,6 +232,7 @@ base-files \
 base-passwd \
 bash \
 bsdutils \
+bzip2 \
 coreutils \
 dash \
 debconf \

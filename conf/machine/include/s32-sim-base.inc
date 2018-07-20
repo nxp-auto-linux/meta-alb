@@ -13,3 +13,5 @@ VIRTUAL-RUNTIME_init_manager = "busybox"
 VIRTUAL-RUNTIME_initscripts = "initscripts"
 VIRTUAL-RUNTIME_keymaps = "keymaps"
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+
+SOC_FAMILY_append = ":gen1"

@@ -32,12 +32,12 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 require conf/machine/include/nodistropackage.inc
 DISTRO_NEVER_WRITE_PACKAGE = "\
 	alsa-conf \
+	alsa-lib \
 	update-alternatives \
 	bash \
 	base-files \
 	bc \
 	bluez5 \
-	bzip2 \
 	coreutils \
 	db \
 	dpkg \
@@ -59,6 +59,8 @@ DISTRO_NEVER_WRITE_PACKAGE = "\
 	xz \
 	zlib \
 "
+
+PREFERRED_PROVIDER_bzip2="ubuntu-base"
 
 # Avoid the warning reporting for recipes that RDEPENDS on ubuntu-base
 # The workaround is to INSANE_SKIP build-deps for these recipes

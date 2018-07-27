@@ -21,3 +21,7 @@ IMAGE_INSTALL_append_s32v2xx += "\
 IMAGE_INSTALL_append_s32v2xx += "\
     canutils \
 "
+
+# Support for Inter-Process(or) Communication over Shared Memory (ipc-shm) under Linux
+IMAGE_INSTALL_append_s32v234evb += " ipc-shm "
+IMAGE_INSTALL_append_s32v234sbc += " ipc-shm "

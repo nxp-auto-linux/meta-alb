@@ -16,6 +16,9 @@ DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += " \
 # LXC configuration
 DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'containers_4.1.26.config', '', d)}"
 
+# VIRTIO
+DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtio', 'virtio', '', d)}"
+
 # Docker configuration
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
 
@@ -23,6 +26,7 @@ SRC_URI += "\
     file://build/blueboxconfig_s32v234pcie_4.14 \
     file://build/containers_4.1.26.config \
     file://build/docker.config \
+    file://build/virtio \
 "
 
 require vnet-s32.inc

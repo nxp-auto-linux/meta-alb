@@ -17,4 +17,8 @@ do_install() {
 FILES_${PN} = "${SAMPLESDIR}"
 FILES_${PN}-dbg += "${SAMPLESDIR}/.debug"
 
+# This recipe applies to all non-pcie demos.
+# Clustering demo has not been added.
+EXTRA_OEMAKE += "samples="multicore gpio networking""
+
 COMPATIBLE_MACHINE = "s32v234evb|s32v234pcie|s32v234tmdp|s32v234bbmini|s32v234sbc"

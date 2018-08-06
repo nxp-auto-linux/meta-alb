@@ -1,0 +1,40 @@
+From e7137d053a7a3ba4712c2f85114ce9b14e5d3c11 Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Tue, 17 Jul 2018 17:44:24 +0300
+Subject: [PATCH] env: Add Makefile rule to generate default environment
+
+Add new rule `env-default` to dump the default
+environment from common/env_common.o to a file named
+`env-default.txt`
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 4313016..d460471 100644
+--- a/Makefile
++++ b/Makefile
+@@ -748,7 +748,7 @@ DO_STATIC_RELA =
+ endif
+ 
+ # Always append ALL so that arch config.mk's can add custom ones
+-ALL-y += u-boot.srec u-boot.bin System.map u-boot.cfg binary_size_check
++ALL-y += u-boot.srec u-boot.bin System.map u-boot.cfg binary_size_check env-default
+ 
+ ALL-$(CONFIG_ONENAND_U_BOOT) += u-boot-onenand.bin
+ ifeq ($(CONFIG_SPL_FSL_PBL),y)
+@@ -883,6 +883,9 @@ binary_size_check: u-boot.bin FORCE
+ 		fi \
+ 	fi
+ 
++env-default: common/env_common.o FORCE
++	$(shell $(CONFIG_SHELL) $(srctree)/scripts/get_default_envs.sh $(build-dir) > $@.txt)
++
+ u-boot.bin: u-boot FORCE
+ 	$(call if_changed,objcopy)
+ 	$(call DO_STATIC_RELA,$<,$@,$(CONFIG_SYS_TEXT_BASE))
+-- 
+2.7.4
+

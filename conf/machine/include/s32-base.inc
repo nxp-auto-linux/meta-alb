@@ -29,8 +29,8 @@ PREFERRED_VERSION_linux-s32 ?= "4.14"
 UBOOT_BOOTSPACE_SEEK ?= "8"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"
 UBOOT_ENTRYPOINT ?= "80080000"
-# we don't support flashing the u-boot environment yet
-#UBOOT_ENV_SDCARD_OFFSET ?= "0x000c0000"
+# Comment next line to prevent writing the environment to sdcard
+UBOOT_ENV_SDCARD_OFFSET ?= "0x000c0000"
 
 #s32 has no hardware clock
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"

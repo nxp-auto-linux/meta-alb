@@ -12,11 +12,7 @@ PROVIDES = "kernel-module-galcore${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-galcore${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
 SRC_URI = " git://source.codeaurora.org/external/autobsps32/galcore;branch=alb/master;protocol=https "
-SRCREV = "27d109df067486855b6b58b8da9adff2200a003d"
-
-SRC_URI += "\
-    file://0001-Wno-misleading-indentation.patch \
-"
+SRCREV = "05f39e222f055e4a3a7299a5d8d10138caf223c9"
 
 LIC_FILES_CHKSUM = "file://GPLv2;md5=fcb02dc552a041dee27e4b85c7396067"
 

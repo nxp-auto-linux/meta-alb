@@ -49,6 +49,20 @@
 # Prerequisites:
 # - The root file system must already be generated under ${APTGET_CHROOT_DIR} (e.g 
 #    from a debian/ubuntu CD image or by running debootstrap)
+#
+# Note: If your host requires a proxy to connect to the internet, then you should use the same
+# configuration for the chroot environment where the root filesystem to be updated.
+# For this purpose you should set the following variables (preferably in local.conf):
+# ENV_HOST_PROXIES - a space separated list of proxies, e.g.
+#     ENV_HOST_PROXIES = "http_proxy=http://my.proxy.nxp.com:8080 \
+#                         https_proxy=http://my.proxy.nxp.com:8080 "
+# APTGET_HOST_PROXIES - a space separated list of 'Acquire' options to be written to the apt.conf from
+#                       the target root filesystem, which is used during the filesystem update, e.g.:
+#     APTGET_HOST_PROXIES = "Acquire::http::proxy \"my.proxy.nxp.com:8080/\"; \
+#                            Acquire::http::proxy \"my.proxy.nxp.com:8080/\"; "
+# Normally only the http(s) proxy is required (to be added to ENV_HOST_PROXIES). 
+# APTGET_HOST_PROXIES, if missing, is generated from the proxy data in ENV_HOST_PROXIES.
+
 APTGET_EXTRA_PACKAGES ?= ""
 APTGET_EXTRA_PACKAGES_LAST ?= ""
 APTGET_EXTRA_SOURCE_PACKAGES ?= ""
@@ -127,6 +141,9 @@ ${PSEUDO_LOCALSTATEDIR}:\
 /etc/resolv.conf:\
 "
 
+ENV_HOST_PROXIES ?= ""
+APTGET_HOST_PROXIES ?= ""
+
 fakeroot do_shell_update_prepend() {
 	# Once the basic rootfs is unpacked, we use the local passwd
 	# information.
@@ -140,16 +157,50 @@ fakeroot do_shell_update_prepend() {
 	export PSEUDO_CHROOT_FORCED="${PSEUDO_CHROOT_FORCED}"
 	export PSEUDO_CHROOT_EXCEPTIONS="${PSEUDO_CHROOT_EXCEPTIONS}"
 
+	# apt may not be fully configured at this stage
+	mkdir -p "${APTGET_CHROOT_DIR}/etc/apt"
+
+	# Add any proxies from the host, according to
+	# https://wiki.yoctoproject.org/wiki/Working_Behind_a_Network_Proxy
+	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
+	QEMU_SET_ENV="${QEMU_SET_ENV}"
+
+	while [ -n "$ENV_HOST_PROXIES" ]; do
+		IFS=" =_" read -r proxy_type proxy_string proxy_val ENV_HOST_PROXIES <<END_PROXY
+$ENV_HOST_PROXIES
+END_PROXY
+		if [ "$proxy_string" != "proxy" ]; then
+			bb_warn "Invalid proxy \"$proxy\""
+			continue
+		fi
+
+		QEMU_SET_ENV="$QEMU_SET_ENV,${proxy_type}_${proxy_string}=$proxy_val"
+
+		# If APTGET_HOST_PROXIES is not defined in local.conf, then
+		# apt.conf is populated using proxy information in ENV_HOST_PROXIES
+		if [ -z "${APTGET_HOST_PROXIES}" ]; then
+			echo >>"${APTGET_CHROOT_DIR}/etc/apt/apt.conf" "Acquire::$proxy_type::proxy \"$proxy_val/\";"
+		fi
+	done
+
 	# With this little trick, we can qemu target-side executables
 	# inside pseudo chroot without losing pseudo functionality.
 	# This is a must have for some of the package related scripts
 	# that have to use the target side executables.
 	# This depends on both our pseudo and qemu update
 	export PSEUDO_CHROOT_XPREFIX="${PSEUDO_CHROOT_XPREFIX}"
-	export QEMU_SET_ENV="${QEMU_SET_ENV}"
+	export QEMU_SET_ENV
 	export QEMU_UNSET_ENV="${QEMU_UNSET_ENV}"
 	export QEMU_LIBCSYSCALL="1"
 	#unset QEMU_LD_PREFIX
+
+	APTGET_HOST_PROXIES="${APTGET_HOST_PROXIES}"
+	while [ -n "$APTGET_HOST_PROXIES" ]; do
+		read -r proxy <<END_PROXY
+$APTGET_HOST_PROXIES
+END_PROXY
+		echo >>"${APTGET_CHROOT_DIR}/etc/apt/apt.conf" "$proxy"
+	done
 
 	# We need to set at least one (dummy) user and we set passwords for all of them.
 	# useradd is not debian, but good enough for now.
@@ -227,9 +278,13 @@ END_PPA
 			else
 				ppa_file="/etc/apt/sources.list"
 			fi
+			ppa_proxy=""
+			if [ -n "$ENV_HTTP_PROXY" ]; then
+				ppa_proxy="--keyserver-options http-proxy=$ENV_HTTP_PROXY"
+			fi
 
 			echo >>"${APTGET_CHROOT_DIR}/$ppa_file" "$ppa_type $ppa_addr $DISTRO_NAME main"
-			chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-key adv --keyserver $ppa_server --recv-key $ppa_hash
+			chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-key adv --keyserver $ppa_server $ppa_proxy --recv-key $ppa_hash
 		done
 	fi
 

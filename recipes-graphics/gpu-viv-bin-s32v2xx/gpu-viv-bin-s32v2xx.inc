@@ -6,7 +6,7 @@
 DESCRIPTION = "GPU driver and apps for s32v2xx"
 SECTION = "libs"
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=e4ea72ff91665efb91435921a29148b7"
+LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=f5411d7aeec487c2c1ffcc664e866832"
 
 DEPENDS += "kernel-module-galcore"
 RDEPENDS_${PN} += "kernel-module-galcore"
@@ -24,12 +24,12 @@ FSL_EULA_CHKSUM = "c9ae442cf1f9dd6c13dfad64b0ffe73f"
 
 inherit fsl-auto-eula-unpack pkgconfig
 
-S = "${WORKDIR}/gpu-viv-bin-s32v234-6.2.2-hardfp"
+S = "${WORKDIR}/gpu-viv-bin-s32v234-6.2.4.p2-hardfp"
 
 # Dummy entry to keep the recipe parser happy if we don't use this recipe
 FSL_LOCAL_MIRROR ?= "file://."
 
-SRC_URI = "${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-6.2.2-hardfp.run;fsl-eula=true \
+SRC_URI = "${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-6.2.4.p2-hardfp.run;fsl-eula=true \
            file://egl.pc \
            file://glesv2.pc \
            file://vg.pc \
@@ -64,7 +64,7 @@ do_install_append () {
     chown -R root:root ${D}/opt ${D}/usr/lib ${D}/etc
 }
 
-S = "${WORKDIR}/gpu-viv-bin-s32v234-6.2.2-hardfp"
+S = "${WORKDIR}/gpu-viv-bin-s32v234-6.2.4.p2-hardfp"
 
 # **** HACK START ****
 # Here I have to fix a Vivante weirdness in shared library creation

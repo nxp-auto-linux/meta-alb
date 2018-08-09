@@ -1,5 +1,3 @@
-require gcc-${PV}-fsl.inc
-
 DEPENDS_append = " nativesdk-isl"
 RDEPENDS_${PN}_append = " nativesdk-isl"
 

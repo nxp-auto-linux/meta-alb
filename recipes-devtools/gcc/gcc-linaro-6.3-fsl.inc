@@ -19,7 +19,4 @@ BACKPORTS += "\
            file://0001-2017-02-13-Richard-Biener-rguenther-suse.de.patch \
 "
 
-
-# Configure gcc to use isl
-EXTRA_OECONF_BASE_remove = " --without-isl"
-NATIVEDEPS += " isl-native"
+require gcc-common-fsl.inc

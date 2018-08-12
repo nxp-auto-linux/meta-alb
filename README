@@ -1,6 +1,12 @@
 OpenEmbedded/Yocto BSP layer for NXP Auto Linux BSP platforms
 =============================================================
 
+First time setup
+----------------
+
+To install all prerequisites before starting any build, run:
+$ ./scripts/host-prepare.sh
+
 Creating Build Directories and Testing the Installation
 -------------------------------------------------------
 

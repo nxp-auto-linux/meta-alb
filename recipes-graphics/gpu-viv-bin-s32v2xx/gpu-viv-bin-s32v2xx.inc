@@ -6,7 +6,6 @@
 DESCRIPTION = "GPU driver and apps for s32v2xx"
 SECTION = "libs"
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=f5411d7aeec487c2c1ffcc664e866832"
 
 DEPENDS += "kernel-module-galcore"
 RDEPENDS_${PN} += "kernel-module-galcore"
@@ -24,12 +23,26 @@ FSL_EULA_CHKSUM = "c9ae442cf1f9dd6c13dfad64b0ffe73f"
 
 inherit fsl-auto-eula-unpack pkgconfig
 
-S = "${WORKDIR}/gpu-viv-bin-s32v234-6.2.4.p2-hardfp"
+# We support two kernel versions; 4.14 (latest, default) and 4.1
+# For each one you should use a different version of the binaries:
+# 6.2.4 for the latest kernel, 6.2.2 for 4.1
+KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
+KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
+PV = "${@base_conditional("KERNEL_VER", "4.1", "6.2.2", "6.2.4", d)}"
+
+# We may have a version suffix for various path elements
+PVS = "${@base_conditional("PV", "6.2.4", ".p2", "", d)}"
+LIC_FILES_MD5 = "${@base_conditional("PV", "6.2.4", \
+	"f5411d7aeec487c2c1ffcc664e866832", "e4ea72ff91665efb91435921a29148b7", d)}"
+LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=${LIC_FILES_MD5}"
+
+
+S = "${WORKDIR}/gpu-viv-bin-s32v234-${PV}${PVS}-hardfp"
 
 # Dummy entry to keep the recipe parser happy if we don't use this recipe
 FSL_LOCAL_MIRROR ?= "file://."
 
-SRC_URI = "${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-6.2.4.p2-hardfp.run;fsl-eula=true \
+SRC_URI = "${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-${PV}${PVS}-hardfp.run;fsl-eula=true \
            file://egl.pc \
            file://glesv2.pc \
            file://vg.pc \
@@ -63,8 +76,6 @@ do_install_append () {
     # This may be due to host contamination [host-user-contaminated]'
     chown -R root:root ${D}/opt ${D}/usr/lib ${D}/etc
 }
-
-S = "${WORKDIR}/gpu-viv-bin-s32v234-6.2.4.p2-hardfp"
 
 # **** HACK START ****
 # Here I have to fix a Vivante weirdness in shared library creation

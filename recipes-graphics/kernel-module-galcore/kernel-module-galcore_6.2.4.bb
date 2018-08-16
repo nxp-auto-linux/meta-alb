@@ -18,6 +18,15 @@ LIC_FILES_CHKSUM = "file://GPLv2;md5=fcb02dc552a041dee27e4b85c7396067"
 
 PR = "r0"
 
+# Backwards compatibility. Use older revisions for older kernel versions.
+KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
+KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
+
+# For older kernel versions, currently only 4.1 is supported
+OLD_KERNEL_INCLUDE = "kernel-module-galcore-old-${KERNEL_VER}.inc"
+
+include ${OLD_KERNEL_INCLUDE}
+
 S = "${WORKDIR}/git"
 
 # MACHINE_EXTRA_RRECOMMENDS += "kernel-module-galcore"

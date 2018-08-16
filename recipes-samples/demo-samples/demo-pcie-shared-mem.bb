@@ -15,13 +15,13 @@ do_install() {
 FILES_${PN} = "${SAMPLESDIR}"
 FILES_${PN}-dbg += "${SAMPLESDIR}/.debug"
 
-DEMO_PCIE_APPS ?= "net_ep net_rc"
+DEMO_PCIE_APPS ?= "pcie_ep pcie_rc"
 
-DEMO_PCIE_APPS_ls2 = "net_rc"
-DEMO_PCIE_APPS_s32v234pcie = "net_ep"
-DEMO_PCIE_APPS_s32v234bbmini = "net_ep"
+DEMO_PCIE_APPS_ls2 = "pcie_rc"
+DEMO_PCIE_APPS_s32v234pcie = "pcie_ep"
+DEMO_PCIE_APPS_s32v234bbmini = "pcie_ep"
 
-EXTRA_OEMAKE = "samples=pcie_virt_eth apps="${DEMO_PCIE_APPS}""
+EXTRA_OEMAKE = "samples=pcie_shared_mem apps="${DEMO_PCIE_APPS}""
 
 require demo-pcie.inc
 

@@ -1,0 +1,39 @@
+From aea957f4f0fc463596bd1d1f8f8faa06a147dc7e Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Mon, 25 Jun 2018 15:56:50 +0300
+Subject: [PATCH 1/1] pcie-ls2: kernel support for pcie demos (icc and user space)
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+index 4fb9a09..82d7f5d 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+@@ -786,4 +786,21 @@
+ 		interrupts = <0 18 0x4>;
+ 		little-endian;
+ 	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;ranges;
++		/*1Mb shared memory*/
++		shared_memory: shm@0x8080000000 {
++			compatible = "fsl,qoriq-shm";
++			reg = <0x80 0x80000000 0x0 0x400000>;    /*4 MB*/
++			no-map;
++		};
++	};
++
++	icc-linux {
++		compatible = "fsl,qoriq-icc";
++		memory-region = <&shared_memory>;
++	};
++
+ };
+-- 
+2.7.4
+

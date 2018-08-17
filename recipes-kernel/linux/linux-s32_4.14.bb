@@ -22,11 +22,16 @@ DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virti
 # Docker configuration
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
 
+# Temperature Monitoring Unit
+DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "tmu.config"
+DELTA_KERNEL_DEFCONFIG_append_s32v234evb += "tmu.config"
+
 SRC_URI += "\
     file://build/blueboxconfig_s32v234pcie_4.14 \
     file://build/containers_4.1.26.config \
     file://build/docker.config \
     file://build/virtio \
+    file://build/tmu.config \
 "
 
 require vnet-s32.inc

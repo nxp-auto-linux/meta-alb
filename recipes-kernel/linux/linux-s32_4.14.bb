@@ -22,6 +22,9 @@ DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virti
 # Docker configuration
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
 
+# GPU configuration
+DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 'gpu.config', '', d)}"
+
 # Temperature Monitoring Unit
 DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "tmu.config"
 DELTA_KERNEL_DEFCONFIG_append_s32v234evb += "tmu.config"
@@ -31,6 +34,7 @@ SRC_URI += "\
     file://build/containers_${PV}.config \
     file://build/docker.config \
     file://build/virtio \
+    file://build/gpu.config \
     file://build/tmu.config \
 "
 

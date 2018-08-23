@@ -1,0 +1,54 @@
+From f35a4f7c26a7d1f659fe9799174163bc30a09b91 Mon Sep 17 00:00:00 2001
+From: Catalin Udma <catalin-dan.udma@nxp.com>
+Date: Thu, 23 Aug 2018 18:45:30 +0300
+Subject: [PATCH] build: disable parallel make to avoid compile time race
+ conditions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+sometimes, the ppa build fails with error:
+ “build/src/errata.c:37:16: fatal error: io.h: No such file or
+directory”.
+After compile, io.h is in the correct location and a new compile will
+work without errors - thus assuming a parallem make issue.
+
+Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
+---
+ ppa/build | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ppa/build b/ppa/build
+index f03f9ea..72dab60 100755
+--- a/ppa/build
++++ b/ppa/build
+@@ -500,7 +500,7 @@ until [ "$1" = "" ]; do
+                 cd soc-$device
+ 
+                 echo $action soc-$device
+-                make -j24 $target >> ../bldlog.txt
++                make  $target >> ../bldlog.txt
+             else
+                 action=building
+ 
+@@ -609,7 +609,7 @@ until [ "$1" = "" ]; do
+ 
+                 if [ "$tools_built" == "false" ]; then
+ 	                cd ./tools
+-	                make -j24  >> ../bldlog.txt
++	                make   >> ../bldlog.txt
+ 	                cd - >> ../bldlog.txt
+                     tools_built="true"
+                 fi
+@@ -622,7 +622,7 @@ until [ "$1" = "" ]; do
+                 echo >> ../bldlog.txt
+                 echo $action $bld_mode $target [$make_opts $test_opt ] $device >> ../bldlog.txt
+ 
+-                make -j24 $target $make_opts $test_opt >> ../bldlog.txt
++                make  $target $make_opts $test_opt >> ../bldlog.txt
+             fi
+             cd ..
+             break
+-- 
+2.7.4
+

@@ -53,7 +53,6 @@ DISTRO_NEVER_WRITE_PACKAGE = "\
 	netbase \
 	opkg-utils \
 	perl \
-	python3 \
 	readline \
 	util-linux \
 	xz \
@@ -61,6 +60,7 @@ DISTRO_NEVER_WRITE_PACKAGE = "\
 "
 
 PREFERRED_PROVIDER_bzip2="ubuntu-base"
+PREFERRED_PROVIDER_python3="ubuntu-base"
 
 # Avoid the warning reporting for recipes that RDEPENDS on ubuntu-base
 # The workaround is to INSANE_SKIP build-deps for these recipes

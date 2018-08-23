@@ -22,11 +22,15 @@ DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virti
 # Docker configuration
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
 
+# GPU configuration
+DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 'gpu.config', '', d)}"
+
 SRC_URI += "\
     file://build/blueboxconfig_s32v234pcie_4.14 \
     file://build/containers_4.1.26.config \
     file://build/docker.config \
     file://build/virtio \
+    file://build/gpu.config \
 "
 
 require vnet-s32.inc

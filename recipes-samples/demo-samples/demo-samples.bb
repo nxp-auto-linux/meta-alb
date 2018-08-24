@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=d1fe458e57ae72e9abc9aff2684690d0"
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/alb-demos;branch=alb/master;protocol=https"
 
 S = "${WORKDIR}/git"
-SRCREV = "bf271b880f211977938a40884e209a6192c33765"
+SRCREV = "b9611698eb57183f05356d5b60f0adc21787e8ac"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 

@@ -1,4 +1,9 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+
 SRC_URI = "git://source.codeaurora.org/external/qoriq/qoriq-components/ppa-generic.git;nobranch=1 \
+"
+
+SRC_URI += "file://0001-build-disable-parallel-make-to-avoid-compile-time-ra.patch \
 "
 
 SRCREV = "e5641434f00d75634a285341d810df4261daf5de"

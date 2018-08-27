@@ -14,7 +14,7 @@ DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += " \
 "
 
 # LXC configuration
-DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'containers_4.1.26.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' containers_${PV}.config', '', d)}"
 
 # VIRTIO
 DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtio', 'virtio', '', d)}"
@@ -28,7 +28,7 @@ DELTA_KERNEL_DEFCONFIG_append_s32v234evb += "tmu.config"
 
 SRC_URI += "\
     file://build/blueboxconfig_s32v234pcie_4.14 \
-    file://build/containers_4.1.26.config \
+    file://build/containers_${PV}.config \
     file://build/docker.config \
     file://build/virtio \
     file://build/tmu.config \

@@ -136,6 +136,13 @@ fakeroot do_shell_update() {
 	# to enable that by default
 	sed -i "s/^#*FSCKFIX\s*=.*/FSCKFIX=yes/g" "${APTGET_CHROOT_DIR}/etc/default/rcS"
 
+	# Add /usr/bin/python3 symlink to /usr/bin/python3.5, as it is required
+	# by other packages depending on python3
+	if [ ! -f ${APTGET_CHROOT_DIR}/usr/bin/python3 ]; then
+		cd ${APTGET_CHROOT_DIR}/usr/bin/
+		ln -s python3.5 python3
+		cd -
+	fi
 	set +x
 }
 
@@ -315,6 +322,7 @@ ncurses-bin \
 passwd \
 perl-base \
 procps \
+python3 \
 readline-common \
 sed \
 sensible-utils \

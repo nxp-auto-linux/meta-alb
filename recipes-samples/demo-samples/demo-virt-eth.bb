@@ -3,7 +3,7 @@ LIC_FILES_CHKSUM = "file://pcie_virt_eth/COPYING;md5=39bba7d2cf0ba1036f2a6e2be52
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/alb-demos;branch=alb/master;protocol=https"
 
 S = "${WORKDIR}/git"
-SRCREV = "96cc6ca7a5987d83a67b00908d64ff4160889fb1"
+SRCREV = "b9611698eb57183f05356d5b60f0adc21787e8ac"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 

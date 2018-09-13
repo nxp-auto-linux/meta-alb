@@ -64,6 +64,15 @@ do_deploy_append_s32() {
     fi
 }
 
+# run make scripts after the shared work folder is created to prepare further
+# module build. The module's make scripts may have been already executed
+# before linux clean, and thus will not re-trigger again
+do_shared_workdir_append () {
+	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+	make CC="${KERNEL_CC}" LD="${KERNEL_LD}" AR="${KERNEL_AR}" \
+	           -C ${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} scripts
+}
+
 FILES_kernel-image += "/boot/zImage*"
 
 # Support for TJA1100 and TJA1102 under Linux

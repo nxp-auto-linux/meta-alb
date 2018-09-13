@@ -47,6 +47,9 @@ BBMACHINE=".+bbmini|.+bluebox"
 # Any s32v234* machine type
 S32V234MACHINE="s32v234.+"
 
+# Any Ubuntu machine type
+UBUNTUMACHINE=".+ubuntu"
+
 if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
     echo "ERROR: This script needs to be sourced."
     SCRIPT_PATH=`readlink -f $0`
@@ -208,6 +211,11 @@ add_layers_for_machines()
     fi
 }
 
+is_not_ubuntu_machine()
+{
+    echo ${MACHINE} | egrep -q "${UBUNTUMACHINE}"
+    return $?
+}
 
 # parse the parameters
 OLD_OPTIND=$OPTIND
@@ -363,7 +371,12 @@ if [ -n "$setup_sstate" ]; then
         CACHES="`pwd`/${setup_sstate}"
     fi
 else
-    CACHES="$ROOTDIR/sstate-cache"
+    is_not_ubuntu_machine
+    if [ $? -eq 1 ]; then
+        CACHES="$ROOTDIR/sstate-cache"
+    else
+        CACHES="$ROOTDIR/sstate-cache-ubuntu"
+    fi
 fi
 mkdir -p $CACHES
 CACHES=`readlink -f "$CACHES"`

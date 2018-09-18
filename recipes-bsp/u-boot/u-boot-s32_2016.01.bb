@@ -23,6 +23,7 @@ SRCREV = "46271708ccece2ca496c091f51d17edb5a99d306"
 # Support for generating default environment
 SRC_URI += " \
     file://0001-env-Add-Makefile-rule-to-generate-default-environmen.patch \
+    file://0001-dcu-sbc-Set-min-value-to-0xD-for-2D_ACE_QOS.patch \
 "
 SRC_URI += "file://get_default_envs.sh"
 

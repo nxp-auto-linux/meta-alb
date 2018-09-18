@@ -1,0 +1,79 @@
+From 8f15d9c889c3935fb2f45992840019430ab3fb5d Mon Sep 17 00:00:00 2001
+From: Cosmin Oprea <cosmin.oprea@nxp.com>
+Date: Fri, 31 Aug 2018 12:22:31 +0300
+Subject: [PATCH] dcu: sbc: Set min value to 0xD for 2D_ACE_QOS
+
+Issue: ALB-2804
+Signed-off-by: Cosmin Oprea <cosmin.oprea@nxp.com>
+---
+ arch/arm/include/asm/arch-s32/src.h    | 6 ++++--
+ board/microsys/mpxs32v234/mpxs32v234.c | 8 ++++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/include/asm/arch-s32/src.h b/arch/arm/include/asm/arch-s32/src.h
+index dd8b2c4..9307fc4 100644
+--- a/arch/arm/include/asm/arch-s32/src.h
++++ b/arch/arm/include/asm/arch-s32/src.h
+@@ -74,7 +74,8 @@
+ #define SRC_GPR6_PCIE_PCS_TX_SWING_LOW_MASK				(0x7f << 25)
+ #define SRC_GPR6_PCIE_PCS_TX_SWING_LOW_OFFSET			25
+ 
+-#ifdef CONFIG_S32V234EVB_29288
++#if defined(CONFIG_S32V234EVB_29288) || defined(CONFIG_MPXS32V234_R1) || \
++	defined(CONFIG_MPXS32V234_R2)
+ /*
+  * SRC_GPR8 bit fields
+  */
+@@ -105,7 +106,8 @@ struct src {
+ 	u32 gpr4;
+ 	u32 gpr5;
+ 	u32 gpr6;
+-#ifdef CONFIG_S32V234EVB_29288
++#if defined(CONFIG_S32V234EVB_29288) || defined(CONFIG_MPXS32V234_R1) || \
++	defined(CONFIG_MPXS32V234_R2)
+ 	u32 reserved_0x114[1];
+ 	u32 gpr8;
+ 	u32 reserved_0x120[1];
+diff --git a/board/microsys/mpxs32v234/mpxs32v234.c b/board/microsys/mpxs32v234/mpxs32v234.c
+index 8d66f86..7c7f2d0 100644
+--- a/board/microsys/mpxs32v234/mpxs32v234.c
++++ b/board/microsys/mpxs32v234/mpxs32v234.c
+@@ -9,6 +9,7 @@
+ #include <common.h>
+ #include <command.h>
+ #include <asm/io.h>
++#include <asm/arch/soc.h>
+ #include <asm/arch/imx-regs.h>
+ #include <asm/arch/siul.h>
+ #include <asm/arch/clock.h>
+@@ -49,7 +50,7 @@ static void setup_iomux_uart(void)
+ 	writel(SIUL2_IMCR_UART_RXD_to_pad, SIUL2_IMCRn(SIUL2_IMCR_UART1_RXD));
+ }
+ 
+-static void setup_iomux_enet(void)
++void setup_iomux_enet(void)
+ {
+ #ifndef CONFIG_PHY_RGMII_DIRECT_CONNECTED
+ 	/* MDC - PC13 */
+@@ -192,6 +193,10 @@ void setup_xrdc(void)
+ #ifdef CONFIG_DCU_QOS_FIX
+ int board_dcu_qos(void)
+ {
++	struct src *src_regs = (struct src *)SRC_SOC_BASE_ADDR;
++	writel(MIN_DCU_QOS_PRIORITY << SRC_GPR8_2D_ACE_QOS_OFFSET,
++	       &src_regs->gpr8);
++
+ 	/* m_fastdma1_ib */
+ 	writel(0x0, 0x40012380);
+ 	writel(0x0, 0x40012384);
+@@ -280,7 +285,6 @@ int board_early_init_f(void)
+ 	setup_iomux_dcu();
+ #ifdef CONFIG_DCU_QOS_FIX
+ 	board_dcu_qos();
+-
+ #endif
+ 
+ 	setup_xrdc();
+-- 
+2.7.4
+

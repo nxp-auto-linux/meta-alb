@@ -20,7 +20,7 @@ IMAGE_INSTALL += " \
 "
 
 # Benchmark tools
-IMAGE_INSTALL += "dhrystone ramsmp"
+IMAGE_INSTALL += "dhrystone"
 
 # Add packages required for OpenMPI demo
 # TODO: add them to the RDEPENDS list in the OpenMPI demo recipe

@@ -11,11 +11,11 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 inherit module
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/ipcf/ipc-shm;branch=master;protocol=https"
-SRCREV = "ae41cd1040a4d731a1dda99d9282f90edaf8d300"
+SRCREV = "ff092308775c19b76936ffe52a7dff97d250137f"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"
-EXTRA_OEMAKE_append = " -C ./ipc-shm-sample INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} "
+EXTRA_OEMAKE_append = " -C ./sample INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} "
 MODULES_MODULE_SYMVERS_LOCATION = "ipc-shm-dev"
 
 PROVIDES += "kernel-module-ipc-shm-sample${KERNEL_MODULE_PACKAGE_SUFFIX}"

@@ -23,6 +23,9 @@ DISTRO_FEATURES_append += " gcc-loop-optimization"
 
 KERNEL_IMAGETYPE ?= "Image"
 
+# required for u-boot
+HOSTTOOLS += "comm"
+
 # S32 BSP default providers
 PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"

@@ -5,11 +5,13 @@ UPDATE_FLAG=''
 if test $force_update; then UPDATE_FLAG='-y --force-yes';fi
 
 # pkgs listed in yocto doc
-# http://www.yoctoproject.org/docs/current/yocto-project-qs/yocto-project-qs.html#packages
-PKGS=" gawk wget git-core diffstat unzip texinfo \
-     build-essential chrpath socat libsdl1.2-dev xterm"
+# https://www.yoctoproject.org/docs/2.4.2/ref-manual/ref-manual.html#intro-requirements
+PKGS=" curl gawk wget git-core diffstat unzip texinfo gcc-multilib \
+     build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
+     xz-utils debianutils iputils-ping \
+     libsdl1.2-dev xterm"
 # pkgs required for fsl use
-PKGS="$PKGS vim-common xz-utils tofrodos libstring-crc32-perl screen"
+PKGS="$PKGS make vim-common tofrodos libstring-crc32-perl screen"
 
 if [ "$distro" = "Ubuntu" ]; then
 	if [ "$release" = "16.04" ]; then

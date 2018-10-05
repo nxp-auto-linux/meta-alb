@@ -6,20 +6,31 @@ if test $force_update; then UPDATE_FLAG='-y';fi
 echo "Install packages needed to build Yocto, please wait, it may take a while"
 
 # pkgs listed in yocto doc
-# http://www.yoctoproject.org/docs/current/yocto-project-qs/yocto-project-qs.html#packages
-PKGS="gawk make wget tar bzip2 gzip python unzip perl patch \
+# https://www.yoctoproject.org/docs/2.4.2/ref-manual/ref-manual.html#intro-requirements
+PKGS="curl gawk make wget tar bzip2 gzip python python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo \
-     chrpath socat SDL-devel xterm"
+     chrpath socat perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue \
+     python3-pip xz which SDL-devel xterm"
 if [ "Fedora" = "$distro" ]; then
-    PKGS="$PKGS ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue findutils which"
+    PKGS="$PKGS ccache perl-bignum python3-pexpect findutils file cpio"
 fi
 # pkgs required for fsl use
 PKGS="vim-common redhat-lsb xz perl-String-CRC32 dos2unix screen $PKGS"
 
+# Extra Packages for Enterprise Linux (i.e. epel-release) is a collection
+# of packages from Fedora built on RHEL/CentOS for easy installation of
+# packages not included in enterprise Linux by default.
+# You need to install these packages separately.
+# The makecache command consumes additional Metadata from epel-release.
+
 if [ "yum" = "$hostpkg" ];then
+    sudo yum $UPDATE_FLAG install epel-release
+    sudo yum makecache
     sudo yum $UPDATE_FLAG groupinstall "Development Tools"
     sudo yum $UPDATE_FLAG install $PKGS
 elif [ "dnf" = "$hostpkg" ];then
+    sudo dnf $UPDATE_FLAG install epel-release
+    sudo dnf makecache
     sudo dnf $UPDATE_FLAG group install "Development Tools"
     sudo dnf $UPDATE_FLAG install $PKGS
 fi

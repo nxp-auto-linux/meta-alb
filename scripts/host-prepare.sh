@@ -7,12 +7,12 @@
 # (2) Ubuntu/Mint/Debian: apt-get
 # (3) openSUSE/SUSE: zypper
 #
-# The following platforms were tested:
-# Ubuntu: 10.04/11.10/12.04
-# Fedora: 15/17/18
-# RHEL/CeniOS: 5.x/6.x
-# openSUSE: 11.4/12.1
-# Debian: 6.07
+# The following platforms are supported for poky rocko:
+# Ubuntu: 14.10, 15.04, 15.10, 16.04 (LTS)
+# Fedora: 22/23/24
+# RHEL/CentOS: 7.x
+# openSUSE: 13.2/Leap 42.1
+# Debian: 8.x (Jessie), 9.x (Stretch)
 
 SCRIPT_DIR=`readlink -f $(dirname $0)`
 
@@ -131,17 +131,51 @@ if [ "$rc" != "0" ];then
     exit 1
 fi
 
-# Make sure python is 2.x (2.7.3 or greater)
-PYTHON_PATH="/opt/python-2.7.3"
-PYTHON_v2=`/usr/bin/env python -c 'import sys
-print (sys.version_info >= (2, 7, 3) and "1" or "0")'`
-PYTHON_v3=`/usr/bin/env python -c 'import sys
-print (sys.version_info >= (3, 0) and "1" or "0")'`
-if [ "$PYTHON_v2" = '0' -o "$PYTHON_v3" = '1' ]; then
-    echo "Python version 2.x( 2.7.3 or greater) is required. For example, install 2.7.3 at $PYTHON_PATH:
-    (1) wget http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz
-    (2) tar -zxvf Python-2.7.3.tgz
-    (3) cd Python-2.7.3
+verlte () {
+    [  "$1" = "`printf "$1\n$2" | sort -V | head -n1`" ]
+}
+
+verlt() {
+    [ "$1" = "$2" ] && return 1 || verlte $1 $2
+}
+
+# Check for host kernel version and issue a warning if not 3.2.0 or later
+# Yocto SDK requires this minimum version, although it is not clear
+# if we should enforce it for running bitbake
+
+EXPECTED_KERNEL="3.2.0"
+verlt `uname -r` $EXPECTED_KERNEL
+if [ $? = 0 ]; then
+    echo "Warning: It is recommended to use a kernel > $EXPECTED_KERNEL"
+fi
+
+# Check for git version and issue an error if not 1.8.3.1 or greater
+
+EXPECTED_GIT="1.8.3.1"
+CURRENT_GIT=`git --version | rev | cut -d" " -f1 | rev`
+verlt $CURRENT_GIT $EXPECTED_GIT
+if [ $? = 0 ]; then
+    echo "Found git version $CURRENT_GIT. You must use at least version $EXPECTED_GIT"
+fi
+
+# Check for tar version and issue an error if not 1.27 or greater
+
+EXPECTED_TAR="1.27"
+CURRENT_TAR=`tar --version | head -n 1 | rev | cut -d" " -f1 | rev`
+verlt $CURRENT_TAR $EXPECTED_TAR
+if [ $? = 0 ]; then
+    echo "Found tar version $CURRENT_TAR. You must use at least version $EXPECTED_TAR"
+fi
+
+# Make sure we have python 3.4 or later installed
+PYTHON_PATH="/opt/python-3.4.0"
+PYTHON_v3=`/usr/bin/env python3 -c 'import sys
+print (sys.version_info >= (3, 4, 0) and "1" or "0")'`
+if [ "$PYTHON_v3" = '0' ]; then
+    echo "Python version 3.x (3.4.0 or greater) is required. For example, install 3.4.0 at $PYTHON_PATH:
+    (1) wget http://www.python.org/ftp/python/3.4.0/Python-3.4.0.tgz 
+    (2) tar -zxvf Python-3.4.0.tgz 
+    (3) cd Python-3.4.0
     (4) ./configure --prefix=$PYTHON_PATH && make
     (5) su -
     (6) make install

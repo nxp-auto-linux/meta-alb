@@ -1,0 +1,60 @@
+From 3b74b342c57db21c2c1e0b5c9114eba839b6c1aa Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Thu, 6 Sep 2018 17:18:03 +0300
+Subject: [PATCH] icc: change shared mem reservation due to conflict
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ release/iccs32v234/sample/linux_app/ICC_module/ICC_Pcie.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/release/iccs32v234/sample/linux_app/ICC_module/ICC_Pcie.c b/release/iccs32v234/sample/linux_app/ICC_module/ICC_Pcie.c
+index 2b5d310..30a3873 100644
+--- a/release/iccs32v234/sample/linux_app/ICC_module/ICC_Pcie.c
++++ b/release/iccs32v234/sample/linux_app/ICC_module/ICC_Pcie.c
+@@ -51,6 +51,10 @@
+ #define ICC_USE_BAR 	2
+ #endif
+ 
++#ifndef ICC_SHM_OFFSET
++#define ICC_SHM_OFFSET 0x100000
++#endif
++
+ #ifdef ICC_BUILD_FOR_M4
+ static uint64_t ICC_EP_PCIE_Phys_Base_Addr;
+ #else
+@@ -186,8 +190,8 @@ int pcie_init_bar(struct s32v_bar *bar)
+ /* API for accessing shared memory when the device is built in kernel */
+ static int init_shared_memory(struct reserved_mem *rmem)
+ {
+-    ICC_Shm_Phys_Base_Addr = rmem->base;
+-    ICC_Shm_Size = rmem->size;
++    ICC_Shm_Phys_Base_Addr = rmem->base + ICC_SHM_OFFSET;
++    ICC_Shm_Size = rmem->size - ICC_SHM_OFFSET;
+ 
+     ICC_INFO("Reserved shared mem block: addr=%#llx size=%d", ICC_Shm_Phys_Base_Addr, ICC_Shm_Size);
+     WARN_ON(!(ICC_Shm_Phys_Base_Addr && ICC_Shm_Size));
+@@ -208,8 +212,8 @@ static void setup_shm_from_device_tree(struct ICC_platform_data *icc_data)
+             if (shm) {
+                 uint64_t reg_size = 0;
+                 const __be32 * shm_base = of_get_address(shm, 0, &reg_size, NULL);
+-                ICC_Shm_Phys_Base_Addr = of_translate_address(shm, shm_base);
+-                ICC_Shm_Size = reg_size;
++                ICC_Shm_Phys_Base_Addr = of_translate_address(shm, shm_base) + ICC_SHM_OFFSET;
++                ICC_Shm_Size = reg_size - ICC_SHM_OFFSET;
+                 ICC_INFO("Reserved shared mem block: addr=%#llx size=%d", ICC_Shm_Phys_Base_Addr, ICC_Shm_Size);
+ 
+                 of_node_put(shm);
+@@ -349,8 +353,7 @@ void pcie_init_shmem(struct ICC_platform_data *icc_data)
+ 
+             /* Reserve shared memory */
+             if (!devm_request_mem_region(dev, get_pcie_shmem_base_phys_address(), get_shmem_size(), "ICC_shmem")) {
+-                ICC_ERR("Failed to request mem region!");
+-                return;
++                ICC_INFO("Failed to request mem region. Using shared mem anyway");
+             }
+ 
+             /* ICC Shared mem is mapped differently on RC and EP, but in both cases it physically
+-- 
+2.7.4
+

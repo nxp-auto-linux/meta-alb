@@ -1,6 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-BUSYBOX_SPLIT_SUID_qoriq = "0"
+# Prevent splitting busybox applets in two binaries (*.suid and *.nosuid)
+BUSYBOX_SPLIT_SUID = "0"
 ALTERNATIVE_PRIORITY[init] = "40"
 
 SRC_URI += " \

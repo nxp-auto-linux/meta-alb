@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = " \
 "
 
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native"
+DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 SRCREV = "46271708ccece2ca496c091f51d17edb5a99d306"

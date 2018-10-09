@@ -17,8 +17,12 @@ LIC_FILES_CHKSUM = " \
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
-SRCREV = "46271708ccece2ca496c091f51d17edb5a99d306"
+# For the moment u-boot 2016.01 is default. To use u-boot 2018.07, add in local.conf:
+# PREFERRED_VERSION_u-boot-s32 = "2018.07"
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=${SRCBRANCH}"
+
+SRCREV ?= "4bd1c7252ba13cc59c1ddca5a97f807afe1b51b0"
+SRCBRANCH ?= "alb-2018.07"
 
 SCMVERSION = "y"
 LOCALVERSION = ""

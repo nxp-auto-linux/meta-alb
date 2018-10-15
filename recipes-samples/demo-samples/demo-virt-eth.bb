@@ -3,7 +3,7 @@ LIC_FILES_CHKSUM = "file://pcie_virt_eth/COPYING;md5=39bba7d2cf0ba1036f2a6e2be52
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/alb-demos;branch=alb/master;protocol=https"
 
 S = "${WORKDIR}/git"
-SRCREV = "b9611698eb57183f05356d5b60f0adc21787e8ac"
+SRCREV = "264a88d49aff18a2739351c8f53fc279ae5c9577"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 
@@ -26,4 +26,4 @@ EXTRA_OEMAKE = "samples=pcie_virt_eth apps="${DEMO_PCIE_APPS}""
 require demo-pcie.inc
 
 # we support BlueBox (s32v234pcie and ls2080abluebox) BlueBox Mini (s32v234bbmini and ls2084abbmini) and s32v234evb
-COMPATIBLE_MACHINE = "s32v234pcie|s32v234evb|s32v234bbmini|ls2080abluebox|ls2084abbmini"
+COMPATIBLE_MACHINE = "s32v234pcie|s32v234evb|s32v234bbmini|ls2080abluebox|ls2084abbmini|s32v234sbc"

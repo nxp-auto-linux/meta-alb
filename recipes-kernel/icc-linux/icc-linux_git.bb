@@ -10,5 +10,6 @@ EXTRA_OEMAKE_s32v234pcie = "CONFIG=EP"
 EXTRA_OEMAKE_s32v234bbmini = "CONFIG=EP"
 EXTRA_OEMAKE_s32v234evb = "CONFIG=RC"
 EXTRA_OEMAKE_s32v234evb28899 = "CONFIG=RC"
+EXTRA_OEMAKE_s32v234sbc = "CONFIG=RC"
 
-COMPATIBLE_MACHINE = "ls2080abluebox|ls2084abluebox|ls2084abbmini|s32v234pcie|s32v234bbmini|s32v234evb.*"
+COMPATIBLE_MACHINE = "ls2080abluebox|ls2084abluebox|ls2084abbmini|s32v234pcie|s32v234bbmini|s32v234evb.*|s32v234sbc"

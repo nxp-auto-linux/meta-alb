@@ -26,4 +26,4 @@ EXTRA_OEMAKE = "samples=pcie_shared_mem apps="${DEMO_PCIE_APPS}""
 require demo-pcie.inc
 
 # we support BlueBox (s32v234pcie and ls2080abluebox) BlueBox Mini (s32v234bbmini and ls2084abbmini) and s32v234evb
-COMPATIBLE_MACHINE = "s32v234pcie|s32v234evb|s32v234bbmini|ls2080abluebox|ls2084abbmini"
+COMPATIBLE_MACHINE = "s32v234pcie|s32v234evb|s32v234bbmini|ls2080abluebox|ls2084abbmini|s32v234sbc"

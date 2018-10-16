@@ -33,15 +33,6 @@ FACTORY_FLASH_IMAGE_ubuntu = ""
 do_rootfs[depends] += "${FACTORY_FLASH_IMAGE_NAME}:do_image_complete ${FACTORY_SDCARD_ROOTFS_IMAGE}:do_image_complete bbdeployscripts:do_deploy"
 IMAGE_ROOTFS_IMAGELIST = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.itb bbdeployimage.sh bbreplacerootfs.sh"
 
-# Generating an SDHC image to be directly booted with RCW=0x40
-IMAGE_FSTYPES_append = " sdcard"
-SDCARD_ROOTFS = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ext3"
-SDCARD_RCW_ls2084abbmini = "rcw"
-SDCARD_RCW_NAME_ls2084abbmini = "rcw/${MACHINE}/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_1800_700_1867_1600.bin"
-BOOT_SPACE = "65536"
-SDCARD_BINARY_SPACE = "65536"
-UBOOT_BOOTSPACE_OFFSET  = "${FLASHIMAGE_UBOOT_OFFSET}"
-
 # For factory imaging, we use a custom U-Boot environment
 SDCARDIMAGE_EXTRA4_FILE_ls2084abbmini = "u-boot-flashenv-factory-${MACHINE}.bin"
 

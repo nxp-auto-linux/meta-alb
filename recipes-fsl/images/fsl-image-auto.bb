@@ -32,8 +32,11 @@ IMAGE_INSTALL += "openssl-misc"
 # Increase the freespace
 IMAGE_ROOTFS_EXTRA_SPACE ?= "54000"
 
-# Enable LXC features
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' lxc', '', d)}"
+# Enable LXC features.
+# On LS2 enable it by default. On s32, only by DISTRO_FEATURE
+LXC_INSTALL_PACKAGES = "lxc debootstrap"
+IMAGE_INSTALL_append_s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' ${LXC_INSTALL_PACKAGES}', '', d)}"
+IMAGE_INSTALL_append_ls2 = " ${LXC_INSTALL_PACKAGES}"
 
 # SFTP server
 IMAGE_INSTALL_append = " openssh openssh-sftp openssh-sftp-server "

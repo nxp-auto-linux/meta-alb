@@ -17,7 +17,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
-SRCREV = "91fa942849bd2bd3d0f9cc250deb9ebbe36e9f3c"
+SRCREV = "64eed971e06fca95eb214b83f946d6ae37eda0c4"
 
 
 # Support for generating default environment

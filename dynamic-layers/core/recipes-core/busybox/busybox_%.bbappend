@@ -16,10 +16,13 @@ do_configure_append() {
 }
 
 do_install_append () {
-    rm -f ${D}${sysconfdir}/init.d/rcS
-    rm -f ${D}${sysconfdir}/init.d/rcK
-    rm -f ${D}${sysconfdir}/inittab
-    rm -f ${D}${base_sbindir}/runlevel
-    # remove sbin if empty
-    rm -df ${D}${base_sbindir}
+
+    if [ "${@(d.getVar('VIRTUAL-RUNTIME_init_manager'))}" != "busybox" ]; then
+        rm -f ${D}${sysconfdir}/init.d/rcS
+        rm -f ${D}${sysconfdir}/init.d/rcK
+        rm -f ${D}${sysconfdir}/inittab
+        rm -f ${D}${base_sbindir}/runlevel
+        # remove sbin if empty
+        rm -df ${D}${base_sbindir}
+    fi
 }

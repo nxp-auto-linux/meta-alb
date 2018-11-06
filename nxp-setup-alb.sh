@@ -329,8 +329,8 @@ fi
 
 # set default jobs and threads
 CPUS=`grep -c processor /proc/cpuinfo`
-JOBS="4"
-THREADS="4"
+JOBS="$(( ${CPUS} * 3 / 2))"
+THREADS="$(( ${CPUS} * 2 ))"
 
 # check optional jobs and threads
 if echo "$setup_j" | egrep -q "^[0-9]+$"; then

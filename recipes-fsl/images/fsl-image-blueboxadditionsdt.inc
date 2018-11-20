@@ -72,4 +72,18 @@ QT4_PACKAGES = " \
 
 IMAGE_INSTALL += "${@bb.utils.contains("BBFILE_COLLECTIONS", "qt4-layer", "${QT4_PACKAGES}", "", d)}"
 
+# remove some X startup applications which are either inexistent or
+# have initialization issues
+
+ROOTFS_AUTOSTART_CLEANUP_LIST ?= "xscreensaver.desktop"
+ROOTFS_POSTPROCESS_COMMAND_append = "do_rootfs_startup_cleanup; "
+
+do_rootfs_startup_cleanup() {
+    if [ -e "${IMAGE_ROOTFS}/etc/xdg/autostart" ]; then
+        cd "${IMAGE_ROOTFS}/etc/xdg/autostart"
+        rm -rf ${ROOTFS_AUTOSTART_CLEANUP_LIST}
+        cd -
+    fi
+}
+
 REQUIRED_DISTRO_FEATURES += "x11"

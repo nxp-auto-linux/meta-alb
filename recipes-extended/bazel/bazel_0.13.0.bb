@@ -22,6 +22,7 @@ do_install() {
 
 	install -d "${OUTPUT_DIR}"
 	cp "${DL_DIR}/${BAZEL_PACKAGE}.zip" "${OUTPUT_DIR}"
+	cp "${THISDIR}/${BPN}/fix_java_options.patch" "${OUTPUT_DIR}"
 
 	echo "#!/bin/bash" > ${DEPLOY_SCRIPT}
 	echo "echo -n \"Unpacking the Bazel archive... \"" >> ${DEPLOY_SCRIPT}
@@ -30,6 +31,7 @@ do_install() {
 	echo "unzip -qq -o ${BAZEL_PACKAGE}.zip -d ${BAZEL_PACKAGE} &> /dev/null" >> ${DEPLOY_SCRIPT}
 	echo "echo \"Done.\"" >> ${DEPLOY_SCRIPT}
 	echo "cd ${BAZEL_PACKAGE}" >> ${DEPLOY_SCRIPT}
+	echo "patch -p1 -i ../fix_java_options.patch" >> ${DEPLOY_SCRIPT}
 	echo "./compile.sh" >> ${DEPLOY_SCRIPT}
 	echo "ln -fs \$(pwd)/output/bazel /usr/local/bin/bazel" >> ${DEPLOY_SCRIPT}
 

@@ -18,6 +18,13 @@ IMAGE_CLASSES += "image_types_fsl_flashimage"
 UBOOT_CONFIG ?= "sdcard"
 UBOOT_CONFIG[sdcard] = "${MACHINE}_config,,u-boot.${UBOOT_SUFFIX}"
 
+# Setting the following variable disables the AVB TX queues (1 and 2) on S32V234 
+# to prevent a FEC TX queue timeout that occurs when using NFS root filesystem.
+# This issue occurs on S32V234 and we enable it by default for this platform
+# for safety.
+# The limitation can be disabled by setting it to 0 in local.conf.
+KERNEL_FEC_LIMIT_TX ?= "1"
+
 # On S32V, we support either pure SW rendering or HW assisted
 # rendering. Libraries come from different sources then.
 PREFERRED_PROVIDER_virtual/egl = "${@bb.utils.contains("DISTRO_FEATURES", "gpu", "gpu-viv-bin-s32v2xx", "mesa", d)}"

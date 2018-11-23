@@ -6,7 +6,7 @@ if test $force_update; then UPDATE_FLAG='-y --force-yes';fi
 
 # pkgs listed in yocto doc
 # https://www.yoctoproject.org/docs/2.4.2/ref-manual/ref-manual.html#intro-requirements
-PKGS=" curl gawk wget git-core diffstat unzip texinfo gcc-multilib \
+PKGS=" curl gawk wget git-core diffstat unzip texinfo \
      build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
      xz-utils debianutils iputils-ping \
      libsdl1.2-dev xterm"

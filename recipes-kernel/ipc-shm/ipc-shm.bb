@@ -3,7 +3,7 @@
 # Copyright 2018 NXP
 #
 
-SUMMARY = "Adds support for Inter-Process(or) Communication over Shared Memory (ipc-shm)"
+SUMMARY = "Support for Inter-Process(or) Communication over Shared Memory (ipc-shm)"
 
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 inherit module
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/ipcf/ipc-shm;branch=master;protocol=https"
-SRCREV = "ff092308775c19b76936ffe52a7dff97d250137f"
+SRCREV = "c526a30d85aafbe55e5db957a48d133b4bcd4b8b"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"

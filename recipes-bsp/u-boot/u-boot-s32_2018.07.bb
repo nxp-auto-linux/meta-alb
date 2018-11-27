@@ -1,5 +1,7 @@
 require recipes-bsp/u-boot/u-boot.inc
+
 inherit fsl-u-boot-localversion
+
 DESCRIPTION = "U-boot provided by NXP with focus on S32 chipsets"
 PROVIDES = "virtual/bootloader u-boot"
 
@@ -13,32 +15,34 @@ LIC_FILES_CHKSUM = " \
 "
 
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native"
+DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
+# For the moment u-boot 2016.01 is default. To use u-boot 2018.07, add in local.conf:
+# PREFERRED_VERSION_u-boot-s32 = "2018.07"
+SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=${SRCBRANCH}"
 
-SRCREV = "ec7bf83322fd6450869e3b79f7f8e0bcbd1f4438"
-
-
-# Support for generating default environment
-SRC_URI += " \
-    file://0001-env-Add-Makefile-rule-to-generate-default-environmen.patch \
-"
-SRC_URI += "file://get_default_envs.sh"
-
-EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}" V=1'
-EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
+SRCREV ?= "4bd1c7252ba13cc59c1ddca5a97f807afe1b51b0"
+SRCBRANCH ?= "alb-2018.07"
 
 SCMVERSION = "y"
 LOCALVERSION = ""
 
+# Support for generating default environment
+SRC_URI += " \
+    file://0001-env-Add-Makefile-rule-to-generate-default-environment-2018.patch \
+"
+
+# FIXME: Allow linking of 'tools' binaries with native libraries
+#        used for generating the boot logo and other tools used
+#        during the build process.
+EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS}" \
+                 HOSTLDFLAGS="${BUILD_LDFLAGS}" \
+                 HOSTSTRIP=true'
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 USRC ?= ""
 S = '${@base_conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
-
-do_compile_prepend() {
-    cp "${WORKDIR}/get_default_envs.sh" "${S}/scripts"
-    chmod a+rx "${S}/scripts/get_default_envs.sh"
-}
 
 do_compile_append() {
     unset i j k
@@ -54,6 +58,7 @@ do_compile_append() {
                         cp -r ${S}/tools/s32v234-qspi/ ${B}/${config}/tools/s32v234-qspi/
                         cd ${B}/${config}/tools/s32v234-qspi/
                         oe_runmake
+                        mv -f ${B}/${config}/${binary} ${B}/${config}/${binary}.nospi
                         cp ${B}/${config}/tools/s32v234-qspi/${binary}.qspi ${B}/${config}/${binary}
                         cp ${B}/${config}/${binary} ${B}/${config}/u-boot-${type}.${UBOOT_SUFFIX}
                         cd -
@@ -81,8 +86,6 @@ do_install_append() {
     done
 }
 
-PACKAGES += "${PN}-images ${PN}-default-env"
-FILES_${PN}-images += "/boot"
-FILES_${PN}-default-env += "${ENV_STAGE_DIR}"
+FILES_${PN} += "${ENV_STAGE_DIR}"
 
 COMPATIBLE_MACHINE = "s32"

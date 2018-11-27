@@ -1,0 +1,10 @@
+--- a/scripts/bootstrap/compile.sh	1980-01-01 00:00:00.000000000 +0000
++++ b/scripts/bootstrap/compile.sh	2016-02-11 19:26:52.000000000 +0000
+@@ -55,6 +55,7 @@
+ 
+ unset JAVA_TOOL_OPTIONS
+ unset _JAVA_OPTIONS
++export _JAVA_OPTIONS="-Xmx1g  -XX:-UseGCOverheadLimit "
+ 
+ LDFLAGS=${LDFLAGS:-""}
+ 

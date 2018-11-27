@@ -10,7 +10,7 @@ echo "Install packages needed to build Yocto, please wait, it may take a while"
 PKGS="curl gawk make wget tar bzip2 gzip python python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo \
      chrpath socat perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue \
-     python3-pip xz which SDL-devel xterm"
+     python3-pip xz which SDL-devel xterm ncurses-devel"
 if [ "Fedora" = "$distro" ]; then
     PKGS="$PKGS ccache perl-bignum python3-pexpect findutils file cpio"
 fi

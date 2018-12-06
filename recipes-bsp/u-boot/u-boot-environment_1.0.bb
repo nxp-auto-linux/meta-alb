@@ -49,4 +49,4 @@ UBOOT_ENV_NAME_append_ls2084abbmini = " u-boot-flashenv-factory"
 
 require u-boot-environment.inc
 
-DEPENDS_append_s32 = "${@base_conditional("DEFAULT_ENV", "", "" , " u-boot-s32", d)}"
+DEPENDS_append_s32 = "${@oe.utils.conditional("DEFAULT_ENV", "", "" , " u-boot-s32", d)}"

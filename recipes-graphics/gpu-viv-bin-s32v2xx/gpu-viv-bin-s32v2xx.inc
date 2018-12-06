@@ -28,11 +28,11 @@ inherit fsl-auto-eula-unpack pkgconfig
 # 6.2.4 for the latest kernel, 6.2.2 for 4.1
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
-PV = "${@base_conditional("KERNEL_VER", "4.1", "6.2.2", "6.2.4", d)}"
+PV = "${@oe.utils.conditional("KERNEL_VER", "4.1", "6.2.2", "6.2.4", d)}"
 
 # We may have a version suffix for various path elements
-PVS = "${@base_conditional("PV", "6.2.4", ".p2", "", d)}"
-LIC_FILES_MD5 = "${@base_conditional("PV", "6.2.4", \
+PVS = "${@oe.utils.conditional("PV", "6.2.4", ".p2", "", d)}"
+LIC_FILES_MD5 = "${@oe.utils.conditional("PV", "6.2.4", \
 	"f5411d7aeec487c2c1ffcc664e866832", "e4ea72ff91665efb91435921a29148b7", d)}"
 LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=${LIC_FILES_MD5}"
 

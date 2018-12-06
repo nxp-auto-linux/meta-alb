@@ -78,7 +78,7 @@ do_compile () {
 				srcsuffix=""
 			fi
 			echo "*** $srcsuffix/$suffix *** $envsize ***"
-			mkenvimage ${@base_conditional('SITEINFO_ENDIANNESS', 'le', '', '-b', d)} -s ${envsize} ${UBOOT_ENV_PAD} -o ${S}/${envname}${suffix}.bin ${envname}${srcsuffix}.txt
+			mkenvimage ${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '', '-b', d)} -s ${envsize} ${UBOOT_ENV_PAD} -o ${S}/${envname}${suffix}.bin ${envname}${srcsuffix}.txt
 		done
 	done
 }

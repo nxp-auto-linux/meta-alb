@@ -39,7 +39,7 @@ EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS}" \
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 USRC ?= ""
-S = '${@base_conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
+S = '${@oe.utils.conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
 
 do_compile_append() {
     unset i j k

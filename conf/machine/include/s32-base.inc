@@ -31,7 +31,7 @@ PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/kernel = "linux-s32"
 PREFERRED_VERSION_linux-s32 ?= "4.14"
-PREFERRED_VERSION_u-boot-s32 ?= "2016.01"
+PREFERRED_VERSION_u-boot-s32 ?= "2018.07"
 
 UBOOT_BOOTSPACE_SEEK ?= "8"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"

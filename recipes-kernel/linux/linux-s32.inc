@@ -73,7 +73,7 @@ do_shared_workdir_append () {
 	           -C ${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} scripts
 }
 
-FILES_kernel-image += "/boot/zImage*"
+FILES_${KERNEL_PACKAGE_NAME}-image += "/boot/zImage*"
 
 # Support for TJA1100 and TJA1102 under Linux
 KERNEL_MODULE_AUTOLOAD_s32v234bbmini += "\

@@ -1,1 +1,1 @@
-require  recipes-core/glibc/glibc-mtrace.inc
+require glibc-mtrace.inc

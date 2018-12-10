@@ -1,1 +1,1 @@
-require recipes-core/glibc/glibc-scripts.inc
+require glibc-scripts.inc

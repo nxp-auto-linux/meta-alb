@@ -1,1 +1,1 @@
-require recipes-core/glibc/glibc-locale.inc
+require glibc-locale.inc

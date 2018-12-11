@@ -1,1 +1,0 @@
-COMPATIBLE_MACHINE += "(ls2084a)"

@@ -1,13 +1,14 @@
-From c2f54a106ca3c1e6bc79a524bab4d6e9c4f25afa Mon Sep 17 00:00:00 2001
+From ad9509c0a3db269ecf68c08bc03b2ab43bb31d01 Mon Sep 17 00:00:00 2001
 From: nxa15299 <Heinz.Wrobel@nxp.com>
-Date: Sat, 13 Jan 2018 19:42:31 +0100
+Date: Wed, 12 Dec 2018 16:50:38 +0200
 Subject: [PATCH] u-boot: Basic set of BB Mini configuration added
 
 Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  arch/arm/Kconfig                                   |  16 +
- arch/arm/cpu/armv8/Kconfig                         | 2 +-
- arch/arm/dts/Makefile                              |   2 +
+ arch/arm/cpu/armv8/Kconfig                         |   2 +-
+ arch/arm/dts/Makefile                              |   1 +
  arch/arm/dts/fsl-ls2084a-bbmini.dts                |  16 +
  arch/arm/dts/fsl-ls2084a.dtsi                      | 138 +++++++++
  board/freescale/ls2084abbmini/Kconfig              |  16 +
@@ -22,7 +23,7 @@ Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
  configs/ls2084abbmini_defconfig                    |  47 +++
  configs/ls2084abbmini_sdcard_defconfig             |  61 ++++
  include/configs/ls2084abbmini.h                    | 299 +++++++++++++++++++
- 17 files changed, 1490 insertions(+)
+ 17 files changed, 1489 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm/dts/fsl-ls2084a-bbmini.dts
  create mode 100644 arch/arm/dts/fsl-ls2084a.dtsi
  create mode 100644 board/freescale/ls2084abbmini/Kconfig
@@ -39,10 +40,10 @@ Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
  create mode 100644 include/configs/ls2084abbmini.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 31688ff..754cf00 100644
+index c7493e4..302dadf 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -843,6 +843,21 @@ config TARGET_LS2081ARDB
+@@ -906,6 +906,21 @@ config TARGET_LS2081ARDB
  	  development platform that supports the QorIQ LS2081A/LS2041A
  	  Layerscape Architecture processor.
  
@@ -64,7 +65,7 @@ index 31688ff..754cf00 100644
  config TARGET_HIKEY
  	bool "Support HiKey 96boards Consumer Edition Platform"
  	select ARM64
-@@ -1175,6 +1190,7 @@ source "board/freescale/ls2080a/Kconfig"
+@@ -1310,6 +1325,7 @@ source "board/freescale/ls2080a/Kconfig"
  source "board/freescale/ls2080aqds/Kconfig"
  source "board/freescale/ls2080ardb/Kconfig"
  source "board/freescale/ls1088a/Kconfig"
@@ -73,11 +74,11 @@ index 31688ff..754cf00 100644
  source "board/freescale/ls1043aqds/Kconfig"
  source "board/freescale/ls1021atwr/Kconfig"
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 5f7a9da..ea03abe 100644
+index 22d2f29..7062198 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
-@@ -92,7 +92,7 @@ config PSCI_RESET
- 		   !TARGET_LS1012ARDB && !TARGET_LS1012AFRDM && \
+@@ -94,7 +94,7 @@ config PSCI_RESET
+		   !TARGET_LS1012AFRWY && \
  		   !TARGET_LS1043ARDB && !TARGET_LS1043AQDS && \
  		   !TARGET_LS1046ARDB && !TARGET_LS1046AQDS && \
 -		   !TARGET_LS2081ARDB && \
@@ -86,10 +87,10 @@ index 5f7a9da..ea03abe 100644
  	help
  	  Most armv8 systems have PSCI support enabled in EL3, either through
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 1709ac6..288b64c 100644
+index b532289..1e3943f 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -186,6 +186,7 @@ dtb-$(CONFIG_ARCH_LS1021A) += ls1021a-qds-duart.dtb \
+@@ -203,6 +203,7 @@ dtb-$(CONFIG_ARCH_LS1021A) += ls1021a-qds-duart.dtb \
  dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
  	fsl-ls2080a-rdb.dtb \
  	fsl-ls2081a-rdb.dtb \
@@ -1349,7 +1350,7 @@ index 0000000..bbda3a6
 +CONFIG_DISTRO_DEFAULTS=y
 diff --git a/include/configs/ls2084abbmini.h b/include/configs/ls2084abbmini.h
 new file mode 100644
-index 0000000..e2ec6d3
+index 0000000..15ae362
 --- /dev/null
 +++ b/include/configs/ls2084abbmini.h
 @@ -0,0 +1,299 @@
@@ -1653,5 +1654,5 @@ index 0000000..e2ec6d3
 +
 +#endif /* __LS2_RDB_H */
 -- 
-1.8.3.1
+2.7.4
 

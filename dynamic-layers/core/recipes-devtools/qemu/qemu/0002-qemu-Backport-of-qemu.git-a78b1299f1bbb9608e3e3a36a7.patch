@@ -1,21 +1,22 @@
-From 0410eaaf7086e96d521b9e8eb44f2be670fb4259 Mon Sep 17 00:00:00 2001
-From: nxa15299 <Heinz.Wrobel@nxp.com>
-Date: Wed, 31 Jan 2018 07:40:00 +0100
-Subject: [PATCH 2/4] qemu: Backport of
+From 95c6d5f50156d9ececbd08398fa37846139516c7 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 20 Dec 2018 15:02:07 +0200
+Subject: [PATCH] qemu: Backport of
  qemu.git-a78b1299f1bbb9608e3e3a36a7f16cf700a2789d
 
 No change to the original patch
 
 Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Costea Ciprian <ciprianmarian.costea@nxp.com>
 ---
- user-exec.c | 33 ++++++++++++---------------------
+ accel/tcg/user-exec.c | 33 ++++++++++++---------------------
  1 file changed, 12 insertions(+), 21 deletions(-)
 
-diff --git a/user-exec.c b/user-exec.c
-index 2a975ea..3cf17a3 100644
---- a/user-exec.c
-+++ b/user-exec.c
-@@ -54,12 +54,13 @@ static void cpu_exit_tb_from_sighandler(CPUState *cpu, sigset_t *old_set)
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index f42285e..a622d8d 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -57,12 +57,13 @@ static void cpu_exit_tb_from_sighandler(CPUState *cpu, sigset_t *old_set)
     the effective address of the memory exception. 'is_write' is 1 if a
     write caused the exception and otherwise 0'. 'old_set' is the
     signal set which should be restored */
@@ -28,9 +29,9 @@ index 2a975ea..3cf17a3 100644
      int ret;
 +    unsigned long address = (unsigned long)info->si_addr;
  
-     /* For synchronous signals we expect to be coming from the vCPU
-      * thread (so current_cpu should be valid) and either from running
-@@ -180,7 +181,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+     /* We must handle PC addresses from two different sources:
+      * a call return address and a signal frame address.
+@@ -215,7 +216,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
  #endif
      pc = EIP_sig(uc);
      trapno = TRAP_sig(uc);
@@ -39,7 +40,7 @@ index 2a975ea..3cf17a3 100644
                               trapno == 0xe ?
                               (ERROR_sig(uc) >> 1) & 1 : 0,
                               &MASK_sig(uc));
-@@ -226,7 +227,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+@@ -261,7 +262,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
  #endif
  
      pc = PC_sig(uc);
@@ -48,7 +49,7 @@ index 2a975ea..3cf17a3 100644
                               TRAP_sig(uc) == 0xe ?
                               (ERROR_sig(uc) >> 1) & 1 : 0,
                               &MASK_sig(uc));
-@@ -306,8 +307,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+@@ -341,8 +342,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
          is_write = 1;
      }
  #endif
@@ -58,7 +59,7 @@ index 2a975ea..3cf17a3 100644
  }
  
  #elif defined(__alpha__)
-@@ -337,8 +337,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+@@ -372,8 +372,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
          is_write = 1;
      }
  
@@ -68,7 +69,7 @@ index 2a975ea..3cf17a3 100644
  }
  #elif defined(__sparc__)
  
-@@ -397,8 +396,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+@@ -432,8 +431,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
              break;
          }
      }
@@ -78,7 +79,7 @@ index 2a975ea..3cf17a3 100644
  }
  
  #elif defined(__arm__)
-@@ -431,9 +429,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+@@ -466,9 +464,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
       * later processor; on v5 we will always report this as a read).
       */
      is_write = extract32(uc->uc_mcontext.error_code, 11, 1);
@@ -89,7 +90,7 @@ index 2a975ea..3cf17a3 100644
  }
  
  #elif defined(__aarch64__)
-@@ -460,8 +456,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+@@ -495,8 +491,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
                  /* Ignore bits 23 & 24, controlling indexing.  */
                  || (insn & 0x3a400000) == 0x28000000); /* C3.3.7,14-16 */
  
@@ -99,7 +100,7 @@ index 2a975ea..3cf17a3 100644
  }
  
  #elif defined(__ia64)
-@@ -494,9 +489,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
+@@ -529,9 +524,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
      default:
          break;
      }
@@ -110,7 +111,7 @@ index 2a975ea..3cf17a3 100644
  }
  
  #elif defined(__s390__)
-@@ -548,8 +541,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+@@ -583,8 +576,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
          }
          break;
      }
@@ -120,7 +121,7 @@ index 2a975ea..3cf17a3 100644
  }
  
  #elif defined(__mips__)
-@@ -564,8 +556,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+@@ -599,8 +591,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
  
      /* XXX: compute is_write */
      is_write = 0;
@@ -131,5 +132,5 @@ index 2a975ea..3cf17a3 100644
  
  #else
 -- 
-2.15.1
+1.9.1
 

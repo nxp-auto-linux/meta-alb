@@ -68,7 +68,7 @@ index 0000000..a12abda
 +/*
 + * Set the boot location pointer to the SDHC flash boot area.
 + */
-+ 
++
 +.pbi
 +write 0x01e00404,0x00000000
 +write 0x01e00400,0x1800a000

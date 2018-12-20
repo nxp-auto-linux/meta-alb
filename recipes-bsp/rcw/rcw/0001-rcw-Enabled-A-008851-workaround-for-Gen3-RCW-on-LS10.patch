@@ -1,18 +1,20 @@
-From 95963a7b47f95427c58a94fd8f654db4cb58f2a5 Mon Sep 17 00:00:00 2001
+From 2a9924c81829a5f50805c6913b208286136fcb20 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Wed, 25 Oct 2017 10:59:30 +0200
+Date: Thu, 20 Dec 2018 13:14:56 +0200
 Subject: [PATCH] rcw: Enabled A-008851 workaround for Gen3 RCW on LS1046ARDB
 
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  ls1046ardb/pex_gen3_link.rcw | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
 
 diff --git a/ls1046ardb/pex_gen3_link.rcw b/ls1046ardb/pex_gen3_link.rcw
-index 2d8f545..56c64ea 100644
+index 27e7459..e69d051 100644
 --- a/ls1046ardb/pex_gen3_link.rcw
 +++ b/ls1046ardb/pex_gen3_link.rcw
-@@ -5,10 +5,25 @@
-  * PCIe3 GEN3_RELATED_OFF register: 0x0360_0890 little endian
+@@ -12,10 +12,25 @@
+  *
   * ALTCBAR Register (SCFG_ALTCBAR): 0x0157_0158 big endian
   * PBL is also big endian block on LS1046A
 + *
@@ -38,5 +40,5 @@ index 2d8f545..56c64ea 100644
  awrite 0x500890, 0x01048000
  awrite 0x600890, 0x01048000
 -- 
-1.7.12.4
+2.7.4
 

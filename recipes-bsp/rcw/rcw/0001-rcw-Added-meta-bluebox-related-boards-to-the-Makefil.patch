@@ -1,24 +1,25 @@
-From 764acb0f43979e97553e4915ea0e5106bd960251 Mon Sep 17 00:00:00 2001
+From 129dbc045cbc6114b305f319650d30c775486744 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Wed, 17 May 2017 11:49:55 +0200
+Date: Wed, 19 Dec 2018 17:04:28 +0200
 Subject: [PATCH] rcw: Added meta-bluebox related boards to the Makefile
 
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
- Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index fb55c8b..ee87bb3 100644
+index 9f0587e..7e51af6 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,6 @@
  DESTDIR = .
  BOARDS = b4420qds b4860qds \
-+	 ls1012ardb \
 +	 ls2080abluebox ls2084abluebox ls2084abbmini \
+ 	 ls1012ardb ls1012a2g5rdb ls1012afrdm ls1012aqds \
  	 ls1021aqds ls1021atwr ls1043aqds ls1043ardb ls1046ardb ls1046aqds \
- 	 p2041rdb p3041ds p4080ds p5020ds p5040ds \
- 	 t1024qds t1023rdb t1024rdb t1040rdb t1042rdb t1042rdb_pi t1040qds \
+ 	 ls1088ardb ls1088aqds\
 -- 
-1.7.12.4
+2.7.4
 

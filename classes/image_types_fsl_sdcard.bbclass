@@ -6,6 +6,7 @@ IMAGE_TYPES += "sdcard"
 BOOTDD_VOLUME_ID ?= "boot_${MACHINE}"
 
 UBOOT_REALSUFFIX_SDCARD ?= ".${UBOOT_SUFFIX_SDCARD}"
+IMAGE_BOOTLOADER ?= "u-boot"
 
 UBOOT_TYPE_SDCARD ?= "sdcard"
 UBOOT_BASENAME_SDCARD ?= "u-boot"
@@ -82,6 +83,9 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA8_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA8', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
 "
+
+do_image_sdcard[depends] += "${IMAGE_BASENAME}:do_image_ext3"
+
 SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
 SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_fsl_lsch3_sdcard"
 SDCARD_GENERATION_COMMAND_s32 = "generate_imx_sdcard"

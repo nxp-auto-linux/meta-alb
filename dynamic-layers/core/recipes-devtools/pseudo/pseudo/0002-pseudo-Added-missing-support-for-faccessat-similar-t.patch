@@ -1,9 +1,11 @@
-From abb6608d3249ae931f20de30a1554a9eae518c4e Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Wed, 25 Oct 2017 08:40:27 +0200
-Subject: [PATCH 2/2] pseudo: Added missing support for faccessat(), similar to
+From 932526b8ab47a6214291b67458761605a7410820 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@freescale.com>
+Date: Tue, 8 Jan 2019 15:25:52 +0200
+Subject: [PATCH] pseudo: Added missing support for faccessat(), similar to
  access()
 
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Costea Ciprian <ciprianmarian.costea@nxp.com>
 ---
  ports/linux/guts/faccessat.c | 30 ++++++++++++++++++++++++++++++
  ports/linux/wrapfuncs.in     |  1 +
@@ -12,7 +14,7 @@ Subject: [PATCH 2/2] pseudo: Added missing support for faccessat(), similar to
 
 diff --git a/ports/linux/guts/faccessat.c b/ports/linux/guts/faccessat.c
 new file mode 100644
-index 0000000..47632cb
+index 0000000..0ba30e7
 --- /dev/null
 +++ b/ports/linux/guts/faccessat.c
 @@ -0,0 +1,30 @@
@@ -34,7 +36,7 @@ index 0000000..47632cb
 +
 +	if (mode & X_OK) {
 +		if (buf.st_mode & 0111) {
-+			return 0;
++            return 0;
 +		} else {
 +			errno = EPERM;
 +			return -1;
@@ -47,7 +49,7 @@ index 0000000..47632cb
 + * }
 + */
 diff --git a/ports/linux/wrapfuncs.in b/ports/linux/wrapfuncs.in
-index 76507f4..0ac281e 100644
+index de41695..b806172 100644
 --- a/ports/linux/wrapfuncs.in
 +++ b/ports/linux/wrapfuncs.in
 @@ -5,6 +5,7 @@ int __lxstat(int ver, const char *path, struct stat *buf); /* flags=AT_SYMLINK_N
@@ -55,9 +57,9 @@ index 76507f4..0ac281e 100644
  int lchown(const char *path, uid_t owner, gid_t group); /* flags=AT_SYMLINK_NOFOLLOW */
  int __fxstatat(int ver, int dirfd, const char *path, struct stat *buf, int flags);
 +int faccessat(int dirfd, const char *path, int mode, int flags);
- int openat(int dirfd, const char *path, int flags, ...{mode_t mode});
- int __openat_2(int dirfd, const char *path, int flags);
- int __xmknod(int ver, const char *path, mode_t mode, dev_t *dev); /* flags=AT_SYMLINK_NOFOLLOW */
+ int openat(int dirfd, const char *path, int flags, ...{mode_t mode}); /* flags=0 */
+ int __openat_2(int dirfd, const char *path, int flags); /* flags=0 */
+ int mknod(const char *path, mode_t mode, dev_t dev); /* real_func=pseudo_mknod */
 -- 
-1.8.3.1
+1.9.1
 

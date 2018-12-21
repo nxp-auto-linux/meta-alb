@@ -4,7 +4,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 # use inside pseudo for target rootfs setups
 SRC_URI += " \
     file://0001-pseudo-Enabled-utimensat-ftimens.patch \
-    file://0002-pseudo-Cleaned-added-mk-o-stemp-s-function-wrappers.patch \
     file://0003-pseudo-The-stat-v-fs-functions-were-not-wrapped-prop.patch \
     file://0004-pseudo-Ensure-by-adding-the-right-headers-that-the-f.patch \
     file://0005-pseudo-Added-support-function-for-fnmatch.patch \
@@ -25,7 +24,6 @@ SRC_URI += " \
 \
     file://0001-pseudo-pseudo_root_path-didn-t-work-properly-for-chr.patch \
     file://0001-pseudo-Fixing-an-incorrect-EAR-patch-port.patch \
-    file://0001-pseudo-openat-and-__openat_2-flags-handling-was-brok.patch \
     file://0001-pseudo-Cleaned-check-of-symlink-flag-handling.patch \
     file://0001-pseudo-Another-missing-EAR3-patch.patch \
     file://0001-pseudo-Diagnostic-cleanup-for-utimensat.patch \

@@ -1,18 +1,20 @@
-From 73baad3312366d1923094c625f4eae021e3a7983 Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Sun, 23 Apr 2017 21:23:17 +0200
-Subject: [PATCH 04/17] u-boot: Add config info for thermal based early fan
+From e443fb941ab09c19d39cac0b964c92196fb224a4 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 17 Jan 2019 11:36:04 +0200
+Subject: [PATCH 05/15] u-boot: Add config info for thermal based early fan
  control on LS2080A RDB
 
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  include/configs/ls2080ardb.h | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/include/configs/ls2080ardb.h b/include/configs/ls2080ardb.h
-index 5f02c8aa5a..c46c062977 100644
+index 36c212d..e617289 100644
 --- a/include/configs/ls2080ardb.h
 +++ b/include/configs/ls2080ardb.h
-@@ -280,6 +280,10 @@ unsigned long get_board_sys_clk(void);
+@@ -284,6 +284,10 @@ unsigned long get_board_sys_clk(void);
  
  /* I2C bus multiplexer */
  #define I2C_MUX_CH_DEFAULT      0x8
@@ -22,7 +24,7 @@ index 5f02c8aa5a..c46c062977 100644
 +#define CONFIG_INIT_I2C_DEVICES_F
  
  /* SPI */
- #ifdef CONFIG_FSL_DSPI
+ #if defined(CONFIG_FSL_QSPI) || defined(CONFIG_FSL_DSPI)
 -- 
-2.12.2
+2.7.4
 

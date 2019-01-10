@@ -1,9 +1,9 @@
-From ad9509c0a3db269ecf68c08bc03b2ab43bb31d01 Mon Sep 17 00:00:00 2001
-From: nxa15299 <Heinz.Wrobel@nxp.com>
-Date: Wed, 12 Dec 2018 16:50:38 +0200
-Subject: [PATCH] u-boot: Basic set of BB Mini configuration added
+From 5f6f06164345f979c6e3b9da7142cf37ef14b3b1 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 17 Jan 2019 11:15:18 +0200
+Subject: [PATCH 01/15] u-boot: Basic set of BB Mini configuration added
 
-Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  arch/arm/Kconfig                                   |  16 +
@@ -14,16 +14,16 @@ Signed-off-by: Dan Nica <dan.nica@nxp.com>
  board/freescale/ls2084abbmini/Kconfig              |  16 +
  board/freescale/ls2084abbmini/MAINTAINERS          |  10 +
  board/freescale/ls2084abbmini/Makefile             |   8 +
- board/freescale/ls2084abbmini/README               | 163 +++++++++++
+ board/freescale/ls2084abbmini/README               | 162 +++++++++++
  board/freescale/ls2084abbmini/ddr.c                | 173 +++++++++++
  board/freescale/ls2084abbmini/ddr.h                |  58 ++++
  board/freescale/ls2084abbmini/eth_ls2084abbmini.c  | 140 +++++++++
- board/freescale/ls2084abbmini/ls2084abbmini.c      | 322 +++++++++++++++++++++
+ board/freescale/ls2084abbmini/ls2084abbmini.c      | 321 +++++++++++++++++++++
  .../freescale/ls2084abbmini/ls2084abbmini_qixis.h  |  20 ++
  configs/ls2084abbmini_defconfig                    |  47 +++
  configs/ls2084abbmini_sdcard_defconfig             |  61 ++++
  include/configs/ls2084abbmini.h                    | 299 +++++++++++++++++++
- 17 files changed, 1489 insertions(+), 1 deletion(-)
+ 17 files changed, 1487 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm/dts/fsl-ls2084a-bbmini.dts
  create mode 100644 arch/arm/dts/fsl-ls2084a.dtsi
  create mode 100644 board/freescale/ls2084abbmini/Kconfig
@@ -40,10 +40,10 @@ Signed-off-by: Dan Nica <dan.nica@nxp.com>
  create mode 100644 include/configs/ls2084abbmini.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index c7493e4..302dadf 100644
+index d77bc6e..676c576 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -906,6 +906,21 @@ config TARGET_LS2081ARDB
+@@ -871,6 +871,21 @@ config TARGET_LS2081ARDB
  	  development platform that supports the QorIQ LS2081A/LS2041A
  	  Layerscape Architecture processor.
  
@@ -65,7 +65,7 @@ index c7493e4..302dadf 100644
  config TARGET_HIKEY
  	bool "Support HiKey 96boards Consumer Edition Platform"
  	select ARM64
-@@ -1310,6 +1325,7 @@ source "board/freescale/ls2080a/Kconfig"
+@@ -1245,6 +1260,7 @@ source "board/freescale/ls2080a/Kconfig"
  source "board/freescale/ls2080aqds/Kconfig"
  source "board/freescale/ls2080ardb/Kconfig"
  source "board/freescale/ls1088a/Kconfig"
@@ -74,11 +74,11 @@ index c7493e4..302dadf 100644
  source "board/freescale/ls1043aqds/Kconfig"
  source "board/freescale/ls1021atwr/Kconfig"
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 22d2f29..7062198 100644
+index 3a0e129..d9fe0d0 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
-@@ -94,7 +94,7 @@ config PSCI_RESET
-		   !TARGET_LS1012AFRWY && \
+@@ -93,7 +93,7 @@ config PSCI_RESET
+ 		   !TARGET_LS1012A2G5RDB && !TARGET_LS1012AQDS && \
  		   !TARGET_LS1043ARDB && !TARGET_LS1043AQDS && \
  		   !TARGET_LS1046ARDB && !TARGET_LS1046AQDS && \
 -		   !TARGET_LS2081ARDB && \
@@ -87,10 +87,10 @@ index 22d2f29..7062198 100644
  	help
  	  Most armv8 systems have PSCI support enabled in EL3, either through
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index b532289..1e3943f 100644
+index 9e49b7d..4ee874e 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -203,6 +203,7 @@ dtb-$(CONFIG_ARCH_LS1021A) += ls1021a-qds-duart.dtb \
+@@ -189,6 +189,7 @@ dtb-$(CONFIG_ARCH_LS1021A) += ls1021a-qds-duart.dtb \
  dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
  	fsl-ls2080a-rdb.dtb \
  	fsl-ls2081a-rdb.dtb \
@@ -318,10 +318,10 @@ index 0000000..00d452e
 +obj-y += ddr.o
 diff --git a/board/freescale/ls2084abbmini/README b/board/freescale/ls2084abbmini/README
 new file mode 100644
-index 0000000..5af2957
+index 0000000..b154c7a
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/README
-@@ -0,0 +1,163 @@
+@@ -0,0 +1,162 @@
 +Overview
 +--------
 +The LS2080A Reference Design (RDB) is a high-performance computing,
@@ -484,7 +484,6 @@ index 0000000..5af2957
 +=> setenv bootargs 'console=ttyS1,115200 root=/dev/ram
 +   earlycon=uart8250,mmio,0x21c0600,115200 default_hugepagesz=2m hugepagesz=2m
 +   hugepages=16 mem=2048M'
-+
 diff --git a/board/freescale/ls2084abbmini/ddr.c b/board/freescale/ls2084abbmini/ddr.c
 new file mode 100644
 index 0000000..01f7d82
@@ -730,7 +729,7 @@ index 0000000..6479ab1
 +#endif
 diff --git a/board/freescale/ls2084abbmini/eth_ls2084abbmini.c b/board/freescale/ls2084abbmini/eth_ls2084abbmini.c
 new file mode 100644
-index 0000000..96fdd0b
+index 0000000..972eb44
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/eth_ls2084abbmini.c
 @@ -0,0 +1,140 @@
@@ -865,7 +864,7 @@ index 0000000..96fdd0b
 +	char *mc_boot_env_var;
 +	/* The MC may only be initialized in the reset PHY function
 +	 * because otherwise U-Boot has not yet set up all the MAC
-+	 * address info properly. Without MAC addresses, the MC code 
++	 * address info properly. Without MAC addresses, the MC code
 +	 * can not properly initialize the DPC.
 +	 */
 +	mc_boot_env_var = getenv(MC_BOOT_ENV_VAR);
@@ -876,10 +875,10 @@ index 0000000..96fdd0b
 +#endif /* CONFIG_RESET_PHY_R */
 diff --git a/board/freescale/ls2084abbmini/ls2084abbmini.c b/board/freescale/ls2084abbmini/ls2084abbmini.c
 new file mode 100644
-index 0000000..090bd6b
+index 0000000..7002ef4
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/ls2084abbmini.c
-@@ -0,0 +1,322 @@
+@@ -0,0 +1,321 @@
 +/*
 + * Copyright 2016-2018 NXP
 + *
@@ -1201,7 +1200,6 @@ index 0000000..090bd6b
 +	}
 +#endif
 +}
-+
 diff --git a/board/freescale/ls2084abbmini/ls2084abbmini_qixis.h b/board/freescale/ls2084abbmini/ls2084abbmini_qixis.h
 new file mode 100644
 index 0000000..cb60c00

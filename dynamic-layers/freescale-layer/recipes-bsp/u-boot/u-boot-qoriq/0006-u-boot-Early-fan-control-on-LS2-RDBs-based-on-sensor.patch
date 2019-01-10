@@ -1,18 +1,20 @@
-From 61bbf741a0d0e16ad23b60de9fb5536ff9314530 Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Sun, 23 Apr 2017 21:28:10 +0200
-Subject: [PATCH 06/17] u-boot: Early fan control on LS2 RDBs based on sensor
+From 148f77ef09d79d79134f1607182fd5aa563b9696 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 17 Jan 2019 11:46:23 +0200
+Subject: [PATCH 07/15] u-boot: Early fan control on LS2 RDBs based on sensor
  input
 
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  board/freescale/ls2080ardb/ls2080ardb.c | 161 ++++++++++++++++++++++++++++++++
  1 file changed, 161 insertions(+)
 
 diff --git a/board/freescale/ls2080ardb/ls2080ardb.c b/board/freescale/ls2080ardb/ls2080ardb.c
-index a38b0d55b4..38c765e1d4 100644
+index 97af550..f5d268b 100644
 --- a/board/freescale/ls2080ardb/ls2080ardb.c
 +++ b/board/freescale/ls2080ardb/ls2080ardb.c
-@@ -197,6 +197,167 @@ int board_init(void)
+@@ -237,6 +237,167 @@ int board_init(void)
  	return 0;
  }
  
@@ -179,7 +181,7 @@ index a38b0d55b4..38c765e1d4 100644
 +
  int board_early_init_f(void)
  {
- 	fsl_lsch3_early_init_f();
+ #ifdef CONFIG_SYS_I2C_EARLY_INIT
 -- 
-2.12.2
+2.7.4
 

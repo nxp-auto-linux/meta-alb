@@ -1,9 +1,11 @@
-From c6ccf2e568cbfc8dae9edd57a47a2200a1972c67 Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Mon, 24 Apr 2017 00:37:34 +0200
-Subject: [PATCH] u-boot: First attempt to add GIC support for ARMv8, needed
- for LS2 in EP mode
+From 46c2b6d8ccdce0f05ee656d54c3be782fbc194aa Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 17 Jan 2019 12:39:19 +0200
+Subject: [PATCH 11/15] u-boot: First attempt to add GIC support for ARMv8,
+ needed for LS2 in EP mode
 
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  arch/arm/cpu/armv8/Kconfig        |  10 +
  arch/arm/cpu/armv8/Makefile       |   1 +
@@ -15,10 +17,10 @@ Subject: [PATCH] u-boot: First attempt to add GIC support for ARMv8, needed
  create mode 100644 arch/arm/include/asm/gicsupport.h
 
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 2cf2291ca7..54b9cc3562 100644
+index d9fe0d0..ec912c4 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
-@@ -33,4 +33,14 @@ config ARMV8_SPIN_TABLE
+@@ -41,6 +41,16 @@ config ARMV8_SPIN_TABLE
  	    - Reserve the code for the spin-table and the release address
  	      via a /memreserve/ region in the Device Tree.
  
@@ -32,12 +34,14 @@ index 2cf2291ca7..54b9cc3562 100644
 +	  mode need supporting interrupt handlers to function correctly.
 +	  This setting is required for configurations with such drivers.
 +
- endif
+ menu "ARMv8 secure monitor firmware"
+ config ARMV8_SEC_FIRMWARE_SUPPORT
+ 	bool "Enable ARMv8 secure monitor firmware framework support"
 diff --git a/arch/arm/cpu/armv8/Makefile b/arch/arm/cpu/armv8/Makefile
-index 9f659274b7..eba0c60692 100644
+index 1249547..dfcbb8a 100644
 --- a/arch/arm/cpu/armv8/Makefile
 +++ b/arch/arm/cpu/armv8/Makefile
-@@ -21,6 +21,7 @@ obj-$(CONFIG_ARMV8_SPIN_TABLE) += spin_table.o spin_table_v8.o
+@@ -25,6 +25,7 @@ obj-$(CONFIG_ARMV8_SPIN_TABLE) += spin_table.o spin_table_v8.o
  endif
  obj-$(CONFIG_$(SPL_)ARMV8_SEC_FIRMWARE_SUPPORT) += sec_firmware.o sec_firmware_asm.o
  
@@ -47,7 +51,7 @@ index 9f659274b7..eba0c60692 100644
  obj-$(CONFIG_ARCH_ZYNQMP) += zynqmp/
 diff --git a/arch/arm/cpu/armv8/gicsupport.c b/arch/arm/cpu/armv8/gicsupport.c
 new file mode 100644
-index 0000000000..2b854ae480
+index 0000000..2b854ae
 --- /dev/null
 +++ b/arch/arm/cpu/armv8/gicsupport.c
 @@ -0,0 +1,385 @@
@@ -438,7 +442,7 @@ index 0000000000..2b854ae480
 +#endif
 diff --git a/arch/arm/include/asm/gicsupport.h b/arch/arm/include/asm/gicsupport.h
 new file mode 100644
-index 0000000000..3494bab118
+index 0000000..6ecc997
 --- /dev/null
 +++ b/arch/arm/include/asm/gicsupport.h
 @@ -0,0 +1,11 @@
@@ -454,12 +458,12 @@ index 0000000000..3494bab118
 +static void gic_set_type(unsigned int irq, int type);
 +int gic_register_handler(int irq, void (*handler)(struct pt_regs *pt_regs, unsigned int esr), int type, const char *name);
 diff --git a/arch/arm/lib/interrupts_64.c b/arch/arm/lib/interrupts_64.c
-index 7c9cfce69f..83c0b6bc8e 100644
+index cbcfeec..a568f47 100644
 --- a/arch/arm/lib/interrupts_64.c
 +++ b/arch/arm/lib/interrupts_64.c
-@@ -10,17 +10,17 @@
- #include <efi_loader.h>
+@@ -11,17 +11,17 @@
  
+ DECLARE_GLOBAL_DATA_PTR;
  
 -int interrupt_init(void)
 +int __weak interrupt_init(void)
@@ -478,7 +482,7 @@ index 7c9cfce69f..83c0b6bc8e 100644
  {
  	return 0;
  }
-@@ -95,7 +95,7 @@ void do_sync(struct pt_regs *pt_regs, unsigned int esr)
+@@ -101,7 +101,7 @@ void do_sync(struct pt_regs *pt_regs, unsigned int esr)
  /*
   * do_irq handles the Irq exception.
   */
@@ -488,5 +492,5 @@ index 7c9cfce69f..83c0b6bc8e 100644
  	efi_restore_gd();
  	printf("\"Irq\" handler, esr 0x%08x\n", esr);
 -- 
-2.12.2
+2.7.4
 

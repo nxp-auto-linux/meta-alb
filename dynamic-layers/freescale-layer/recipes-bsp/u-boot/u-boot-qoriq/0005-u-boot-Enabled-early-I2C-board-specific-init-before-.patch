@@ -1,33 +1,35 @@
-From 19f73fa9df3596a7f34db604c4f5776bd6b0d091 Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Sun, 23 Apr 2017 21:25:43 +0200
-Subject: [PATCH 05/17] u-boot: Enabled early I2C board specific init before
+From 2ce12960beb6794956d4dc2ed2df38990f7221c1 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 17 Jan 2019 11:38:53 +0200
+Subject: [PATCH 06/15] u-boot: Enabled early I2C board specific init before
  memory is available
 
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  common/board_f.c | 3 +++
  include/common.h | 1 +
  2 files changed, 4 insertions(+)
 
 diff --git a/common/board_f.c b/common/board_f.c
-index da381dbd93..d9d4d2a31e 100644
+index c62e778..e5d0419 100644
 --- a/common/board_f.c
 +++ b/common/board_f.c
-@@ -935,6 +935,9 @@ static init_fnc_t init_sequence_f[] = {
- 	INIT_FUNC_WATCHDOG_RESET
- #if defined(CONFIG_HARD_I2C) || defined(CONFIG_SYS_I2C)
+@@ -822,6 +822,9 @@ static const init_fnc_t init_sequence_f[] = {
+ #if defined(CONFIG_SYS_I2C)
  	init_func_i2c,
+ #endif
 +#if defined(CONFIG_INIT_I2C_DEVICES_F)
 +	board_init_i2c_devices_f,
 +#endif
+ #if defined(CONFIG_VID) && !defined(CONFIG_SPL)
+ 	init_func_vid,
  #endif
- #if defined(CONFIG_HARD_SPI)
- 	init_func_spi,
 diff --git a/include/common.h b/include/common.h
-index e9f0dea308..e8fabac105 100644
+index 8df7e6d..13f9674 100644
 --- a/include/common.h
 +++ b/include/common.h
-@@ -506,6 +506,7 @@ int board_late_init (void);
+@@ -466,6 +466,7 @@ int board_late_init (void);
  int board_postclk_init (void); /* after clocks/timebase, before env/serial */
  int board_early_init_r (void);
  void board_poweroff (void);
@@ -36,5 +38,5 @@ index e9f0dea308..e8fabac105 100644
  #if defined(CONFIG_SYS_DRAM_TEST)
  int testdram(void);
 -- 
-2.12.2
+2.7.4
 

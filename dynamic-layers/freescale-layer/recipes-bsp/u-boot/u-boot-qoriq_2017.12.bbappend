@@ -21,8 +21,6 @@ SRC_URI += "\
 	file://0001-u-boot-Enable-GIC-support-to-permit-PCIe-EP-use-on-t.patch \
 	file://0001-u-boot-Enabled-setexpr-for-LS2080ARDB-platform-U-Boo.patch \
 \
-	file://0001-u-boot-Enabled-late-mcinitcmd-execution-by-enabling-.patch \
-\
 	file://0001-u-boot-Fix-LS2088A-style-VF-setup-on-EPs.patch \
 "
 
@@ -31,6 +29,5 @@ SRC_URI += "\
 #
 ###	file://0001-u-boot-SPL-NAND-support-should-only-be-active-if-NAN.patch \
 #
-###	file://0001-u-boot-Fixup-random-MAC-addresses-in-DPL-based-on-U-.patch \
 #
 #

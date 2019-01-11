@@ -18,6 +18,7 @@ def dnwp_nopackagewrites(d):
 				pkgtype = pkgclass.split('_', 1)[1]
 				pkgwritefunc = 'do_package_write_%s' % pkgtype
 				d.setVarFlag(pkgwritefunc, 'noexec', '1')
+				d.setVarFlag('do_package', 'postfuncs', "dnwp_writemanifest")
 
 def dnwp_prefprov(d):
 	packagelist = (d.getVar('DISTRO_NEVER_WRITE_PACKAGE', True) or '').split()
@@ -45,3 +46,13 @@ python distro_never_write_package_post () {
 	return
 }
 
+python dnwp_writemanifest() {
+    for pkgclass in (d.getVar('PACKAGE_CLASSES') or '').split():
+        if pkgclass.startswith('package_'):
+            pkgtype = pkgclass.split('_', 1)[1]
+            pkgwritetype = 'package_write_%s' % pkgtype
+            manifest_path = '%s/manifest-%s-%s.%s' % (d.getVar('SSTATE_MANIFESTS', True), \
+d.getVar('SSTATE_MANMACH'), d.getVar('PN', True), pkgwritetype)
+            if not os.path.exists(manifest_path):
+                open(manifest_path, 'a').close()
+}

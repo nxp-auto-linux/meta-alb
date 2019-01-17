@@ -80,9 +80,11 @@ generate_flashimage_entry() {
                 FLASHIMAGE_MAX=$(printf "%d + %d\n" ${FLASHIMAGE_FILE_OFFSET} ${FLASHIMAGE_FILE_SIZE} | bc)
 
                 if [ "${FLASHIMAGE_BANK4}" = "yes" ]; then
-                        if [ ${FLASHIMAGE_FILE_OFFSET} -lt ${FLASHIMAGE_BANK4_XOR} && ${FLASHIMAGE_MAX} -gt ${FLASHIMAGE_BANK4_XOR} ]; then
-                                bberror "${FLASHIMAGE_FILE} is reaching into flash bank 4 to ${FLASHIMAGE_MAX}. Please reduce size or turn off bank 4 in the config!"
-                                exit 1
+                        if [ ${FLASHIMAGE_FILE_OFFSET} -lt ${FLASHIMAGE_BANK4_XOR} ]; then
+                                if [ ${FLASHIMAGE_MAX} -gt ${FLASHIMAGE_BANK4_XOR} ]; then
+                                        bberror "${FLASHIMAGE_FILE} is reaching into flash bank 4 to ${FLASHIMAGE_MAX}. Please reduce size or turn off bank 4 in the config!"
+                                        exit 1
+                                fi
                         fi
                 fi
 

@@ -1,0 +1,53 @@
+From 24e34e2b36c4e339ca3c7c932bd10a82872a5c01 Mon Sep 17 00:00:00 2001
+From: Dan Nica <dan.nica@nxp.com>
+Date: Fri, 18 Jan 2019 13:33:46 +0200
+Subject: [PATCH 2/2] config: Move "new" CONFIG options to whitelist
+
+All CONFIG options must be added using Kconfig. Moving
+ours to the whitelist is a temporary circumvention of
+this issue.
+
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
+---
+ scripts/config_whitelist.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/scripts/config_whitelist.txt b/scripts/config_whitelist.txt
+index 8a0c95b..e646b6a 100644
+--- a/scripts/config_whitelist.txt
++++ b/scripts/config_whitelist.txt
+@@ -1063,6 +1063,7 @@ CONFIG_IMX_WATCHDOG
+ CONFIG_INETSPACE_V2
+ CONFIG_INITRD_TAG
+ CONFIG_INIT_CRITICAL
++CONFIG_INIT_I2C_DEVICES_F
+ CONFIG_INIT_IGNORE_ERROR
+ CONFIG_INI_ALLOW_MULTILINE
+ CONFIG_INI_CASE_INSENSITIVE
+@@ -1291,6 +1292,7 @@ CONFIG_LPUART
+ CONFIG_LPUART_32B_REG
+ CONFIG_LQ038J7DH53
+ CONFIG_LS102XA_STREAM_ID
++CONFIG_LS2080A
+ CONFIG_LSCHLV2
+ CONFIG_LSXHL
+ CONFIG_LYNXKDI
+@@ -4710,6 +4712,7 @@ CONFIG_SYS_USB_OHCI_CPU_INIT
+ CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS
+ CONFIG_SYS_USB_OHCI_REGS_BASE
+ CONFIG_SYS_USB_OHCI_SLOT_NAME
++CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS
+ CONFIG_SYS_USER_SWITCHES_BASE
+ CONFIG_SYS_USE_BOOT_NORFLASH
+ CONFIG_SYS_USE_DATAFLASH
+@@ -5007,6 +5010,7 @@ CONFIG_USB_XHCI_OMAP
+ CONFIG_USER_LOWLEVEL_INIT
+ CONFIG_USE_FDT
+ CONFIG_USE_INTERRUPT
++CONFIG_USE_IRQ
+ CONFIG_USE_NAND
+ CONFIG_USE_NOR
+ CONFIG_USE_ONENAND_BOARD_INIT
+-- 
+2.7.4
+

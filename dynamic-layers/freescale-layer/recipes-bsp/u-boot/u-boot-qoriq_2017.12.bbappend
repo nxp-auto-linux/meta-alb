@@ -22,6 +22,7 @@ SRC_URI += "\
 	file://0001-u-boot-Enabled-setexpr-for-LS2080ARDB-platform-U-Boo.patch \
 \
 	file://0001-u-boot-Fix-LS2088A-style-VF-setup-on-EPs.patch \
+	file://0002-config-Move-new-CONFIG-options-to-whitelist.patch \
 "
 
 #

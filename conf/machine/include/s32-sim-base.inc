@@ -1,6 +1,7 @@
 require conf/machine/include/s32-base.inc
 
 IMAGE_FSTYPES += "cpio.gz"
+IMAGE_FSTYPES_remove = "flashimage"
 
 KERNEL_DEFCONFIG ?= "s32gen1_defconfig"
 

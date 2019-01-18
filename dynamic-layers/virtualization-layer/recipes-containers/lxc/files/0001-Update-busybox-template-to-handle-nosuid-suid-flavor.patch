@@ -1,4 +1,4 @@
-From d9f7bf32fa1ce0a0dcbd1a6a4d147f5cd7970f28 Mon Sep 17 00:00:00 2001
+From d00f28250f904ac2b4af766377d08163dc2bdf5d Mon Sep 17 00:00:00 2001
 From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Date: Tue, 28 Aug 2018 13:59:20 +0300
 Subject: [PATCH] Update busybox template to handle nosuid/suid flavors of
@@ -17,12 +17,13 @@ of some very important command links which refer to applets
 built into the suid binary (e.g. login, mount, passwd, su).
 
 Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
 ---
- templates/lxc-busybox.in | 63 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 52 insertions(+), 11 deletions(-)
+ templates/lxc-busybox.in | 62 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 52 insertions(+), 10 deletions(-)
 
 diff --git a/templates/lxc-busybox.in b/templates/lxc-busybox.in
-index c266668..ed5fba2 100644
+index 25e4cbf..97474fd 100644
 --- a/templates/lxc-busybox.in
 +++ b/templates/lxc-busybox.in
 @@ -66,7 +66,6 @@ copy_binary()
@@ -59,7 +60,7 @@ index c266668..ed5fba2 100644
          return 1
      fi
  
-@@ -314,20 +316,32 @@ configure_busybox()
+@@ -327,17 +329,30 @@ configure_busybox()
      # it would be nice to just use "chroot $rootfs busybox --install -s /bin"
      # but that only works right in a chroot with busybox >= 1.19.0
      pushd $rootfs/bin > /dev/null || return 1
@@ -72,12 +73,9 @@ index c266668..ed5fba2 100644
  
 +    has_init=`./$bb_binary --help | grep 'Currently defined functions:' -A300 | grep init`
 +    if [ -n "$has_init" ]; then
-     # relink /sbin/init
--    ln $rootfs/bin/busybox $rootfs/sbin/init
 +        ln $rootfs/bin/$bb_binary $rootfs/sbin/init
 +    fi
 +    popd > /dev/null
- 
 +    if [ ! -f "$rootfs/etc/fstab" ]; then
      # /etc/fstab must exist for "mount -a"
      touch $rootfs/etc/fstab
@@ -96,7 +94,7 @@ index c266668..ed5fba2 100644
  
      return 0
  }
-@@ -433,16 +447,43 @@ if [ -z "$rootfs" ]; then
+@@ -443,16 +458,43 @@ if [ -z "$rootfs" ]; then
      fi
  fi
  

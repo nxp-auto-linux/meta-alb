@@ -15,6 +15,7 @@ PREMIRRORS_prepend = " git://github.com/qoriq-open-source/ git://source.codeauro
 # No better place for this if it should stay in the layer
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"
 PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
+PREFERRED_PROVIDER_virtual/nativesdk-crypt = "nativesdk-libxcrypt"
 
 # For all other elements we use the SDK defaults
 require conf/machine/include/qoriq-arm64.inc

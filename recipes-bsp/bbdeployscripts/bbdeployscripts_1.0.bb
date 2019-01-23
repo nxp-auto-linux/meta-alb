@@ -10,7 +10,7 @@ PV = "1.0+fslgit"
 
 inherit deploy
 
-DEPENDS = "u-boot-mkimage-native"
+DEPENDS = "u-boot-mkimage-native dtc-native"
 
 UBOOT_DEPLOYSCRIPT_NAME_ITS ?= "bbdeployimage"
 LINUX_DEPLOYSCRIPT_NAME_SH ?= "bbdeployimage"

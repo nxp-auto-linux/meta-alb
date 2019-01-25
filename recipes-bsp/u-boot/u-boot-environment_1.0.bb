@@ -25,6 +25,17 @@ SRC_URI = " \
 DEFAULT_ENV_s32 ??= "u-boot-default-flashenv"
 DEFAULT_ENV_PATH_s32 ??= "${STAGING_DIR_TARGET}${datadir}/env/"
 
+# S32 boards have more default environments, e.g for QSPI and SDCARD
+# Add also the SD environment and describe the mapping between the
+# environment and the u-boot config (qspi, sdcard) as defined in the
+# UBOOT_CONFIG variable
+UBOOT_ENV_NAME_append_s32 = " u-boot-flashenv-sd"
+UBOOT_ENV_NAME_MAP ??= ""
+UBOOT_ENV_NAME_MAP_s32 = " \
+	u-boot-flashenv    : qspi; \
+	u-boot-flashenv-sd : sdcard; \
+"
+
 # Turns out that some board configs use a different size in U-Boot.
 # If we do not want to override the board config with a different one,
 # we have to be creative locally and second guess the environment size.

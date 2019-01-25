@@ -25,14 +25,36 @@ UBOOT_KERNEL_IMAGETYPE ?= "${KERNEL_IMAGETYPE}"
 DEFAULT_ENV ?= ""
 DEFAULT_ENV_PATH ?= ""
 
+
+get_default_env () {
+	envname=$1
+
+	# remove whitespaces
+	IN="$(echo "${UBOOT_ENV_NAME_MAP}" | sed -e 's/[[:blank:]]//g')"
+
+	set -- "$IN"
+	IFS=';'
+	for entry in ${IN}; do
+		func="${entry%:*}"
+		value="${entry#*:}"
+		if [ "${func}" = "${envname}" ]; then
+			echo "${value}"
+			break
+		fi
+	done
+}
+
+
 do_compile () {
 	for envname in ${UBOOT_ENV_NAME}; do
 		# Concatenate default environment from u-boot with environment file ${UBOOT_ENV_NAME}.txt
 		# In the future we should merge them, i.e. override variable definitions from 
 		# default environment with those from the environment file ${UBOOT_ENV_NAME}, so that
 		# ${UBOOT_ENV_NAME} would become sort of an environment "fragment"
+		envtype=$(get_default_env "${envname}")
+
 		if [ -n "${DEFAULT_ENV}" ]; then
-			DEFAULT_ENV_FILE="${DEFAULT_ENV_PATH}/${DEFAULT_ENV}.txt"
+			DEFAULT_ENV_FILE="${DEFAULT_ENV_PATH}/${DEFAULT_ENV}${envtype}.txt"
 			if [ -e "$DEFAULT_ENV_FILE" ]; then
 				cat "$DEFAULT_ENV_FILE" ${S}/${envname}.txt > ${S}/temp.txt
 				mv -f ${S}/temp.txt ${S}/${envname}.txt

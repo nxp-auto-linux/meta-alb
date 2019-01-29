@@ -1,0 +1,57 @@
+From 3b286abafd61771fc33864f53bd30022146ac43e Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Wed, 12 Dec 2018 15:20:35 +0200
+Subject: [PATCH] dpdk-extras: Added support for LS2084A
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
+---
+ nxp/dpaa2/dynamic_dpl.sh | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/nxp/dpaa2/dynamic_dpl.sh b/nxp/dpaa2/dynamic_dpl.sh
+index 7edc900..4f5aa01 100755
+--- a/nxp/dpaa2/dynamic_dpl.sh
++++ b/nxp/dpaa2/dynamic_dpl.sh
+@@ -207,12 +207,12 @@ get_dpni_parameters() {
+ 	then
+ 		if [ -e /sys/firmware/devicetree/base/compatible ]
+ 		then
+-			board_type=`grep -ao '1088\|2088\|2080\|2085\|2160' /sys/firmware/devicetree/base/compatible | head -1`
++			board_type=`grep -ao '1088\|2088\|2084\|2080\|2085\|2160' /sys/firmware/devicetree/base/compatible | head -1`
+ 		fi
+ 		if [ -z "$board_type" ]
+ 		then
+ 			echo "Unable to find the board type!"
+-			echo "Please enter the board type! (Accepted board type keywords: 1088/2088/2085/2080/2160)"
++			echo "Please enter the board type! (Accepted board type keywords: 1088/2088/2084/2085/2080/2160)"
+ 			read board_type
+ 		fi
+ 	else
+@@ -222,12 +222,12 @@ get_dpni_parameters() {
+ 	if [ \
+ 	     $board_type != "1088" -a $board_type != "2080" -a \
+ 	     $board_type != "2085" -a $board_type != "2088" -a \
+-	     $board_type != "2160" \
++	     $board_type != "2160" -a $board_type != "2084" \
+ 	   ]
+ 	then
+ 		echo "  Invalid board type ${board_type} specified."
+ 		echo -n "  Only supported values are "
+-		echo "  1088|2080|2085|2088|2160."
++		echo "  1088|2080|2084|2085|2088|2160."
+ 		echo "  Not continuing ahead."
+ 		return 1;
+ 	fi
+@@ -256,7 +256,7 @@ get_dpni_parameters() {
+ 		if [[ $board_type == "1088" || $board_type == "2080" || $board_type == "2085" ]]
+ 		then
+ 			MAX_QOS=1
+-		elif [[ $board_type == "2088" || $board_type == "2160" ]]
++		elif [[ $board_type == "2088" || $board_type == "2160" || $board_type == "2084"]]
+ 		then
+ 			# Setting MAX_QOS to default value on LS2088 = 64, as per restool v1.5
+ 			MAX_QOS=64
+-- 
+2.7.4
+

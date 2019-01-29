@@ -16,3 +16,4 @@ ITB_ROOTFS_TYPE = ""
 ITB_ROOTFS_NAME_EXT = ""
 
 require linux-kernelitb.inc
+DEPENDS += "dtc-native"

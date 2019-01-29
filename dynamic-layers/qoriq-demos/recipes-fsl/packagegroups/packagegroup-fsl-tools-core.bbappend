@@ -9,14 +9,12 @@ RDEPENDS_${PN}_remove_s32v = "pkc-host"
 
 RDEPENDS_${PN}_append_ls2080abluebox = " \
     odp \
-    dce \
     devmem2 \
     ofp \
     fio \
     restool \
 "
 RDEPENDS_${PN}_append_ls2084a = " \
-    dce \
     devmem2 \
     ofp \
     fio \

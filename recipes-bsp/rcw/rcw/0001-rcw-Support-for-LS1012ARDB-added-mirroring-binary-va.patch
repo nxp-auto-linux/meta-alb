@@ -1,30 +1,29 @@
-From 7256b86bd89c8e589d1a61c0b5e92e4b754b0da3 Mon Sep 17 00:00:00 2001
-From: nxa15299 <Heinz.Wrobel@nxp.com>
-Date: Tue, 16 Jan 2018 08:59:48 +0100
-Subject: [PATCH] rcw: Support for LS1012ARDB added, mirroring binary values  in
+From aa5142594f382a3a733e75788e17ddd2a9a07628 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 18 Jan 2019 16:38:51 +0200
+Subject: [PATCH] rcw: Support for LS1012ARDB added, mirroring binary values in
  LSDK rocko as found in Jan 2018 in public
 
-Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
- ls1012ardb/Makefile                                |   1 +
- ls1012ardb/README                                  |   3 +-
- .../PBL_0x35_0x08_800_250_1000_default.rcw         |  40 +++++++++++++++
- .../PBL_0x35_0x08_800_250_1000_sben.rcw            |  43 ++++++++++++++++
- .../PBL_0x35_0x08_800_250_1000_default.rcw         |  40 +++++++++++++++
- .../PBL_0x35_0x08_800_250_1000_sben.rcw            |  42 +++++++++++++++
- ls1012ardb/a010554.rcw                             |   7 +++
- ls1012ardb/bootlocptr_qspi_p1.rcw                  |   7 +++
- ls1012ardb/bootlocptr_qspi_p2.rcw                  |   6 +++
- ls1012ardb/clkpcsr.rcw                             |   6 +++
- ls1012ardb/enablepcieepcfg.rcw                     |   7 +++
- ls1012ardb/ls1012a.rcwi                            |  57 +++++++++++++++++++++
- ls1012ardb/qspi_cfg.rcw                            |   6 +++
- ls1012ardb/qspi_endianess.rcw                      |   6 +++
- ls1012ardb/sata6gbaud.rcw                          |   6 +++
- ls1012ardb/scratchrw1_esbc.rcw                     |   6 +++
- ls1012ardb/usb_phy_ctrl.rcw                        |   6 +++
- 21 files changed, 288 insertions(+), 1 deletion(-)
- create mode 100644 ls1012ardb/Makefile
+ ls1012ardb/README                                  |  3 +-
+ .../PBL_0x35_0x08_800_250_1000_default.rcw         | 39 ++++++++++++++++++++
+ .../PBL_0x35_0x08_800_250_1000_sben.rcw            | 42 ++++++++++++++++++++++
+ .../PBL_0x35_0x08_800_250_1000_default.rcw         | 39 ++++++++++++++++++++
+ .../PBL_0x35_0x08_800_250_1000_sben.rcw            | 41 +++++++++++++++++++++
+ ls1012ardb/a010554.rcw                             |  7 ++++
+ ls1012ardb/bootlocptr_qspi_p1.rcw                  |  7 ++++
+ ls1012ardb/bootlocptr_qspi_p2.rcw                  |  6 ++++
+ ls1012ardb/clkpcsr.rcw                             |  6 ++++
+ ls1012ardb/enablepcieepcfg.rcw                     |  7 ++++
+ ls1012ardb/ls1012a.rcwi                            | 10 +++---
+ ls1012ardb/qspi_cfg.rcw                            |  6 ++++
+ ls1012ardb/qspi_endianess.rcw                      |  6 ++++
+ ls1012ardb/sata6gbaud.rcw                          |  6 ++++
+ ls1012ardb/scratchrw1_esbc.rcw                     |  6 ++++
+ ls1012ardb/usb_phy_ctrl.rcw                        |  6 ++++
+ 16 files changed, 231 insertions(+), 6 deletions(-)
  create mode 100644 ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_default.rcw
  create mode 100644 ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_sben.rcw
  create mode 100644 ls1012ardb/R_SPNH_3508/PBL_0x35_0x08_800_250_1000_default.rcw
@@ -34,22 +33,14 @@ Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
  create mode 100644 ls1012ardb/bootlocptr_qspi_p2.rcw
  create mode 100644 ls1012ardb/clkpcsr.rcw
  create mode 100644 ls1012ardb/enablepcieepcfg.rcw
- create mode 100644 ls1012ardb/ls1012a.rcwi
  create mode 100644 ls1012ardb/qspi_cfg.rcw
  create mode 100644 ls1012ardb/qspi_endianess.rcw
  create mode 100644 ls1012ardb/sata6gbaud.rcw
  create mode 100644 ls1012ardb/scratchrw1_esbc.rcw
  create mode 100644 ls1012ardb/usb_phy_ctrl.rcw
 
-diff --git a/ls1012ardb/Makefile b/ls1012ardb/Makefile
-new file mode 100644
-index 0000000..f77e46b
---- /dev/null
-+++ b/ls1012ardb/Makefile
-@@ -0,0 +1 @@
-+include ../Makefile.inc
 diff --git a/ls1012ardb/README b/ls1012ardb/README
-index 006da6e..807997a 100644
+index 6f735d8..b687bfd 100644
 --- a/ls1012ardb/README
 +++ b/ls1012ardb/README
 @@ -13,7 +13,8 @@ e = What is available in SerDes1 Lane2
@@ -64,10 +55,10 @@ index 006da6e..807997a 100644
  
 diff --git a/ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_default.rcw b/ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_default.rcw
 new file mode 100644
-index 0000000..7c41b41
+index 0000000..6481c92
 --- /dev/null
 +++ b/ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_default.rcw
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,39 @@
 +#include <ls1012a.rcwi>
 +
 +SYS_PLL_RAT=4
@@ -107,13 +98,12 @@ index 0000000..7c41b41
 +#include <clkpcsr.rcw>
 +#include <qspi_endianess.rcw>
 +/* CRC and Stop command (CRC 0x15c98e05)*/
-+
 diff --git a/ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_sben.rcw b/ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_sben.rcw
 new file mode 100644
-index 0000000..4d010ab
+index 0000000..3c01a65
 --- /dev/null
 +++ b/ls1012ardb/R_SENH_3508/PBL_0x35_0x08_800_250_1000_sben.rcw
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,42 @@
 +#include <ls1012a.rcwi>
 +
 +SYS_PLL_RAT=4
@@ -156,13 +146,12 @@ index 0000000..4d010ab
 +#include <scratchrw1_esbc.rcw>
 +#include <qspi_endianess.rcw>
 +/* CRC and Stop command (CRC 0xf4688703)*/
-+
 diff --git a/ls1012ardb/R_SPNH_3508/PBL_0x35_0x08_800_250_1000_default.rcw b/ls1012ardb/R_SPNH_3508/PBL_0x35_0x08_800_250_1000_default.rcw
 new file mode 100644
-index 0000000..4230ce8
+index 0000000..e4eba1b
 --- /dev/null
 +++ b/ls1012ardb/R_SPNH_3508/PBL_0x35_0x08_800_250_1000_default.rcw
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,39 @@
 +#include <ls1012a.rcwi>
 +
 +SYS_PLL_RAT=4
@@ -202,13 +191,12 @@ index 0000000..4230ce8
 +#include <enablepcieepcfg.rcw>
 +#include <qspi_endianess.rcw>
 +/* CRC and Stop command (CRC 0x15c98e05)*/
-+
 diff --git a/ls1012ardb/R_SPNH_3508/PBL_0x35_0x08_800_250_1000_sben.rcw b/ls1012ardb/R_SPNH_3508/PBL_0x35_0x08_800_250_1000_sben.rcw
 new file mode 100644
-index 0000000..e05ff49
+index 0000000..8da04e5
 --- /dev/null
 +++ b/ls1012ardb/R_SPNH_3508/PBL_0x35_0x08_800_250_1000_sben.rcw
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,41 @@
 +#include <ls1012a.rcwi>
 +
 +SYS_PLL_RAT=4
@@ -250,7 +238,6 @@ index 0000000..e05ff49
 +#include <scratchrw1_esbc.rcw>
 +#include <qspi_endianess.rcw>
 +/* CRC and Stop command (CRC 0xa194d035)*/
-+
 diff --git a/ls1012ardb/a010554.rcw b/ls1012ardb/a010554.rcw
 new file mode 100644
 index 0000000..cbb0b38
@@ -315,68 +302,31 @@ index 0000000..f57beb9
 +awrite 0x004c0014,0x00000001
 +.end
 diff --git a/ls1012ardb/ls1012a.rcwi b/ls1012ardb/ls1012a.rcwi
-new file mode 100644
-index 0000000..293be4f
---- /dev/null
+index 0983839..001932c 100644
+--- a/ls1012ardb/ls1012a.rcwi
 +++ b/ls1012ardb/ls1012a.rcwi
-@@ -0,0 +1,57 @@
-+%size=512
-+%pbiformat=1
-+%sysaddr=0x01ee0100
-+%pbladdr=0x01610000
+@@ -1,6 +1,8 @@
+ %size=512
+-%sysaddr=ee0100
+-%pbladdr=610000
++%sysaddr=01ee0100
++%pbladdr=01610000
 +%littleendian64b=1
 +%dont64bswapcrc=1
-+
-+SYS_PLL_CFG[0:1]
-+SYS_PLL_RAT[2:6]
-+CGA_PLL1_CFG[24:25]
-+CGA_PLL1_RAT[26:31]
-+SRDS_PRTCL_S1[128:143]
-+SRDS_PLL_REF_CLK_SEL_S1[160:161]
-+RESERVED166_167_1[166:167]
-+SRDS_PLL_PD_S1[168:169]
-+RESERVED188_1[188]
-+SRDS_INT_REFCLK[189]
-+PBI_SRC[192:195]
-+BOOT_HO[201]
-+SB_EN[202]
-+SYS_PLL_SPD[242:243]
-+CGA_PLL1_SPD[244]
-+HOST_AGT_PEX[264]
-+GP_INFO[288:319]
-+SDHC2_EXT_CLK[254]
-+SDHC2_EXT_CMD[355]
-+SDHC2_EXT_DAT3[356]
-+SDHC2_EXT_DAT2[357]
-+SDHC2_EXT_DAT1[358]
-+SDHC2_EXT_DAT0[359]
-+EC1_EXT_SAI3[360:361]
-+EC1_EXT_SAI4[362:363]
-+EC1_EXT_SAI2_TX[364]
-+EC1_EXT_SAI2_RX[365]
-+EC1_BASE[366:367]
-+UART1_BASE[368:369]
-+UART2_BASE_FLOW[370:371]
-+SDHC1_BASE[372:373]
-+SDHC2_BASE_DAT321[374:375]
-+SDHC2_BASE_BASE[376:377]
-+UART2_BASE_DATA[378]
-+EMI1_BASE[379]
-+GPIO_FTM_EXTCLK_BASE[380:381]
-+CLK_OUT_BASE[383]
-+SDHC1_CD[419]
-+SDHC1_WP[420]
-+QSPI_DATA0_GPIO[421]
-+QSPI_DATA1_GPIO[422:423]
-+QSPI_IIC2[424:425]
-+USB1_DRVVBUS_BASE[429:430]
-+USB1_PWRFAULT_BASE[431:432]
-+SDHC1_VSEL[434]
-+EMI1_MODE[438]
-+EVDD_SEL[439:440]
-+IIC1_BASE[441:442]
-+EMI1_CMODE[444]
-+SYSCLK_FREQ[472:481]
+ 
+ SYS_PLL_CFG[0:1]
+ SYS_PLL_RAT[2:6]
+@@ -12,9 +14,7 @@ FM1_MAC_RAT[158]
+ SRDS_PLL1_REF_CLK_SEL_S1[160]
+ SRDS_PLL2_REF_CLK_SEL_S1[161]
+ USB_REFCLK_SEL[164]
+-RGMII_REFCLK_SEL[165]
+-RGMII_CLK_DCC[166]
+-HDLC2_MODE[167]
++RESERVED165_167_1[165:167]
+ SRDS_PLL_PD_S1[168:169]
+ SRDS_DIV_PEX[176:177]
+ SRDS_REFCLK_SEL[188]
 diff --git a/ls1012ardb/qspi_cfg.rcw b/ls1012ardb/qspi_cfg.rcw
 new file mode 100644
 index 0000000..18dc5f3
@@ -438,5 +388,5 @@ index 0000000..574b80b
 +write 0x00570418,0x0000009c
 +.end
 -- 
-2.15.1
+2.7.4
 

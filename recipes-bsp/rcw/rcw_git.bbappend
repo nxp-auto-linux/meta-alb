@@ -1,7 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI_append += " \
-    file://0001-Updated-rcw.py-to-deal-with-LS2-and-disassembly.patch \
     file://t4bluebox.patch \
     file://0001-Complete-ls2bluebox-RCW-setup-based-on-LS2080ARM-Rev.patch \
     file://0001-rcw-Support-for-LS2084A-in-BB-Classic.patch \
@@ -9,13 +8,8 @@ SRC_URI_append += " \
     file://0001-Turned-PCS-pins-into-GPIO-as-we-do-not-support-SDHC-.patch \
     file://0001-rcw-Added-SDHC-boot-RCW-for-BB-Mini.patch \
     file://0001-rcw-Added-a-PEX3-EP-Gen-2-configuration-for-the-LS20.patch \
-    file://0001-rcw-Fixed-blockcopy-implementation-and-disassembly.patch \
     file://0002-Corrected-blockcopy-command-for-fetching-SDHC-U-Boot.patch \
-    file://0001-rcw-Broke-awrite-for-older-pbi-format-in-prior-patch.patch \
 \
-    file://0001-rcw-Updated-rcw.py-script-to-correctly-disassemble-L.patch \
-    file://0002-rcw-added-littleendian64b-support-for-LS1012A-into-r.patch \
-    file://0001-rcw-Enabled-dont64bswapcrc-to-avoid-swap-on-endianes.patch \
 \
     file://0001-rcw-Support-for-LS1012ARDB-added-mirroring-binary-va.patch \
     file://0001-rcw-Added-meta-bluebox-related-boards-to-the-Makefil.patch \
@@ -27,11 +21,8 @@ SRC_URI_append += " \
 \
     file://0001-rcw-Fixed-IRQxx_BASE-ordering-for-LS2-parts.patch \
 \
-    file://0001-rcw-rcw.py-disassembler-now-deals-with-littleendian-.patch \
 \
-    file://0001-rcw-Added-example-conversion-to-rcw.py-for-LS1088ARB.patch \
 \
-    file://0001-rcw.py-regexp-parser-was-broken-for-write.b1.patch \
 "
 
 # We want to reuse RCWs without duplication by being able to specify

@@ -276,7 +276,7 @@ new file mode 100644
 index 0000000..5ba1e22
 --- /dev/null
 +++ b/ls2084abbmini/README
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,14 @@
 +The RCW directories names for the BlueBox with LS2084 board conform to the following
 +naming convention:
 +
@@ -291,7 +291,6 @@ index 0000000..5ba1e22
 +h   = 'H'  indicates SATA port is supported
 +i   = '42' indicates SerDes1 protocol 0x2A
 +j   = '65' indicates SerDes2 protocol 0x41
-+
 diff --git a/ls2084abbmini/a009102.rcw b/ls2084abbmini/a009102.rcw
 new file mode 100644
 index 0000000..2d93d21
@@ -346,7 +345,7 @@ index 0000000..b91c5ac
 +/*
 + * Set the boot location pointer to the IFC NOR flash boot area.
 + */
-+ 
++
 +.pbi
 +write 0x01e00404,0x00000000
 +write 0x01e00400,0x30100000
@@ -360,7 +359,7 @@ index 0000000..f348054
 +/*
 + * Set the boot location pointer to the QSPI flash boot area.
 + */
-+ 
++
 +.pbi
 +write 0x01e00404,0x00000000
 +write 0x01e00400,0x20100000

@@ -79,7 +79,7 @@ new file mode 100644
 index 0000000..4984b61
 --- /dev/null
 +++ b/ls2080abluebox/README
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,14 @@
 +The RCW directories names for the S32VLS2 board conform to the following
 +naming convention:
 +
@@ -94,7 +94,6 @@ index 0000000..4984b61
 +h   = 'H'  indicates SATA port is supported
 +i   = '42' indicates SerDes1 protocol 0x2A
 +j   = '65' indicates SerDes2 protocol 0x41
-+
 diff --git a/ls2080abluebox/a008972.rcw b/ls2080abluebox/a008972.rcw
 new file mode 100644
 index 0000000..6e77756
@@ -105,7 +104,7 @@ index 0000000..6e77756
 + * Errata workaround for A-008972 on LS2080A:
 + *      - CCN-504 performance
 + */
-+ 
++
 +.pbi
 +write 0x03080000,0x00000000
 +write 0x03080500,0x000004d7
@@ -123,7 +122,7 @@ index 0000000..053ead7
 + *      - SVR
 + *      - AIOP power
 + */
-+ 
++
 +.pbi
 +loadacwindow 0x01c0
 +awrite 0x00117e60,0x00000001
@@ -139,7 +138,7 @@ index 0000000..d4d6f8d
 +/*
 + * Set the boot location pointer to the IFC NOR flash boot area.
 + */
-+ 
++
 +.pbi
 +write 0x00e00404,0x00000000
 +write 0x00e00400,0x30100000
@@ -240,7 +239,7 @@ index 0000000..ce799cc
 +/*
 + * Override default SerDes settings for SATA6G
 + */
-+ 
++
 +.pbi
 +write 0x00eb099c,0x00502880
 +write 0x00eb09dc,0x00502880

@@ -7,6 +7,7 @@ SRC_URI += "\
 	file://0002-u-boot-qoriq-Special-config-for-LS2080ARDB-with-LS20.patch \
 	file://0001-Resolve-multiple-undefined-redefined-build-errors.patch \
     file://0001-iommu-Fix-iommu-map-entry-in-fsl-mc-node-from-dts.patch \
+	file://0001-env-Fix-environment-location-flash-mmc.patch \
 "
 
 SRCREV_ls1043ardb = "9f7df1b406ff11409021cd2112beedd6b57bb600"

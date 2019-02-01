@@ -1,0 +1,68 @@
+From e30989bd96498265d5dbd66bc1242d80465c6d34 Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Sat, 13 Jan 2018 12:15:35 +0100
+Subject: [PATCH] u-boot: Fix LS2088A style VF setup on EPs
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ drivers/pci/pcie_layerscape.c |  6 ++----
+ drivers/pci/pcie_layerscape.h | 11 +++--------
+ 2 files changed, 5 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/pci/pcie_layerscape.c b/drivers/pci/pcie_layerscape.c
+index 9a69107..9600210 100644
+--- a/drivers/pci/pcie_layerscape.c
++++ b/drivers/pci/pcie_layerscape.c
+@@ -468,15 +468,13 @@ static void ls_pcie_setup_ep(struct ls_pcie *pcie)
+ 
+ 		for (pf = 0; pf < PCIE_PF_NUM; pf++) {
+ 			for (vf = 0; vf <= PCIE_VF_NUM; vf++) {
+-				ctrl_writel(pcie, PCIE_LCTRL0_VAL(pf, vf),
+-					    PCIE_PF_VF_CTRL);
++				ctrl_writel(pcie, PCIE_LCTRL0_VAL(vf),
++					    PCIE_PF_VF_CTRL + PCIE_LCTRL0_PF(pf));
+ 
+ 				ls_pcie_ep_setup_bars(pcie->dbi);
+ 				ls_pcie_ep_setup_atu(pcie);
+ 			}
+ 		}
+-		/* Disable CFG2 */
+-		ctrl_writel(pcie, 0, PCIE_PF_VF_CTRL);
+ 	} else {
+ 		ls_pcie_ep_setup_bars(pcie->dbi + PCIE_NO_SRIOV_BAR_BASE);
+ 		ls_pcie_ep_setup_atu(pcie);
+diff --git a/drivers/pci/pcie_layerscape.h b/drivers/pci/pcie_layerscape.h
+index 4313e85..16a5b83 100644
+--- a/drivers/pci/pcie_layerscape.h
++++ b/drivers/pci/pcie_layerscape.h
+@@ -74,16 +74,11 @@
+ #define LTSSM_PCIE_DETECT_ACTIVE	0x01 /* L0 state */
+ #define LTSSM_PCIE_L0		0x11 /* L0 state */
+ 
+-#define PCIE_DBI_SIZE		0x100000 /* 1M */
+-
+-#define PCIE_LCTRL0_CFG2_ENABLE	(1 << 31)
+ #define PCIE_LCTRL0_VF(vf)	((vf) << 22)
+ #define PCIE_LCTRL0_PF(pf)	((pf) << 16)
+ #define PCIE_LCTRL0_VF_ACTIVE	(1 << 21)
+-#define PCIE_LCTRL0_VAL(pf, vf)	(PCIE_LCTRL0_PF(pf) |			   \
+-				 PCIE_LCTRL0_VF(vf) |			   \
+-				 ((vf) == 0 ? 0 : PCIE_LCTRL0_VF_ACTIVE) | \
+-				 PCIE_LCTRL0_CFG2_ENABLE)
++#define PCIE_LCTRL0_VAL(vf)	(PCIE_LCTRL0_VF(vf) |			   \
++				 ((vf) == 0 ? 0 : PCIE_LCTRL0_VF_ACTIVE))
+ 
+ #define PCIE_NO_SRIOV_BAR_BASE	0x1000
+ 
+@@ -101,7 +96,7 @@
+ #define PCIE_LUT_ENABLE		(1 << 31)
+ #define PCIE_LUT_ENTRY_COUNT	32
+ 
+-/* PF Controll registers */
++/* PF Control registers */
+ #define PCIE_PF_CONFIG		0x14
+ #define PCIE_PF_VF_CTRL		0x7F8
+ #define PCIE_PF_DBG		0x7FC
+-- 
+1.8.3.1
+

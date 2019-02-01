@@ -1,0 +1,30 @@
+From 7845a82f2856c33ee50b335435f93d14b6f23804 Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Mon, 24 Apr 2017 01:29:52 +0200
+Subject: [PATCH] u-boot: Enable GIC support to permit PCIe EP use on the LS2
+ RDB without config loss
+
+---
+ include/configs/ls2080ardb.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/include/configs/ls2080ardb.h b/include/configs/ls2080ardb.h
+index 57decdc..30c6d84 100644
+--- a/include/configs/ls2080ardb.h
++++ b/include/configs/ls2080ardb.h
+@@ -334,6 +334,12 @@ unsigned long get_board_sys_clk(void);
+ #define CONFIG_CMD_PCI
+ #endif
+ 
++#ifdef CONFIG_CMD_PCI
++#define CONFIG_GICSUPPORT
++#define CONFIG_USE_IRQ
++#define CONFIG_CMD_IRQ
++#endif
++
+ /*  MMC  */
+ #define CONFIG_MMC
+ #ifdef CONFIG_MMC
+-- 
+2.0.4
+

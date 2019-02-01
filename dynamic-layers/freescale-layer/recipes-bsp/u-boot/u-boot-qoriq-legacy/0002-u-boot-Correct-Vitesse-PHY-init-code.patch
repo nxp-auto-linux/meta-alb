@@ -1,0 +1,140 @@
+From 782391e4fba6a712fab59fe77109fe642a0ed92b Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Sun, 23 Apr 2017 21:14:01 +0200
+Subject: [PATCH] u-boot: Correct Vitesse PHY init code
+
+---
+ drivers/net/phy/vitesse.c | 105 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 99 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
+index e5e9922..e95b736 100644
+--- a/drivers/net/phy/vitesse.c
++++ b/drivers/net/phy/vitesse.c
+@@ -269,12 +269,6 @@ static int vsc8664_config(struct phy_device *phydev)
+ {
+ 	u32 val;
+ 
+-	/* Enable MAC interface auto-negotiation */
+-	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS, 0);
+-	val = phy_read(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_EPHY_CON);
+-	val |= (1 << 13);
+-	phy_write(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_EPHY_CON, val);
+-
+ 	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS,
+ 		  PHY_EXT_PAGE_ACCESS_EXTENDED);
+ 	val = phy_read(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_SERDES_AND_SIGDET);
+@@ -282,6 +276,97 @@ static int vsc8664_config(struct phy_device *phydev)
+ 	phy_write(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_SERDES_AND_SIGDET, val);
+ 	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS, 0);
+ 
++	/* Vitesse Spec May 2014  8.2 states that a soft reset needs to
++	 * be issued after setting the LED blink bit
++	 */
++	phy_reset(phydev);
++
++	/* Spec 8.3 states that 100/1000BASE-T Amplitude compensation is
++	 * required
++	 */
++	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS,
++ 	          0x2a30);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 24);
++	val = ((val & 0xfffb) | 0x0003);
++	phy_write(phydev, MDIO_DEVAD_NONE, 24, val);
++	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS, 0);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 24);
++	val = ((val & 0xfff5) | 0x0004);
++	phy_write(phydev, MDIO_DEVAD_NONE, 24, val);
++
++	/* Spec 8.4 states 10BASE-T Performance needs to be made
++	 * robust
++	 */
++	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS,
++	          0x52b5);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x0);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x3f);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x8794);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0xf7);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0xadb4);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x879e);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x0);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x32);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87a0);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x41);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x410);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87a2);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x41);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x410);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87a4);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x41);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x284);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87a6);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x92);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0xbcb8);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87a8);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x3);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0xcfbf);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87aa);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x49);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x2451);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87ac);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x1);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x1410);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87c0);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x10);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0xb498);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87e8);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x71);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0xe7dd);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87ea);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x69);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x6512);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87ec);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x49);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x2451);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87ee);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x45);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x410);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87f0);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x41);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x410);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87f2);
++	phy_write(phydev, MDIO_DEVAD_NONE, 18, 0x0);
++	phy_write(phydev, MDIO_DEVAD_NONE, 17, 0x10);
++	phy_write(phydev, MDIO_DEVAD_NONE, 16, 0x87f4);
++	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS,
++	          0x2a30);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 9);
++	val = ((val & 0xffff) | 0x0040);
++	phy_write(phydev, MDIO_DEVAD_NONE, 9, val);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 22);
++	val = ((val & 0xffff) | 0x0010);
++	phy_write(phydev, MDIO_DEVAD_NONE, 22, val);
++	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS, 0);
++
++
++	/* Enable MAC interface auto-negotiation */
++	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS, 0);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_EPHY_CON);
++	val |= (1 << 13);
++	phy_write(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_EPHY_CON, val);
++
+ 	/* Enable LED blink */
+ 	val = phy_read(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_LED_CON);
+ 	val &= ~(1 << 2);
+@@ -434,7 +519,15 @@ int phy_vitesse_init(void)
+ 	phy_register(&VSC8574_driver);
+ 	phy_register(&VSC8584_driver);
+ 	phy_register(&VSC8514_driver);
++#if 0
++/* VSC8662 appears to be a phantom of VSC8664 and
++ * there is apparently no way to differentiate
++ * between them in software. So we use the proper
++ * VSC8664 initialization for both, and ignore
++ * the rudimentary VSC8662_driver.
++ */
+ 	phy_register(&VSC8662_driver);
++#endif
+ 	phy_register(&VSC8664_driver);
+ 	phy_register(&cis8201_driver);
+ 	phy_register(&cis8204_driver);

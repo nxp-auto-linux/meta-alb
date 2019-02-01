@@ -1,0 +1,207 @@
+From 4128bebdb6b36d7cddb0806a4e42a0f980621165 Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Mon, 24 Apr 2017 01:41:03 +0200
+Subject: [PATCH] u-boot: Fixup random MAC addresses in DPL based on U-Boot
+ config for DPAA2
+
+---
+ drivers/net/fsl-mc/mc.c | 169 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 169 insertions(+)
+
+diff --git a/drivers/net/fsl-mc/mc.c b/drivers/net/fsl-mc/mc.c
+index e85595781b..03f3b8babf 100644
+--- a/drivers/net/fsl-mc/mc.c
++++ b/drivers/net/fsl-mc/mc.c
+@@ -19,6 +19,9 @@
+ #include <fsl-mc/fsl_dpni.h>
+ #include <fsl-mc/fsl_qbman_portal.h>
+ #include <fsl-mc/ldpaa_wriop.h>
++#ifdef CONFIG_DM_ETH
++#include <dm/device.h>
++#endif
+ 
+ #define MC_RAM_BASE_ADDR_ALIGNMENT  (512UL * 1024 * 1024)
+ #define MC_RAM_BASE_ADDR_ALIGNMENT_MASK	(~(MC_RAM_BASE_ADDR_ALIGNMENT - 1))
+@@ -339,6 +342,170 @@ static int load_mc_dpc(u64 mc_ram_addr, size_t mc_ram_size, u64 mc_dpc_addr)
+ 	return 0;
+ }
+ 
++static int mc_dpl_macfixup(void *fdt, const char *path, const char *prop, const uchar *mac)
++{
++	uint32_t mac32[6];
++	int j;
++
++	printf("Fixing up %s with the configured MAC address %02x:%02x:%02x:%02x:%02x:%02x\n", path, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
++
++	/* Preset an FDT representation of our MAC */
++	for (j = 0; j < 6; j++) {
++		mac32[j] = cpu_to_fdt32(mac[j]);
++	}
++
++	/* This is a really UGLY hack. FIX ME! Possibly this should
++	 * not even be done in this function.
++	 * It is a bit of a problem to properly predict the size we
++	 * need to have.
++	 */
++	fdt_increase_size(fdt, 64 + strlen(prop) + sizeof(mac32));
++
++	do_fixup_by_path(fdt, path, prop, mac32, sizeof(mac32), 1);
++	return 0;
++}
++
++static int mc_dpl_checkmac(const void *fdt, const int nodeoffset)
++{
++	int j, len;
++	const struct fdt_property *prop = fdt_get_property(fdt, nodeoffset, "mac_addr", &len);
++	const fdt32_t *mac32fdt = (prop) ? (const fdt32_t *)prop->data : NULL;
++
++	if(len != 6 * sizeof(fdt32_t)) {
++		/* Bad MAC size is no MAC */
++		prop = NULL;
++	}
++
++	if(prop) {
++		/* Check for a non-zero MAC */
++		for (j = 0; j < 6; j++) {
++			if(fdt32_to_cpu(mac32fdt[j])) {
++				break;
++			}
++		}
++		if(j >= 6) {
++			/* Zero MAC is no MAC */
++			prop = NULL;
++		}
++	}
++
++	return prop != NULL;
++}
++
++static int mc_fixup_dpl(u64 dpc_addr)
++{
++	void *blob = (void *)dpc_addr;
++	int i;
++
++	/* We check the MAC setup for up to 16 physical ports.
++	 * If the DPL doesn't contain any useful MAC for a port,
++	 * we try to override it with our understanding of the value.
++	 * DPMACs start counting at 1
++	 */
++	for (i = 1; i < 16; i++) {
++		uchar mac[6];
++
++		/* If we have an env but nothing in the DPL, fixup
++		 * the DPL to mirror the environment.
++		 * eth addresses start at index 0
++		 */
++		if(eth_getenv_enetaddr_by_index("eth", i - 1, mac)) {
++			char dpmacname[20];
++			char dpniname[20];
++			int objoffset, dpmacoffset, dpnioffset = -1, connoffset;
++			int off;
++			int dpmacid;
++
++			objoffset = fdt_path_offset(blob, "/objects");
++			connoffset = fdt_path_offset(blob, "/connections");
++
++			/* Reconstructing the DPMAC id from the eth%d index
++			 * This is a bit weird because we don't have
++			 * eth_get_dev_by_index unfortunately to then deal
++			 * with the alias name. This code is really second
++			 * guessing what is hidden in ldpaa_eth.c, but
++			 * unfortunately, I do not see any other way to get the
++			 * DPMAC back from the eth id.
++			 */
++			dpmacid = i; /* Stupid default */
++#ifdef CONFIG_DM_ETH
++#error The following code is untested!
++			{
++				char ethname[10];
++
++				sprintf(ethname, "eth%d", i - 1);
++				struct udevice *dpmacdev = eth_get_dev_by_name(ethname);
++				if(dpmacdev) {
++					if (!strncmp(dpmacdev->name, "DPMAC", 5) && strlen(dpmacdev->name) > 5) {
++						dpmacid = simple_strtoul(&dpmacdev->name[5], NULL, 10);
++					}
++				}
++			}
++#else
++			{
++				struct eth_device *dpmacdev = eth_get_dev_by_index(i - 1);
++				if(dpmacdev) {
++						if (!strncmp(dpmacdev->name, "DPMAC", 5) && strlen(dpmacdev->name) > 5) {
++							dpmacid = simple_strtoul(&dpmacdev->name[5], NULL, 10);
++						}
++				}
++			}
++#endif
++			sprintf(dpmacname, "dpmac@%d", dpmacid);
++			dpmacoffset = fdt_subnode_offset(blob, objoffset, dpmacname);
++
++			/* Now we need to figure out if there is any
++			 * DPNI connected to this MAC, so we walk the
++			 * connection list
++			 */
++			dpniname[0] = 0;
++			for (off = fdt_first_subnode(blob, connoffset);
++			     off >= 0;
++			     off = fdt_next_subnode(blob, off)) {
++				const char *s1, *s2, *s = NULL;
++				if(fdt_get_string(blob, off, "endpoint1", &s1) >= 0 &&
++				   fdt_get_string(blob, off, "endpoint2", &s2) >= 0) {
++					if(strcmp(s1, dpmacname) == 0) {
++						s = s2;
++					}
++					if(strcmp(s2, dpmacname) == 0) {
++						s = s1;
++					}
++				}
++
++				if(s && strncmp(s, "dpni@", 5) == 0) {
++					printf("Checking connection %s <=> %s\n", s1, s2);
++					strcpy(dpniname, s);
++					dpnioffset = fdt_subnode_offset(blob, objoffset, dpniname);
++					break;
++				}
++			}
++
++
++			if(dpmacoffset >= 0) {
++				int dpmacok = mc_dpl_checkmac(blob, dpmacoffset);
++				int dpniok  = (dpnioffset >= 0) ? mc_dpl_checkmac(blob, dpnioffset) : 0;
++				char fullpath[40];
++
++				if(!dpmacok && !dpniok) {
++					/* No usable MAC in DPL, so we place ours */
++					strcpy(fullpath, "/objects/");
++					strcat(fullpath, dpmacname);
++					mc_dpl_macfixup(blob, fullpath, "mac_addr", mac);
++					if(dpnioffset >= 0) {
++						strcpy(fullpath, "/objects/");
++						strcat(fullpath, dpniname);
++						mc_dpl_macfixup(blob, fullpath, "mac_addr", mac);
++					}
++				}
++			}
++		}
++	}
++	flush_dcache_range(dpc_addr, dpc_addr + fdt_totalsize(blob));
++
++	return 0;
++}
++
+ static int load_mc_dpl(u64 mc_ram_addr, size_t mc_ram_size, u64 mc_dpl_addr)
+ {
+ 	u64 mc_dpl_offset;
+@@ -385,6 +552,8 @@ static int load_mc_dpl(u64 mc_ram_addr, size_t mc_ram_size, u64 mc_dpl_addr)
+ 		      (u64)dpl_fdt_hdr, dpl_size, mc_ram_addr + mc_dpl_offset);
+ #endif /* not defined CONFIG_SYS_LS_MC_DPL_IN_DDR */
+ 
++	if (mc_fixup_dpl(mc_ram_addr + mc_dpl_offset))
++		return -EINVAL;
+ 	dump_ram_words("DPL", (void *)(mc_ram_addr + mc_dpl_offset));
+ 	return 0;
+ }
+-- 
+2.12.2
+

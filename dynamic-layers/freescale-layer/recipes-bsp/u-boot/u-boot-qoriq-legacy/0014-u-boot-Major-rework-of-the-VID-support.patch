@@ -1,0 +1,892 @@
+From 3d3cbe9cf4846b03750fcff9cb19d0c8446b47e4 Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Sat, 13 Jan 2018 19:34:15 +0100
+Subject: [PATCH] u-boot: Major rework of the VID support
+
+The VID code didn't properly read the FUSESR on all chips. It didn't properly
+set the voltages on all chips. It didn't properly support the voltage
+regulators in use by NXP. It didn't properly report voltage changes.
+Finally, the LTC channel use is now configurable to deal properly with
+single and dual channel setups.
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+---
+ .../include/asm/arch-fsl-layerscape/immap_lsch3.h  |  13 +-
+ board/freescale/common/vid.c                       | 508 ++++++++++-----------
+ board/freescale/common/vid.h                       |  27 ++
+ 3 files changed, 270 insertions(+), 278 deletions(-)
+
+diff --git a/arch/arm/include/asm/arch-fsl-layerscape/immap_lsch3.h b/arch/arm/include/asm/arch-fsl-layerscape/immap_lsch3.h
+index 0359b6c..1a7b0c9 100644
+--- a/arch/arm/include/asm/arch-fsl-layerscape/immap_lsch3.h
++++ b/arch/arm/include/asm/arch-fsl-layerscape/immap_lsch3.h
+@@ -203,15 +203,14 @@ struct ccsr_gur {
+ 	u32	gpporcr3;
+ 	u32	gpporcr4;
+ 	u8	res_030[0x60-0x30];
+-#define FSL_CHASSIS3_DCFG_FUSESR_VID_MASK	0x1F
+-#define FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK	0x1F
+-#if defined(CONFIG_ARCH_LS1088A)
+ #define FSL_CHASSIS3_DCFG_FUSESR_VID_SHIFT	25
++#define FSL_CHASSIS3_DCFG_FUSESR_VID_MASK	0x1F
+ #define FSL_CHASSIS3_DCFG_FUSESR_ALTVID_SHIFT	20
+-#else
+-#define FSL_CHASSIS3_DCFG_FUSESR_VID_SHIFT	2
+-#define FSL_CHASSIS3_DCFG_FUSESR_ALTVID_SHIFT	7
+-#endif
++#define FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK	0x1F
++#define FSL_CHASSIS3_DCFG_FUSESR_LOW_VID_SHIFT		2
++#define FSL_CHASSIS3_DCFG_FUSESR_LOW_VID_MASK		0x1F
++#define FSL_CHASSIS3_DCFG_FUSESR_LOW_ALTVID_SHIFT	7
++#define FSL_CHASSIS3_DCFG_FUSESR_LOW_ALTVID_MASK	0x1F
+ 	u32	dcfg_fusesr;	/* Fuse status register */
+ 	u8	res_064[0x70-0x64];
+ 	u32	devdisr;	/* Device disable control 1 */
+diff --git a/board/freescale/common/vid.c b/board/freescale/common/vid.c
+index 810de17..b8faf35 100644
+--- a/board/freescale/common/vid.c
++++ b/board/freescale/common/vid.c
+@@ -41,10 +41,8 @@ int __weak board_adjust_vdd(int vdd)
+ 	return 0;
+ }
+ 
+-#if defined(CONFIG_VOL_MONITOR_IR36021_SET) || \
+-	defined(CONFIG_VOL_MONITOR_IR36021_READ)
+ /*
+- * Get the i2c address configuration for the IR regulator chip
++ * Get the i2c address configuration for the regulator chip
+  *
+  * There are some variance in the RDB HW regarding the I2C address configuration
+  * for the IR regulator chip, which is likely a problem of external resistor
+@@ -55,9 +53,13 @@ int __weak board_adjust_vdd(int vdd)
+  * 0x08 (Verified on T1040RDB-PA,T4240RDB-PB,X-T4240RDB-16GPA)
+  * 0x09 (Verified on T1040RDB-PA)
+  * 0x38 (Verified on T2080QDS, T2081QDS, T4240RDB)
++ *
++ * For other types of regulator chips, we check the IDs before we
++ * return the address to avoid making damaging mistakes
+  */
+-static int find_ir_chip_on_i2c(void)
++static int find_vid_chip_on_i2c(void)
+ {
++#if defined(CONFIG_VOL_MONITOR_IR36021_READ) || defined(CONFIG_VOL_MONITOR_IR36021_SET)
+ 	int i2caddress;
+ 	int ret;
+ 	u8 byte;
+@@ -70,12 +72,28 @@ static int find_ir_chip_on_i2c(void)
+ 		ret = i2c_read(i2caddress,
+ 			       IR36021_MFR_ID_OFFSET, 1, (void *)&byte,
+ 			       sizeof(byte));
+-		if ((ret >= 0) && (byte == IR36021_MFR_ID))
++		if (!ret && (byte == IR36021_MFR_ID))
++			return i2caddress;
++	}
++#endif
++#if defined(CONFIG_VOL_MONITOR_LTC3882)
++	int i2caddress = I2C_VOL_MONITOR_ADDR;
++	int ret;
++	u8 buf[8];
++
++	ret = i2c_read(i2caddress,
++		       LTC3882_MFR_ID, 1, (void *)&buf[0],
++		       4);
++	if (!ret && memcmp(buf, "\3LTC", 4) == 0) {
++		ret = i2c_read(i2caddress,
++			       LTC3882_MFR_MODEL, 1, (void *)&buf[0],
++			       8);
++		if (!ret && memcmp(buf, "\7LTC3882", 8) == 0)
+ 			return i2caddress;
+ 	}
++#endif
+ 	return -1;
+ }
+-#endif
+ 
+ /* Maximum loop count waiting for new voltage to take effect */
+ #define MAX_LOOP_WAIT_NEW_VOL		100
+@@ -94,10 +112,15 @@ static int find_ir_chip_on_i2c(void)
+ #ifdef CONFIG_VOL_MONITOR_INA220
+ #define WAIT_FOR_ADC	532	/* wait for 532 microseconds for ADC */
+ #define ADC_MIN_ACCURACY	4
+-#else
++#endif
++#ifdef CONFIG_VOL_MONITOR_IR36021_READ
+ #define WAIT_FOR_ADC	138	/* wait for 138 microseconds for ADC */
+ #define ADC_MIN_ACCURACY	4
+ #endif
++#ifdef CONFIG_VOL_MONITOR_LTC3882_READ
++#define WAIT_FOR_ADC		0
++#define ADC_MIN_ACCURACY	4
++#endif
+ 
+ #ifdef CONFIG_VOL_MONITOR_INA220
+ static int read_voltage_from_INA220(int i2caddress)
+@@ -107,9 +130,9 @@ static int read_voltage_from_INA220(int i2caddress)
+ 	u8 buf[2];
+ 
+ 	for (i = 0; i < NUM_READINGS; i++) {
+-		ret = i2c_read(I2C_VOL_MONITOR_ADDR,
++		ret = i2c_read(i2caddress,
+ 			       I2C_VOL_MONITOR_BUS_V_OFFSET, 1,
+-			       (void *)&buf, 2);
++			       (void *)&buf[0], 2);
+ 		if (ret) {
+ 			printf("VID: failed to read core voltage\n");
+ 			return ret;
+@@ -152,7 +175,7 @@ static int read_voltage_from_IR(int i2caddress)
+ 			printf("VID: Core voltage sensor error\n");
+ 			return -1;
+ 		}
+-		debug("VID: bus voltage reads 0x%02x\n", vol_mon);
++		debug("VID: Core voltage reads 0x%02x\n", vol_mon);
+ 		/* Resolution is 1/128V. We scale up here to get 1/128mV
+ 		 * and divide at the end
+ 		 */
+@@ -165,37 +188,35 @@ static int read_voltage_from_IR(int i2caddress)
+ 	/* calculate the average */
+ 	voltage_read /= NUM_READINGS;
+ 
+-	/* Compensate for a board specific voltage drop between regulator and
+-	 * SoC before converting into an IR VID value
+-	 */
+-	voltage_read -= board_vdd_drop_compensation();
+-
+ 	return voltage_read;
+ }
+ #endif
+ 
+ #ifdef CONFIG_VOL_MONITOR_LTC3882_READ
+-/* read the current value of the LTC Regulator Voltage */
++/* read the current value of the LTC Regulator Voltage.
++ * This will only read the first channel for dual channel setups */
+ static int read_voltage_from_LTC(int i2caddress)
+ {
+ 	int  ret, vcode = 0;
+-	u8 chan = PWM_CHANNEL0;
++	u8 chan = LTC3882_VID_CHANNEL;
++	u8 buf[2];
+ 
+ 	/* select the PAGE 0 using PMBus commands PAGE for VDD*/
+-	ret = i2c_write(I2C_VOL_MONITOR_ADDR,
+-			PMBUS_CMD_PAGE, 1, &chan, 1);
++	ret = i2c_write(i2caddress,
++			LTC3882_PAGE, 1, &chan, 1);
+ 	if (ret) {
+-		printf("VID: failed to select VDD Page 0\n");
++		printf("VID: failed to select VDD Page\n");
+ 		return ret;
+ 	}
+ 
+ 	/*read the output voltage using PMBus command READ_VOUT*/
+-	ret = i2c_read(I2C_VOL_MONITOR_ADDR,
+-		       PMBUS_CMD_READ_VOUT, 1, (void *)&vcode, 2);
++	ret = i2c_read(i2caddress,
++		       LTC3882_READ_VOUT, 1, (void *)&buf[0], 2);
+ 	if (ret) {
+-		printf("VID: failed to read the volatge\n");
++		printf("VID: failed to read the voltage\n");
+ 		return ret;
+ 	}
++	vcode = (buf[1] << 8) | buf[0];
+ 
+ 	/* Scale down to the real mV as LTC resolution is 1/4096V,rounding up */
+ 	vcode = DIV_ROUND_UP(vcode * 1000, 4096);
+@@ -208,18 +229,25 @@ static int read_voltage(int i2caddress)
+ {
+ 	int voltage_read;
+ #ifdef CONFIG_VOL_MONITOR_INA220
+-	voltage_read = read_voltage_from_INA220(i2caddress);
++	voltage_read = read_voltage_from_INA220(I2C_VOL_MONITOR_ADDR);
+ #elif defined CONFIG_VOL_MONITOR_IR36021_READ
+ 	voltage_read = read_voltage_from_IR(i2caddress);
+ #elif defined CONFIG_VOL_MONITOR_LTC3882_READ
+ 	voltage_read = read_voltage_from_LTC(i2caddress);
+ #else
+-	return -1;
++	voltage_read = -1;
+ #endif
++	if (voltage_read >= 0)
++	{
++		/* Compensate for a board specific voltage drop between regulator and
++		 * SoC before converting into an IR VID value
++		 */
++		voltage_read -= board_vdd_drop_compensation();
++	}
++
+ 	return voltage_read;
+ }
+ 
+-#ifdef CONFIG_VOL_MONITOR_IR36021_SET
+ /*
+  * We need to calculate how long before the voltage stops to drop
+  * or increase. It returns with the loop count. Each loop takes
+@@ -242,6 +270,7 @@ static int wait_for_new_voltage(int vdd, int i2caddress)
+ 	for (timeout = 0;
+ 	     abs(vdd - vdd_current) > (IR_VDD_STEP_UP + IR_VDD_STEP_DOWN) &&
+ 	     timeout < MAX_LOOP_WAIT_NEW_VOL; timeout++) {
++		udelay(1000);
+ 		vdd_current = read_voltage(i2caddress);
+ 	}
+ 	if (timeout >= MAX_LOOP_WAIT_NEW_VOL) {
+@@ -260,18 +289,18 @@ static int wait_for_voltage_stable(int i2caddress)
+ 	int timeout, vdd_current, vdd;
+ 
+ 	vdd = read_voltage(i2caddress);
+-	udelay(NUM_READINGS * WAIT_FOR_ADC);
++	udelay(1000);
+ 
+ 	/* wait until voltage is stable */
+ 	vdd_current = read_voltage(i2caddress);
+ 	/* The maximum timeout is
+-	 * MAX_LOOP_WAIT_VOL_STABLE * NUM_READINGS * WAIT_FOR_ADC
++	 * MAX_LOOP_WAIT_VOL_STABLE * (1000µs + NUM_READINGS * WAIT_FOR_ADC)
+ 	 */
+ 	for (timeout = MAX_LOOP_WAIT_VOL_STABLE;
+ 	     abs(vdd - vdd_current) > ADC_MIN_ACCURACY &&
+ 	     timeout > 0; timeout--) {
+ 		vdd = vdd_current;
+-		udelay(NUM_READINGS * WAIT_FOR_ADC);
++		udelay(1000);
+ 		vdd_current = read_voltage(i2caddress);
+ 	}
+ 	if (timeout == 0)
+@@ -279,22 +308,34 @@ static int wait_for_voltage_stable(int i2caddress)
+ 	return vdd_current;
+ }
+ 
++#ifdef CONFIG_VOL_MONITOR_IR36021_SET
+ /* Set the voltage to the IR chip */
+ static int set_voltage_to_IR(int i2caddress, int vdd)
+ {
+ 	int wait, vdd_last;
+ 	int ret;
+ 	u8 vid;
++	u8 buf;
+ 
+-	/* Compensate for a board specific voltage drop between regulator and
+-	 * SoC before converting into an IR VID value
+-	 */
+-	vdd += board_vdd_drop_compensation();
+-#ifdef CONFIG_FSL_LSCH2
+-	vid = DIV_ROUND_UP(vdd - 265, 5);
+-#else
+-	vid = DIV_ROUND_UP(vdd - 245, 5);
+-#endif
++	/* check if IR chip works in Intel mode*/
++	ret = i2c_read(i2caddress,
++		       IR36021_INTEL_MODE_OOFSET,
++		       1, (void *)&buf, 1);
++	if (ret) {
++		printf("VID: failed to read IR chip mode.\n");
++		return -1;
++	}
++	if ((buf & IR36021_MODE_MASK) != IR36021_INTEL_MODE) {
++		/* AMD SVI2 mode. */
++		/* An increase by 5 in the VID value causes a decrease
++		 * by 4/128V in the output rail, -6.25mV per step.
++		 * The scale appears to be 0V based starting from 0xf8.
++		 */
++		vid = 248 - DIV_ROUND_UP(vdd * 4, 25);
++	} else {
++		/* Intel mode */
++		vid = DIV_ROUND_UP(vdd - 245, 5);
++	}
+ 
+ 	ret = i2c_write(i2caddress, IR36021_LOOP1_MANUAL_ID_OFFSET,
+ 			1, (void *)&vid, sizeof(vid));
+@@ -305,7 +346,7 @@ static int set_voltage_to_IR(int i2caddress, int vdd)
+ 	wait = wait_for_new_voltage(vdd, i2caddress);
+ 	if (wait < 0)
+ 		return -1;
+-	debug("VID: Waited %d us\n", wait * NUM_READINGS * WAIT_FOR_ADC);
++	debug("VID: Waited %d us\n", wait * (1000 + NUM_READINGS * WAIT_FOR_ADC));
+ 
+ 	vdd_last = wait_for_voltage_stable(i2caddress);
+ 	if (vdd_last < 0)
+@@ -313,14 +354,51 @@ static int set_voltage_to_IR(int i2caddress, int vdd)
+ 	debug("VID: Current voltage is %d mV\n", vdd_last);
+ 	return vdd_last;
+ }
++#endif
+ 
++#if defined(CONFIG_VOL_MONITOR_LTC3882_SET)
++/* Helper function to write a mV value as LTC L16 into the chip,
++ * returning a boolean for success */
++static int write_l16_mV_LTC3882(int i2caddress, int cmd, int mv)
++{
++	int l16;
++	int ret;
++	u8 buf[5];
++
++	/* Scale mV to L16 */
++	l16 = mv;
++	l16 <<= 12;
++	l16 /= 1000;
++	debug("VID: cmd 0x%02x voltage write 0x%04x\n", cmd, l16);
++	buf[0] = 4;
++	buf[1] = LTC3882_VID_CHANNEL;
++	buf[2] = LTC3882_VOUT_COMMAND;
++	buf[3] = (l16 & 0xff);
++	buf[4] = (l16 >> 8);
++
++	/* This code assumes that both channels run the very
++	 * SAME voltage. This is likely true for LS2 style
++	 * devices. For any other configuration, all hell will
++	 * break loose!
++	 */
++	ret = i2c_write(i2caddress,
++			LTC3882_PAGE_PLUS_WRITE, 1, (void *)&buf, 5);
++#ifdef LTC3882_VID_CHANNEL2
++	if (!ret) {
++		buf[1] = LTC3882_VID_CHANNEL2;
++		ret = i2c_write(i2caddress,
++				LTC3882_PAGE_PLUS_WRITE, 1, (void *)&buf, 5);
++	}
++#endif
++	return ret;
++}
+ #endif
+ 
+ #ifdef CONFIG_VOL_MONITOR_LTC3882_SET
+ /* this function sets the VDD and returns the value set */
+ static int set_voltage_to_LTC(int i2caddress, int vdd)
+ {
+-	int ret, vdd_last, vdd_target = vdd;
++	int wait, ret, vdd_last;
+ 
+ 	/* Scale up to the LTC resolution is 1/4096V */
+ 	vdd = (vdd * 4096) / 1000;
+@@ -328,25 +406,25 @@ static int set_voltage_to_LTC(int i2caddress, int vdd)
+ 	/* 5-byte buffer which needs to be sent following the
+ 	 * PMBus command PAGE_PLUS_WRITE.
+ 	 */
+-	u8 buff[5] = {0x04, PWM_CHANNEL0, PMBUS_CMD_VOUT_COMMAND,
++	u8 buff[5] = {0x04, LTC3882_VID_CHANNEL, LTC3882_VOUT_COMMAND,
+ 			vdd & 0xFF, (vdd & 0xFF00) >> 8};
+ 
+ 	/* Write the desired voltage code to the regulator */
+-	ret = i2c_write(I2C_VOL_MONITOR_ADDR,
+-			PMBUS_CMD_PAGE_PLUS_WRITE, 1, (void *)&buff, 5);
++	ret = i2c_write(i2caddress,
++			LTC3882_PAGE_PLUS_WRITE, 1, (void *)&buff, 5);
+ 	if (ret) {
+-		printf("VID: I2C failed to write to the volatge regulator\n");
++		printf("VID: I2C failed to write to the voltage regulator\n");
+ 		return -1;
+ 	}
+ 
+-	/* Wait for the volatge to get to the desired value */
+-	do {
+-		vdd_last = read_voltage_from_LTC(i2caddress);
+-		if (vdd_last < 0) {
+-			printf("VID: Couldn't read sensor abort VID adjust\n");
+-			return -1;
+-		}
+-	} while (vdd_last != vdd_target);
++	/* Wait for the voltage to get to the desired value */
++	wait = wait_for_new_voltage(vdd, i2caddress);
++	if (wait < 0)
++		return -1;
++
++	vdd_last = wait_for_voltage_stable(i2caddress);
++	if (vdd_last < 0)
++		return -1;
+ 	return vdd_last;
+ }
+ #endif
+@@ -355,6 +433,10 @@ static int set_voltage(int i2caddress, int vdd)
+ {
+ 	int vdd_last = -1;
+ 
++	/* Compensate for a board specific voltage drop between regulator and
++	 * SoC before converting into a VID value
++	 */
++	vdd += board_vdd_drop_compensation();
+ #ifdef CONFIG_VOL_MONITOR_IR36021_SET
+ 	vdd_last = set_voltage_to_IR(i2caddress, vdd);
+ #elif defined CONFIG_VOL_MONITOR_LTC3882_SET
+@@ -365,221 +447,103 @@ static int set_voltage(int i2caddress, int vdd)
+ 	return vdd_last;
+ }
+ 
+-#ifdef CONFIG_FSL_LSCH3
+-int adjust_vdd(ulong vdd_override)
++#if defined(CONFIG_FSL_LSCH3)
++static bool soc_has_lowbitsinfusesr(struct ccsr_gur *gur)
+ {
+-	int re_enable = disable_interrupts();
+-	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+-	u32 fusesr;
+-#if defined(CONFIG_VOL_MONITOR_IR36021_SET) || \
+-	defined(CONFIG_VOL_MONITOR_IR36021_READ)
+-	u8 vid, buf;
+-#else
+-	u8 vid;
+-#endif
+-	int vdd_target, vdd_current, vdd_last;
+-	int ret, i2caddress;
+-	unsigned long vdd_string_override;
+-	char *vdd_string;
+-	static const uint16_t vdd[32] = {
+-#ifdef CONFIG_ARCH_LS1088A
+-		10250,
+-		9875,
+-#else
+-		10500,
+-		0,      /* reserved */
+-#endif
+-		9750,
+-		0,      /* reserved */
+-#ifdef CONFIG_ARCH_LS1088A
+-		0,      /* reserved */
+-#else
+-		9500,
+-#endif
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-#ifdef CONFIG_ARCH_LS1088A
+-		9000,
+-#else
+-		0,      /* reserved */
+-#endif
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		10000,  /* 1.0000V */
+-#ifdef CONFIG_ARCH_LS1088A
+-		10125,
+-#else
+-		0,      /* reserved */
+-#endif
+-		10250,
+-		0,      /* reserved */
+-#ifdef CONFIG_ARCH_LS1088A
+-		0,      /* reserved */
+-#else
+-		10500,
+-#endif
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-		0,      /* reserved */
+-	};
+-	struct vdd_drive {
+-		u8 vid;
+-		unsigned voltage;
+-	};
++	u32 svr = in_le32(&gur->svr);
+ 
+-	ret = i2c_multiplexer_select_vid_channel(I2C_MUX_CH_VOL_MONITOR);
+-	if (ret) {
+-		debug("VID: I2C failed to switch channel\n");
+-		ret = -1;
+-		goto exit;
+-	}
+-#if defined(CONFIG_VOL_MONITOR_IR36021_SET) || \
+-	defined(CONFIG_VOL_MONITOR_IR36021_READ)
+-	ret = find_ir_chip_on_i2c();
+-	if (ret < 0) {
+-		printf("VID: Could not find voltage regulator on I2C.\n");
+-		ret = -1;
+-		goto exit;
+-	} else {
+-		i2caddress = ret;
+-		debug("VID: IR Chip found on I2C address 0x%02x\n", i2caddress);
++	/* LS2088A derivatives have different FUSESR */
++	switch(SVR_SOC_VER(svr)) {
++		case SVR_LS2088A:
++		case SVR_LS2048A:
++		case SVR_LS2084A:
++		case SVR_LS2044A:
++			return true;
+ 	}
+ 
+-	/* check IR chip work on Intel mode*/
+-	ret = i2c_read(i2caddress,
+-		       IR36021_INTEL_MODE_OOFSET,
+-		       1, (void *)&buf, 1);
+-	if (ret) {
+-		printf("VID: failed to read IR chip mode.\n");
+-		ret = -1;
+-		goto exit;
+-	}
+-	if ((buf & IR36021_MODE_MASK) != IR36021_INTEL_MODE) {
+-		printf("VID: IR Chip is not used in Intel mode.\n");
+-		ret = -1;
+-		goto exit;
+-	}
++	return false;
++}
+ #endif
+ 
+-	/* get the voltage ID from fuse status register */
+-	fusesr = in_le32(&gur->dcfg_fusesr);
+-	vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_ALTVID_SHIFT) &
+-		FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK;
+-	if ((vid == 0) || (vid == FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK)) {
+-		vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_VID_SHIFT) &
+-			FSL_CHASSIS3_DCFG_FUSESR_VID_MASK;
+-	}
+-	vdd_target = vdd[vid];
+-
+-	/* check override variable for overriding VDD */
+-	vdd_string = getenv(CONFIG_VID_FLS_ENV);
+-	if (vdd_override == 0 && vdd_string &&
+-	    !strict_strtoul(vdd_string, 10, &vdd_string_override))
+-		vdd_override = vdd_string_override;
+-
+-	if (vdd_override >= VDD_MV_MIN && vdd_override <= VDD_MV_MAX) {
+-		vdd_target = vdd_override * 10; /* convert to 1/10 mV */
+-		debug("VDD override is %lu\n", vdd_override);
+-	} else if (vdd_override != 0) {
+-		printf("Invalid value.\n");
+-	}
++int vid_set_mv_limits(int absmax,
++                      int marginhigh, int marginlow,
++                      int ovfault, int ovwarn,
++                      int uvwarn, int uvfault)
++{
++	int ret;
++	int i2caddress;
+ 
+-	/* divide and round up by 10 to get a value in mV */
+-	vdd_target = DIV_ROUND_UP(vdd_target, 10);
+-	if (vdd_target == 0) {
+-		debug("VID: VID not used\n");
+-		ret = 0;
+-		goto exit;
+-	} else if (vdd_target < VDD_MV_MIN || vdd_target > VDD_MV_MAX) {
+-		/* Check vdd_target is in valid range */
+-		printf("VID: Target VID %d mV is not in range.\n",
+-		       vdd_target);
+-		ret = -1;
+-		goto exit;
+-	} else {
+-		debug("VID: vid = %d mV\n", vdd_target);
++	ret = i2c_multiplexer_select_vid_channel(I2C_MUX_CH_VOL_MONITOR);
++	if (ret) {
++		debug("VID: I2C failed to switch channel\n");
++		return ret;
+ 	}
++	i2caddress = find_vid_chip_on_i2c();
+ 
+-	/*
+-	 * Read voltage monitor to check real voltage.
+-	 */
+-	vdd_last = read_voltage(i2caddress);
+-	if (vdd_last < 0) {
+-		printf("VID: Couldn't read sensor abort VID adjustment\n");
++#if defined(CONFIG_VOL_MONITOR_LTC3882_SET)
++	if (i2caddress >= 0) {
++		/* We need to program the voltage limits
++		 * properly, or the chip may freak out on
++		 * VID changes. 
++		 */
++		ret = write_l16_mV_LTC3882(i2caddress,
++					   LTC3882_VOUT_MAX,
++					   absmax);
++		if (!ret)
++			ret = write_l16_mV_LTC3882(i2caddress,
++						   LTC3882_VOUT_MARGIN_HIGH,
++						   marginhigh);
++		if (!ret)
++			ret = write_l16_mV_LTC3882(i2caddress,
++						   LTC3882_VOUT_MARGIN_LOW,
++						   marginlow);
++		if (!ret)
++			ret = write_l16_mV_LTC3882(i2caddress,
++						   LTC3882_VOUT_OV_FAULT_LIMIT,
++						   ovfault);
++		if (!ret)
++			ret = write_l16_mV_LTC3882(i2caddress,
++						   LTC3882_VOUT_OV_WARN_LIMIT,
++						   ovwarn);
++		if (!ret)
++			ret = write_l16_mV_LTC3882(i2caddress,
++						   LTC3882_VOUT_UV_WARN_LIMIT,
++						   uvwarn);
++		if (!ret)
++			ret = write_l16_mV_LTC3882(i2caddress,
++						   LTC3882_VOUT_UV_FAULT_LIMIT,
++						   uvfault);
++	} else
+ 		ret = -1;
+-		goto exit;
+-	}
+-	vdd_current = vdd_last;
+-	debug("VID: Core voltage is currently at %d mV\n", vdd_last);
+-
+-#ifdef CONFIG_VOL_MONITOR_LTC3882_SET
+-	/* Set the target voltage */
+-	vdd_last = vdd_current = set_voltage(i2caddress, vdd_target);
+-#else
+-	/*
+-	  * Adjust voltage to at or one step above target.
+-	  * As measurements are less precise than setting the values
+-	  * we may run through dummy steps that cancel each other
+-	  * when stepping up and then down.
+-	  */
+-	while (vdd_last > 0 &&
+-	       vdd_last < vdd_target) {
+-		vdd_current += IR_VDD_STEP_UP;
+-		vdd_last = set_voltage(i2caddress, vdd_current);
+-	}
+-	while (vdd_last > 0 &&
+-	       vdd_last > vdd_target + (IR_VDD_STEP_DOWN - 1)) {
+-		vdd_current -= IR_VDD_STEP_DOWN;
+-		vdd_last = set_voltage(i2caddress, vdd_current);
+-	}
+-
+ #endif
+-	if (board_adjust_vdd(vdd_target) < 0) {
+-		ret = -1;
+-		goto exit;
+-	}
++	if (ret)
++		printf("VID: Setting voltage limits failed! VID regulation may not be stable!\n");
+ 
+-	if (vdd_last > 0)
+-		printf("VID: Core voltage after adjustment is at %d mV\n",
+-		       vdd_last);
+-	else
+-		ret = -1;
+-exit:
+-	if (re_enable)
+-		enable_interrupts();
+ 	i2c_multiplexer_select_vid_channel(I2C_MUX_CH_DEFAULT);
++
+ 	return ret;
+ }
+-#else /* !CONFIG_FSL_LSCH3 */
++
+ int adjust_vdd(ulong vdd_override)
+ {
+ 	int re_enable = disable_interrupts();
+-#if defined(CONFIG_FSL_LSCH2)
++#if defined(CONFIG_FSL_LSCH2) || defined(CONFIG_FSL_LSCH3)
+ 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+ #else
+ 	ccsr_gur_t __iomem *gur =
+ 		(void __iomem *)(CONFIG_SYS_MPC85xx_GUTS_ADDR);
+ #endif
+ 	u32 fusesr;
+-	u8 vid, buf;
++	u8 vid;
+ 	int vdd_target, vdd_current, vdd_last;
+ 	int ret, i2caddress;
+ 	unsigned long vdd_string_override;
+ 	char *vdd_string;
++	/* Note that these are all possible values for the FUSESR
++	 * register. Specific SoCs will only ever reference their
++	 * own subset. Manual overrides can be used for settings
++	 * outside the specification and need to be used carefully.
++	 */
+ 	static const uint16_t vdd[32] = {
+ 		0,      /* unused */
+ 		9875,   /* 0.9875V */
+@@ -619,36 +583,22 @@ int adjust_vdd(ulong vdd_override)
+ 		ret = -1;
+ 		goto exit;
+ 	}
+-#if defined(CONFIG_VOL_MONITOR_IR36021_SET) || \
+-	defined(CONFIG_VOL_MONITOR_IR36021_READ)
+-	ret = find_ir_chip_on_i2c();
++	ret = find_vid_chip_on_i2c();
+ 	if (ret < 0) {
+ 		printf("VID: Could not find voltage regulator on I2C.\n");
+ 		ret = -1;
+ 		goto exit;
+ 	} else {
+ 		i2caddress = ret;
+-		debug("VID: IR Chip found on I2C address 0x%02x\n", i2caddress);
+-	}
+-
+-	/* check IR chip work on Intel mode*/
+-	ret = i2c_read(i2caddress,
+-		       IR36021_INTEL_MODE_OOFSET,
+-		       1, (void *)&buf, 1);
+-	if (ret) {
+-		printf("VID: failed to read IR chip mode.\n");
+-		ret = -1;
+-		goto exit;
+-	}
+-	if ((buf & IR36021_MODE_MASK) != IR36021_INTEL_MODE) {
+-		printf("VID: IR Chip is not used in Intel mode.\n");
+-		ret = -1;
+-		goto exit;
++		debug("VID: Voltage regulator found on I2C address 0x%02x\n", i2caddress);
+ 	}
+-#endif
+ 
+ 	/* get the voltage ID from fuse status register */
++#ifdef CONFIG_FSL_LSCH3
++	fusesr = in_le32(&gur->dcfg_fusesr);
++#else
+ 	fusesr = in_be32(&gur->dcfg_fusesr);
++#endif
+ 	/*
+ 	 * VID is used according to the table below
+ 	 *                ---------------------------------------
+@@ -673,6 +623,22 @@ int adjust_vdd(ulong vdd_override)
+ 		vid = (fusesr >> FSL_CHASSIS2_DCFG_FUSESR_VID_SHIFT) &
+ 			FSL_CHASSIS2_DCFG_FUSESR_VID_MASK;
+ 	}
++#elif defined(CONFIG_FSL_LSCH3)
++	if(soc_has_lowbitsinfusesr(gur)) {
++		vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_LOW_ALTVID_SHIFT) &
++			FSL_CHASSIS3_DCFG_FUSESR_LOW_ALTVID_MASK;
++		if ((vid == 0) || (vid == FSL_CHASSIS3_DCFG_FUSESR_LOW_ALTVID_MASK)) {
++			vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_LOW_VID_SHIFT) &
++				FSL_CHASSIS3_DCFG_FUSESR_LOW_VID_MASK;
++		}
++	} else {
++		vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_ALTVID_SHIFT) &
++			FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK;
++		if ((vid == 0) || (vid == FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK)) {
++			vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_VID_SHIFT) &
++				FSL_CHASSIS3_DCFG_FUSESR_VID_MASK;
++		}
++	}
+ #else
+ 	vid = (fusesr >> FSL_CORENET_DCFG_FUSESR_ALTVID_SHIFT) &
+ 		FSL_CORENET_DCFG_FUSESR_ALTVID_MASK;
+@@ -692,7 +658,7 @@ int adjust_vdd(ulong vdd_override)
+ 		vdd_target = vdd_override * 10; /* convert to 1/10 mV */
+ 		debug("VDD override is %lu\n", vdd_override);
+ 	} else if (vdd_override != 0) {
+-		printf("Invalid value.\n");
++		printf("VID: Invalid override value %lu mV.\n", vdd_override);
+ 	}
+ 	if (vdd_target == 0) {
+ 		debug("VID: VID not used\n");
+@@ -701,7 +667,7 @@ int adjust_vdd(ulong vdd_override)
+ 	} else {
+ 		/* divide and round up by 10 to get a value in mV */
+ 		vdd_target = DIV_ROUND_UP(vdd_target, 10);
+-		debug("VID: vid = %d mV\n", vdd_target);
++		printf("VID: SoC target voltage = %d mV\n", vdd_target);
+ 	}
+ 
+ 	/*
+@@ -722,19 +688,23 @@ int adjust_vdd(ulong vdd_override)
+ 	  * when stepping up and then down.
+ 	  */
+ 	while (vdd_last > 0 &&
+-	       vdd_last < vdd_target) {
++	       vdd_last < vdd_target &&
++	       vdd_current < vdd_target) {
+ 		vdd_current += IR_VDD_STEP_UP;
+ 		vdd_last = set_voltage(i2caddress, vdd_current);
+ 	}
+ 	while (vdd_last > 0 &&
+-	       vdd_last > vdd_target + (IR_VDD_STEP_DOWN - 1)) {
++	       vdd_last > vdd_target + (IR_VDD_STEP_DOWN - 1) &&
++	       vdd_current > vdd_target + (IR_VDD_STEP_DOWN - 1)) {
+ 		vdd_current -= IR_VDD_STEP_DOWN;
+ 		vdd_last = set_voltage(i2caddress, vdd_current);
+ 	}
+ 
+-	if (vdd_last > 0)
++	if (vdd_last > 0) {
+ 		printf("VID: Core voltage after adjustment is at %d mV\n",
+ 		       vdd_last);
++		ret = 0;
++	}
+ 	else
+ 		ret = -1;
+ exit:
+@@ -745,7 +715,6 @@ exit:
+ 
+ 	return ret;
+ }
+-#endif
+ 
+ static int print_vdd(void)
+ {
+@@ -753,20 +722,17 @@ static int print_vdd(void)
+ 
+ 	ret = i2c_multiplexer_select_vid_channel(I2C_MUX_CH_VOL_MONITOR);
+ 	if (ret) {
+-		debug("VID : I2c failed to switch channel\n");
++		debug("VID : I2C failed to switch channel\n");
+ 		return -1;
+ 	}
+-#if defined(CONFIG_VOL_MONITOR_IR36021_SET) || \
+-	defined(CONFIG_VOL_MONITOR_IR36021_READ)
+-	ret = find_ir_chip_on_i2c();
++	ret = find_vid_chip_on_i2c();
+ 	if (ret < 0) {
+ 		printf("VID: Could not find voltage regulator on I2C.\n");
+ 		goto exit;
+ 	} else {
+ 		i2caddress = ret;
+-		debug("VID: IR Chip found on I2C address 0x%02x\n", i2caddress);
++		debug("VID: Chip found on I2C address 0x%02x\n", i2caddress);
+ 	}
+-#endif
+ 
+ 	/*
+ 	 * Read voltage monitor to check real voltage.
+diff --git a/board/freescale/common/vid.h b/board/freescale/common/vid.h
+index 9182c20..7fc2090 100644
+--- a/board/freescale/common/vid.h
++++ b/board/freescale/common/vid.h
+@@ -7,6 +7,7 @@
+ #ifndef __VID_H_
+ #define __VID_H_
+ 
++/* Declarations for the IR36021 */
+ #define IR36021_LOOP1_MANUAL_ID_OFFSET	0x6A
+ #define IR36021_LOOP1_VOUT_OFFSET	0x9A
+ #define IR36021_MFR_ID_OFFSET		0x92
+@@ -16,9 +17,35 @@
+ #define IR36021_INTEL_MODE		0x00
+ #define IR36021_AMD_MODE		0x20
+ 
++/* Declarations for the LTC3882 */
++#define LTC3882_PAGE			0x00
++#define LTC3882_PAGE_PLUS_WRITE		0x05
++#define LTC3882_PAGE_PLUS_READ		0x06
++#define LTC3882_VOUT_COMMAND		0x21
++#define LTC3882_VOUT_MAX		0x24
++#define LTC3882_VOUT_MARGIN_HIGH	0x25
++#define LTC3882_VOUT_MARGIN_LOW		0x26
++#define LTC3882_VOUT_OV_FAULT_LIMIT	0x40
++#define LTC3882_VOUT_OV_WARN_LIMIT	0x42
++#define LTC3882_VOUT_UV_WARN_LIMIT	0x43
++#define LTC3882_VOUT_UV_FAULT_LIMIT	0x44
++#define LTC3882_READ_VOUT		0x8B
++#define LTC3882_MFR_ID			0x99
++#define LTC3882_MFR_MODEL		0x9A
++
++/* This is a compatibility setting for existing board configs */
++#ifdef PWM_CHANNEL0
++#define LTC3882_VID_CHANNEL	PWM_CHANNEL0
++#endif
++
+ /* step the IR regulator in 5mV increments */
+ #define IR_VDD_STEP_DOWN		5
+ #define IR_VDD_STEP_UP			5
++
++int vid_set_mv_limits(int absmax,
++                      int marginhigh, int marginlow,
++                      int ovfault, int ovwarn,
++                      int uvwarn, int uvfault);
+ int adjust_vdd(ulong vdd_override);
+ 
+ #endif  /* __VID_H_ */
+-- 
+1.8.3.1
+

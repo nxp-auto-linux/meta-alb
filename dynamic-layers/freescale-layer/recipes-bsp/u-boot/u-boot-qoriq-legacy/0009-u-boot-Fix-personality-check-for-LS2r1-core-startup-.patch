@@ -1,0 +1,26 @@
+From 31f9ad9389f422c2c8e928ed61b5e96b4e6746db Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Sun, 23 Apr 2017 21:50:30 +0200
+Subject: [PATCH 09/17] u-boot: Fix personality check for LS2r1 core startup
+ method
+
+---
+ arch/arm/cpu/armv8/fsl-layerscape/mp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/cpu/armv8/fsl-layerscape/mp.c b/arch/arm/cpu/armv8/fsl-layerscape/mp.c
+index 1d33e74d10..fb92223d3c 100644
+--- a/arch/arm/cpu/armv8/fsl-layerscape/mp.c
++++ b/arch/arm/cpu/armv8/fsl-layerscape/mp.c
+@@ -98,7 +98,7 @@ int fsl_layerscape_wake_seconday_cores(void)
+ 
+ 	svr = gur_in32(&gur->svr);
+ 	ver = SVR_SOC_VER(svr);
+-	if (ver == SVR_LS2080A || ver == SVR_LS2085A) {
++	if (ver == SVR_LS2080A || ver == SVR_LS2040A || ver == SVR_LS2045A || ver == SVR_LS2085A) {
+ 		gur_out32(&gur->scratchrw[6], 1);
+ 		asm volatile("dsb st" : : : "memory");
+ 		rst->brrl = cores;
+-- 
+2.12.2
+

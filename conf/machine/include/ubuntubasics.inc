@@ -1,3 +1,17 @@
+# We have recipies for:
+# - 16.04.5
+# - 18.04.1
+UBUNTU_TARGET_VERSION ?= "16.04.3"
+#UBUNTU_TARGET_VERSION ?= "18.04.1"
+
+UBUNTU_TARGET_BASEVERSION ?= "${@os.path.splitext(d.getVar('UBUNTU_TARGET_VERSION', True))[0]}"
+UBUNTU_TARGET_SUBVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[2]}"
+PREFERRED_VERSION_ubuntu-base = "${UBUNTU_TARGET_VERSION}"
+
+# I am sure there are smarter ways to map the architecture. This works
+# initially. FIX
+UBUNTU_TARGET_ARCH="${@d.getVar('TARGET_ARCH', True).replace("aarch64", "arm64")}"
+
 # Downconfigure Yocto environment to not pull in local things
 IMAGE_LINGUAS = ""
 SDK_RDEPENDS = ""
@@ -12,6 +26,14 @@ HOSTTOOLS += "chroot"
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"
 
+# When creating images, we would like to preserve any extended
+# attributes that are part of our rootfs
+IMAGE_CMD_TAR = "tar --xattrs --xattrs-include=*"
+do_image_tar[depends] += "tar-replacement-native:do_populate_sysroot"
+EXTRANATIVEPATH += "tar-native"
+
+# We influence the setup to match Ubuntu more properly as otherwise
+# Yocto behavior may conflict with the Ubuntu rootfs.
 DISTRO_FEATURES_remove = "sysvinit"
 DISTRO_FEATURES_append = " systemd"
 DISTRO_FEATURES_append += "docker"
@@ -30,7 +52,7 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 # The respective Ubuntu image must then install the Ubuntu version of
 # the recipe.
 require conf/machine/include/nodistropackage.inc
-DISTRO_NEVER_WRITE_PACKAGE = "\
+DISTRO_NEVER_WRITE_PACKAGE += "\
 	alsa-conf \
 	alsa-lib \
 	update-alternatives \
@@ -38,56 +60,35 @@ DISTRO_NEVER_WRITE_PACKAGE = "\
 	base-files \
 	bc \
 	bluez5 \
+	bzip2 \
 	coreutils \
 	db \
 	dpkg \
+	flex \
 	glibc \
 	glibc-locale \
 	gcc-runtime \
+	gdbm \
 	initscripts \
 	libffi \
 	libgcc \
 	liblzma \
 	libpam \
+	libsqlite3 \
+	m4 \
 	ncurses \
 	netbase \
 	opkg-utils \
 	perl \
+	python3 \
+	qemuwrapper-cross \
+	sqlite3 \
 	readline \
 	util-linux \
 	xz \
 	zlib \
 "
-
-PREFERRED_PROVIDER_bzip2="ubuntu-base"
-PREFERRED_PROVIDER_python3="ubuntu-base"
-
-# Avoid the warning reporting for recipes that RDEPENDS on ubuntu-base
-# The workaround is to INSANE_SKIP build-deps for these recipes
-require conf/machine/include/set_insane_skip.inc
-SET_INSANE_SKIP_VALUE = " build-deps "
-SET_INSANE_SKIP_LIST = "\
-	flex \
-	sqlite3 \
-	db-bin \
-	ncurses \
-	ncurses-libticw \
-	ncurses-libpanel \
-	ncurses-libncurses \
-	ncurses-libncursesw \
-	ncurses-libpanelw \
-	ncurses-libformw \
-	ncurses-libtic \
-	ncurses-libmenu \
-	ncurses-libmenuw \
-	ncurses-libform \
-	ncurses-tools \
-	openssl \
-	python3 \
-	python3-ctypes \
-	python3-misc \
-	python3-sqlite3 \
-	python3-curses \
-"
+# All the runtime above should come from ubuntu-base
+DISTRO_DEFAULT_RPROVIDER = "ubuntu-base"
 
 require conf/machine/include/ubuntutcconf.inc

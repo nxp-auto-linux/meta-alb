@@ -22,6 +22,11 @@ SRC_URI += "\
 	file://0004-linux-user-mmap.c-handle-invalid-len-maps-correctly.patch \
 	file://0005-linux-user-syscall.c-target_mmap-was-called-with-0-f.patch \
 	file://0006-linux-user-elfload.c-Allocate-beyond-the-host-proces.patch \
+\
+	file://0001-qemu-user-Several-builtin-strace-dump-deficiencies-f.patch \
+	file://0002-linux-user-syscall-getsockopt-robustness-increased.patch \
+	file://0003-qemu-user-Loading-an-elf-broke-the-heap-for-that-elf.patch \
+	file://0001-qemu-user-Improved-diagnostic-output-for-unexpected-.patch \
 "
 
 QEMU_TARGETS += "ppc64"

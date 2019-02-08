@@ -15,10 +15,10 @@ Subject: [PATCH] u-boot: First attempt to add GIC support for ARMv8, needed
  create mode 100644 arch/arm/include/asm/gicsupport.h
 
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 2cf2291ca7..54b9cc3562 100644
+index 12aba9d..006dab4 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
-@@ -33,4 +33,14 @@ config ARMV8_SPIN_TABLE
+@@ -41,6 +41,16 @@ config ARMV8_SPIN_TABLE
  	    - Reserve the code for the spin-table and the release address
  	      via a /memreserve/ region in the Device Tree.
  
@@ -32,7 +32,9 @@ index 2cf2291ca7..54b9cc3562 100644
 +	  mode need supporting interrupt handlers to function correctly.
 +	  This setting is required for configurations with such drivers.
 +
- endif
+ menu "ARMv8 secure monitor firmware"
+ config ARMV8_SEC_FIRMWARE_SUPPORT
+ 	bool "Enable ARMv8 secure monitor firmware framework support"
 diff --git a/arch/arm/cpu/armv8/Makefile b/arch/arm/cpu/armv8/Makefile
 index c447085..d61adf8 100644
 --- a/arch/arm/cpu/armv8/Makefile
@@ -438,7 +440,7 @@ index 0000000..2b854ae
 +#endif
 diff --git a/arch/arm/include/asm/gicsupport.h b/arch/arm/include/asm/gicsupport.h
 new file mode 100644
-index 0000000..3494bab
+index 0000000..6ecc997
 --- /dev/null
 +++ b/arch/arm/include/asm/gicsupport.h
 @@ -0,0 +1,11 @@

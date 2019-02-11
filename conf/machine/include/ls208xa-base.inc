@@ -41,7 +41,3 @@ IMAGE_CLASSES += "image_types_fsl_itb image_types_fsl_flashimage"
 # Temporarily keep the legacy u-boot 2017.09 while
 # the switch to sumo branch is in progress
 PREFERRED_VERSION_u-boot-qoriq = "2017.09+fslgit"
-
-# Temporarily keep the current kernel 4.9 while
-# the switch to sumo branch is in progress
-PREFERRED_VERSION_linux-qoriq = "4.9"

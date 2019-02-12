@@ -1,0 +1,47 @@
+From fc4086fc59cd07fde7a463bf62266902dde255c0 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 4 Jan 2019 07:07:42 +0100
+Subject: [PATCH 4/6] linux-user/mmap.c: handle invalid len maps correctly
+
+Verbatim backport of
+https://github.com/qemu/qemu/commit/38138fab93584ad3560ddfcd70efbd5bb6b4a6f0#diff-2bf4728e0473404c39c97190bd02b2f8
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ linux-user/mmap.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 84b15c9..f29caa1 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -392,14 +392,23 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+     }
+ #endif
+ 
+-    if (offset & ~TARGET_PAGE_MASK) {
++    if (!len) {
+         errno = EINVAL;
+         goto fail;
+     }
+ 
++    /* Also check for overflows... */
+     len = TARGET_PAGE_ALIGN(len);
+-    if (len == 0)
+-        goto the_end;
++    if (!len) {
++        errno = ENOMEM;
++        goto fail;
++    }
++
++    if (offset & ~TARGET_PAGE_MASK) {
++        errno = EINVAL;
++        goto fail;
++    }
++
+     real_start = start & qemu_host_page_mask;
+     host_offset = offset & qemu_host_page_mask;
+ 
+-- 
+1.8.3.1
+

@@ -27,6 +27,8 @@ SRC_URI += "\
 	file://0002-linux-user-syscall-getsockopt-robustness-increased.patch \
 	file://0003-qemu-user-Loading-an-elf-broke-the-heap-for-that-elf.patch \
 	file://0001-qemu-user-Improved-diagnostic-output-for-unexpected-.patch \
+\
+	file://0001-qemu-user-SO_PEERGROUPS-was-not-emulated-breaking-ta.patch \
 "
 
 QEMU_TARGETS += "ppc64"

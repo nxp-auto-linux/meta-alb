@@ -1,0 +1,124 @@
+From 67f340f8b01fe1b1a8e4addd2f65f61719ce2734 Mon Sep 17 00:00:00 2001
+From: Stefan Singer <stefan.singer@nxp.com>
+Date: Tue, 12 Feb 2019 04:20:32 -0800
+Subject: [PATCH] qemu-user: SO_PEERGROUPS was not emulated, breaking target
+ code
+
+As this fairly new socket option was not handled, the default
+drop resulted in ERANGE being returned which caused the caller to
+go into an endless loop. This happened on a sufficiently enabled
+Ubuntu 16.04.5 host. If SO_PEERGROUPS is not known, we just
+silently report it as unsupported. If it is known on the host at
+build time, we try a translation.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ linux-user/hppa/sockbits.h |  2 ++
+ linux-user/socket.h        |  9 +++++++++
+ linux-user/syscall.c       | 41 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 52 insertions(+)
+
+diff --git a/linux-user/hppa/sockbits.h b/linux-user/hppa/sockbits.h
+index 5044619..d2459ae 100644
+--- a/linux-user/hppa/sockbits.h
++++ b/linux-user/hppa/sockbits.h
+@@ -64,6 +64,8 @@
+ 
+ #define TARGET_SO_CNX_ADVICE           0x402E
+ 
++#define TARGET_SO_PEERGROUPS           0x4034
++
+ /** sock_type - Socket types - default values
+  *
+  *
+diff --git a/linux-user/socket.h b/linux-user/socket.h
+index 7051cd2..efc39f9 100644
+--- a/linux-user/socket.h
++++ b/linux-user/socket.h
+@@ -65,6 +65,8 @@
+     #define TARGET_SO_RCVBUFFORCE          33
+     #define TARGET_SO_PASSSEC              34
+ 
++    #define TARGET_SO_PEERGROUPS           59
++
+     /** sock_type - Socket types
+      *
+      * Please notice that for binary compat reasons MIPS has to
+@@ -170,6 +172,8 @@
+     /* Instruct lower device to use last 4-bytes of skb data as FCS */
+     #define TARGET_SO_NOFCS     43
+ 
++    #define TARGET_SO_PEERGROUPS           59
++
+     /** sock_type - Socket types
+      *
+      * Please notice that for binary compat reasons ALPHA has to
+@@ -247,8 +251,13 @@
+     #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
+ 
+     #define TARGET_SO_PASSSEC        31
++
++    #define TARGET_SO_PEERGROUPS     0x3d
++
+ #else
+     #define TARGET_SO_PASSSEC        34
++    #define TARGET_SO_PEERGROUPS     59
++
+ #endif
+ 
+     /* For setsockopt(2) */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 99d331a..4e7b68b 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -3238,6 +3238,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+         case TARGET_SO_SNDTIMEO:
+         case TARGET_SO_PEERNAME:
+             goto unimplemented;
++        case TARGET_SO_PEERGROUPS: {
++#ifdef SO_PEERGROUPS
++                int n, i;
++                socklen_t hlen, alen;
++                uint32_t *tgroups;
++                gid_t *hgroups;
++
++                if (get_user_u32(len, optlen)) {
++                return -TARGET_EFAULT;
++            }
++            if (len < 0) {
++                return -TARGET_EINVAL;
++            }
++            n = len / sizeof(uint32_t);
++            hlen = sizeof(gid_t) * n;
++            hgroups = alloca(hlen);
++            alen = hlen;
++            ret = get_errno(getsockopt(sockfd, level, SO_PEERGROUPS,
++                                       hgroups, &alen));
++            if (hlen != alen) {
++                n = alen / sizeof(gid_t);
++                len = n * sizeof(uint32_t);
++                if (put_user_u32(len, optlen)) {
++                    return -TARGET_EFAULT;
++                }
++            }
++            if (ret < 0) {
++                return ret;
++            }
++            if (!(tgroups = lock_user(VERIFY_WRITE, optval_addr, len, 0))) {
++                return -TARGET_EFAULT;
++            }
++            for (i = 0; i < n; i++) {
++                    __put_user(hgroups[i], &tgroups[i]);
++            }
++            unlock_user(tgroups, optval_addr, len);
++#else
++            ret = -TARGET_EOPNOTSUPP;
++#endif
++            break;
++        }
+         case TARGET_SO_PEERCRED: {
+             struct ucred cr;
+             socklen_t crlen;
+-- 
+2.7.4
+

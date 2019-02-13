@@ -23,6 +23,10 @@ FLASHIMAGE_UBOOT ?= "u-boot"
 FLASHIMAGE_UBOOT_BASENAME ?= "u-boot"
 FLASHIMAGE_UBOOT_FILE ?= '${FLASHIMAGE_UBOOT_BASENAME}-${MACHINE}${FLASHIMAGE_UBOOT_REALSUFFIX}${@oe.utils.conditional("FLASHIMAGE_UBOOT_TYPE", "", "", "-${FLASHIMAGE_UBOOT_TYPE}", d)}'
 FLASHIMAGE_KERNEL ?= "virtual/kernel"
+# The FLASHIMAGE_ROOTFS recipe name is special in that it needs to be
+# an image recipe, not a normal package recipe.
+# If the rootfs is to be created by a package recipe, then it needs
+# to be added as EXTRA file rather than using the ROOTFS variable
 FLASHIMAGE_ROOTFS ?= ""
 FLASHIMAGE_ROOTFS_FILE ?= ""
 FLASHIMAGE_ROOTFS_SUFFIX ?= ""
@@ -35,7 +39,7 @@ do_image_flashimage[depends] += " \
         ${@d.getVar('FLASHIMAGE_RESET_FILE', True) and d.getVar('FLASHIMAGE_RESET', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_UBOOT_FILE', True) and d.getVar('FLASHIMAGE_UBOOT', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_KERNEL_FILE', True) and d.getVar('FLASHIMAGE_KERNEL', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_ROOTFS_FILE', True) and d.getVar('FLASHIMAGE_ROOTFS', True) and d.getVar('FLASHIMAGE_ROOTFS', True) + ':do_deploy' or ''} \
+        ${@d.getVar('FLASHIMAGE_ROOTFS_FILE', True) and d.getVar('FLASHIMAGE_ROOTFS', True) and d.getVar('FLASHIMAGE_ROOTFS', True) + ':do_image_complete' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA1_FILE', True) and d.getVar('FLASHIMAGE_EXTRA1', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA2_FILE', True) and d.getVar('FLASHIMAGE_EXTRA2', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA3_FILE', True) and d.getVar('FLASHIMAGE_EXTRA3', True) + ':do_deploy' or ''} \
@@ -76,9 +80,11 @@ generate_flashimage_entry() {
                 FLASHIMAGE_MAX=$(printf "%d + %d\n" ${FLASHIMAGE_FILE_OFFSET} ${FLASHIMAGE_FILE_SIZE} | bc)
 
                 if [ "${FLASHIMAGE_BANK4}" = "yes" ]; then
-                        if [ ${FLASHIMAGE_FILE_OFFSET} -lt ${FLASHIMAGE_BANK4_XOR} && ${FLASHIMAGE_MAX} -gt ${FLASHIMAGE_BANK4_XOR} ]; then
-                                bberror "${FLASHIMAGE_FILE} is reaching into flash bank 4 to ${FLASHIMAGE_MAX}. Please reduce size or turn off bank 4 in the config!"
-                                exit 1
+                        if [ ${FLASHIMAGE_FILE_OFFSET} -lt ${FLASHIMAGE_BANK4_XOR} ]; then
+                                if [ ${FLASHIMAGE_MAX} -gt ${FLASHIMAGE_BANK4_XOR} ]; then
+                                        bberror "${FLASHIMAGE_FILE} is reaching into flash bank 4 to ${FLASHIMAGE_MAX}. Please reduce size or turn off bank 4 in the config!"
+                                        exit 1
+                                fi
                         fi
                 fi
 

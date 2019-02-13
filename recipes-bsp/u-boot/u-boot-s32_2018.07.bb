@@ -73,13 +73,21 @@ do_compile_append() {
 ENV_STAGE_DIR = "${datadir}/env"
 
 do_install_append() {
+    unset i j
     mkdir -p ${D}${ENV_STAGE_DIR}
     # we should have one config
     for config in ${UBOOT_MACHINE}; do
-        # remove any empty lines which might break the environment
-        sed '/^[[:space:]]*$/d' -i ${B}/${config}/env-default.txt
-        # install our environment file to usr/share to have it staged by yocto
-        install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv.txt
+        i=`expr $i + 1`;
+        unset j
+        for type in ${UBOOT_CONFIG}; do
+            j=`expr $j + 1`;
+            if [ $j -eq $i ]; then
+                # remove any empty lines which might break the environment
+                sed '/^[[:space:]]*$/d' -i ${B}/${config}/env-default.txt
+                # install our environment file to usr/share to have it staged by yocto
+                install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv${type}.txt
+            fi
+        done
     done
 }
 

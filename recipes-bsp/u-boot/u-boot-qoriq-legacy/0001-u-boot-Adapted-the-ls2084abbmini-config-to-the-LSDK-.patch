@@ -1,0 +1,32 @@
+From cb619c48dba0c0059e82d6e617fedde6677773a1 Mon Sep 17 00:00:00 2001
+From: nxa15299 <Heinz.Wrobel@nxp.com>
+Date: Fri, 9 Feb 2018 18:55:47 +0100
+Subject: [PATCH] u-boot: Adapted the ls2084abbmini config to the LSDK env
+ offset
+
+Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+
+---
+ include/configs/ls2084abbmini.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/ls2084abbmini.h b/include/configs/ls2084abbmini.h
+index 15ae362..44eb01d 100644
+--- a/include/configs/ls2084abbmini.h
++++ b/include/configs/ls2084abbmini.h
+@@ -181,13 +181,13 @@ unsigned long get_board_sys_clk(void);
+ #undef CONFIG_SPL_PAD_TO
+ #define CONFIG_SPL_PAD_TO		0x20000
+ #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR    0x900 /* address 0x120000 */
+-#define CONFIG_ENV_OFFSET		0x200000
++#define CONFIG_ENV_OFFSET		0x300000
+ #define CONFIG_ENV_IS_IN_MMC
+ #define CONFIG_SYS_MMC_ENV_DEV		0
+ #define CONFIG_ENV_SIZE			0x2000	/* Same as in NOR! */
+ #else
+ #define CONFIG_ENV_IS_IN_FLASH
+-#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x200000)
++#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x300000)
+ #define CONFIG_ENV_SECT_SIZE		0x20000
+ #define CONFIG_ENV_SIZE			0x2000
+ #endif

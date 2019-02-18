@@ -1,0 +1,51 @@
+From 9f3d52d326625ec4d8a7e9fa765ab5d258734148 Mon Sep 17 00:00:00 2001
+From: r39252 <Heinz.Wrobel@freescale.com>
+Date: Sun, 23 Apr 2017 21:11:16 +0200
+Subject: [PATCH 01/17] u-boot: Enable Vitesse reset delay required per spec
+
+---
+ include/configs/B4860QDS.h   | 2 +-
+ include/configs/T4240RDB.h   | 1 +
+ include/configs/corenet_ds.h | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/B4860QDS.h b/include/configs/B4860QDS.h
+index 2226aba..ccb33ce 100644
+--- a/include/configs/B4860QDS.h
++++ b/include/configs/B4860QDS.h
+@@ -660,7 +660,7 @@ unsigned long get_board_ddr_clk(void);
+ #define CONFIG_FMAN_ENET
+ #define CONFIG_PHYLIB_10G
+ #define CONFIG_PHY_VITESSE
+-#define CONFIG_PHY_TERANETICS
++#define CONFIG_PHY_RESET_DELAY 4       /* Required by Vitesse Spec */
+ #define SGMII_CARD_PORT1_PHY_ADDR 0x1C
+ #define SGMII_CARD_PORT2_PHY_ADDR 0x10
+ #define SGMII_CARD_PORT3_PHY_ADDR 0x1E
+diff --git a/include/configs/T4240RDB.h b/include/configs/T4240RDB.h
+index 0d9cdfb..8471238 100644
+--- a/include/configs/T4240RDB.h
++++ b/include/configs/T4240RDB.h
+@@ -634,6 +634,7 @@ unsigned long get_board_ddr_clk(void);
+ #define CONFIG_FMAN_ENET
+ #define CONFIG_PHYLIB_10G
+ #define CONFIG_PHY_VITESSE
++#define CONFIG_PHY_RESET_DELAY 4       /* Required by Vitesse Spec */
+ #define CONFIG_PHY_CORTINA
+ #define CONFIG_SYS_CORTINA_FW_IN_NOR
+ #define CONFIG_CORTINA_FW_ADDR		0xefe00000
+diff --git a/include/configs/corenet_ds.h b/include/configs/corenet_ds.h
+index 7bbe31c..9225e29 100644
+--- a/include/configs/corenet_ds.h
++++ b/include/configs/corenet_ds.h
+@@ -539,6 +539,7 @@
+ #define CONFIG_FMAN_ENET
+ #define CONFIG_PHYLIB_10G
+ #define CONFIG_PHY_VITESSE
++#define CONFIG_PHY_RESET_DELAY 4       /* Required by Vitesse Spec */
+ #define CONFIG_PHY_TERANETICS
+ #endif
+ 
+-- 
+2.12.2
+

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier:	BSD-3-Clause
 #
-# Copyright 2018 NXP
+# Copyright 2018-2019 NXP
 #
 
 SUMMARY = "Support for Inter-Process(or) Communication over Shared Memory (ipc-shm)"
@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 inherit module
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/ipcf/ipc-shm;branch=master;protocol=https"
-SRCREV = "c526a30d85aafbe55e5db957a48d133b4bcd4b8b"
+SRCREV = "3b087b5f0236acfcd588af8337af72703d5f769e"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"

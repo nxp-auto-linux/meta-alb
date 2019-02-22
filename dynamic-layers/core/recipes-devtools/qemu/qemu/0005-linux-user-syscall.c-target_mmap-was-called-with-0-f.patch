@@ -1,0 +1,32 @@
+From 9af1c01bdf0bd8b3d4828bb6b64567b28fee4bad Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 4 Jan 2019 12:43:44 +0100
+Subject: [PATCH 5/6] linux-user/syscall.c: target_mmap was called with 0 fd
+ instead of -1
+
+While this is not a functional delta, it is defensive as
+the mmap implementation should ignore fd. If it doesn't in the future
+due to some bug during development, at least stdin is not messed with.
+This should help to avoid obscure bugs and side effects.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ linux-user/syscall.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e61fe24..742e012 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1147,7 +1147,7 @@ abi_long do_brk(abi_ulong new_brk)
+     new_alloc_size = HOST_PAGE_ALIGN(new_brk - brk_page);
+     mapped_addr = get_errno(target_mmap(brk_page, new_alloc_size,
+                                         PROT_READ|PROT_WRITE,
+-                                        MAP_ANON|MAP_PRIVATE, 0, 0));
++                                        MAP_ANON|MAP_PRIVATE, -1, 0));
+ 
+     if (mapped_addr == brk_page) {
+         /* Heap contents are initialized to zero, as for anonymous
+-- 
+1.8.3.1
+

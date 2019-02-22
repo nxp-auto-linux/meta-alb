@@ -1,0 +1,66 @@
+From 414cbc814446de72c1369804f86e7bf32048ce3d Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 4 Jan 2019 16:17:24 +0100
+Subject: [PATCH] linux-user/elfload.c: Allocate beyond the host process heap
+
+There was a really ugly problem hidden in loading the elf.
+When trying to find a space to mmap, it started early on,
+independent of the sbrk(0) of the host process. If the heap
+had a sufficiently large free element in it, the elf would
+be loaded into the heap of the host process. If really large
+and complex executables were loaded (emacs byte compiling for
+example), then the host process heap malloc would fail because
+suddenly something already mmap'ed the elf in there.
+For executables that are not loaded to a fixed location, the
+code will now ensure that any mmap'ed segment is a certain
+distance away from the sbrk(0) boundary. This keeps the heap
+alive. The distance is currently hardcoded to 16MB.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
+---
+ linux-user/elfload.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 20f3d8c..24806af 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1832,6 +1832,9 @@ static int validate_guest_space(unsigned long guest_base,
+ }
+ #endif
+ 
++#ifndef QEMU_SBRK_DISTANCE
++#define QEMU_SBRK_DISTANCE (16*1024*1024)
++#endif
+ unsigned long init_guest_space(unsigned long host_start,
+                                unsigned long host_size,
+                                unsigned long guest_start,
+@@ -1842,6 +1845,24 @@ unsigned long init_guest_space(unsigned long host_start,
+ 
+     assert(host_start || host_size);
+ 
++    if (!fixed) {
++        /* We need to make sure that we do not map our guest inside
++         * the heap of our process itself. This can happen and if qemu then
++         * needs to allocate from its heap and fails, the emulation
++         * won't last long anymore.
++         */
++        real_start = (unsigned long)sbrk(0);
++
++        /* In terms of virtual space, we want qemu to retain some
++         * brk() capability, so we "round" up. This should likely
++         * be configurable somehow
++         */
++        real_start += QEMU_SBRK_DISTANCE;
++        if (host_start < real_start) {
++            host_start = real_start;
++        }
++    }
++
+     /* If just a starting address is given, then just verify that
+      * address.  */
+     if (host_start && !host_size) {
+-- 
+2.7.4
+

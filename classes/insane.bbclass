@@ -820,6 +820,9 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
         # Now do the sanity check!!!
         if "build-deps" not in skip:
             for rdepend in rdepends:
+                pref_rdepend = localdata.getVar("PREFERRED_RPROVIDER_%s" % rdepend)
+                if pref_rdepend:
+                    rdepend = pref_rdepend
                 if "-dbg" in rdepend and "debug-deps" not in skip:
                     error_msg = "%s rdepends on %s" % (pkg,rdepend)
                     package_qa_handle_error("debug-deps", error_msg, d)
@@ -870,6 +873,9 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
                 while next:
                     new = []
                     for rdep in next:
+                        pref_rdep = localdata.getVar("PREFERRED_RPROVIDER_%s" % rdep)
+                        if pref_rdep:
+                            rdep = pref_rdep
                         rdep_data = oe.packagedata.read_subpkgdata(rdep, d)
                         sub_rdeps = rdep_data.get("RDEPENDS_" + rdep)
                         if not sub_rdeps:

@@ -1,4 +1,4 @@
-# Copyright 2017 NXP
+# Copyright 2017,2019 NXP
 
 SUMMARY = "Add support for KVASER USB CAN in BB Mini"
 LICENSE = "GPLv2 & BSD"
@@ -11,8 +11,8 @@ inherit module
 
 VER = "${@d.getVar('PV',True).replace('.', '_')}"
 SRC_URI = "http://www.kvaser.com/software/7330130980754/V${VER}/linuxcan.tar.gz"
-SRC_URI[md5sum] = "6fe54a7d9678791e3c0eb92d85f3857e"
-SRC_URI[sha256sum] = "41c48f636a48ac27584c59029fba7788ea2877e0534a53fb0557750c36164fcb"
+SRC_URI[md5sum] = "baa38408b1ccea8f3a0e624ca611d399"
+SRC_URI[sha256sum] = "95a178395f87ab2e2da78e7de810ef6e08b3b718cfcdd441f7c2936826475cc5"
 
 SRC_URI += "\
 	file://kvaser-cross-compile-support.patch \
@@ -47,7 +47,7 @@ RPROVIDES_${PN} = " \
 
 INHIBIT_PACKAGE_STRIP = "1"
 
-# Original do_compile overwrites CC and LD, by stripping the --sysroot flag which 
+# Original do_compile overwrites CC and LD, by stripping the --sysroot flag which
 # instructs gcc where to locate required files such as headers.
 # As a result, the yocto build may use header files from the host root filesystem.
 do_compile() {

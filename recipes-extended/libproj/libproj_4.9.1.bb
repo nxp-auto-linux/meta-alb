@@ -19,3 +19,5 @@ do_install() {
 
 # On powerpc64, libraries reside in .../lib64
 EXTRA_OECMAKE = "-DPROJ_LIB_SUBDIR=${baselib}"
+
+OECMAKE_GENERATOR = "Unix Makefiles"

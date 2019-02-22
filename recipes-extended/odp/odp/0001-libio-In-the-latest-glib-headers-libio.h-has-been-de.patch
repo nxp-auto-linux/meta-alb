@@ -1,0 +1,29 @@
+From 99b73a8dee2205f544b23b3daa42f076c4220985 Mon Sep 17 00:00:00 2001
+From: Catalin Udma <catalin-dan.udma@nxp.com>
+Date: Thu, 21 Feb 2019 09:15:48 +0200
+Subject: [PATCH] libio: In the latest glib-headers libio.h has been deprecated
+
+This patch removes this warning:
+error: #warning "<libio.h> is deprecated; use <stdio.h> instead."
+
+Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
+---
+ platform/linux-dpaa2/flib/mc/fsl_mc_sys.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/linux-dpaa2/flib/mc/fsl_mc_sys.h b/platform/linux-dpaa2/flib/mc/fsl_mc_sys.h
+index 0613ce4..e99aaf2 100644
+--- a/platform/linux-dpaa2/flib/mc/fsl_mc_sys.h
++++ b/platform/linux-dpaa2/flib/mc/fsl_mc_sys.h
+@@ -51,7 +51,7 @@ struct fsl_mc_io {
+ 
+ #else /* __linux_driver__ */
+ #include <stdio.h>
+-#include <libio.h>
++#include <stdio.h>
+ #include <stdint.h>
+ #include <errno.h>
+ #include <sys/uio.h>
+-- 
+2.7.4
+

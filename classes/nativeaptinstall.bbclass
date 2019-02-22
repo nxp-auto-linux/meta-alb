@@ -92,7 +92,8 @@ PSEUDO_CHROOT_XPREFIX="${STAGING_BINDIR_NATIVE}/qemu-${TRANSLATED_TARGET_ARCH}"
 # When running in qemu, we don't really want libpseudo as qemu is already
 # running with libpseudo. We want to be as chroot as possible and we
 # really only want to run native things inside pseudo chroot
-QEMU_SET_ENV="PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin,LD_LIBRARY_PATH=${APTGET_EXTRA_LIBRARY_PATH},PSEUDO_PASSWD=${APTGET_CHROOT_DIR},LC_ALL=C"
+APTGET_EXTRA_LIBRARY_PATH_COLON="${@":".join((d.getVar("APTGET_EXTRA_LIBRARY_PATH") or "").split())}"
+QEMU_SET_ENV="PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin,LD_LIBRARY_PATH=${APTGET_EXTRA_LIBRARY_PATH_COLON},PSEUDO_PASSWD=${APTGET_CHROOT_DIR},LC_ALL=C,DEBIAN_FRONTEND=noninteractive"
 QEMU_UNSET_ENV="LD_PRELOAD,APT_CONFIG"
 
 # This is an ugly one, but I haven't come up yet with a neat solution.

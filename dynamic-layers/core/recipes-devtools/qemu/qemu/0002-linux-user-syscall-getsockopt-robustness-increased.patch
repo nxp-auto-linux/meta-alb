@@ -1,0 +1,59 @@
+From 8bb36f8120264b50aec3d21d0d63150946ef3f65 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Tue, 5 Feb 2019 07:12:39 +0100
+Subject: [PATCH 2/3] linux-user: syscall getsockopt robustness increased
+
+There was one formal type sizeof mixup and depending on what the caller
+passed in, innocent memory could have been overwritten.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ linux-user/syscall.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 05c9d26..99d331a 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -3265,9 +3265,12 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+             if (!lock_user_struct(VERIFY_WRITE, tcr, optval_addr, 0)) {
+                 return -TARGET_EFAULT;
+             }
+-            __put_user(cr.pid, &tcr->pid);
+-            __put_user(cr.uid, &tcr->uid);
+-            __put_user(cr.gid, &tcr->gid);
++            if (len >= offsetof(struct ucred, pid) + sizeof(cr.pid))
++                __put_user(cr.pid, &tcr->pid);
++            if (len >= offsetof(struct ucred, uid) + sizeof(cr.uid))
++                __put_user(cr.uid, &tcr->uid);
++            if (len >= offsetof(struct ucred, gid) + sizeof(cr.gid))
++                __put_user(cr.gid, &tcr->gid);
+             unlock_user_struct(tcr, optval_addr, 1);
+             break;
+         }
+@@ -3365,10 +3368,11 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+             if (len == 4) {
+                 if (put_user_u32(val, optval_addr))
+                     return -TARGET_EFAULT;
+-            } else {
++            } else if (len == 1) {
+                 if (put_user_u8(val, optval_addr))
+                     return -TARGET_EFAULT;
+-            }
++            } else
++                return -TARGET_ERANGE;
+         }
+         else {
+             int i;
+@@ -3400,7 +3404,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+                 return -TARGET_EFAULT;
+             if (len < 0)
+                 return -TARGET_EINVAL;
+-            lv = sizeof(lv);
++            lv = sizeof(val);
+             ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
+             if (ret < 0)
+                 return ret;
+-- 
+1.8.3.1
+

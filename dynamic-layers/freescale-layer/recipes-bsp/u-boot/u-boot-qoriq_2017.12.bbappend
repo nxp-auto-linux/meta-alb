@@ -23,6 +23,8 @@ SRC_URI += "\
 \
 	file://0001-u-boot-Fix-LS2088A-style-VF-setup-on-EPs.patch \
 	file://0002-config-Move-new-CONFIG-options-to-whitelist.patch \
+\
+	file://0001-u-boot-qoriq-Fix-misuse-of-IS_ENABLED-macro.patch \
 "
 
 #

@@ -37,7 +37,3 @@ BOOT_SPACE = "65536"
 
 # Other types of images
 IMAGE_CLASSES += "image_types_fsl_itb image_types_fsl_flashimage"
-
-# Temporarily keep the legacy u-boot 2017.09 while
-# the switch to sumo branch is in progress
-PREFERRED_VERSION_u-boot-qoriq = "2017.09+fslgit"

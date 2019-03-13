@@ -4,20 +4,20 @@
 auto lo
 iface lo inet loopback
 
-auto ni0
-iface ni0 inet dhcp
+auto eth0
+iface eth0 inet dhcp
 dhclient_opts -nw
 
-auto ni1
-iface ni1 inet dhcp
+auto eth1
+iface eth1 inet dhcp
 dhclient_opts -nw
 
-auto ni2
-iface ni2 inet dhcp
+auto eth2
+iface eth2 inet dhcp
 dhclient_opts -nw
 
-auto ni3
-iface ni3 inet dhcp
+auto eth3
+iface eth3 inet dhcp
 dhclient_opts -nw
 
 

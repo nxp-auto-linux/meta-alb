@@ -6,6 +6,7 @@ SRC_URI += "\
 	file://0001-kernel-phylib-ioctl-now-translates-C45-properly-for-.patch \
 \
 	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-wh.patch \
+	file://0001-dpaa2-eth-Keep-the-correspondence-between-dpni-id-an.patch \
 "
 
 # We don't know at this stage if we want to keep or drop these. They

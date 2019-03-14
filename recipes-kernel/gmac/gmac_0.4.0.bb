@@ -1,4 +1,6 @@
 # Copyright 2018 NXP
+#
+# This is the GMAC driver for Linux kernel 4.1
 
 SUMMARY = "Linux driver for transmitting and receiving Ethernet frames using the GMAC hardware"
 LICENSE = "BSD-3-Clause"

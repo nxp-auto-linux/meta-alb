@@ -1,0 +1,14 @@
+
+ifndef KDIR
+	KDIR = /lib/modules/$(shell uname -r)/build
+endif
+
+ifndef MDIR
+	MDIR = $(PWD)
+endif
+
+all:
+	make -C $(KDIR) M=$(MDIR) CONFIG_NET_VENDOR_STMICRO=y CONFIG_STMMAC_ETH=m CONFIG_STMMAC_PLATFORM=m CONFIG_DWMAC_S32CC=m modules
+
+clean:
+	make -C $(KDIR) M=$(MDIR) CONFIG_NET_VENDOR_STMICRO=y CONFIG_STMMAC_ETH=m CONFIG_STMMAC_PLATFORM=m CONFIG_DWMAC_S32CC=m clean

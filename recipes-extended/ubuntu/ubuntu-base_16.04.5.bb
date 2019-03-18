@@ -222,9 +222,9 @@ fakeroot do_aptget_user_update_append() {
 	# don't clutter the target
 	#rm -rf ${APTGET_CHROOT_DIR}/var/log/*
 
-	# The info file causes a Yocto complaint.
-	# It may be easier to recreate it later. UNDERSTAND AND FIX!
-	rm -f "${APTGET_CHROOT_DIR}/usr/share/info/dir"
+	# The info dir file causes a Yocto complaint.
+	# Per Yocto docs it should never be packaged
+	rm -f "${APTGET_CHROOT_DIR}${infodir}/dir"
 
 	# There is an unfulfilled libldap dependency.
 	# Fixing the dependency seems a bit tricky to do,

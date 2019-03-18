@@ -5,7 +5,7 @@
 # rootfs pollution or destruction.
 PV = "${@d.getVar('PREFERRED_VERSION_ubuntu-base', True) or '1.0'}"
 
-LINGUAS_INSTALL = ""
+IMAGE_LINGUAS = ""
 IMAGE_INSTALL = ""
 inherit image
 export PACKAGE_INSTALL = "${IMAGE_INSTALL}"

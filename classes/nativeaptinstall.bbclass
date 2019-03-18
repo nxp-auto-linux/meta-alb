@@ -276,11 +276,25 @@ END_USER
 		x="${APTGET_INIT_PACKAGES}"
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install $x
 	fi
+
 	if [ -n "${APTGET_EXTRA_PPA}" ]; then
 		DISTRO_NAME=`grep "DISTRIB_CODENAME=" "${APTGET_CHROOT_DIR}/etc/lsb-release" | sed "s/DISTRIB_CODENAME=//g"`
+		DISTRO_RELEASE=`grep "DISTRIB_RELEASE=" "${APTGET_CHROOT_DIR}/etc/lsb-release" | sed "s/DISTRIB_RELEASE=//g"`
 
 		if [ -z "$DISTRO_NAME" ]; then 
 			bberror "Unable to get target linux distribution codename. Please check that \"${APTGET_CHROOT_DIR}/etc/lsb-release\" is not corrupted."
+		fi
+
+		# For apt-key to be reliable, we need both gpg and dirmngr
+		# As workaround for an 18.04 gpg regressions, we also use curl
+		APTGET_GPG_BROKEN=""
+		if [ "$DISTRO_RELEASE" = "18.04" ]; then
+			APTGET_GPG_BROKEN="1"
+		fi
+		if [ -n "$APTGET_GPG_BROKEN" ]; then
+			chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install curl gnupg2
+		else
+			chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install gnupg2 dirmngr
 		fi
 
 		# Tricky variable hack to get word parsing for Yocto
@@ -302,11 +316,25 @@ END_PPA
 			fi
 			ppa_proxy=""
 			if [ -n "$ENV_HTTP_PROXY" ]; then
+				if [ -n "$APTGET_GPG_BROKEN" ]; then
+					ppa_proxy="-proxy=$ENV_HTTP_PROXY"
+				else
 				ppa_proxy="--keyserver-options http-proxy=$ENV_HTTP_PROXY"
+				fi
 			fi
 
 			echo >>"${APTGET_CHROOT_DIR}/$ppa_file" "$ppa_type $ppa_addr $DISTRO_NAME main"
-			chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-key adv --keyserver $ppa_server $ppa_proxy --recv-key $ppa_hash
+			if [ -n "$APTGET_GPG_BROKEN" ]; then
+				HTTPPPASERVER=`echo $ppa_server | sed "s/hkp:/http:/g"`
+				mkdir -p "${APTGET_CHROOT_DIR}/tmp/gpg"
+				chmod 0600 "${APTGET_CHROOT_DIR}/tmp/gpg"
+				chroot "${APTGET_CHROOT_DIR}" /usr/bin/curl -sL "$HTTPPPASERVER/pks/lookup?op=get&search=0x$ppa_hash" | chroot "${APTGET_CHROOT_DIR}" /usr/bin/gpg --homedir /tmp/gpg --import || true
+				chroot "${APTGET_CHROOT_DIR}" /usr/bin/gpg --homedir /tmp/gpg --export $ppa_hash | chroot "${APTGET_CHROOT_DIR}" /usr/bin/tee "/etc/apt/trusted.gpg.d/$ppa_file_orig.gpg"
+				rm -rf "${APTGET_CHROOT_DIR}/tmp/gpg"
+			else
+				chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-key adv --keyserver $ppa_server $ppa_proxy --recv-key $ppa_hash
+			fi
+
 		done
 	fi
 

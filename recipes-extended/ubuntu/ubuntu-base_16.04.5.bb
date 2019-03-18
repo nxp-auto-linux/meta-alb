@@ -13,13 +13,13 @@ B = "${S}"
 # initially. FIX
 UBUNTU_TARGET_ARCH="${@d.getVar('TARGET_ARCH', True).replace("aarch64", "arm64")}"
 
-ROOTFS="ubuntu-base-16.04.3-base-${UBUNTU_TARGET_ARCH}.tar.gz"
+ROOTFS="ubuntu-base-${UBUNTU_TARGET_VERSION}-base-${UBUNTU_TARGET_ARCH}.tar.gz"
 SRC_URI = " \
-	http://cdimage.ubuntu.com/ubuntu-base/releases/16.04/release/${ROOTFS};unpack=0;subdir=rootfs \
+	http://cdimage.ubuntu.com/ubuntu-base/releases/${UBUNTU_TARGET_BASEVERSION}/release/${ROOTFS};unpack=0;subdir=rootfs \
 	file://fstab \
 "
-SRC_URI[md5sum] = "a01899507180fbdb6caca334057ad086"
-SRC_URI[sha256sum] = "76553b0c5153d8f69f2ab6a60a8e9129ff87be5e9c4d2f1791ce58a84ad08b6c"
+SRC_URI[md5sum] = "f8013a313d868ed334c17682e2651b32"
+SRC_URI[sha256sum] = "aa9771e13631b1b65308027ce5e8d7aa86191e8d38a290d3b8319355fe5093e7"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

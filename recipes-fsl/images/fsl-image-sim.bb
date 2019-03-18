@@ -9,3 +9,5 @@ require recipes-fsl/images/fsl-image-base.bb
 IMAGE_INSTALL_append_s32g275sim = " ipc-shm "
 IMAGE_INSTALL_append_s32v344sim = " ipc-shm "
 IMAGE_INSTALL_append_s32r45xsim = " ipc-shm "
+
+IMAGE_INSTALL_append_gen1 ?= "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' gmac ', '', d)}"

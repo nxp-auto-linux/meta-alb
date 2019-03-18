@@ -289,153 +289,77 @@ PACKAGEFUNCS =+ "prep_xattr_postinst"
 
 COMPATIBLE_MACHINE = "ubuntu"
 
-# We should not have a single PROVIDES entry as this package
-# does not provide anything for build time of any other package!
-# PROVIDES += ""
-
-RPROVIDES_${PN}_ubuntu += "\
-	eglibc rtld(GNU_HASH) \
+# Some packages are implicitly present in Ubuntu due to the kernel
+# and rootfs configuration. We pretend to have the respective Yocto
+# names therefore. Stuff is grouped for easier updates
+RPROVIDES_${PN}_ubuntu += " \
+/bin/sh \
 "
-
-#
-RPROVIDES_${PN}_ubuntu += "\
-	base-files \
-	bash \
-	libc6 \
-	glibc \
-	libgcc1-dev \
+RPROVIDES_${PN}_ubuntu += " \
+libgcc1-dev \
+rtld(GNU_HASH) \
+update-alternatives \
 "
-#
-RPROVIDES_${PN}_ubuntu += "\
-	libattr1 \
-	libcap2 \
-	libblkid1 \
-	libfdisk1 \
-	libffi6 \
-	libmount1 \
-	libncurses5 \
-	libncursesw5 \
-	libpam \
-	libpanelw5 \
-	libsmartcols1 \
-	libtic5 \
-	libtinfo5 \
-	libuuid1 \
-	libz1 \
-	ncurses-terminfo-base \
-	netbase \
-	pam-plugin-deny \
-	pam-plugin-permit \
-	pam-plugin-unix \
-	pam-plugin-warn \
-	update-alternatives \
+RPROVIDES_${PN}_ubuntu += " \
+pam-plugin-access \
+pam-plugin-debug \
+pam-plugin-deny \
+pam-plugin-echo \
+pam-plugin-env \
+pam-plugin-exec \
+pam-plugin-faildelay \
+pam-plugin-filter \
+pam-plugin-ftp \
+pam-plugin-group \
+pam-plugin-issue \
+pam-plugin-keyinit \
+pam-plugin-limits \
+pam-plugin-lastlog \
+pam-plugin-listfile \
+pam-plugin-localuser \
+pam-plugin-loginuid \
+pam-plugin-mkhomedir \
+pam-plugin-motd \
+pam-plugin-namespace \
+pam-plugin-nologin \
+pam-plugin-permit \
+pam-plugin-pwhistory \
+pam-plugin-rhosts \
+pam-plugin-rootok \
+pam-plugin-securetty \
+pam-plugin-shells \
+pam-plugin-stress \
+pam-plugin-succeed-if \
+pam-plugin-time \
+pam-plugin-timestamp \
+pam-plugin-tally \
+pam-plugin-tally2 \
+pam-plugin-umask \
+pam-plugin-unix \
+pam-plugin-warn \
+pam-plugin-wheel \
+pam-plugin-xauth \
 "
-
-# The content from the original Ubuntu manifest file.
-# This does not precisely correlate to the package names we have,
-# but it is a good start.
-RPROVIDES_${PN}_ubuntu += "\
-adduser \
-alsa-conf \
-apt \
-base-files \
-base-passwd \
-bash \
-bsdutils \
-bzip2 \
-coreutils \
-dash \
-debconf \
-debianutils \
-diffutils \
-dpkg \
-e2fslibs \
-e2fsprogs \
-findutils \
-gcc-5-base \
-gcc-6-base \
-gnupg \
-gpgv \
-grep \
-gzip \
-hostname \
-init \
-init-system-helpers \
-initscripts \
-insserv \
-libacl1 \
-libapparmor1 \
-libapt-pkg5.0 \
-libasound2 \
-libattr1 \
-libaudit-common \
-libaudit1 \
-libblkid1 \
-libbz2-1.0 \
-libbz2.so.1 \
-libc-bin \
-libc6 \
-libcap2 \
-libcap2-bin \
-libcomerr2 \
-libcryptsetup4 \
-libdb5.3 \
-libdebconfclient0 \
-libdevmapper1.02.1 \
-libfdisk1 \
-libgcc1 \
-libgcrypt20 \
-libgpg-error0 \
-libkmod2 \
-liblz4-1 \
-liblzma5 \
-libmount1 \
+RPROVIDES_${PN}_ubuntu += " \
+libform5 \
+libformw5 \
+libmenu5 \
+libmenuw5 \
 libncurses5 \
 libncursesw5 \
-libpam-modules \
-libpam-modules-bin \
-libpam-runtime \
-libpam0g \
-libpcre3 \
-libprocps4 \
-libreadline6 \
-libseccomp2 \
-libselinux1 \
-libsemanage-common \
-libsemanage1 \
-libsepol1 \
-libsmartcols1 \
-libss2 \
-libstdc++6 \
-libsystemd0 \
+libpanel5 \
+libpanelw5 \
+libtic5 \
 libtinfo5 \
-libudev1 \
-libusb-0.1-4 \
-libustr-1.0-1 \
-libuuid1 \
-locales \
-login \
-lsb-base \
-makedev \
-mawk \
-mount \
-multiarch-support \
-ncurses-base \
-ncurses-bin \
-passwd \
-perl-base \
-procps \
-python3 \
-readline-common \
-sed \
-sensible-utils \
-systemd \
-systemd-sysv \
-sysv-rc \
-sysvinit-utils \
-tar \
-tzdata \
-ubuntu-keyring \
-util-linux \
-zlib1g \
+ncurses-terminfo-base \
+"
+
+# A few things are provided where we don't have a Yocto equivalent
+# currently/possibly. We add them preemptively just in case
+RPROVIDES_${PN}_ubuntu += " \
+pam-plugin-tty-audit \
+pam-plugin-userdb \
+pam-plugin-extrausers \
+pam-plugin-sepermit \
+pam-plugin-selinux \
 "

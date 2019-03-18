@@ -7,7 +7,7 @@ SRC_URI[md5sum] = "f8013a313d868ed334c17682e2651b32"
 SRC_URI[sha256sum] = "aa9771e13631b1b65308027ce5e8d7aa86191e8d38a290d3b8319355fe5093e7"
 
 require ubuntu-base.inc
-require ubuntu-tarfiles.inc
+require ubuntu-tarfiles_${PV}.inc
 
 # There are some basic differences between different Ubuntu versions.
 # We try not to address them in the generic recipe

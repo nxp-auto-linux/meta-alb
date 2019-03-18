@@ -18,7 +18,7 @@ DEBIAN_TARGET_ARCH="${@d.getVar('TRANSLATED_TARGET_ARCH', True).replace("aarch64
 # Ensure minimum build dependencies are installed
 APTGET_EXTRA_PACKAGES += "make gcc"
 
-fakeroot do_shell_update_append() {
+fakeroot do_aptget_user_update_append() {
 
 	if [ -e "${KERNEL_CHROOT_DIR}/${KERNEL_SRC_PATH}" ]; then
 		ARCH=${DEBIAN_TARGET_ARCH} chroot "${KERNEL_CHROOT_DIR}" /usr/bin/make V=1 -C "${KERNEL_SRC_PATH}" scripts

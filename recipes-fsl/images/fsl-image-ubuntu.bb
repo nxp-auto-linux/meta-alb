@@ -3,6 +3,10 @@ require fsl-image-ubuntu-base.bb
 
 require kernel-source-debian.inc
 
+# Example for use of "ppa:" to install x2go with xfce4
+APTGET_EXTRA_PPA += "ppa:x2go/stable;"
+APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
+APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
 
 IMAGE_INSTALL_append_ls2084abbmini += " \
     kvaser \

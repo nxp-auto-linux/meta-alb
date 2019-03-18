@@ -173,7 +173,7 @@ fakeroot do_shell_update_prepend() {
 	# Add any proxies from the host, according to
 	# https://wiki.yoctoproject.org/wiki/Working_Behind_a_Network_Proxy
 	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
-	QEMU_SET_ENV="${QEMU_SET_ENV}"
+	export QEMU_SET_ENV="${QEMU_SET_ENV}"
 
 	while [ -n "$ENV_HOST_PROXIES" ]; do
 		IFS=" =_" read -r proxy_type proxy_string proxy_val ENV_HOST_PROXIES <<END_PROXY
@@ -184,7 +184,7 @@ END_PROXY
 			continue
 		fi
 
-		QEMU_SET_ENV="$QEMU_SET_ENV,${proxy_type}_${proxy_string}=$proxy_val"
+		export QEMU_SET_ENV="$QEMU_SET_ENV,${proxy_type}_${proxy_string}=$proxy_val"
 
 		# If APTGET_HOST_PROXIES is not defined in local.conf, then
 		# apt.conf is populated using proxy information in ENV_HOST_PROXIES

@@ -25,3 +25,5 @@ IMAGE_INSTALL_append_s32v2xx += "\
 # Support for Inter-Process(or) Communication over Shared Memory (ipc-shm) under Linux
 IMAGE_INSTALL_append_s32v234evb += " ipc-shm "
 IMAGE_INSTALL_append_s32v234sbc += " ipc-shm "
+
+IMAGE_INSTALL_append_gen1 ?= "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' gmac ', '', d)}"

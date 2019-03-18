@@ -230,12 +230,14 @@ fakeroot do_aptget_user_update_append() {
 	# Fixing the dependency seems a bit tricky to do,
 	# so we eliminate the single tool that causes
 	# the dependency problem. UNDERSTAND AND FIX!
-	rm -f "${APTGET_CHROOT_DIR}/usr/lib/gnupg/gpgkeys_ldap"
+	#rm -f "${APTGET_CHROOT_DIR}/usr/lib/gnupg/gpgkeys_ldap"
 
 	# The default ubuntu-base rootfs does not do filesystem
 	# fixes on boot. Given the nature of the BlueBox, we want
 	# to enable that by default
-	sed -i "s/^#*FSCKFIX\s*=.*/FSCKFIX=yes/g" "${APTGET_CHROOT_DIR}/etc/default/rcS"
+	if [ -f "${APTGET_CHROOT_DIR}/lib/init/vars.sh" ]; then
+		sed -i "s/^#*FSCKFIX\s*=.*/FSCKFIX=yes/g" "${APTGET_CHROOT_DIR}/lib/init/vars.sh"
+	fi
 
 	# Add /usr/bin/python3 symlink to /usr/bin/python3.5, as it is required
 	# by other packages depending on python3

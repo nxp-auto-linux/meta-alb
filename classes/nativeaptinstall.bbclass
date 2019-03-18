@@ -391,6 +391,10 @@ END_PPA
 		rm -f "${APTGET_CHROOT_DIR}/aptgetsource.sh"
 	fi
 
+	# The list of installed packages goes into the log
+        echo "Installed packages:"
+	chroot "${APTGET_CHROOT_DIR}" /usr/bin/dpkg -l | grep '^ii' | awk '{print $2}'
+
 	set +x
 }
 

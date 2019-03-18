@@ -191,7 +191,7 @@ END_PROXY
 		# If APTGET_HOST_PROXIES is not defined in local.conf, then
 		# apt.conf is populated using proxy information in ENV_HOST_PROXIES
 		if [ -z "${APTGET_HOST_PROXIES}" ]; then
-			echo >>"${APTGET_CHROOT_DIR}/etc/apt/apt.conf" "Acquire::$proxy_type::proxy \"$proxy_val/\";"
+			echo >>"${APTGET_CHROOT_DIR}/etc/apt/apt.conf" "Acquire::$proxy_type::proxy \"$proxy_val/\"; /* Yocto */"
 		fi
 	done
 
@@ -423,6 +423,11 @@ fakeroot do_shell_update_append() {
 
 	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy clean
+	fi
+
+	# Delete any temp proxy lines we may have added in the target rootfs
+	if [ -f "${APTGET_CHROOT_DIR}/etc/apt/apt.conf" ]; then
+		sed -i '/^Acquire::.+; \/* Yocto *\/\s*$/d' "${APTGET_CHROOT_DIR}/etc/apt/apt.conf"
 	fi
 
 	set +x

@@ -58,7 +58,7 @@
 # Note: If your host requires a proxy to connect to the internet, then you should use the same
 # configuration for the chroot environment where the root filesystem to be updated.
 # For this purpose you should set the following variables (preferably in local.conf):
-# ENV_HOST_PROXIES - a space separated list of proxies, e.g.
+# ENV_HOST_PROXIES - a space separated list of host side temporary proxies, e.g.
 #     ENV_HOST_PROXIES = "http_proxy=http://my.proxy.nxp.com:8080 \
 #                         https_proxy=http://my.proxy.nxp.com:8080 "
 # APTGET_HOST_PROXIES - a space separated list of 'Acquire' options to be written to the apt.conf from

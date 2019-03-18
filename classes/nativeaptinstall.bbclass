@@ -149,8 +149,6 @@ ${PSEUDO_LOCALSTATEDIR}:\
 /dev/pts:\
 /dev/pts/*:\
 /dev/ptmx:\
-/etc/hosts:\
-/etc/resolv.conf:\
 "
 
 ENV_HOST_PROXIES ?= ""
@@ -195,6 +193,9 @@ END_PROXY
 		fi
 	done
 
+	export etc_hosts_renamed="${APTGET_CHROOT_DIR}/etc/hosts.yocto"
+	export etc_resolv_conf_renamed="${APTGET_CHROOT_DIR}/etc/resolv.conf.yocto"
+
 	# With this little trick, we can qemu target-side executables
 	# inside pseudo chroot without losing pseudo functionality.
 	# This is a must have for some of the package related scripts
@@ -205,6 +206,21 @@ END_PROXY
 	export QEMU_UNSET_ENV="${QEMU_UNSET_ENV}"
 	export QEMU_LIBCSYSCALL="1"
 	#unset QEMU_LD_PREFIX
+	# While we do our installation stunt in qemu land, we also want
+	# to be able to use host side networking configs. This means we
+	# need to protect the host and DNS config. We do a bit of a
+	# convoluted stunt here to hopefully be flexible enough about
+	# different rootfs types.
+	if [ -e "${APTGET_CHROOT_DIR}/etc/hosts" ]; then
+		rm -f "$etc_hosts_renamed"
+		mv "${APTGET_CHROOT_DIR}/etc/hosts" "$etc_hosts_renamed"
+	fi
+	cp "/etc/hosts" "${APTGET_CHROOT_DIR}/etc/hosts"
+	if [ -e "${APTGET_CHROOT_DIR}/etc/resolv.conf" ]; then
+		rm -f "$etc_resolv_conf_renamed"
+		mv "${APTGET_CHROOT_DIR}/etc/resolv.conf" "$etc_resolv_conf_renamed"
+	fi
+	cp "/etc/resolv.conf" "${APTGET_CHROOT_DIR}/etc/resolv.conf"
 
 	APTGET_HOST_PROXIES="${APTGET_HOST_PROXIES}"
 	while [ -n "$APTGET_HOST_PROXIES" ]; do
@@ -428,6 +444,21 @@ fakeroot do_shell_update_append() {
 	# Delete any temp proxy lines we may have added in the target rootfs
 	if [ -f "${APTGET_CHROOT_DIR}/etc/apt/apt.conf" ]; then
 		sed -i '/^Acquire::.+; \/* Yocto *\/\s*$/d' "${APTGET_CHROOT_DIR}/etc/apt/apt.conf"
+	fi
+
+	# Now that we are done in qemu land, we reinstate the original
+	# networking config of our target rootfs.
+	# We really should do this only if the targets have not been
+	# modified during installation. Hmm. Remove vs. Merge? FIX?
+	if [ -e "$etc_hosts_renamed" ]; then
+		mv -f "$etc_hosts_renamed" "${APTGET_CHROOT_DIR}/etc/hosts" 
+	fi
+	if [ -e "$etc_resolv_conf_renamed" ]; then
+		if [ ! -L "${APTGET_CHROOT_DIR}/etc/resolv.conf" ]; then
+			mv -f "$etc_resolv_conf_renamed" "${APTGET_CHROOT_DIR}/etc/resolv.conf"
+		else
+			rm -f "$etc_resolv_conf_renamed"
+		fi
 	fi
 
 	set +x

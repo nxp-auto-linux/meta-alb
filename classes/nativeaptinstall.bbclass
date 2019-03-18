@@ -76,6 +76,8 @@ APTGET_SKIP_UPGRADE ?= "0"
 
 # Set this to anything but 0 to skip performing apt-get clean at the end
 APTGET_SKIP_CACHECLEAN ?= "0"
+# Minimum package needs for apt to work right. Nothing else.
+APTGET_INIT_PACKAGES ?= "apt-transport-https ca-certificates software-properties-common apt-utils"
 
 APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${TRANSLATED_TARGET_ARCH}"
 APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
@@ -261,6 +263,12 @@ END_USER
 		fi
 	fi
 
+	# Prepare apt to be generically usable
+	chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy update
+	if [ -n "${APTGET_INIT_PACKAGES}" ]; then
+		x="${APTGET_INIT_PACKAGES}"
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install $x
+	fi
 	if [ -n "${APTGET_EXTRA_PPA}" ]; then
 		DISTRO_NAME=`grep "DISTRIB_CODENAME=" "${APTGET_CHROOT_DIR}/etc/lsb-release" | sed "s/DISTRIB_CODENAME=//g"`
 

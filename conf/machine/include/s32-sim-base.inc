@@ -18,4 +18,7 @@ DISTRO_FEATURES_append += " virtio "
 
 PREFERRED_VERSION_gmac = "${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '0.4.1', '0.4.0', d)}"
 
+# Force Linux booting single core when using GMAC
+KERNEL_SINGLE_CORE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', '1', '0', d)}"
+
 SOC_FAMILY_append = ":gen1"

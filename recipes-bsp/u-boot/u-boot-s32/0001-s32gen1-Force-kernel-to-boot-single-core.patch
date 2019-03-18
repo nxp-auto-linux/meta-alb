@@ -1,0 +1,27 @@
+From fa4024dc6f16baa67a6b191f1e6785b15e2e7030 Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Sat, 16 Mar 2019 21:40:54 +0000
+Subject: [PATCH] s32gen1: Force kernel to boot single core.
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ include/configs/s32.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/s32.h b/include/configs/s32.h
+index d06ea92..d1287c2 100644
+--- a/include/configs/s32.h
++++ b/include/configs/s32.h
+@@ -215,7 +215,8 @@
+ #endif
+ 
+ #undef CONFIG_BOOTARGS
+-#if defined(CONFIG_S32G275) && defined(CONFIG_RUN_AT_EL2)
++
++#if defined(VIRTUAL_PLATFORM)
+ #define S32G_BOOTARGS_MAXCPUS " maxcpus=1 "
+ #else
+ #define S32G_BOOTARGS_MAXCPUS ""
+-- 
+2.7.4
+

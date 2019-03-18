@@ -24,10 +24,15 @@ SRCREV = "33111da4309c04921ce592ee3c2a571f54f33402"
 SCMVERSION = "y"
 LOCALVERSION = ""
 
+KERNEL_SINGLE_CORE ??= "0"
+
 # Support for generating default environment
 SRC_URI += " \
     file://0001-env-Add-Makefile-rule-to-generate-default-environment-2018.patch \
 "
+
+# Force booting linux single core on demand
+SRC_URI_append_gen1 = "${@oe.utils.conditional("KERNEL_SINGLE_CORE", "0", "", " file://0001-s32gen1-Force-kernel-to-boot-single-core.patch ", d)}"
 
 # FIXME: Allow linking of 'tools' binaries with native libraries
 #        used for generating the boot logo and other tools used

@@ -213,7 +213,10 @@ END_PROXY
 	# The Ubuntu 'adduser' doesn't work because passwd is called
 	# which doesn't like our pseudo root
 	if [ -n "${APTGET_ADD_USERS}" ]; then
-		for user in "${APTGET_ADD_USERS}"; do
+		# Tricky variable hack to get word parsing for Yocto
+		# variables in the shell.
+		x="${APTGET_ADD_USERS}"
+		for user in $x; do
 
 			IFS=':' read -r user_name user_passwd user_shell <<END_USER
 $user
@@ -265,7 +268,10 @@ END_USER
 			bberror "Unable to get target linux distribution codename. Please check that \"${APTGET_CHROOT_DIR}/etc/lsb-release\" is not corrupted."
 		fi
 
-		for ppa in "${APTGET_EXTRA_PPA}"; do
+		# Tricky variable hack to get word parsing for Yocto
+		# variables in the shell.
+		x="${APTGET_EXTRA_PPA}"
+		for ppa in $x; do
 
 			IFS=';' read -r ppa_addr ppa_server ppa_hash ppa_type ppa_file <<END_PPA
 $ppa
@@ -327,7 +333,8 @@ END_PPA
 		echo  >"${APTGET_CHROOT_DIR}/aptgetsource.sh" "#!/bin/sh"
 		echo >>"${APTGET_CHROOT_DIR}/aptgetsource.sh" "cd \$1"
 		echo >>"${APTGET_CHROOT_DIR}/aptgetsource.sh" "/usr/bin/apt-get -yq source \$2"
-		for i in "${APTGET_EXTRA_SOURCE_PACKAGES}"; do
+		x="${APTGET_EXTRA_SOURCE_PACKAGES}"
+		for i in $x; do
 			chroot "${APTGET_CHROOT_DIR}" /bin/bash /aptgetsource.sh "/root" "${i}"
 		done
 		rm -f "${APTGET_CHROOT_DIR}/aptgetsource.sh"

@@ -332,6 +332,7 @@ END_PPA
 				chroot "${APTGET_CHROOT_DIR}" /usr/bin/add-apt-repository -y -s $ppa_addr
 				continue;
 			fi
+
 			if [ -z "$ppa_type" ]; then
 				ppa_type="deb"
 			fi
@@ -345,7 +346,7 @@ END_PPA
 				if [ -n "$APTGET_GPG_BROKEN" ]; then
 					ppa_proxy="-proxy=$ENV_HTTP_PROXY"
 				else
-				ppa_proxy="--keyserver-options http-proxy=$ENV_HTTP_PROXY"
+					ppa_proxy="--keyserver-options http-proxy=$ENV_HTTP_PROXY"
 				fi
 			fi
 

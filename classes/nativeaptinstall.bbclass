@@ -42,6 +42,8 @@
 #                      'shell' is the default shell (if empty, default is /bin/sh).
 #   APTGET_SKIP_UPGRADE - (optional) prevent running apt-get upgrade on the root filesystem
 #   APTGET_SKIP_FULLUPGRADE - (optional) prevent running apt-get full-upgrade on the root filesystem
+#   APTGET_YOCTO_TRANSLATION - (optional) pairs of <debianpkgname>:<commalistofyoctopkgnames>
+#                      to automatically correct dependencies
 #   APTGET_INIT_PACKAGES - (optional) For apt to work right on arbitrary setups, some
 #                      minimum packages are needed. This is preset appropriately but may be changed.
 # - define function 'do_shell_update' (optional) containing all custom processing that
@@ -432,6 +434,7 @@ APTGET_ALL_PACKAGES = "${APTGET_EXTRA_PACKAGES} \
 	${APTGET_EXTRA_PACKAGES_LAST} \
 	${APTGET_EXTRA_SOURCE_PACKAGES} \
 	${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} \
+	${APTGET_RPROVIDES} \
 "
 python () {
 	pn = (d.getVar('PN', True) or "")

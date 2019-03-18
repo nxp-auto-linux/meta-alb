@@ -302,15 +302,19 @@ END_USER
 		x="${APTGET_EXTRA_PPA}"
 		for ppa in $x; do
 
-			IFS=';' read -r ppa_addr ppa_server ppa_hash ppa_type ppa_file <<END_PPA
+			IFS=';' read -r ppa_addr ppa_server ppa_hash ppa_type ppa_file_orig <<END_PPA
 $ppa
 END_PPA
 
+			if [ "`echo $ppa_addr | head -c 4`" = "ppa:" ]; then
+				chroot "${APTGET_CHROOT_DIR}" /usr/bin/add-apt-repository -y -s $ppa_addr
+				continue;
+			fi
 			if [ -z "$ppa_type" ]; then
 				ppa_type="deb"
 			fi
-			if [ -n "$ppa_file" ]; then
-				ppa_file="/etc/apt/sources.list.d/$ppa_file"
+			if [ -n "$ppa_file_orig" ]; then
+				ppa_file="/etc/apt/sources.list.d/$ppa_file_orig"
 			else
 				ppa_file="/etc/apt/sources.list"
 			fi

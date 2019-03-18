@@ -340,9 +340,8 @@ END_PPA
 			fi
 
 		done
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy update
 	fi
-
-	chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy update
 
 	if [ "${APTGET_SKIP_UPGRADE}" = "0" ]; then
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qyf install

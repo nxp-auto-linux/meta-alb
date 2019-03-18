@@ -109,7 +109,7 @@ fakeroot do_shell_prepare() {
 	tar -C "${D}" -xzf "${S}/${ROOTFS}"
 }
 
-fakeroot do_shell_update() {
+fakeroot do_aptget_user_update_append() {
 
 	set -x
 
@@ -148,7 +148,7 @@ fakeroot do_shell_update() {
 
 python do_install() {
     bb.build.exec_func("do_shell_prepare", d)
-    bb.build.exec_func("do_shell_update", d)
+    bb.build.exec_func("do_aptget_update", d)
 }
 
 PKGDEST = "${WORKDIR}/packages-split"

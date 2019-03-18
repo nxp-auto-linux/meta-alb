@@ -6,8 +6,8 @@
 #    handled transparently as needed.
 #
 # Custom shell operations that require chroot can also be executed using this class,
-#    by adding them to a function named 'do_shell_update' and defined in the caller
-#    recipe.
+#    by adding them to a function named 'do_aptget_user_update' and defined in the
+#    caller recipe, and executing the task do_aptget_update then.
 #
 # All that is required in order to use this class is:
 # - define variables:
@@ -18,7 +18,7 @@
 #   APTGET_EXTRA_PACKAGES_LAST - the list of debian packages (space separated) to be
 #                           installed over the existing root filesystem, after all packages
 #                           in APTGET_EXTRA_PACKAGES is installed and all operations in
-#                           'do_shell_update' have been executed
+#                           'do_aptget_update' have been executed
 #   APTGET_EXTRA_SOURCE_PACKAGES - the list of debian source packages (space separated)
 #                                  to be installed over the existing root filesystem
 #   APTGET_EXTRA_PACKAGES_SERVICES_DISABLED - the list of debian packages (space separated)
@@ -46,9 +46,9 @@
 #                      to automatically correct dependencies
 #   APTGET_INIT_PACKAGES - (optional) For apt to work right on arbitrary setups, some
 #                      minimum packages are needed. This is preset appropriately but may be changed.
-# - define function 'do_shell_update' (optional) containing all custom processing that
+# - define function 'do_aptget_user_update' (optional) containing all custom processing that
 #          normally require to be executed under chroot (with root privileges)
-# - call function 'do_shell_update' either directly (e.g. call it from 'do_install')
+# - call function 'do_aptget_update' either directly (e.g. call it from 'do_install')
 #        or indirectly (e.g. add it to the variable 'ROOTFS_POSTPROCESS_COMMAND')
 #
 # Prerequisites:
@@ -154,11 +154,7 @@ ${PSEUDO_LOCALSTATEDIR}:\
 ENV_HOST_PROXIES ?= ""
 APTGET_HOST_PROXIES ?= ""
 
-fakeroot do_shell_update_prepend() {
-	# Once the basic rootfs is unpacked, we use the local passwd
-	# information.
-	set -x
-
+aptget_update_presetvars() {
 	export PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
 
 	# All this depends on the updated pseudo-native with better 
@@ -167,13 +163,20 @@ fakeroot do_shell_update_prepend() {
 	export PSEUDO_CHROOT_FORCED="${PSEUDO_CHROOT_FORCED}"
 	export PSEUDO_CHROOT_EXCEPTIONS="${PSEUDO_CHROOT_EXCEPTIONS}"
 
-	# apt may not be fully configured at this stage
-	mkdir -p "${APTGET_CHROOT_DIR}/etc/apt"
+	# With this little trick, we can qemu target-side executables
+	# inside pseudo chroot without losing pseudo functionality.
+	# This is a must have for some of the package related scripts
+	# that have to use the target side executables.
+	# This depends on both our pseudo and qemu update
+	export PSEUDO_CHROOT_XPREFIX="${PSEUDO_CHROOT_XPREFIX}"
+	export QEMU_SET_ENV="${QEMU_SET_ENV}"
+	export QEMU_UNSET_ENV="${QEMU_UNSET_ENV}"
+	export QEMU_LIBCSYSCALL="1"
+	#unset QEMU_LD_PREFIX
 
 	# Add any proxies from the host, according to
 	# https://wiki.yoctoproject.org/wiki/Working_Behind_a_Network_Proxy
 	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
-	export QEMU_SET_ENV="${QEMU_SET_ENV}"
 
 	while [ -n "$ENV_HOST_PROXIES" ]; do
 		IFS=" =_" read -r proxy_type proxy_string proxy_val ENV_HOST_PROXIES <<END_PROXY
@@ -195,17 +198,15 @@ END_PROXY
 
 	export etc_hosts_renamed="${APTGET_CHROOT_DIR}/etc/hosts.yocto"
 	export etc_resolv_conf_renamed="${APTGET_CHROOT_DIR}/etc/resolv.conf.yocto"
+}
 
-	# With this little trick, we can qemu target-side executables
-	# inside pseudo chroot without losing pseudo functionality.
-	# This is a must have for some of the package related scripts
-	# that have to use the target side executables.
-	# This depends on both our pseudo and qemu update
-	export PSEUDO_CHROOT_XPREFIX="${PSEUDO_CHROOT_XPREFIX}"
-	export QEMU_SET_ENV
-	export QEMU_UNSET_ENV="${QEMU_UNSET_ENV}"
-	export QEMU_LIBCSYSCALL="1"
-	#unset QEMU_LD_PREFIX
+fakeroot aptget_update_begin() {
+	# Once the basic rootfs is unpacked, we use the local passwd
+	# information.
+	set -x
+
+	aptget_update_presetvars;
+
 	# While we do our installation stunt in qemu land, we also want
 	# to be able to use host side networking configs. This means we
 	# need to protect the host and DNS config. We do a bit of a
@@ -221,6 +222,9 @@ END_PROXY
 		mv "${APTGET_CHROOT_DIR}/etc/resolv.conf" "$etc_resolv_conf_renamed"
 	fi
 	cp "/etc/resolv.conf" "${APTGET_CHROOT_DIR}/etc/resolv.conf"
+
+	# apt may not be fully configured at this stage
+	mkdir -p "${APTGET_CHROOT_DIR}/etc/apt"
 
 	APTGET_HOST_PROXIES="${APTGET_HOST_PROXIES}"
 	while [ -n "$APTGET_HOST_PROXIES" ]; do
@@ -417,13 +421,21 @@ END_PPA
 }
 
 # empty placeholder, override it in parent script for more functionality
-fakeroot do_shell_update() {
+fakeroot do_aptget_user_update_prepend() {
+
+	aptget_update_presetvars;
+}
+
+fakeroot do_aptget_user_update() {
+
 	:
 }
 
-fakeroot do_shell_update_append() {
+fakeroot aptget_update_end() {
 
 	set -x
+
+	aptget_update_presetvars;
 
 	if [ -n "${APTGET_EXTRA_PACKAGES_LAST}" ]; then
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install ${APTGET_EXTRA_PACKAGES_LAST}
@@ -462,6 +474,12 @@ fakeroot do_shell_update_append() {
 	fi
 
 	set +x
+}
+
+python do_aptget_update() {
+        bb.build.exec_func("aptget_update_begin", d);
+        bb.build.exec_func("do_aptget_user_update", d);
+        bb.build.exec_func("aptget_update_end", d);
 }
 
 # The various apt packages need to be translated properly into Yocto

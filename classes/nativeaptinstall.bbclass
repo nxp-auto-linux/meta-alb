@@ -41,6 +41,9 @@
 #                      then generate it again.
 #                      'shell' is the default shell (if empty, default is /bin/sh).
 #   APTGET_SKIP_UPGRADE - (optional) prevent running apt-get upgrade on the root filesystem
+#   APTGET_SKIP_FULLUPGRADE - (optional) prevent running apt-get full-upgrade on the root filesystem
+#   APTGET_INIT_PACKAGES - (optional) For apt to work right on arbitrary setups, some
+#                      minimum packages are needed. This is preset appropriately but may be changed.
 # - define function 'do_shell_update' (optional) containing all custom processing that
 #          normally require to be executed under chroot (with root privileges)
 # - call function 'do_shell_update' either directly (e.g. call it from 'do_install')
@@ -74,8 +77,12 @@ APTGET_CHROOT_DIR ?= "${D}"
 # Set this to anything but 0 to skip performing apt-get upgrade
 APTGET_SKIP_UPGRADE ?= "0"
 
+# Set this to anything but 0 to skip performing apt-get full-upgrade
+APTGET_SKIP_FULLUPGRADE ?= "1"
+
 # Set this to anything but 0 to skip performing apt-get clean at the end
 APTGET_SKIP_CACHECLEAN ?= "0"
+
 # Minimum package needs for apt to work right. Nothing else.
 APTGET_INIT_PACKAGES ?= "apt-transport-https ca-certificates software-properties-common apt-utils"
 
@@ -308,6 +315,11 @@ END_PPA
 	if [ "${APTGET_SKIP_UPGRADE}" = "0" ]; then
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qyf install
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy upgrade
+	fi
+
+	if [ "${APTGET_SKIP_FULLUPGRADE}" = "0" ]; then
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qyf install
+		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy full-upgrade
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}" ]; then

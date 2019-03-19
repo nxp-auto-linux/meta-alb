@@ -19,7 +19,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
-SRCREV = "33111da4309c04921ce592ee3c2a571f54f33402"
+SRCREV = "cdc1b4665841905502184c1ba24d1fa497edbb8f"
 
 SCMVERSION = "y"
 LOCALVERSION = ""
@@ -27,6 +27,12 @@ LOCALVERSION = ""
 # Support for generating default environment
 SRC_URI += " \
     file://0001-env-Add-Makefile-rule-to-generate-default-environment-2018.patch \
+"
+
+# Enable Xen default boot if Xen enabled
+DELTA_UBOOT_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
+SRC_URI += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_config.cfg', '', d)} \
 "
 
 # FIXME: Allow linking of 'tools' binaries with native libraries

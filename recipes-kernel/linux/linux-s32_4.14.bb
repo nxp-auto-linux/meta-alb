@@ -36,12 +36,17 @@ SRC_URI += "\
     file://build/virtio \
     file://build/gpu.config \
     file://build/tmu.config \
+    file://build/ftrace.cfg \
 "
 
 # Add CCI device tree node for S32Gen1 only if GMAC is enabled
 SRC_URI_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', \
     ' file://0001-s32gen1-Add-CCI400-device-tree-configuration.patch ', \
     '', d)}"
+
+# Add kernel function tracer for S32Gen1 (conditionally)
+DELTA_KERNEL_DEFCONFIG_append_gen1 += " ${@bb.utils.contains('DISTRO_FEATURES', 'ftrace', \
+    'ftrace.cfg', '', d)}"
 
 # Following patch disables the AVB TX queues (1 and 2) in order to prevent
 # a FEC TX queue timeout that occurs when using NFS root filesystem.

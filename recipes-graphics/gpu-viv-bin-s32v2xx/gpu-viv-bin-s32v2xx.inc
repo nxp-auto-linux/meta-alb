@@ -10,7 +10,9 @@ LICENSE = "Proprietary"
 DEPENDS += "kernel-module-galcore"
 RDEPENDS_${PN} += "kernel-module-galcore"
 
-PROVIDES = "gpu-viv-bin-s32v2xx"
+PROVIDES += "virtual/wayland-egl virtual/libgal-x11 virtual/libopenvg"
+PROVIDES += "virtual/opencl-icd opencl-headers"
+PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl"
 RPROVIDES_${PN} = "gpu-viv-bin-s32v2xx"
 
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"

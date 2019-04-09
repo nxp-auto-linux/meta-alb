@@ -63,12 +63,8 @@ do_install_append () {
     install -m 0644 ${WORKDIR}/glesv2.pc ${D}${libdir}/pkgconfig/glesv2.pc
     install -m 0644 ${WORKDIR}/vg.pc ${D}${libdir}/pkgconfig/vg.pc
 
-    find ${D}/usr -type f -exec chmod 644 {} \;
-    find ${D}/opt -type f -exec chmod 644 {} \;
-
     install -d ${D}/etc
     cp -axr ${S}/etc ${D}
-    find ${D}/etc -type f -exec chmod 644 {} \;
 
     install -d ${D}${sysconfdir}/profile.d/
     install -m 0755 ${WORKDIR}/gpu_set_multi_buffer.sh ${D}${sysconfdir}/profile.d/

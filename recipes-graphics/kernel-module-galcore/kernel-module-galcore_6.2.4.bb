@@ -12,7 +12,7 @@ PROVIDES = "kernel-module-galcore${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-galcore${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
 SRC_URI = " git://source.codeaurora.org/external/autobsps32/galcore;branch=alb/master;protocol=https "
-SRCREV = "7b46839c83db75f428ae3c13d2f7e16a7cd094db"
+SRCREV = "7eed97bdbd065a8990c3d6b526e0d63d383d9871"
 
 LIC_FILES_CHKSUM = "file://GPLv2;md5=fcb02dc552a041dee27e4b85c7396067"
 

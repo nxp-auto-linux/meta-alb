@@ -1,0 +1,39 @@
+From 4b7bc2fd83daf6fc45063e40d9303e0a03d1997f Mon Sep 17 00:00:00 2001
+From: Catalina Radu <catalina.radu@nxp.com>
+Date: Wed, 10 Apr 2019 15:02:31 +0300
+Subject: [PATCH] vnet: Add initial support to build driver in kernel
+
+Signed-off-by: Catalina Radu <catalina.radu@nxp.com>
+---
+ drivers/net/Kconfig  | 2 ++
+ drivers/net/Makefile | 3 +++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index d037751..cb2a1b9 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -523,4 +523,6 @@ config NET_FAILOVER
+ 	  a VM with direct attached VF by failing over to the paravirtual
+ 	  datapath when the VF is unplugged.
+ 
++source "drivers/net/vnet/Kconfig"
++
+ endif # NETDEVICES
+diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+index 21cde7e..1cb695e 100644
+--- a/drivers/net/Makefile
++++ b/drivers/net/Makefile
+@@ -70,6 +70,9 @@ obj-$(CONFIG_XEN_NETDEV_BACKEND) += xen-netback/
+ 
+ obj-$(CONFIG_USB_NET_DRIVERS) += usb/
+ 
++obj-$(CONFIG_VNET_S32) += vnet/s32/
++obj-$(CONFIG_VNET_LS2) += vnet/ls/
++
+ obj-$(CONFIG_HYPERV_NET) += hyperv/
+ obj-$(CONFIG_NTB_NETDEV) += ntb_netdev.o
+ 
+-- 
+1.9.1
+

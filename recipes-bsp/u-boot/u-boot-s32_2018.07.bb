@@ -41,6 +41,26 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 USRC ?= ""
 S = '${@oe.utils.conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
 
+do_merge_delta_config[dirs] = "${B}"
+do_merge_delta_config() {
+    # add config fragments
+    echo ${UBOOT_MACHINE}
+    for config in ${UBOOT_MACHINE}; do
+        # replace <config-type>_config to <config-type>_defconfig to
+        # match the config name file
+        config="$(echo "${config}" | sed -e 's/'_config'/'_defconfig'/g')"
+
+        cp ${S}/configs/${config} .config
+        for deltacfg in ${DELTA_UBOOT_DEFCONFIG}; do
+            ${S}/scripts/kconfig/merge_config.sh -m .config ${deltacfg}
+        done
+        cp .config ${S}/configs/${config}
+    done
+}
+addtask merge_delta_config before do_configure after do_patch
+
+
+
 do_compile_append() {
     unset i j k
     for config in ${UBOOT_MACHINE}; do

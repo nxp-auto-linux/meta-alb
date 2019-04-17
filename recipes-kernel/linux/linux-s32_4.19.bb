@@ -49,6 +49,11 @@ KERNEL_FEC_LIMIT_TX ??= "0"
 
 require vnet-s32.inc
 
+# For Kernel version 4.19, task 'do_merge_delta_config' requires that the cross
+# compiler is available in recipe's sysroot. In order to avoid any erros/warnings
+# at build time of the Linux Kernel version 4.19, we add this dependency.
+do_merge_delta_config[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
+
 SRC_URI_append_s32v2xx = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' file://0001-pcie-s32v-kernel-support-for-pcie-demos-icc-and-user-sp.patch', '', d)}"
 SRC_URI_append_s32v2xx = " ${@oe.utils.conditional('KERNEL_FEC_LIMIT_TX', '0', '', ' file://0001-fec-limit-TX-queues-to-prevent-TX-starvation-crash.patch', d)}"
 

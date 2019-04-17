@@ -1,6 +1,6 @@
 # Copyright (C) 2013 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
-# Copyright 2017-2018 NXP
+# Copyright 2017-2019 NXP
 
 inherit module
 
@@ -31,8 +31,13 @@ S = "${WORKDIR}/git"
 
 # MACHINE_EXTRA_RRECOMMENDS += "kernel-module-galcore"
 
+KERNEL_MODULE_AUTOLOAD += "galcore"
+KERNEL_MODULE_PROBECONF += "galcore"
+module_conf_galcore = "options galcore contiguousSize=0x200000"
+
 FILES_${PN} += "/lib/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv/galcore.ko"
 FILES_${PN} += "/etc/modules-load.d/galcore.conf"
+FILES_${PN} += "/etc/modprobe.d/galcore.conf"
 
 do_install_append(){
 	echo "galcore" > ${S}/galcore.conf

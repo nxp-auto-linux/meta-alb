@@ -60,6 +60,11 @@ SDCARDIMAGE_EXTRA9 ?= "${FLASHIMAGE_EXTRA9}"
 SDCARDIMAGE_EXTRA9_FILE ?= "${FLASHIMAGE_EXTRA9_FILE}"
 SDCARDIMAGE_EXTRA9_OFFSET ?= "${FLASHIMAGE_EXTRA9_OFFSET}"
 
+SDCARDIMAGE_BOOT_EXTRA1 ?= ""
+SDCARDIMAGE_BOOT_EXTRA1_FILE ?= ""
+SDCARDIMAGE_BOOT_EXTRA2 ?= ""
+SDCARDIMAGE_BOOT_EXTRA2_FILE ?= ""
+
 SDCARD_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
 SDCARD = "${SDCARD_DEPLOYDIR}/${IMAGE_NAME}.rootfs.sdcard"
 
@@ -82,6 +87,8 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA7_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA7', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA8_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA8', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
+	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA1', True) + ':do_deploy' or ''} \
+	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA2', True) + ':do_deploy' or ''} \
 "
 
 do_image_sdcard[depends] += "${IMAGE_BASENAME}:do_image_ext3"
@@ -89,6 +96,15 @@ do_image_sdcard[depends] += "${IMAGE_BASENAME}:do_image_ext3"
 SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
 SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_fsl_lsch3_sdcard"
 SDCARD_GENERATION_COMMAND_s32 = "generate_imx_sdcard"
+
+# Add extra images in the boot partition
+add_extra_boot_img() {
+	BOOT_IMAGE_FILE="$1"
+	BOOT_IMAGE="$2"
+	if [ -n "${BOOT_IMAGE_FILE}" ]; then
+		mcopy -i ${BOOT_IMAGE} -s ${DEPLOY_DIR_IMAGE}/${SDCARDIMAGE_BOOT_EXTRA1_FILE} ::/${SDCARDIMAGE_BOOT_EXTRA1_FILE}
+	fi
+}
 
 #
 # Generate the boot image with the boot scripts and required Device Tree
@@ -141,6 +157,10 @@ _generate_boot_image() {
 		mmd -i ${WORKDIR}/boot.img ::/extlinux
 		mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/extlinux.conf ::/extlinux/extlinux.conf
 	fi
+
+	# Add extra boot images in the SDCARD boot partition
+	add_extra_boot_img "${SDCARDIMAGE_BOOT_EXTRA1_FILE}" "${WORKDIR}/boot.img"
+	add_extra_boot_img "${SDCARDIMAGE_BOOT_EXTRA2_FILE}" "${WORKDIR}/boot.img"
 }
 
 # Create an image that can by written onto a SD card using dd for use

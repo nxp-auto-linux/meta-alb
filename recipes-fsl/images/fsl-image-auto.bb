@@ -40,3 +40,7 @@ IMAGE_INSTALL_append_ls2 = " ${LXC_INSTALL_PACKAGES}"
 
 # SFTP server
 IMAGE_INSTALL_append = " openssh openssh-sftp openssh-sftp-server "
+
+# Enable Xen and add Xen Packages
+XEN_IMAGE_INCLUDE = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-auto-xen.inc', '', d)}"
+require ${XEN_IMAGE_INCLUDE}

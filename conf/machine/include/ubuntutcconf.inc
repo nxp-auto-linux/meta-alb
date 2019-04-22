@@ -109,20 +109,37 @@ def ubuntu_ext_toolchain(d):
     arch = d.getVar("TARGET_ARCH", True)
     base = d.getVar("BASE_EXT_TC", True)
 
-    elt_target =  "%s-linux-gnu" % arch
-    host_tc ="%s/%s" % (base, elt_target)
-    host_gcc = "%s/bin/%s-gcc" % (base, elt_target)
+    # We support the Ubuntu-Toolchain only if the host version
+    # matches the target version!
+    ubv = d.getVar('UBUNTU_TARGET_BASEVERSION')
+    if not ubv:
+        bb.error("Do not try to run a Ubuntu build without UBUNTU_TARGET_BASEVERSION set!")
+        return False
+    if not os.path.exists('/etc/lsb-release'):
+        bb.debug(1, "Cannot identify host. Defaulting to Yocto toolchain.")
+        return False
 
-    if os.path.exists(host_tc) and os.path.exists(host_gcc):
-        # Ubuntu host cross toolchain is installed on the host
-        # bb.note("Using Ubuntu host cross toolchain %s" % host_gcc)
+    ubuntu_rel = {
+        'DISTRIB_ID' : None,
+        'DISTRIB_RELEASE' : None,
+        'DISTRIB_CODENAME' : None,
+    }
+    with open('/etc/lsb-release') as rel_file:
+        for line in rel_file:
+            if not '=' in line:
+                continue
+            key, value = line.split("=", 1)
+            if key in ubuntu_rel:
+                ubuntu_rel[key] = value.rstrip()
 
-        # currently is supported only Ubuntu 5.4 version from Ubuntu 16.04
-        version = get_version(d, host_gcc)
-        if "Ubuntu/Linaro 5.4" in version and "ubuntu1~16.04" in version:
-            return True
+    if ubuntu_rel['DISTRIB_ID'] != "Ubuntu" or not ubuntu_rel['DISTRIB_RELEASE']:
+        bb.debug(1, "Host is not running Ubuntu. Using Yocto toolchain.")
+        return False
+    if ubv != ubuntu_rel['DISTRIB_RELEASE']:
+        bb.debug(1, "Ubuntu host version conflict %s vs %s for target" % (ubuntu_rel['DISTRIB_RELEASE'], ubv))
+        return False
 
-    return False
+    return True
 
 # Evaluated a few times only initially and then self holding through
 # the shadow variable, so not really performance critical

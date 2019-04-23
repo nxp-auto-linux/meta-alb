@@ -8,4 +8,4 @@ SRC_URI_append_s32v234bbmini += "\
     file://0001-vnet-Add-initial-support-to-build-driver-in-kernel.patch \
     file://build/vnet_s32.cfg \
 "
-SRCREV_vnet_s32v234bbmini = "213d3b4c6e9150885a44af3b884b90e2ccb3bcd5"
+SRCREV_vnet_s32v234bbmini = "94a690ffa7be81ee4c9ad32d950001abbba3fd34"

@@ -1,10 +1,10 @@
 require ppa.inc
 
-DEPENDS += "optee-os"
+DEPENDS += "optee-os-qoriq"
 
 PPA_PATH_ls1046a = "ls1046"
 PPA_PATH_ls1043a = "ls2088"
-PPA_PATH_ls1012ardb = "ls1012"
+PPA_PATH_ls1012a = "ls1012"
 
 do_compile() {
     export ARMV8_TOOLS_DIR="${STAGING_BINDIR_TOOLCHAIN}"
@@ -16,4 +16,4 @@ do_compile() {
     cd ${S}
 }
 
-COMPATIBLE_MACHINE = "(ls1043a|ls1046a|ls1012ardb)"
+COMPATIBLE_MACHINE = "(ls1043a|ls1046a|ls1012a)"

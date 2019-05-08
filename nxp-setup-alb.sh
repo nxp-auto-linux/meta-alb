@@ -263,6 +263,7 @@ LAYER_LIST=" \
     meta-freescale \
     \
     meta-alb \
+    meta-vnp \
     \
     $extra_layers \
 "

@@ -16,7 +16,7 @@ APTGET_EXTRA_PACKAGES += " \
     aptitude \
     openjdk-8-jdk \
     gcc g++ cpp \
-    build-essential make makedev automake cmake dkms \
+    build-essential make makedev automake cmake dkms flex bison\
     gdb u-boot-tools device-tree-compiler \
     python-dev \
     zip binutils-dev \

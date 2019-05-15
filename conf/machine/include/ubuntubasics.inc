@@ -18,11 +18,6 @@ SDK_RDEPENDS = ""
 POKY_DEFAULT_EXTRA_RDEPENDS = ""
 INITRAMFS_IMAGE = ""
 
-# To run pseudo in proper environments, we need to have chroot
-# available. As there is no simple chroot-native, we take it from
-# the host.
-HOSTTOOLS += "chroot"
-
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"
 

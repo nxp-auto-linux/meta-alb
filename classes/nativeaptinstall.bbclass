@@ -80,7 +80,7 @@ APTGET_SKIP_CACHECLEAN ?= "0"
 APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${TRANSLATED_TARGET_ARCH}"
 APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
 
-DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native"
+DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native coreutils-native"
 
 # script and function references which reside in a different location
 # in staging, or references that have to be taken from chroot afterall.

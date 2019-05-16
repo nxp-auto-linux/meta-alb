@@ -2,8 +2,8 @@
 # This script can be run from U-Boot with the "source" command to
 # deploy the BlueBox image to NOR flash properly using one of the below
 # options:
-# - SD card (FAT partitioned)
-# - USB Stick (FAT partitioned)
+# - SD card (FAT32 partitioned)
+# - USB Stick (FAT32 partitioned)
 # - TFTP
 #
 # DANGER! NO WAY BACK ONCE THIS SCRIPT RUNS!
@@ -11,7 +11,7 @@
 # <Heinz.Wrobel@nxp.com>
 #
 # SD-Card/USB stick preparation
-#       First partition must be FAT and must contain the compiled
+#       First partition must be FAT32 and must contain the compiled
 #       script image (.img and/or .itb) and
 #       the correct image for the box in question:
 #       fsl-image-blueboxbootflash-<platform>.flashimage
@@ -33,7 +33,7 @@
 #       fatload mmc 0:1 90000000 bbdeployimage.itb
 # - USB
 #       usb reset
-#       fatload usb 0:1 90000000  bbdeployimage.itb
+#       fatload usb 0:1 90000000 bbdeployimage.itb
 # - TFTP
 #       tftp 90000000 bbdeployimage.itb
 #
@@ -47,26 +47,12 @@
 setenv file
 setenv neededfilesize
 setenv shellscript
-neededfilesize=08000000     # 128MiB
 shellscript='bbdeployimage.sh'
 
 # We support two banks, and split areas in each for Power Architecture.
 # If two banks or split areas are not needed, they can be set to the
 # same text value respectively without affecting the result
 # First address always must be the LOWEST!
-saddr_0_1=a0000000
-daddr_0_1=580000000
-ssize_0_1=04000000
-saddr_0_2=a0000000
-daddr_0_2=580000000
-ssize_0_2=04000000
-saddr_4_1=a4000000
-daddr_4_1=584000000
-ssize_4_1=04000000
-saddr_4_2=a4000000
-daddr_4_2=584000000
-ssize_4_2=04000000
-
 #----------------------------------------------------------------------
 echo ""
 echo "*** BlueBox update script for LS208xA NOR Flash ***"
@@ -77,20 +63,46 @@ echo ""
 # - BB Classic with LS2080A
 # - BB Classic with LS2084A
 # - BB Mini with LS2084A
+
+flashtype="<unknownflashtype>"
+file="<unknownimagefile>"
+
+neededfilesize=08000000     # 128MiB
+setenv switchtobank0 ""
+saddr_0_1=a0000000
+daddr_0_1=580000000
+ssize_0_1=04000000
+saddr_0_2=a0000000
+daddr_0_2=580000000
+ssize_0_2=04000000
+setenv switchtobank4 ""
+saddr_4_1=a4000000
+daddr_4_1=584000000
+ssize_4_1=04000000
+saddr_4_2=a4000000
+daddr_4_2=584000000
+ssize_4_2=04000000
+
+#----------------------------------------------------------------------
 if itest.b *0x520000000 -eq 0x41; then
         # BB Mini
         echo "This script is running on BlueBox Mini with LS2084A ..."
+        flashtype='NOR'
         file='fsl-image-blueboxbootflash-ls2084abbmini.flashimage'
 else
         # BB Classic
         if itest.w *0x01e000a6 -eq 0x8709; then
                 echo "This script is running on BlueBox Classic with LS2084A ..."
+                flashtype='NOR'
                 file='fsl-image-blueboxbootflash-ls2084abluebox.flashimage'
-        else
+        fi
+        if itest.w *0x01e000a6 -eq 0x8701; then
                 echo "This script is running on BlueBox Classic with LS2080A ..."
+                flashtype='NOR'
                 file='fsl-image-blueboxbootflash-ls2080abluebox.flashimage'
         fi
 fi
+
 echo "We will search for the image $file ..."
 
 #----------------------------------------------------------------------
@@ -99,7 +111,7 @@ echo "We will search for the image $file ..."
 # Note that the weird indent is intentional as there appear to be
 # length limitations for continued lines in U-Boot. By reducing the
 # indent on complex setenv, we keep content length low.
-setenv cmd_flashblock '
+setenv cmd_flashnorblock '
 echo "Checking 0x$da:" "\\\\c";
 if cmp.b $sa $da $ss; then
   ok=1;
@@ -112,7 +124,7 @@ fi;
 '
 if setexpr _hassetexpr 0 + 1; then
         echo "setexpr command is available. Efficient flash method used ..."
-        setenv cmd_flashrange '
+        setenv cmd_flashnorrange '
 verbose=0;
 breakwhile=0;
 ss=80000;
@@ -123,7 +135,7 @@ while test 0x$offset -lt 0x$ssize && test $breakwhile -eq 0; do
   sa=$x;
   setexpr x $daddr + $offset;
   da=$x;
-  run cmd_flashblock;
+  run cmd_flashnorblock;
   if test $ok -eq 0; then
     echo "Failure at offset 0x$offset! ABORTING ...";
     breakwhile=1;
@@ -133,20 +145,27 @@ while test 0x$offset -lt 0x$ssize && test $breakwhile -eq 0; do
 done;'
 else
         echo "setexpr command is unavailable. Standard flash method used ..."
-        setenv cmd_flashrange '
+        setenv cmd_flashnorrange '
 verbose=1;
 ss=$ssize;
 sa=$saddr;
 da=$daddr;
-run cmd_flashblock;'
+run cmd_flashnorblock;'
 fi
-setenv cmd_flashnorbank '
+setenv cmd_flashqspirange '
+sf update $saddr $daddr $ssize'
+setenv cmd_flashNORprobe ''
+setenv cmd_flashQSPIprobe 'sf probe 0'
+setenv cmd_flashNORbank '
 echo "Unprotecting NOR..."; protect off $daddr +$ssize;
-run cmd_flashrange'
+run cmd_flashnorrange'
+setenv cmd_flashQSPIbank '
+echo "Unprotecting QSPI..."; sf protect unlock $daddr +$ssize;
+run cmd_flashqspirange'
 
 #----------------------------------------------------------------------
-# We prepare for 128MiB even with a partial image to have always a
-# well defined result by prefilling the memory!
+# We prepare for the full flash even with a partial image to have
+# always a well defined result by prefilling the memory!
 mw.b $saddr_0_1 ff $neededfilesize
 
 # Now load the image file and check if it is the right size
@@ -195,7 +214,7 @@ if test $ok -gt 0; then
         if test 0x$filesize -eq 0x$neededfilesize; then
                 ok=1
         else
-                echo "Loaded NOR Flash Image is not exactly of $neededfilesize size! ABORTING ..."
+                echo "Loaded ${flashtype} Flash Image is not exactly of $neededfilesize size! ABORTING ..."
                 ok=0
         fi
 fi
@@ -208,34 +227,36 @@ setenv sa
 setenv da
 setenv ss
 for bank in 0 4; do
+	setenv x "run switchtobank${bank}"; run x
+	setenv x "run cmd_flash${flashtype}probe"; run x
         if test $ok -gt 0; then
                 # Trick to do dynamic U-Boot variable expansion
                 setenv x "saddr1=\$saddr_${bank}_1 daddr1=\$daddr_${bank}_1 ssize1=\$ssize_${bank}_1"; run x
                 setenv x "saddr2=\$saddr_${bank}_2 daddr2=\$daddr_${bank}_2 ssize2=\$ssize_${bank}_2"; run x
                 echo ""
-                echo "Checking if NOR Bank ${bank} needs an update..."
-                if cmp.b $saddr1 $daddr1 $ssize1 && cmp.b $saddr2 $daddr2 $ssize2; then
+                echo "Checking if ${flashtype} Bank ${bank} needs an update..."
+                if test "${flashtype}" = "NOR" && cmp.b $saddr1 $daddr1 $ssize1 && cmp.b $saddr2 $daddr2 $ssize2; then
                         ok=1
                 else
-                        echo "*** Updating NOR Bank ${bank} ***"
+                        echo "*** Updating ${flashtype} Bank ${bank} ***"
                         saddr=$saddr1
                         daddr=$daddr1
                         ssize=$ssize1
-                        run cmd_flashnorbank
-                        echo "Protecting RCW in NOR..."; protect on $daddr +1;
+                        setenv x "run cmd_flash${flashtype}bank"; run x
+                        echo "Protecting RCW in ${flashtype}..."; protect on $daddr +1;
                         if test $ok -gt 0 && test $saddr1 -ne $saddr2; then
                                 saddr=$saddr2
                                 daddr=$daddr2
                                 ssize=$ssize2
-                                run cmd_flashnorbank
+				setenv x "run cmd_flash${flashtype}bank"; run x
                         fi
                 fi
 
                 if test $ok -gt 0; then
-                        echo "*** Update for NOR Bank ${bank} complete ***"
+                        echo "*** Update for ${flashtype} Bank ${bank} complete ***"
                 else
                         echo ""
-                        echo "*** Update FAILED for NOR Bank ${bank} ***"
+                        echo "*** Update FAILED for ${flashtype} Bank ${bank} ***"
                 fi
                 echo ""
         fi
@@ -252,7 +273,7 @@ if test $ok -gt 0; then
         echo "Next step would be to prep the SSD properly."
         echo 'Please "reset" now to reboot the board, abort into the command'
         echo 'line of U-Boot with a keypress, and "run boot_from_flash".'
-        echo 'Log into the NOR flash Linux as "root".'
+        echo 'Log into the ${flashtype} flash Linux as "root".'
         echo "Then"
         echo "    $filesrc"
         echo "and finally"

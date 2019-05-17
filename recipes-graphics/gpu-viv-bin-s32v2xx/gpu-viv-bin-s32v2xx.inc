@@ -33,7 +33,7 @@ KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
 PV = "${@oe.utils.conditional("KERNEL_VER", "4.1", "6.2.2", "6.2.4", d)}"
 
 # We may have a version suffix for various path elements
-PVS = "${@oe.utils.conditional("PV", "6.2.4", ".p2", "", d)}"
+PVS = "${@oe.utils.conditional("PV", "6.2.4", ".p4", "", d)}"
 LIC_FILES_MD5 = "${@oe.utils.conditional("PV", "6.2.4", \
 	"f5411d7aeec487c2c1ffcc664e866832", "e4ea72ff91665efb91435921a29148b7", d)}"
 LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=${LIC_FILES_MD5}"

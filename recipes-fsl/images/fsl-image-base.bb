@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017-2018 NXP
+# Copyright 2017-2019 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -39,4 +39,4 @@ IMAGE_INSTALL_append_fsl-lsch3 += " \
 
 IMAGE_FSTYPES ?= "tar.gz"
 
-IMAGE_INSTALL_append_gen1 = " ${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', '', 'gmac ethtool', d)}"
+IMAGE_INSTALL_append_gen1 = " ${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.1', 'gmac ethtool', '', d)}"

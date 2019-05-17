@@ -1,0 +1,36 @@
+From 53540a10d239a570f7332e6376f55a3438d4299e Mon Sep 17 00:00:00 2001
+From: Catalina Radu <catalina.radu@nxp.com>
+Date: Thu, 21 Sep 2017 06:45:43 -0700
+Subject: [PATCH] vnet: Add initial support to build driver in kernel
+
+Signed-off-by: Catalina Radu <catalina.radu@nxp.com>
+---
+ drivers/net/Kconfig  | 2 ++
+ drivers/net/Makefile | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index df51d60..d8c4b22 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -381,4 +381,6 @@ config VMXNET3
+ 
+ source "drivers/net/hyperv/Kconfig"
+ 
++source "drivers/net/vnet/Kconfig"
++
+ endif # NETDEVICES
+diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+index e25fdd7..42756a3 100644
+--- a/drivers/net/Makefile
++++ b/drivers/net/Makefile
+@@ -66,3 +66,6 @@ obj-$(CONFIG_USB_NET_DRIVERS) += usb/
+ 
++obj-$(CONFIG_VNET_S32) += vnet/s32/
++obj-$(CONFIG_VNET_LS2) += vnet/ls/
++
+ obj-$(CONFIG_HYPERV_NET) += hyperv/
+ obj-$(CONFIG_NTB_NETDEV) += ntb_netdev.o
+-- 
+2.7.4
+

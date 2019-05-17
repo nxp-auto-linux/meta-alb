@@ -37,3 +37,5 @@ do_install_append_ubuntu() {
 }
 
 FILES_${PN}_append_ubuntu = " /usr/src/${KERNEL_HEADERS_DIR}"
+
+INSANE_SKIP_${PN} = "arch"

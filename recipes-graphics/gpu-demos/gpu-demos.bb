@@ -1,4 +1,4 @@
-# Copyright 2018 NXP
+# Copyright 2018-2019 NXP
 
 inherit autotools
 inherit fsl-auto-eula-unpack pkgconfig

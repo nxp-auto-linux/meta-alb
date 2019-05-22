@@ -25,9 +25,9 @@ FSL_EULA_CHKSUM = "c9ae442cf1f9dd6c13dfad64b0ffe73f"
 
 inherit fsl-auto-eula-unpack pkgconfig
 
-# We support two kernel versions; 4.14 (latest, default) and 4.1
-# For each one you should use a different version of the binaries:
-# 6.2.4 for the latest kernel, 6.2.2 for 4.1
+# We support two kernel versions; 4.19 (latest, default) and 4.14.
+# The following code enables support for using a different version
+# of the binaries for different version of kernel.
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
 PV = "${@oe.utils.conditional("KERNEL_VER", "4.1", "6.2.2", "6.2.4", d)}"

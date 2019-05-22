@@ -22,7 +22,7 @@ PR = "r0"
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
 
-# For older kernel versions, currently only 4.1 is supported
+# For older kernel versions, currently only 4.14 is supported
 OLD_KERNEL_INCLUDE = "kernel-module-galcore-old-${KERNEL_VER}.inc"
 
 include ${OLD_KERNEL_INCLUDE}

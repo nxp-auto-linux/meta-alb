@@ -1,19 +1,26 @@
-From 18eabd76edcdf22ab1b53fc51aad08572b20fc56 Mon Sep 17 00:00:00 2001
+From 89bcde95697e45f0355ee1896976dacb786db6d7 Mon Sep 17 00:00:00 2001
 From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Date: Thu, 7 Dec 2017 18:11:39 +0200
-Subject: [PATCH 2/2] kvaser: fix parallel build
+Subject: [PATCH] kvaser: fix parallel build
 
 Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Signed-off-by: Stefan-Gabriel Mirea <stefan-gabriel.mirea@nxp.com>
 ---
- Makefile                     | 14 +++++++-------
- common/osif_functions_user.c |  1 -
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ Makefile | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index ff6aa2d..7654922 100644
+index ba52682..f048296 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -89,25 +89,25 @@ linlib:
+@@ -120,31 +120,31 @@ print_versions_start:
+ canlib:
+ 	$(MAKE) -C canlib examples
+ 
+-linlib:
++linlib: canlib
+ 	$(MAKE) -C linlib
+ 
  common:
  	@cd ./common; $(MAKE) kv_module
  
@@ -45,7 +52,7 @@ index ff6aa2d..7654922 100644
 +pciefd: common
  	@cd ./pciefd; $(MAKE) kv_module
  
- install: $(DRIVERS)
+ install:
 -- 
-2.7.4
+2.21.0
 

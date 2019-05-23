@@ -3,25 +3,24 @@
 SUMMARY = "Add support for KVASER USB CAN in BB Mini"
 LICENSE = "GPLv2 & BSD"
 LIC_FILES_CHKSUM = " \
-    file://COPYING.GPL;md5=8c6f370c9073badc24ad75afa6822bcb \
-    file://COPYING.BSD;md5=bd8f1ae4e33f4479c3f8a32742cb3c5b \
+    file://COPYING;md5=2cf4d51e36bb1104d17f3f6849f7565e \
+    file://COPYING.GPL;md5=4cbb77fd75630b4028ece91b3a627eb4 \
+    file://COPYING.BSD;md5=6957ddf8dbb77d424a70a509ee99f569 \
 "
 
 inherit module
 
-VER = "${@d.getVar('PV',True).replace('.', '_')}"
-SRC_URI = "http://www.kvaser.com/software/7330130980754/V${VER}/linuxcan.tar.gz"
-SRC_URI[md5sum] = "baa38408b1ccea8f3a0e624ca611d399"
-SRC_URI[sha256sum] = "95a178395f87ab2e2da78e7de810ef6e08b3b718cfcdd441f7c2936826475cc5"
+SRC_URI = "https://www.kvaser.com/download/?utm_ean=7330130980754&utm_status=V${PV};downloadfilename=linuxcan.tar.gz"
+SRC_URI[md5sum] = "2eb56959f54bd53e8dc8949630d221ef"
+SRC_URI[sha256sum] = "4fdb4bd8d4a4088f212f5892869a81a01372ef9434430c18b36ff52e2c221c01"
 
 SRC_URI += "\
-	file://kvaser-cross-compile-support.patch \
 	file://kvaser-fix-parallel-build.patch \
 "
 
 S = "${WORKDIR}/linuxcan"
 
-EXTRA_OEMAKE += 'KERNEL_SOURCE_DIR="${STAGING_KERNEL_DIR}" V=1'
+EXTRA_OEMAKE += 'KDIR="${STAGING_KERNEL_DIR}" V=1'
 
 MODULES = "leaf"
 # The following modules are untested, to be re-added in the future if needed

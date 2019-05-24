@@ -9,3 +9,6 @@ require recipes-fsl/images/fsl-image-base.bb
 IMAGE_INSTALL_append_s32g275sim = " ipc-shm "
 IMAGE_INSTALL_append_s32v344sim = " ipc-shm "
 IMAGE_INSTALL_append_s32r45xsim = " ipc-shm "
+
+# Enable Xen and add Xen Packages
+require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-xen.inc', '', d)}

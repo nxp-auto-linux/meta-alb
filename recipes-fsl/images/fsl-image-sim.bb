@@ -13,4 +13,4 @@ IMAGE_INSTALL_append_s32r45xsim = " ipc-shm "
 # Enable Xen and add Xen Packages
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-xen.inc', '', d)}
 
-IMAGE_INSTALL_append_gen1 ?= "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' gmac ', '', d)}"
+IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"

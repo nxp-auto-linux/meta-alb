@@ -1,5 +1,5 @@
 #
-# Copyright 2017,2018 NXP
+# Copyright 2017-2019 NXP
 #
 
 # Support for native graphics. We enable this via DISTRO_FEATURES
@@ -26,4 +26,4 @@ IMAGE_INSTALL_append_s32v2xx += "\
 IMAGE_INSTALL_append_s32v234evb += " ipc-shm "
 IMAGE_INSTALL_append_s32v234sbc += " ipc-shm "
 
-IMAGE_INSTALL_append_gen1 ?= "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' gmac ', '', d)}"
+IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"

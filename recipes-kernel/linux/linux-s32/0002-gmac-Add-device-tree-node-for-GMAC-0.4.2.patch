@@ -1,0 +1,45 @@
+From 312f090b39f85e76f0fec1a4838dda3ad4a9c8df Mon Sep 17 00:00:00 2001
+From: Jan Petrous <Jan.Petrous@nxp.com>
+Date: Mon, 18 Mar 2019 09:08:38 +0000
+Subject: [PATCH 2/2] gmac: Add device tree node for GMAC 0.4.2
+
+Issue: ALB-3755
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/s32-gen1.dtsi | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/s32-gen1.dtsi b/arch/arm64/boot/dts/freescale/s32-gen1.dtsi
+index 7e0780f..f0eacc2 100644
+--- a/arch/arm64/boot/dts/freescale/s32-gen1.dtsi
++++ b/arch/arm64/boot/dts/freescale/s32-gen1.dtsi
+@@ -582,6 +582,26 @@
+ 		status = "disabled";
+ 	};
+ 
++	gmac0: ethernet@4033c000 {
++		compatible = "fsl,s32cc-dwmac", "fsl,dwc-eqos";
++		reg = <0x0 0x4033c000 0x0 0x2000>;
++		interrupt-parent = <&gic>;
++		interrupts = <0 57 4>;
++		interrupt-names = "macirq";
++		clocks = <&sysclk>, <&sysclk>;
++		clock-names = "stmmaceth", "pclk";
++		phy-mode = "gmii";
++		phy-handle = <&phy1>;
++		mdio0 {
++			compatible = "snps,dwmac-mdio";
++			#address-cells = <1>;
++			#size-cells = <0>;
++			phy1: ethernet-phy@1 {
++				reg = <1>;
++			};
++		};
++	};
++
+ 	can4: flexcan@44000000{
+ 		compatible = "fsl,s32gen1-flexcan";
+ 		reg = <0x0 0x44000000 0x0 0xA000>;
+-- 
+2.7.4
+

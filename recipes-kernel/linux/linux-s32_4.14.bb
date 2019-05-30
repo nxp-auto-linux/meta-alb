@@ -1,7 +1,7 @@
 require recipes-kernel/linux/linux-s32.inc
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb-4.14"
-SRCREV = "ed0c94ae1d6d673de1b3de7d5db645ca2e755ffc"
+SRCREV = "75714cc84ae50e4e5f78e2989b203107f27f83db"
 
 DELTA_KERNEL_DEFCONFIG_append_s32v234pcie += " \
     blueboxconfig_s32v234pcie_${PV} \

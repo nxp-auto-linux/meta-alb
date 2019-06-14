@@ -97,7 +97,7 @@ APTGET_EXTRA_PACKAGES_LAST += " \
 # (required by openjdk-8-jdk)
 APTGET_EXTRA_LIBRARY_PATH = "/usr/lib/jvm/java-8-openjdk-arm64/jre/lib/aarch64/jli"
 
-APTGET_EXTRA_PPA = "http://packages.ros.org/ros/ubuntu;hkp://ha.pool.sks-keyservers.net:80;421C365BD9FF1F717815A3895523BAEEB01FA116;deb;ros-latest.list"
+APTGET_EXTRA_PPA = "http://packages.ros.org/ros/ubuntu;hkp://ha.pool.sks-keyservers.net:80;C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654;deb;ros-latest.list"
 
 # bluez must not be allowed to (re)start any services, otherwise install will fail
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED = "bluez libbluetooth3 libusb-dev python-bluez"

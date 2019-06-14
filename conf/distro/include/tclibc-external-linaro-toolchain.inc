@@ -42,6 +42,8 @@ def elt_get_main_version(d):
     version = elt_get_version(d)
     if version != 'UNKNOWN':
         # correctly interpret the Ubuntu toolchain gcc version
+        if version.split()[3] == '(Ubuntu/Linaro':
+            return version.split()[4].split(')')[0]
         if version.split()[4] == '(Ubuntu/Linaro':
             return version.split()[5].split(')')[0]
 

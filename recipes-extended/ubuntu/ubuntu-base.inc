@@ -161,6 +161,7 @@ glibc-gconv-utf-7,glibc-gconv-viscii\
 # names therefore. Stuff is grouped for easier updates
 RPROVIDES_${PN}_ubuntu += " \
 /bin/sh \
+flex \
 "
 RPROVIDES_${PN}_ubuntu += " \
 libgcc1-dev \

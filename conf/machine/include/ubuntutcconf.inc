@@ -139,7 +139,19 @@ def ubuntu_ext_toolchain(d):
         bb.debug(1, "Ubuntu host version conflict %s vs %s for target" % (ubuntu_rel['DISTRIB_RELEASE'], ubv))
         return False
 
-    return True
+    elt_target =  "%s-linux-gnu" % arch
+    host_tc ="%s/%s" % (base, elt_target)
+    host_gcc = "%s/bin/%s-gcc" % (base, elt_target)
+
+    if os.path.exists(host_tc) and os.path.exists(host_gcc):
+        # Ubuntu host cross toolchain is installed on the host
+
+        version = get_version(d, host_gcc)
+        if "Ubuntu/Linaro" in version:
+            #bb.note("Using Ubuntu host cross toolchain %s" % host_gcc)
+            return True
+
+    return False
 
 # Evaluated a few times only initially and then self holding through
 # the shadow variable, so not really performance critical

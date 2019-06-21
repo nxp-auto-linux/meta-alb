@@ -14,8 +14,8 @@ PKGS=" curl gawk wget git-core diffstat unzip texinfo \
 PKGS="$PKGS make vim-common tofrodos libstring-crc32-perl screen"
 
 if [ "$distro" = "Ubuntu" ]; then
-	if [ "$release" = "16.04" ]; then
-		# add pks for Ubuntu target: Ubuntu 16.04 toolchain
+	if [ "$release" = "16.04" -o "$release" = "18.04" ]; then
+		# add pks for Ubuntu target: Ubuntu 16.04 or 18.04 toolchain
 		PKGS="$PKGS gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross"
 	fi
 fi

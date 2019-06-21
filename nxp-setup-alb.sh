@@ -41,8 +41,9 @@ ARMMACHINE="^ls|^s32"
 DEFAULT_DISTRO="fsl-auto"
 COMPANY="NXP"
 
-# Any bluebox machine type
-BBMACHINE=".+bbmini|.+bluebox"
+# Any bluebox or LS machine type
+BBLSMACHINE=".+bbmini|.+bluebox|ls.+"
+
 
 # Any s32v234* machine type
 S32V234MACHINE="s32v234.+"
@@ -268,7 +269,7 @@ LAYER_LIST=" \
     $extra_layers \
 "
 
-BBLAYERS=" \
+LSLAYERS=" \
     meta-qoriq-demos \
     meta-security \
 "
@@ -285,7 +286,7 @@ if [ $? -eq 0 ]; then
     "
 
     add_layers_for_machines "${S32V234LAYERS}" "${S32V234MACHINE}"
-    add_layers_for_machines "${BBLAYERS}" "${BBMACHINE}"
+    add_layers_for_machines "${LSLAYERS}" "${BBLSMACHINE}"
 
 fi
  

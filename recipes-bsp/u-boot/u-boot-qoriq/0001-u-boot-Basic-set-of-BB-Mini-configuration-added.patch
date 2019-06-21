@@ -1,4 +1,4 @@
-From 5f6f06164345f979c6e3b9da7142cf37ef14b3b1 Mon Sep 17 00:00:00 2001
+From 79c89b1a9c936c12543075acb472636e3731ba0c Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Date: Thu, 17 Jan 2019 11:15:18 +0200
 Subject: [PATCH 01/15] u-boot: Basic set of BB Mini configuration added
@@ -7,7 +7,7 @@ Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
  arch/arm/Kconfig                                   |  16 +
- arch/arm/cpu/armv8/Kconfig                         |   2 +-
+ arch/arm/cpu/armv8/Kconfig                         |   1 +
  arch/arm/dts/Makefile                              |   1 +
  arch/arm/dts/fsl-ls2084a-bbmini.dts                |  16 +
  arch/arm/dts/fsl-ls2084a.dtsi                      | 138 +++++++++
@@ -23,7 +23,7 @@ Signed-off-by: Dan Nica <dan.nica@nxp.com>
  configs/ls2084abbmini_defconfig                    |  47 +++
  configs/ls2084abbmini_sdcard_defconfig             |  61 ++++
  include/configs/ls2084abbmini.h                    | 299 +++++++++++++++++++
- 17 files changed, 1487 insertions(+), 1 deletion(-)
+ 17 files changed, 1487 insertions(+)
  create mode 100644 arch/arm/dts/fsl-ls2084a-bbmini.dts
  create mode 100644 arch/arm/dts/fsl-ls2084a.dtsi
  create mode 100644 board/freescale/ls2084abbmini/Kconfig
@@ -74,18 +74,17 @@ index d77bc6e..676c576 100644
  source "board/freescale/ls1043aqds/Kconfig"
  source "board/freescale/ls1021atwr/Kconfig"
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index 3a0e129..d9fe0d0 100644
+index 9d30ded..bf515f8 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
-@@ -93,7 +93,7 @@ config PSCI_RESET
+@@ -98,6 +98,7 @@ config PSCI_RESET
+ 	depends on !ARCH_EXYNOS7 && !ARCH_BCM283X && \
+ 		   !TARGET_LS2080A_SIMU && !TARGET_LS2080AQDS && \
+ 		   !TARGET_LS2080ARDB && !TARGET_LS2080A_EMU && \
++		   !TARGET_LS2084ABBMINI && \
+ 		   !TARGET_LS1088ARDB && !TARGET_LS1088AQDS && \
+ 		   !TARGET_LS1012ARDB && !TARGET_LS1012AFRDM && \
  		   !TARGET_LS1012A2G5RDB && !TARGET_LS1012AQDS && \
- 		   !TARGET_LS1043ARDB && !TARGET_LS1043AQDS && \
- 		   !TARGET_LS1046ARDB && !TARGET_LS1046AQDS && \
--		   !TARGET_LS2081ARDB && \
-+		   !TARGET_LS2081ARDB && !TARGET_LS2084ABBMINI && \
- 		   !ARCH_UNIPHIER && !TARGET_S32V234EVB
- 	help
- 	  Most armv8 systems have PSCI support enabled in EL3, either through
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
 index 9e49b7d..4ee874e 100644
 --- a/arch/arm/dts/Makefile

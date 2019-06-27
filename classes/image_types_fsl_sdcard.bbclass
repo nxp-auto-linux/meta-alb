@@ -65,6 +65,11 @@ SDCARDIMAGE_BOOT_EXTRA1_FILE ?= ""
 SDCARDIMAGE_BOOT_EXTRA2 ?= ""
 SDCARDIMAGE_BOOT_EXTRA2_FILE ?= ""
 
+SDCARD_ROOTFS_EXTRA1 ?= ""
+SDCARD_ROOTFS_EXTRA1_SIZE ?= "0"
+SDCARD_ROOTFS_EXTRA2 ?= ""
+SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
+
 SDCARD_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
 SDCARD = "${SDCARD_DEPLOYDIR}/${IMAGE_NAME}.rootfs.sdcard"
 
@@ -103,6 +108,28 @@ add_extra_boot_img() {
 	BOOT_IMAGE="$2"
 	if [ -n "${BOOT_IMAGE_FILE}" ]; then
 		mcopy -i ${BOOT_IMAGE} -s ${DEPLOY_DIR_IMAGE}/${SDCARDIMAGE_BOOT_EXTRA1_FILE} ::/${SDCARDIMAGE_BOOT_EXTRA1_FILE}
+	fi
+}
+
+# Format rootfs partition
+create_rootfs_partition () {
+	PART_NO="$1"
+	SDCARD_ROOTFS_SIZE="$2"
+	SDCARD_ROOTFS_NAME="$3"
+	if [ -n "${SDCARD_ROOTFS_NAME}" ]; then
+		parted -s ${SDCARD} unit KiB mkpart primary $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ ${SDCARD_ROOTFS_SIZE} \* $PART_NO \+ ${BASE_IMAGE_ROOTFS_ALIGNMENT} \* $PART_NO) \
+			$(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ ${SDCARD_ROOTFS_SIZE} \* $PART_NO \+ ${BASE_IMAGE_ROOTFS_ALIGNMENT} \* $PART_NO + ${SDCARD_ROOTFS_SIZE})
+	fi
+}
+
+# Burn rootfs partition to .sdcard image
+write_rootfs_partition () {
+	PART_NO="$1"
+	SDCARD_ROOTFS_SIZE="$2"
+	SDCARD_ROOTFS_NAME="$3"
+	if [ -n "${SDCARD_ROOTFS_NAME}" ]; then
+		dd if=${SDCARD_ROOTFS_NAME} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024 + \
+			$PART_NO \* ${BASE_IMAGE_ROOTFS_ALIGNMENT} \* 1024 + $PART_NO \* ${SDCARD_ROOTFS_SIZE} \* 1024)
 	fi
 }
 
@@ -243,20 +270,29 @@ generate_fsl_lsch3_sdcard () {
 #
 #                                                     Default Free space = 1.3x
 #                                                     Use IMAGE_OVERHEAD_FACTOR to add more space
-#                                                     <--------->
-#            4MiB               8MiB           SDIMG_ROOTFS                    4MiB
-# <-----------------------> <----------> <----------------------> <------------------------------>
-#  ------------------------ ------------ ------------------------ -------------------------------
-# | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            |     IMAGE_ROOTFS_ALIGNMENT    |
-#  ------------------------ ------------ ------------------------ -------------------------------
-# ^                        ^            ^                        ^                               ^
-# |                        |            |                        |                               |
-# 0                      4096     4MiB +  8MiB       4MiB +  8Mib + SDIMG_ROOTFS   4MiB +  8MiB + SDIMG_ROOTFS + 4MiB
+#                                                     <--------->                                              (optional)
+#            4MiB               8MiB           SDIMG_ROOTFS0                    4MiB                          SDIMG_ROOTFSn                   4MiB
+# <-----------------------> <----------> <----------------------> <----------------------------->       <----------------------> <----------------------------->
+#  ------------------------ ------------ ------------------------ ------------------------------- ..... ------------------------ -------------------------------
+# | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            | BASE_IMAGE_ROOTFS_ALIGNMENT  |       | ROOTFS_SIZE           | BASE_IMAGE_ROOTFS_ALIGNMENT  |
+#  ------------------------ ------------ ------------------------ ------------------------------- ..... ------------------------ -------------------------------
+# ^                        ^            ^                        ^                                      ^                                                      ^
+# |                        |            |                        |                                      |                                                      |
+# 0                      4096     4MiB + 8MiB       4MiB + 8Mib + SDIMG_ROOTFS            12MiB + (SDIMG_ROOTFS + 4MiB) * n                 12MiB + (SDIMG_ROOTFS + 4MiB) * (n + 1)
+#
+#                                       |                                                       |       |                                                      |
+#                                       |                                                       |       |                                                      |
+#                                        <----------------------------------------------------->  .....  <---------------------------------------------------->
+#                                                                   |                                                              |
+#                                                                ROOTFS0                                                        ROOTFSn
+
 generate_imx_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
-	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ $ROOTFS_SIZE)
+	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
+	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 	parted ${SDCARD} print
 
 	# Burn bootloader
@@ -290,9 +326,11 @@ generate_imx_sdcard () {
 
 	_generate_boot_image 1
 
-	# Burn Partition
+	# Burn Partitions
 	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
-	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
+	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 }
 
 generate_sdcardimage_entry() {
@@ -338,6 +376,14 @@ IMAGE_CMD_sdcard () {
 		fi
 	fi
 	SDCARD_SIZE=$(expr ${IMAGE_ROOTFS_ALIGNMENT} + ${BOOT_SPACE_ALIGNED} + $ROOTFS_SIZE + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+
+	# Add size of additional rootfs partitions
+	if [ -n "${SDCARD_ROOTFS_EXTRA1}" ]; then
+		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${SDCARD_ROOTFS_EXTRA1_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+	fi
+	if [ -n "${SDCARD_ROOTFS_EXTRA2}" ]; then
+		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${SDCARD_ROOTFS_EXTRA2_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+	fi
 
 	cd ${SDCARD_DEPLOYDIR}
 

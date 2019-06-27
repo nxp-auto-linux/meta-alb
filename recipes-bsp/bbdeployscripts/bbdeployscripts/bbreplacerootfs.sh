@@ -83,7 +83,7 @@ echo
 
 # rescue relevant user files
 # We just rescue some, and some are rescued and restored automagically
-FILES2RESCUEANDRESTORE="/etc/hostname /etc/sudoers /home/root/.bashrc /home/bluebox/.bashrc /etc/yum/repos.d"
+FILES2RESCUEANDRESTORE="/etc/hosts /etc/hostname /etc/sudoers /etc/default/locale /home/root/.bashrc /home/bluebox/.bashrc /etc/yum/repos.d"
 FILES2RESCUE="${FILES2RESCUEANDRESTORE} /etc/network/interfaces"
 currentdate=`date +%Y%m%d%H%M%S`
 RESCUEPATH="/rescuedfiles"
@@ -113,10 +113,10 @@ for i in ${FILES2RESCUE}; do
 done
 echo
 
-# erase the old rootfs and then unpack the new one
+# erase the old rootfs, preserving home and other things, and then unpack the new one
 cd "$ROOTFS"
 echo "Cleaning out the old root filesystem at ${ROOTFS}..."
-for i in bin boot dev etc lib lib64 linuxrc media mnt opt proc root run sbin sys tmp usr var www; do
+for i in bin boot dev etc lib lib64 linuxrc media mnt opt proc root run sbin srv sys tmp usr var www; do
         echo "Erasing /$i..."
         rm -rf "./$i"
 done
@@ -125,7 +125,7 @@ cd - >/dev/null
 echo
 echo "Unpacking the new rootfs..."
 echo
-tar -xz -C "$ROOTFS" -f "${ROOTFS_IMAGE}"
+(export EXTRACT_UNSAFE_SYMLINKS=1; tar -xz -C "$ROOTFS" -f "${ROOTFS_IMAGE}")
 sync
 
 echo "Restoring relevant user files from previous rootfs..."

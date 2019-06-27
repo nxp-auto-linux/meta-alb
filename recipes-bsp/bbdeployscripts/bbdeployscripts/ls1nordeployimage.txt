@@ -2,8 +2,8 @@
 # This script can be run from U-Boot with the "source" command to
 # deploy the BlueBox image to NOR flash properly using one of the below
 # options:
-# - SD card (FAT partitioned)
-# - USB Stick (FAT partitioned)
+# - SD card (FAT32 partitioned)
+# - USB Stick (FAT32 partitioned)
 # - TFTP
 #
 # DANGER! NO WAY BACK ONCE THIS SCRIPT RUNS!
@@ -11,7 +11,7 @@
 # <Heinz.Wrobel@nxp.com>
 #
 # SD-Card/USB stick preparation
-#       First partition must be FAT and must contain the compiled
+#       First partition must be FAT32 and must contain the compiled
 #       script image (.img and/or .itb) and
 #       the correct image for the box in question:
 #       fsl-image-blueboxbootflash-<platform>.flashimage
@@ -21,7 +21,9 @@
 #       fsl-image-blueboxbootflash-<platform>.flashimage
 #
 # where <platform> can be:
-#       - ls1043ardb
+#       - ls1012abluebox
+#       - ls1043abluebox
+#       - ls1046abluebox
 #
 # Preferred ITB script usage in U-Boot
 #
@@ -31,7 +33,7 @@
 #       fatload mmc 0:1 90000000 bbdeployimage.itb
 # - USB
 #       usb reset
-#       fatload usb 0:1 90000000  bbdeployimage.itb
+#       fatload usb 0:1 90000000 bbdeployimage.itb
 # - TFTP
 #       tftp 90000000 bbdeployimage.itb
 #

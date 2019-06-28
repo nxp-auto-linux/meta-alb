@@ -1,0 +1,15 @@
+Linux: 4.19.31
+Linux-rt: 4.19.31-rt18
+Linux versions: 4.19 4.14
+U-boot: 2018.07
+Ubuntu target: 16.04.3
+Yocto: 2.5.1 "sumo"
+Gcc: linaro-6.3-r2017.02
+Glibc: 2.26
+Binutils: 2.29.1
+Xen: 4.10.1
+Openssl: 1.0.2p
+ROS: kinetic
+GPU: 6.2.4
+IPCF: 0.8.6
+Adaptive Autosar: R18-10

@@ -1,4 +1,4 @@
-From d9752c01a4e70c8658d969cef0798cf34a1f6007 Mon Sep 17 00:00:00 2001
+From 23eceb0187370fef99b1e4a01e914cbd130ea3e2 Mon Sep 17 00:00:00 2001
 From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Date: Tue, 19 Mar 2019 13:15:37 +0000
 Subject: [PATCH] s32gen1: Add CCI400 device tree configuration
@@ -6,13 +6,13 @@ Subject: [PATCH] s32gen1: Add CCI400 device tree configuration
 Issue: ALB-3517
 Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 ---
- arch/arm64/boot/dts/freescale/s32-gen1.dtsi | 25 +++++++++++++++++++++++++
+ .../boot/dts/freescale/fsl-s32-gen1.dtsi      | 25 +++++++++++++++++++
  1 file changed, 25 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/freescale/s32-gen1.dtsi b/arch/arm64/boot/dts/freescale/s32-gen1.dtsi
-index 7bf3fdb..9604d6b 100644
---- a/arch/arm64/boot/dts/freescale/s32-gen1.dtsi
-+++ b/arch/arm64/boot/dts/freescale/s32-gen1.dtsi
+diff --git a/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi b/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
+index 7e0780fd6668..0d1fc2579833 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
 @@ -40,6 +40,7 @@
  		cpu0: cpu@0 {
  			device_type = "cpu";
@@ -45,7 +45,7 @@ index 7bf3fdb..9604d6b 100644
  			reg = <0x0 0x101>;
  			enable-method = "spin-table";
  			cpu-release-addr = <0x0 0x8000fff8>;
-@@ -594,6 +598,27 @@
+@@ -622,6 +626,27 @@
  		status = "disabled";
  	};
  
@@ -74,5 +74,5 @@ index 7bf3fdb..9604d6b 100644
  		compatible = "arm,gic-v3";
  		#interrupt-cells = <3>;
 -- 
-2.7.4
+2.21.0
 

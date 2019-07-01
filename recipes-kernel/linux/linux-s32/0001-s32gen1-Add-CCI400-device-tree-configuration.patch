@@ -1,4 +1,4 @@
-From 23eceb0187370fef99b1e4a01e914cbd130ea3e2 Mon Sep 17 00:00:00 2001
+From 50f272e9889a2d17b0911b532572e0e7b6217248 Mon Sep 17 00:00:00 2001
 From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Date: Tue, 19 Mar 2019 13:15:37 +0000
 Subject: [PATCH] s32gen1: Add CCI400 device tree configuration
@@ -10,42 +10,42 @@ Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
  1 file changed, 25 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi b/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
-index 7e0780fd6668..0d1fc2579833 100644
+index a742c484d5d8..4defb46e6e62 100644
 --- a/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
 +++ b/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
-@@ -40,6 +40,7 @@
+@@ -39,6 +39,7 @@
  		cpu0: cpu@0 {
  			device_type = "cpu";
- 			compatible = "arm,armv8";
+ 			compatible = "arm,cortex-a53";
 +			cci-control-port = <&cci_control1>;
  			reg = <0x0 0x0>;
  			enable-method = "spin-table";
  			cpu-release-addr = <0x0 0x8000fff8>;
-@@ -47,6 +48,7 @@
+@@ -46,6 +47,7 @@
  		cpu1: cpu@1 {
  			device_type = "cpu";
- 			compatible = "arm,armv8";
+ 			compatible = "arm,cortex-a53";
 +			cci-control-port = <&cci_control1>;
  			reg = <0x0 0x1>;
  			enable-method = "spin-table";
  			cpu-release-addr = <0x0 0x8000fff8>;
-@@ -54,6 +56,7 @@
+@@ -53,6 +55,7 @@
  		cpu2: cpu@100 {
  			device_type = "cpu";
- 			compatible = "arm,armv8";
+ 			compatible = "arm,cortex-a53";
 +			cci-control-port = <&cci_control0>;
  			reg = <0x0 0x100>;
  			enable-method = "spin-table";
  			cpu-release-addr = <0x0 0x8000fff8>;
-@@ -61,6 +64,7 @@
+@@ -60,6 +63,7 @@
  		cpu3: cpu@101 {
  			device_type = "cpu";
- 			compatible = "arm,armv8";
+ 			compatible = "arm,cortex-a53";
 +			cci-control-port = <&cci_control0>;
  			reg = <0x0 0x101>;
  			enable-method = "spin-table";
  			cpu-release-addr = <0x0 0x8000fff8>;
-@@ -622,6 +626,27 @@
+@@ -621,6 +625,27 @@
  		status = "disabled";
  	};
  

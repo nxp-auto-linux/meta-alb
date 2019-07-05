@@ -135,7 +135,7 @@ echo
 echo "Unpacking the new rootfs..."
 echo
 mount /dev/sda1 "$ROOTFS"
-tar -xz -C "$ROOTFS" -f "${ROOTFS_IMAGE}"
+(export EXTRACT_UNSAFE_SYMLINKS=1; tar -xz -C "$ROOTFS" -f "${ROOTFS_IMAGE}")
 sync
 
 echo

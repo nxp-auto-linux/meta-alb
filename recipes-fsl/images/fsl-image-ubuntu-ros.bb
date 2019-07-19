@@ -43,7 +43,7 @@ APTGET_EXTRA_PACKAGES_LAST += " \
     ${ADD_ROS_PACKAGES} \
 "
 
-APTGET_EXTRA_PPA = "http://packages.ros.org/ros/ubuntu;hkp://ha.pool.sks-keyservers.net:80;C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654;deb;ros-latest.list"
+APTGET_EXTRA_PPA += "http://packages.ros.org/ros/ubuntu;hkp://ha.pool.sks-keyservers.net:80;C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654;deb;ros-latest.list"
 
 fakeroot do_aptget_user_update_append() {
 

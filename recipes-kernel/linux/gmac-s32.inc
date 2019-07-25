@@ -8,7 +8,6 @@ SRC_URI_append_gen1 += "\
     file://build/gmac_s32.cfg \
     file://0001-gmac-integrate-dwmac-s32cc-module-in-the-kernel-build.patch \
     file://0002-gmac-Add-device-tree-node-for-GMAC-0.4.2.patch \
-    file://0001-s32gen1-Add-CCI400-device-tree-configuration.patch \
 "
 
 do_preconfigure_prepend_gen1() {

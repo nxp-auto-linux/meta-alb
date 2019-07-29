@@ -21,6 +21,6 @@ PREFERRED_VERSION_gmac = "${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4
 GMAC_IMAGE_INSTALL = "${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', 'gmac', '', d)}"
 
 # Add gmac by default
-DISTRO_FEATURES_append += " gmac"
+DISTRO_FEATURES_append += "${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.14', ' gmac', '', d)}"
 
 SOC_FAMILY_append = ":gen1"

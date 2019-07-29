@@ -39,4 +39,4 @@ IMAGE_INSTALL_append_fsl-lsch3 += " \
 
 IMAGE_FSTYPES ?= "tar.gz"
 
-IMAGE_INSTALL_append_gen1 = " ${@bb.utils.contains('PREFERRED_VERSION_linux-s32', '4.1', 'gmac ethtool', '', d)}"
+IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"

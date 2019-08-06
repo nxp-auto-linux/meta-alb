@@ -49,6 +49,7 @@ SRC_URI = "${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin
            file://glesv2.pc \
            file://vg.pc \
            file://gpu_set_multi_buffer.sh \
+           file://gpu_disable_prefetch.sh \
           "
 
 do_install_append () {
@@ -68,6 +69,7 @@ do_install_append () {
 
     install -d ${D}${sysconfdir}/profile.d/
     install -m 0755 ${WORKDIR}/gpu_set_multi_buffer.sh ${D}${sysconfdir}/profile.d/
+    install -m 0755 ${WORKDIR}/gpu_disable_prefetch.sh ${D}${sysconfdir}/profile.d/
     
     # We need this line to avoid warnings:
     # '<file> is owned by uid 1000, which is the same as the user running bitbake.

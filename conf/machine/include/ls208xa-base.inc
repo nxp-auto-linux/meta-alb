@@ -33,7 +33,7 @@ SDCARD_ROOTFS ?= "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ext3"
 UBOOT_SUFFIX_SDCARD ?= "${UBOOT_SUFFIX}"
 
 # 64 MB boot partition
-BOOT_SPACE = "65536"
+BOOT_SPACE ?= "65536"
 
 # Other types of images
 IMAGE_CLASSES += "image_types_fsl_itb image_types_fsl_flashimage"

@@ -1,7 +1,7 @@
 require recipes-kernel/linux/linux-s32.inc
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master"
-SRCREV = "bc9e5d0233ce72a5997c125eebd06253f0ff12ce"
+SRCREV = "9f2bcc244202953cf0436a7f1cb40ca69e745ea8"
 
 # Temporary override 'LIC_FILES_CHKSUM' variable until
 # we officially upgrade to Linux Kernel 4.19
@@ -69,3 +69,7 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-kernel/linux/lin
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen.cfg', '', d)}"
 SRC_URI += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://xen.cfg', '', d)} "
+
+# Add PFE support for S32G
+SRC_URI_append_s32g274aevb = " file://build/pfe_cma_s32.cfg"
+DELTA_KERNEL_DEFCONFIG_append_s32g274aevb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'pfe_cma_s32.cfg', '', d)}"

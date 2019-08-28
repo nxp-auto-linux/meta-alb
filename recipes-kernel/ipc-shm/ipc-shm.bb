@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 inherit module
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/ipcf/ipc-shm;branch=master;protocol=https"
-SRCREV = "07b6aa3c810f1b3eb99e97857eecaa2a85a125ae"
+SRCREV = "4aa531d647de951d53d60a1313a356096d1092cd"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"

@@ -273,7 +273,7 @@ if test $ok -gt 0; then
         echo "Next step would be to prep the SSD properly."
         echo 'Please "reset" now to reboot the board, abort into the command'
         echo 'line of U-Boot with a keypress, and "run boot_from_flash".'
-        echo 'Log into the ${flashtype} flash Linux as "root".'
+        echo "Log into the ${flashtype} flash Linux as \"root\"."
         echo "Then"
         echo "    $filesrc"
         echo "and finally"

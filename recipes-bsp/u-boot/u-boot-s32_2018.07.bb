@@ -35,6 +35,12 @@ SRC_URI += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_config.cfg', '', d)} \
 "
 
+# Enable Arm Trusted Firmware
+DELTA_UBOOT_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
+SRC_URI += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'file://build/atf_config.cfg', '', d)} \
+"
+
 # FIXME: Allow linking of 'tools' binaries with native libraries
 #        used for generating the boot logo and other tools used
 #        during the build process.

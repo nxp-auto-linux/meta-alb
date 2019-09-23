@@ -8,7 +8,7 @@ inherit module
 
 # SJA for kernel 4.14
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
-SRCREV = "c4d34f4e76abcf75ee32d70a79fe3c28a4fe0719"
+SRCREV = "26ba5eff02b292caf032f1df04eb808c217e0725"
 
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'

@@ -30,6 +30,7 @@ IMAGE_INSTALL += "iputils"
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234evb = " sja1105 "
 IMAGE_INSTALL_append_s32v234bbmini = " sja1105 "
+IMAGE_INSTALL_append_s32g274aevb = " sja1105 "
 
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior

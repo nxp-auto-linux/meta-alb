@@ -84,5 +84,9 @@ KERNEL_MODULE_AUTOLOAD_s32v234evb += "\
     nxp \
 "
 
+KERNEL_MODULE_AUTOLOAD_s32g274aevb += "\
+    nxp \
+"
+
 # make everything compatible for the time being
 COMPATIBLE_MACHINE_$MACHINE = "$MACHINE"

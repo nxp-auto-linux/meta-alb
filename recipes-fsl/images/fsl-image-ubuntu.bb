@@ -8,6 +8,8 @@ APTGET_EXTRA_PPA += "ppa:x2go/stable;"
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
 APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
 
+ROOTFS_POSTPROCESS_COMMAND_append = " do_disable_nm_wait_online;"
+
 IMAGE_INSTALL_append_ls2084abbmini += " \
     kvaser \
 "
@@ -77,6 +79,20 @@ APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-8-openjdk-${DEBIAN_TARGET_ARCH}/
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev python-bluez avahi-daemon rtkit"
 
 APTGET_SKIP_UPGRADE = "0"
+
+fakeroot do_disable_nm_wait_online() {
+	set -x
+
+	# In xenial, not in bionic, we want to mask NetworkManager-wait-online service
+	# as it runs: '/usr/bin/nm-online -s -q --timeout=30', which fails at boot time,
+	# adding a delay of 'timeout' seconds, although the network interfaces are
+	# working properly.
+	if [ "${UBUNTU_TARGET_BASEVERSION}" = "16.04" ]; then
+		ln -sf "/dev/null" "${APTGET_CHROOT_DIR}/etc/systemd/system/NetworkManager-wait-online.service"
+	fi
+
+	set +x
+}
 
 # 2GB of free space to root fs partition (at least 1.5 GB needed during the Bazel build)
 IMAGE_ROOTFS_EXTRA_SPACE = "2000000"

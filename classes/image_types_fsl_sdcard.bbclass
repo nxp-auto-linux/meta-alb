@@ -306,7 +306,14 @@ generate_imx_sdcard () {
 			dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
 			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
 		else
-			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+			if [ "${UBOOT_BOOTSPACE_OFFSET}" = "0" ]; then
+				# write IVT
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=0 bs=256 count=1
+				# write the rest of u-boot code
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc bs=512 seek=1 skip=1
+			else
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+			fi
 		fi
 		if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" -a -n "${UBOOT_ENV_SDCARD_FILE}" ]; then
 			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1

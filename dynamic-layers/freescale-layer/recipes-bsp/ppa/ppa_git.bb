@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+require ppa.inc
 
 SRC_URI = "git://source.codeaurora.org/external/qoriq/qoriq-components/ppa-generic.git;nobranch=1 \
 "
@@ -21,7 +21,7 @@ do_compile () {
     cd ${S}/ppa
     if [ ${MACHINE} = ls1012afrdm ];then
         ./build  frdm-fit ${PPA_PATH}
-    else 
+    else
         ./build  rdb-fit ${PPA_PATH}
     fi
     cd ${S}
@@ -38,3 +38,4 @@ do_deploy(){
     ln -sfT ${PPA_NAME}.itb ${DEPLOYDIR}/${PN}.itb
 }
 
+COMPATIBLE_MACHINE = "(ls1043a|ls1046a|ls2088a|ls1012a|ls1088a)"

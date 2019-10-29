@@ -478,9 +478,9 @@ fakeroot aptget_update_end() {
 }
 
 python do_aptget_update() {
-        bb.build.exec_func("aptget_update_begin", d);
-        bb.build.exec_func("do_aptget_user_update", d);
-        bb.build.exec_func("aptget_update_end", d);
+    bb.build.exec_func("aptget_update_begin", d);
+    bb.build.exec_func("do_aptget_user_update", d);
+    bb.build.exec_func("aptget_update_end", d);
 }
 
 # The various apt packages need to be translated properly into Yocto
@@ -492,23 +492,23 @@ APTGET_ALL_PACKAGES = "${APTGET_EXTRA_PACKAGES} \
 	${APTGET_RPROVIDES} \
 "
 python () {
-	pn = (d.getVar('PN', True) or "")
-	packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
-	translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()
+    pn = (d.getVar('PN', True) or "")
+    packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
+    translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()
 
-	rprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
-	for p in packagelist:
-		appendp = True
-		for t in translations:
-			pkg,yocto = t.split(":")
-			if p == pkg:
-				for i in yocto.split(","):
-					if i not in rprovides:
-						bb.debug(1, 'Adding RPROVIDES_%s = "%s"' % (pn, i))
-						rprovides.append(i)
-						appendp = False
-		if appendp:
-			rprovides.append(p)
-	if rprovides:
-		d.setVar('RPROVIDES_%s' % pn, ' '.join(rprovides))
+    rprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
+    for p in packagelist:
+        appendp = True
+        for t in translations:
+            pkg,yocto = t.split(":")
+            if p == pkg:
+                for i in yocto.split(","):
+                    if i not in rprovides:
+                        bb.debug(1, 'Adding RPROVIDES_%s = "%s"' % (pn, i))
+                        rprovides.append(i)
+                        appendp = False
+        if appendp:
+            rprovides.append(p)
+    if rprovides:
+        d.setVar('RPROVIDES_%s' % pn, ' '.join(rprovides))
 }

@@ -11,6 +11,6 @@ do_install () {
     -exec cp -fr '{}' ${D}/${MERGED_DST}/ \;
 }
 python __anonymous () {
-	d.delVarFlag('do_unpack', 'nostamp')
-	d.delVarFlag('do_install', 'nostamp')
+    d.delVarFlag('do_unpack', 'nostamp')
+    d.delVarFlag('do_install', 'nostamp')
 }

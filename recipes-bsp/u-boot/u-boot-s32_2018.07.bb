@@ -19,7 +19,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
-SRCREV = "324c3ea5ff93cce428c6dfe0ec5452e40a2234a5"
+SRCREV = "ba286f8956b1a8ff647da62f7304f245184a11bd"
 
 SCMVERSION = "y"
 LOCALVERSION = ""

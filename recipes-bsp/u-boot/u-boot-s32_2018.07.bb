@@ -19,7 +19,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
-SRCREV = "ba286f8956b1a8ff647da62f7304f245184a11bd"
+SRCREV = "5e2c2d43a4fa86cd2ebc9ced812ee81353fa7b34"
 
 SCMVERSION = "y"
 LOCALVERSION = ""
@@ -27,6 +27,12 @@ LOCALVERSION = ""
 # Support for generating default environment
 SRC_URI += " \
     file://0001-env-Add-Makefile-rule-to-generate-default-environment-2018.patch \
+"
+
+# Updates required for PFE
+DELTA_UBOOT_DEFCONFIG_s32g274aevb = " ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe_config.cfg', '', d)}"
+SRC_URI_append_s32g274aevb = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' file://build/pfe_config.cfg', '', d)} \
 "
 
 # Enable Xen default boot if Xen enabled

@@ -1,0 +1,81 @@
+From d866bbb52f18c4ff993b955f14803bc055f0b77b Mon Sep 17 00:00:00 2001
+From: Catalin Udma <catalin-dan.udma@nxp.com>
+Date: Fri, 15 Nov 2019 12:33:45 +0200
+Subject: [PATCH] configure.ac: fix --without-libdnet
+
+Allow the user to disable libdnet check through --without-libdnet.
+This option is useful to cross-compile tcpreplay to avoid build
+ailures
+if libdnet is installed on host but not on target, see
+https://bugs.buildroot.org/show_bug.cgi?id=12096
+
+Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+[Upstream status: https://github.com/appneta/tcpreplay/pull/567]
+
+cherry-picked from
+https://github.com/appneta/tcpreplay/pull/567/commits/acee9c0c46f71f1f4c33c2dadf69d19e24b90f27
+backport to older tcpreplay version
+Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
+---
+ configure.ac | 44 +++++++++++++++++++++++---------------------
+ 1 file changed, 23 insertions(+), 21 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f9fbd46..f58bb47 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1408,28 +1408,30 @@ if test $have_cygwin = no ; then
+         AC_HELP_STRING([--with-libdnet=DIR], [Use libdnet in DIR]),
+         [trydnetdir=$withval])
+ 
+-    for testdir in $trydnetdir /usr/local /opt/local $MACOSX_SDK_PATH/usr /usr ; do
+-        if test -x ${testdir}/bin/dnet-config -a $founddnet = no ; then
+-            LDNETINC="$($testdir/bin/dnet-config --cflags)"
+-            LDNETLIB="$($testdir/bin/dnet-config --libs)"
+-            libdnet_version="$($testdir/bin/dnet-config --version)"
+-            founddnet=$testdir
+-        fi
+-    done
++    if test $trydnetdir != no; then
++        for testdir in $trydnetdir /usr/local /opt/local $MACOSX_SDK_PATH/usr /usr ; do
++            if test -x ${testdir}/bin/dnet-config -a $founddnet = no ; then
++                LDNETINC="$($testdir/bin/dnet-config --cflags)"
++                LDNETLIB="$($testdir/bin/dnet-config --libs)"
++                libdnet_version="$($testdir/bin/dnet-config --version)"
++                founddnet=$testdir
++            fi
++        done
+ 
+-    if test $founddnet = no ; then
+-        AC_MSG_RESULT(no)
+-        AC_MSG_WARN([libdnet not found, disabling fragroute feature])
+-    else
+-        AC_MSG_RESULT($founddnet)
+-        enable_fragroute=yes
+-        have_libdnet=yes
+-        AC_DEFINE([HAVE_LIBDNET], [1], [Do we have libdnet?])
+-        dnl Debian uses dumbnet.h instead of dnet.h due to naming conflict
+-        old_cflags=$CFLAGS
+-        CFLAGS=$LDNETINC
+-        AC_CHECK_HEADERS([dumbnet.h dnet.h])
+-        CFLAGS=$old_cflags
++        if test $founddnet = no ; then
++            AC_MSG_RESULT(no)
++            AC_MSG_WARN([libdnet not found, disabling fragroute feature])
++        else
++            AC_MSG_RESULT($founddnet)
++            enable_fragroute=yes
++            have_libdnet=yes
++            AC_DEFINE([HAVE_LIBDNET], [1], [Do we have libdnet?])
++            dnl Debian uses dumbnet.h instead of dnet.h due to naming conflict
++            old_cflags=$CFLAGS
++            CFLAGS=$LDNETINC
++            AC_CHECK_HEADERS([dumbnet.h dnet.h])
++            CFLAGS=$old_cflags
++        fi
+     fi
+ 
+ else
+-- 
+2.7.4
+

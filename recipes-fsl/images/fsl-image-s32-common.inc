@@ -17,14 +17,15 @@ IMAGE_INSTALL_append_s32v2xx += "\
     u-boot-s32 \
 "
 
-# Support for the S32V CAN interfaces under Linux
-IMAGE_INSTALL_append_s32v2xx += "\
-    canutils \
-"
-
 # Support for Inter-Process(or) Communication over Shared Memory (ipc-shm) under Linux
 IMAGE_INSTALL_append_s32v234evb += " ipc-shm "
 IMAGE_INSTALL_append_s32v234sbc += " ipc-shm "
 
 IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"
 IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe', '', d)}"
+
+# Support CAN interfaces under Linux
+IMAGE_INSTALL_append += "\
+    can-utils \
+    iproute2 \
+"

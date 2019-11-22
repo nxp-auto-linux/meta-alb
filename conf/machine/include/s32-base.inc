@@ -56,7 +56,7 @@ IMAGE_FSTYPES ?= "${SOC_DEFAULT_IMAGE_FSTYPES}"
 MACHINE_FEATURES ?= "pci ext2 ext3 serial"
 MACHINE_EXTRA_RRECOMMENDS += "udev-extraconf kernel-modules"
 
-EXTRA_IMAGEDEPENDS += "u-boot-s32 cst-native"
+EXTRA_IMAGEDEPENDS += "u-boot-s32 "
 
 # Sub-architecture support
 MACHINE_SOCARCH_SUFFIX ?= ""

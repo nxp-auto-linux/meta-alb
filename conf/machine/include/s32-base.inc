@@ -65,3 +65,5 @@ MACHINE_SOCARCH_SUFFIX_s32 = "-s32"
 MACHINE_ARCH_FILTER = "virtual/kernel"
 
 INHERIT += "fsl-dynamic-packagearch"
+
+require conf/machine/include/openssl_version.inc

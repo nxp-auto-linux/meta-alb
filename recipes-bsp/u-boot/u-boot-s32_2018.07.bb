@@ -19,7 +19,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb/master"
 
-SRCREV = "80977f921a232c8bc3c0e5dd4240c22cc12bf2b8"
+SRCREV = "40d1a264a0279b70acd0a4aef8abae182c6d0308"
 
 SCMVERSION = "y"
 LOCALVERSION = ""
@@ -80,32 +80,34 @@ addtask merge_delta_config before do_configure after do_patch
 
 
 do_compile_append() {
-    unset i j k
-    for config in ${UBOOT_MACHINE}; do
-        i=`expr $i + 1`;
-        for type in ${UBOOT_CONFIG}; do
-            j=`expr $j + 1`;
-            for binary in ${UBOOT_BINARIES}; do
-                k=`expr $k + 1`
-                if [ $j -eq $i ] && [ $k -eq $i ]; then
-                    # Generate an u-boot image which can be flashed and booted via QSPI
-                    if [ "qspi" = "${type}" ];then
-                        cp -r ${S}/tools/s32v234-qspi/ ${B}/${config}/tools/s32v234-qspi/
-                        cd ${B}/${config}/tools/s32v234-qspi/
-                        oe_runmake
-                        mv -f ${B}/${config}/${binary} ${B}/${config}/${binary}.nospi
-                        cp ${B}/${config}/tools/s32v234-qspi/${binary}.qspi ${B}/${config}/${binary}
-                        cp ${B}/${config}/${binary} ${B}/${config}/u-boot-${type}.${UBOOT_SUFFIX}
-                        cd -
+    if [ ${SOC_FAMILY} = "s32:s32v:s32v2xx" ]; then
+        unset i j k
+        for config in ${UBOOT_MACHINE}; do
+            i=`expr $i + 1`;
+            for type in ${UBOOT_CONFIG}; do
+                j=`expr $j + 1`;
+                for binary in ${UBOOT_BINARIES}; do
+                    k=`expr $k + 1`
+                    if [ $j -eq $i ] && [ $k -eq $i ]; then
+                        # Generate an u-boot image which can be flashed and booted via QSPI
+                        if [ "qspi" = "${type}" ];then
+                            cp -r ${S}/tools/s32v234-qspi/ ${B}/${config}/tools/s32v234-qspi/
+                            cd ${B}/${config}/tools/s32v234-qspi/
+                            oe_runmake
+                            mv -f ${B}/${config}/${binary} ${B}/${config}/${binary}.nospi
+                            cp ${B}/${config}/tools/s32v234-qspi/${binary}.qspi ${B}/${config}/${binary}
+                            cp ${B}/${config}/${binary} ${B}/${config}/u-boot-${type}.${UBOOT_SUFFIX}
+                            cd -
+                        fi
+                        cp ${config}/${binary} ${config}/u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX}
                     fi
-                    cp ${config}/${binary} ${config}/u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX}
-                fi
+                done
+                unset k
             done
-            unset k
+            unset j
         done
-        unset j
-    done
-    unset i
+        unset i
+    fi
 }
 
 ENV_STAGE_DIR = "${datadir}/env"

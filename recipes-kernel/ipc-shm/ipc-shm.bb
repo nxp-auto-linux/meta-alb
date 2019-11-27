@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 inherit module
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/ipcf/ipc-shm;branch=master;protocol=https"
-SRCREV = "4aa531d647de951d53d60a1313a356096d1092cd"
+SRCREV = "af9a41d262a57a2c3f4be0f4042adc10b47ffdd6"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"
@@ -22,5 +22,7 @@ PROVIDES += "kernel-module-ipc-shm-sample${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} += "kernel-module-ipc-shm-sample${KERNEL_MODULE_PACKAGE_SUFFIX}"
 PROVIDES += "kernel-module-ipc-shm-dev${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} += "kernel-module-ipc-shm-dev${KERNEL_MODULE_PACKAGE_SUFFIX}"  
+PROVIDES_append_s32v2xx = " kernel-module-ipc-shm-uio${KERNEL_MODULE_PACKAGE_SUFFIX}"
+RPROVIDES_${PN}_append_s32v2xx = " kernel-module-ipc-shm-uio${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
 FILES_${PN} += "${base_libdir}/*"

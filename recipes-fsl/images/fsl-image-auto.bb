@@ -27,8 +27,9 @@ IMAGE_INSTALL += "dhrystone"
 IMAGE_INSTALL += "imagemagick gnuplot mpich mpich-dev"
 
 # Supporting complex evaluation scenarios
-IMAGE_INSTALL += "openssl-misc openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"
-IMAGE_INSTALL_remove += "ipsec-tools"
+IMAGE_INSTALL += "openssl-misc"
+IMAGE_INSTALL_append_s32 += "openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"
+IMAGE_INSTALL_remove_s32 += "ipsec-tools"
 
 # Increase the freespace
 IMAGE_ROOTFS_EXTRA_SPACE ?= "54000"

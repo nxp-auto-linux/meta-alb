@@ -6,7 +6,7 @@ SUMMARY = "Linux driver for the Packet Forwarding Engine hardware"
 LICENSE = "Freescale-EULA"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=116de28c37181b72b36566106a941904"
 
-inherit module
+inherit module deploy
 
 # Dummy entry to keep the recipe parser happy if we don't use this recipe
 PFE_LOCAL_FIRMWARE_DIR ?= "."
@@ -38,6 +38,16 @@ module_do_install() {
 	mkdir -p "${FW_INSTALL_DIR}"
 	install -D "${WORKDIR}/${PFE_LOCAL_FIRMWARE_DIR}/${PFE_FW_BIN}" "${FW_INSTALL_DIR}/${FW_INSTALL_NAME}"
 }
+
+do_deploy() {
+	install -d ${DEPLOYDIR}
+
+	if [ -f ${FW_INSTALL_DIR}/${FW_INSTALL_NAME} ];then
+		install -m 0644 ${FW_INSTALL_DIR}/${FW_INSTALL_NAME} ${DEPLOYDIR}/${FW_INSTALL_NAME}
+	fi
+}
+
+addtask do_deploy after do_install
 
 # do_package_qa throws error "QA Issue: Architecture did not match"
 # when checking the firmware

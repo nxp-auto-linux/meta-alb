@@ -107,7 +107,7 @@ add_extra_boot_img() {
 	BOOT_IMAGE_FILE="$1"
 	BOOT_IMAGE="$2"
 	if [ -n "${BOOT_IMAGE_FILE}" ]; then
-		mcopy -i ${BOOT_IMAGE} -s ${DEPLOY_DIR_IMAGE}/${SDCARDIMAGE_BOOT_EXTRA1_FILE} ::/${SDCARDIMAGE_BOOT_EXTRA1_FILE}
+		mcopy -i ${BOOT_IMAGE} -s ${DEPLOY_DIR_IMAGE}/${BOOT_IMAGE_FILE} ::/${BOOT_IMAGE_FILE}
 	fi
 }
 

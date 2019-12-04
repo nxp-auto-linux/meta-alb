@@ -23,7 +23,7 @@ IMAGE_INSTALL_append_s32v234sbc += " ipc-shm "
 IMAGE_INSTALL_append_s32g274aevb += " ipc-shm "
 
 IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"
-IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe', '', d)}"
+IMAGE_INSTALL_append_s32g274aevb = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe', '', d)}"
 
 # Support CAN interfaces under Linux
 IMAGE_INSTALL_append += "\

@@ -41,4 +41,5 @@ IMAGE_INSTALL_append_fsl-lsch3 += " \
 IMAGE_FSTYPES ?= "tar.gz"
 
 IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"
-IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe', '', d)}"
+
+require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}

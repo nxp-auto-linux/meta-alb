@@ -19,4 +19,6 @@ BACKPORTS += "\
            file://0001-2017-02-13-Richard-Biener-rguenther-suse.de.patch \
 "
 
+EXTRA_OECONF_BASE_append = " --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419 "
+
 require gcc-common-fsl.inc

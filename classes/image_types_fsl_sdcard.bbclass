@@ -204,6 +204,46 @@ _generate_boot_image() {
 	add_extra_boot_img "${SDCARDIMAGE_BOOT_EXTRA2_FILE}" "${WORKDIR}/boot.img"
 }
 
+#
+# A single function to burn the bootloader on any type of SD card
+_burn_bootloader() {
+	# This class supports different types of boot loaders
+	case "${IMAGE_BOOTLOADER}" in
+		imx-bootlets)
+		bberror "The imx-bootlets is not supported for i.MX based machines"
+		exit 1
+		;;
+		u-boot*)
+		if [ -n "${SPL_BINARY}" ]; then
+				dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
+		else
+			if [ "${UBOOT_BOOTSPACE_OFFSET}" = "0" ]; then
+				# write IVT
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=0 bs=256 count=1
+				# write the rest of u-boot code
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc bs=512 seek=1 skip=1
+			else
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
+			fi
+		fi
+		if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" -a -n "${UBOOT_ENV_SDCARD_FILE}" ]; then
+				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1
+		fi
+		;;
+		barebox)
+		dd if=${DEPLOY_DIR_IMAGE}/barebox-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 skip=1 bs=512
+		dd if=${DEPLOY_DIR_IMAGE}/bareboxenv-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 bs=512k
+		;;
+		"")
+		;;
+		*)
+		bberror "Unknown IMAGE_BOOTLOADER value"
+		exit 1
+		;;
+	esac
+}
+
 # Create an image that can by written onto a SD card using dd for use
 # with the Layerscape 2 family of devices
 #
@@ -240,26 +280,7 @@ generate_fsl_lsch3_sdcard () {
 	        dd if=${DEPLOY_DIR_IMAGE}/${SDCARD_RCW_NAME} of=${SDCARD} conv=notrunc seek=8 bs=512
 	fi
 
-	# Burn bootloader
-	case "${IMAGE_BOOTLOADER}" in
-	        u-boot*)
-	        if [ -n "${SPL_BINARY}" ]; then
-	                dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
-	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
-	        else
-	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
-	        fi
-	        if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" -a -n "${UBOOT_ENV_SDCARD_FILE}" ]; then
-	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1
-	        fi
-	        ;;
-	        "")
-	        ;;
-	        *)
-	        bberror "Unknown IMAGE_BOOTLOADER value"
-	        exit 1
-	        ;;
-	esac
+	_burn_bootloader
 
 	_generate_boot_image 1
 
@@ -309,41 +330,7 @@ generate_imx_sdcard () {
 	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 	parted ${SDCARD} print
 
-	# Burn bootloader
-	case "${IMAGE_BOOTLOADER}" in
-		imx-bootlets)
-		bberror "The imx-bootlets is not supported for i.MX based machines"
-		exit 1
-		;;
-		u-boot*)
-		if [ -n "${SPL_BINARY}" ]; then
-			dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
-			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
-		else
-			if [ "${UBOOT_BOOTSPACE_OFFSET}" = "0" ]; then
-				# write IVT
-				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=0 bs=256 count=1
-				# write the rest of u-boot code
-				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc bs=512 seek=1 skip=1
-			else
-				dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
-			fi
-		fi
-		if [ -n "${UBOOT_ENV_SDCARD_OFFSET}" -a -n "${UBOOT_ENV_SDCARD_FILE}" ]; then
-			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_ENV_SDCARD_OFFSET}) bs=1
-		fi
-		;;
-		barebox)
-		dd if=${DEPLOY_DIR_IMAGE}/barebox-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 skip=1 bs=512
-		dd if=${DEPLOY_DIR_IMAGE}/bareboxenv-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 bs=512k
-		;;
-		"")
-		;;
-		*)
-		bberror "Unknown IMAGE_BOOTLOADER value"
-		exit 1
-		;;
-	esac
+	_burn_bootloader
 
 	_generate_boot_image 1
 

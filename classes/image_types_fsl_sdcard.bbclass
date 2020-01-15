@@ -272,7 +272,9 @@ generate_fsl_lsch3_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
-	parted -s ${SDCARD} unit KiB mkpart primary $(expr  ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}) $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED}     \+ $ROOTFS_SIZE)
+	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
+	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 	parted ${SDCARD} print
 
 	# Fill RCW into the boot block
@@ -286,7 +288,9 @@ generate_fsl_lsch3_sdcard () {
 
 	# Burn Partition
 	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
-	dd if=${SDCARD_ROOTFS} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
+	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 }
 
 #

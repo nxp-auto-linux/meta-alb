@@ -132,9 +132,9 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2', True) + ':do_deploy' or ''} \
 "
 
-SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
-SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_fsl_lsch3_sdcard"
-SDCARD_GENERATION_COMMAND_s32 = "generate_imx_sdcard"
+SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_alb_sdcard"
+SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_alb_sdcard"
+SDCARD_GENERATION_COMMAND_s32 = "generate_alb_sdcard"
 
 # Add extra images in the boot partition
 add_extra_boot_img() {
@@ -274,61 +274,14 @@ _burn_bootloader() {
 	esac
 }
 
-# Create an image that can by written onto a SD card using dd for use
-# with the Layerscape 2 family of devices
-#
-# External variables needed:
-#   ${SDCARD_ROOTFS}    - the rootfs image to incorporate
-#   ${IMAGE_BOOTLOADER} - bootloader to use {u-boot, barebox}
-#
-# The disk layout used is:
-#
-#    0                      -> IMAGE_ROOTFS_ALIGNMENT            - reserved to bootloader (not partitioned)
-#    IMAGE_ROOTFS_ALIGNMENT -> BOOT_SPACE                     - kernel and other data
-#    BOOT_SPACE             -> SDIMG_SIZE                     - rootfs
-#
-#                                                     Default Free space = 1.3x
-#                                                     Use IMAGE_OVERHEAD_FACTOR to add more space
-#                                                     <--------->
-#            64MiB              16MiB         SDIMG_ROOTFS
-# <-----------------------> <----------> <---------------------->
-#  ------------------------ ------------ ------------------------
-# | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            |
-#  ------------------------ ------------ ------------------------
-# ^                        ^            ^                        ^                               ^
-# |                        |            |                        |                               |
-# 0                       64MiB   64MiB + 16MiB    64MiB + 16Mib + SDIMG_ROOTFS
-generate_fsl_lsch3_sdcard () {
-	# Create partition table
-	parted -s ${SDCARD} mklabel msdos
-	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
-	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
-	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
-	parted ${SDCARD} print
-
-	# Fill RCW into the boot block
-	if [ -n "${SDCARD_RCW_NAME}" ]; then
-	        dd if=${DEPLOY_DIR_IMAGE}/${SDCARD_RCW_NAME} of=${SDCARD} conv=notrunc seek=8 bs=512
-	fi
-
-	_burn_bootloader
-
-	_generate_boot_image 1
-
-	# Burn Partition
-	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
-	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
-	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
-}
-
 #
 # Create an image that can by written onto a SD card using dd for use
-# with i.MX SoC family
+# with i.MX, S32, or Layerscape SoC families
 #
 # External variables needed:
-#   ${SDCARD_ROOTFS}    - the rootfs image to incorporate
+#   ${SDCARD_ROOTFS}    - the rootfs image type to incorporate, e.g., ext3
+#   ${SDCARD_ROOTFS_EXTRA1_*} - Optional additional partition definition
+#   ${SDCARD_RCW_NAME}  - RCW for Layerscape devices
 #   ${IMAGE_BOOTLOADER} - bootloader to use {u-boot, barebox}
 #
 # The disk layout used is:
@@ -355,14 +308,19 @@ generate_fsl_lsch3_sdcard () {
 #                                                                   |                                                              |
 #                                                                ROOTFS0                                                        ROOTFSn
 
-generate_imx_sdcard () {
+generate_alb_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
 	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
-	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
+	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
+	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
 	parted ${SDCARD} print
+
+	# Fill optional Layerscape RCW into the boot block
+	if [ -n "${SDCARD_RCW_NAME}" ]; then
+	        dd if=${DEPLOY_DIR_IMAGE}/${SDCARD_RCW_NAME} of=${SDCARD} conv=notrunc seek=8 bs=512
+	fi
 
 	_burn_bootloader
 
@@ -371,8 +329,8 @@ generate_imx_sdcard () {
 	# Burn Partitions
 	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
 	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
-	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
+	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
+	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
 }
 
 generate_sdcardimage_entry() {

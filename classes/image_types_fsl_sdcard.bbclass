@@ -132,9 +132,9 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2', True) + ':do_deploy' or ''} \
 "
 
-SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_alb_sdcard"
-SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_alb_sdcard"
-SDCARD_GENERATION_COMMAND_s32 = "generate_alb_sdcard"
+SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_nxp_sdcard"
+SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_nxp_sdcard"
+SDCARD_GENERATION_COMMAND_s32 = "generate_nxp_sdcard"
 
 # Add extra images in the boot partition
 add_extra_boot_img() {
@@ -308,7 +308,7 @@ _burn_bootloader() {
 #                                                                   |                                                              |
 #                                                                ROOTFS0                                                        ROOTFSn
 
-generate_alb_sdcard () {
+generate_nxp_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})

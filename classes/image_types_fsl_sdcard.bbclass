@@ -389,11 +389,6 @@ generate_sdcardimage_entry() {
 
 IMAGE_CMD_sdcard () {
 
-	if [ -z "${SDCARD_ROOTFS}" ]; then
-		bberror "SDCARD_ROOTFS is undefined. To create an SD card image with NXP's BSP, it needs to be defined."
-		exit 1
-	fi
-
 	if [ -n "${UBOOT_BOOTSPACE_OFFSET}" ]; then
 		UBOOT_BOOTSPACE_OFFSET=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET})
 	else
@@ -414,9 +409,11 @@ IMAGE_CMD_sdcard () {
 			IMAGE_ROOTFS_ALIGNMENT=${BASE_IMAGE_ROOTFS_ALIGNMENT}
 		fi
 	fi
-	SDCARD_SIZE=$(expr ${IMAGE_ROOTFS_ALIGNMENT} + ${BOOT_SPACE_ALIGNED} + $ROOTFS_SIZE + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
 
-	# Add size of additional rootfs partitions
+	SDCARD_SIZE=$(expr ${IMAGE_ROOTFS_ALIGNMENT} + ${BOOT_SPACE_ALIGNED})
+	if [ -n "${SDCARD_ROOTFS_REAL}" ]; then
+		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${ROOTFS_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+	fi
 	if [ -n "${SDCARD_ROOTFS_EXTRA1}" ]; then
 		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${SDCARD_ROOTFS_EXTRA1_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
 	fi

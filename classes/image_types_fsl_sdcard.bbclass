@@ -19,6 +19,35 @@ UBOOT_ENV_SDCARD ?= "u-boot-environment"
 UBOOT_ENV_NAME ??= "u-boot-flashenv-sd"
 UBOOT_ENV_SDCARD_FILE ?= "${@d.getVar('UBOOT_ENV_NAME', True) and (d.getVar('UBOOT_ENV_NAME', True).split()[0] + '-${MACHINE}.bin') or ''}"
 
+# The SDCARD_ROOTFS handling is easily broken. Due to the way images
+# are created and how dependencies within the image creation process
+# are handled, we need to ensure that we pull the rootfs from the
+# IMGDEPLOYDIR and not from DEPLOY_DIR_IMAGE (which is the final user
+# visible result). However, having this variable in the machine configs
+# is ugly because it is an image process internal one. So we ignore
+# the passed in path for compatibility and fix the reference.
+# In a nutshell this also means that the whole concept of specifying
+# a name in SDCARD_ROOTFS is broken because it has to match the
+# IMAGE_NAME in the end anyway to leverage the internal dependency
+# process as currently used. So the only thing of relevance is the
+# extension and we can redo the rest internally. Oh well. *sigh*
+# If we really wanted to use a different rootfs, we'd have to
+# differentiate between the recipe name to provide the rootfs and the
+# file resulting from that recipe with a given extension to get the
+# dependencies right.
+# To overcome this, we only take the extension from the SDCARD_ROOTFS
+# now and build the right internal name from scratch.
+# This permits us to build also with no card
+# Another problem with the way the image classes work is that they
+# add DATETIME into the IMAGE_NAME. If one subimage fails to build you
+# can't just rerun the build to recreate the missing image from the
+# dependencies. As the date changed then, the dependencies can no longer
+# be found. As it appears this can't easily be fixed, the only solution
+# then is to bitbake -c clean the image and rebuild it completely.
+# In other words, All or Nothing.
+SDCARD_ROOTFS_EXT ?= "${@d.getVar('SDCARD_ROOTFS', 1).split('.')[-1]}"
+SDCARD_ROOTFS_REAL = "${@oe.utils.conditional("SDCARD_ROOTFS_EXT", "", "", "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}", d)}"
+
 # For integration of raw flash like elements we fall back to the same
 # variables as for the flash class. This permits using one set of
 # variables in the machine definition mostly for different types of
@@ -99,8 +128,6 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA2', True) + ':do_deploy' or ''} \
 	${@d.getVar('ATF_IMAGE_FILE', True) and d.getVar('ATF_IMAGE', True) + ':do_deploy' or ''} \
 "
-
-do_image_sdcard[depends] += "${IMAGE_BASENAME}:do_image_ext3"
 
 SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
 SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_fsl_lsch3_sdcard"
@@ -272,7 +299,7 @@ generate_fsl_lsch3_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
-	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
 	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
 	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 	parted ${SDCARD} print
@@ -288,7 +315,7 @@ generate_fsl_lsch3_sdcard () {
 
 	# Burn Partition
 	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
-	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
 	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
 	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 }
@@ -329,7 +356,7 @@ generate_imx_sdcard () {
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
-	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
 	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
 	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 	parted ${SDCARD} print
@@ -340,7 +367,7 @@ generate_imx_sdcard () {
 
 	# Burn Partitions
 	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
-	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS}
+	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
 	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
 	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
 }

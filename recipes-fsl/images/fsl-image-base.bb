@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017-2019 NXP
+# Copyright 2017-2020 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -31,6 +31,7 @@ IMAGE_INSTALL += "iputils"
 IMAGE_INSTALL_append_s32v234evb = " sja1105 "
 IMAGE_INSTALL_append_s32v234bbmini = " sja1105 "
 IMAGE_INSTALL_append_s32g274aevb = " sja1105 "
+IMAGE_INSTALL_append_s32g274ardb = " sja1105 "
 
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior

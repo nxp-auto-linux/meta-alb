@@ -1,4 +1,4 @@
-# Copyright 2019 NXP
+# Copyright 2019-2020 NXP
 #
 # This is the PFE driver for Linux kernel 4.14 and 4.19
 
@@ -64,4 +64,4 @@ RPROVIDES_${PN} = " \
 	kernel-module-pfeng${KERNEL_MODULE_PACKAGE_SUFFIX} \
 	"
 
-COMPATIBLE_MACHINE = "s32g274aevb"
+COMPATIBLE_MACHINE = "s32g274aevb|s32g274ardb"

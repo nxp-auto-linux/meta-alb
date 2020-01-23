@@ -9,3 +9,4 @@ FLASHIMAGE_EXTRA2_FILE = "pfe-s32g-class.fw"
 FLASHIMAGE_EXTRA2_OFFSET = "${FLASHIMAGE_PFE_OFFSET}"
 
 IMAGE_INSTALL_append_s32g274aevb = " pfe"
+IMAGE_INSTALL_append_s32g274ardb = " pfe"

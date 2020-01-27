@@ -9,7 +9,7 @@
 inherit siteinfo
 inherit deploy
 
-DEPENDS = "u-boot-mkimage-native"
+DEPENDS = "u-boot-tools-native"
 
 S = "${WORKDIR}"
 

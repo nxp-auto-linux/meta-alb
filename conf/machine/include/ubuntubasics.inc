@@ -57,6 +57,7 @@ DISTRO_NEVER_WRITE_PACKAGE += "\
 	bzip2 \
 	coreutils \
 	db \
+	diffutils \
 	dpkg \
 	flex \
 	glibc \

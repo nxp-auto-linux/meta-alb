@@ -17,6 +17,20 @@ SDK_RDEPENDS = ""
 POKY_DEFAULT_EXTRA_RDEPENDS = ""
 INITRAMFS_IMAGE = ""
 
+# The Yocto glibc version must not exceed the Ubuntu glibc version
+# or Yocto created executables will fail on the Ubuntu image.
+# We want to be as close as possible to the respective Ubuntu glibc
+# to avoid compatibility issues.
+# The glibc version for a given Ubuntu release is a priori knowledge,
+# so the suitable Yocto version can be selected here.
+# TODO: This is not really functional yet
+#GLIBCVERSION = '${@ \
+#	oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "linaro-2.20", \
+#	oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "linaro-2.20", \
+#	"unsupportedubuntuversion" \
+#	, d) \
+#	, d)}'
+
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"
 

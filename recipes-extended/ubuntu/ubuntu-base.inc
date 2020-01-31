@@ -27,6 +27,11 @@ do_populate_sdk[noexec] = "1"
 INSANE_SKIP_${PN} += "already-stripped build-deps file-rdeps dev-so staticdev"
 INHIBIT_DEFAULT_DEPS = "1"
 
+# We need to keep all the other recipes happy that will rely on us
+# during runtime through default dependencies!
+RCONFLICTS_${PN} += "glibc eglibc"
+RREPLACES_${PN} += "glibc eglibc"
+
 # The basic ubuntu-base rootfs does not provide enough functionality to
 # enable ethernet or interfaces automatically in general.
 # We support ifconfig, route, busybox, udhcpc
@@ -231,28 +236,6 @@ pam-plugin-extrausers \
 pam-plugin-sepermit \
 pam-plugin-selinux \
 "
-
-# We do not want a local glibc used to build local Yocto packages to
-# interfere with what we provide in ubuntu-base. Therefore we override
-# any .so reference in shared libs with an explicit reference to our
-# package in our version and eliminate all other references by prefixing
-# with "*/" to ours.
-# NOTE: Updated package.bbclass required for path support!
-LOCALONLY_SHLIBS = "${TARFILES}"
-python __anonymous () {
-    import re
-    aslibs = []
-    pn = d.getVar('PN', True)
-    lib_re = re.compile("^.*\.so")
-    for i in (d.getVar('LOCALONLY_SHLIBS', True) or "").split():
-        if lib_re.match(i):
-            aslibs.append('*/' + os.path.basename(i) + ':' + pn)
-
-    bb.debug(2, "Adding to ASSUME_SHLIBS: {}".format(aslibs))
-    a_s = d.getVar('ASSUME_SHLIBS', True) or ""
-    a_s += ' '.join(aslibs)
-    d.setVar('ASSUME_SHLIBS', a_s)
-}
 
 # Ensure that all files of the tgz end up in our packages
 FILES_${PN} += "${base_libdir}/${TRANSLATED_TARGET_ARCH}-linux-gnu/lib*${SOLIBS}"

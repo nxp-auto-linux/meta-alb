@@ -15,9 +15,10 @@ SRC_URI = " \
 	file://fstab \
 "
 
+# Note that we still populate_sysroot because otherwise manifest
+# updates through staging would not happen.
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
-do_populate_sysroot[noexec] = "1"
 do_populate_sdk[noexec] = "1"
 
 # As this package will never be built/compiled, we do not really need

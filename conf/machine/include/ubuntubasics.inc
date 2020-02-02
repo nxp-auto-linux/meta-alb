@@ -23,12 +23,12 @@ INITRAMFS_IMAGE = ""
 # The glibc version for a given Ubuntu release is a priori knowledge,
 # so the suitable Yocto version can be selected here.
 # TODO: This is not really functional yet
-#TCLIBC = '${@ \
-#	oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "linaro-2.20", \
-#	oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "linaro-2.20", \
-#	"unsupportedubuntuversion" \
-#	, d) \
-#	, d)}'
+#GLIBCVERSION = '${@ \
+#    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "linaro-2.20", \
+#    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "linaro-2.20", \
+#    "unsupportedubuntuversion" \
+#    , d) \
+#    , d)}'
 
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"

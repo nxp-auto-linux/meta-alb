@@ -1,7 +1,9 @@
 # A more complex image with customer required setup
 require fsl-image-ubuntu-base.bb
 
-require kernel-source-debian.inc
+# FIX! This include currently requires a different glibc
+# or the packages won't install properly.
+#require kernel-source-debian.inc
 
 # Example for use of "ppa:" to install x2go with xfce4
 APTGET_EXTRA_PPA += "ppa:x2go/stable;"

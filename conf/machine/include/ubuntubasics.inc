@@ -13,8 +13,7 @@ UBUNTU_TARGET_ARCH="${@d.getVar('TARGET_ARCH', True).replace("aarch64", "arm64")
 
 # Downconfigure Yocto environment to not pull in local things
 IMAGE_LINGUAS = ""
-SDK_RDEPENDS = ""
-POKY_DEFAULT_EXTRA_RDEPENDS = ""
+POKY_DEFAULT_EXTRA_RDEPENDS_remove = "packagegroup-core-boot"
 INITRAMFS_IMAGE = ""
 
 # The Yocto glibc version must not exceed the Ubuntu glibc version
@@ -24,7 +23,7 @@ INITRAMFS_IMAGE = ""
 # The glibc version for a given Ubuntu release is a priori knowledge,
 # so the suitable Yocto version can be selected here.
 # TODO: This is not really functional yet
-#GLIBCVERSION = '${@ \
+#TCLIBC = '${@ \
 #	oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "linaro-2.20", \
 #	oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "linaro-2.20", \
 #	"unsupportedubuntuversion" \
@@ -42,10 +41,7 @@ EXTRANATIVEPATH += "tar-native"
 
 # We influence the setup to match Ubuntu more properly as otherwise
 # Yocto behavior may conflict with the Ubuntu rootfs.
-DISTRO_FEATURES_remove = "sysvinit"
-DISTRO_FEATURES_append = " systemd"
-DISTRO_FEATURES_append += "docker"
-VIRTUAL-RUNTIME_init_manager = "systemd"
+INIT_MANAGER = "systemd"
 
 # Turns out that we want the Yocto recipes as default provider, but
 # then we must ensure they do not get deployed to avoid pollution of
@@ -60,13 +56,14 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 # The respective Ubuntu image must then install the Ubuntu version of
 # the recipe.
 require conf/machine/include/nodistropackage.inc
-DISTRO_NEVER_WRITE_PACKAGE += "\
+DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 	alsa-conf \
 	alsa-lib \
 	update-alternatives \
 	bash \
 	base-files \
 	bc \
+	bison \
 	bluez5 \
 	bzip2 \
 	coreutils \
@@ -97,7 +94,8 @@ DISTRO_NEVER_WRITE_PACKAGE += "\
 	xz \
 	zlib \
 "
-# All the runtime above should come from ubuntu-base
-DISTRO_DEFAULT_RPROVIDER = "ubuntu-base"
+# All the runtime above should come from ubuntu-base,
+# but only for the target, not for native elements.
+DISTRO_DEFAULT_RPROVIDER_class-target = "ubuntu-base"
 
 require conf/machine/include/ubuntutcconf.inc

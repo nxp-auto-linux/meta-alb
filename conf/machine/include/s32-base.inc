@@ -9,18 +9,6 @@ SOC_FAMILY = "s32"
 # Otherwise, intermediate include files should be
 # created for various families (e.g. s32v-base.inc, s32g-base.inc etc)
 
-# NXP Automotive uses gcc 6.3
-# For backwards compatibility, we also support gcc 4.9. To use it,
-# set GCCVERSION = "linaro-4.9", BINUVERSION = "linaro-2.25", GLIBCVERSION = "2.20"
-GCCVERSION ?= "linaro-6.3"
-BINUVERSION ?= "2.29.1"
-GLIBCVERSION ?= "2.26"
-PREFERRED_VERSION_libgfortran ?= "linaro-6.3"
-
-# Enable loop support optimizations for gcc.
-# Not supported for gcc 4.9
-DISTRO_FEATURES_append += " gcc-loop-optimization"
-
 KERNEL_IMAGETYPE ?= "Image"
 
 # required for u-boot

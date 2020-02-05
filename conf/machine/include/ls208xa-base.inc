@@ -16,6 +16,9 @@ PREMIRRORS_prepend = " git://github.com/qoriq-open-source/ git://source.codeauro
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"
 PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
 
+# TODO zeus: use legacy mc 10.6, as 10.18 throws a license error
+PREFERRED_VERSION_management-complex = "10.6.0"
+
 # For all other elements we use the SDK defaults
 require conf/machine/include/qoriq-arm64.inc
 require conf/machine/include/arm/arch-arm64.inc

@@ -14,4 +14,4 @@ EXTRA_REQUIRE_s32 = '${@oe.utils.conditional("IMAGE_ROOTFS_REQ", "fsl-image-auto
 
 IMAGE_ROOTFS_DEP ?= "${@bb.utils.contains("BBFILE_COLLECTIONS", "qoriq-demos", "fsl-image-networking", "fsl-image-base", d)}"
 
-IMAGE_ROOTFS_DEP_EXT ?= "ext3.gz"
+IMAGE_ROOTFS_DEP_EXT ?= "ext3"

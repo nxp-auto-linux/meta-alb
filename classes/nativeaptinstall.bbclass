@@ -610,24 +610,30 @@ glibc-gconv-utf-7,glibc-gconv-viscii\
  \
 "
 
+# If we are using this class, we want to ensure that our recipe or
+# image is also properly listed as providing the needed results
 python () {
     pn = (d.getVar('PN', True) or "")
     packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
     translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()
 
-    rprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
+    origrprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
+    allrprovides = []
     for p in packagelist:
         appendp = True
+        rprovides = [p]
         for t in translations:
             pkg,yocto = t.split(":")
-            if p == pkg:
-                for i in yocto.split(","):
-                    if i not in rprovides:
-                        bb.debug(1, 'Adding RPROVIDES_%s = "%s"' % (pn, i))
-                        rprovides.append(i)
-                        appendp = False
-        if appendp:
-            rprovides.append(p)
-    if rprovides:
-        d.setVar('RPROVIDES_%s' % pn, ' '.join(rprovides))
+            if p == pkg and yocto:
+                rprovides = yocto.split(",")
+                break
+
+        for i in rprovides:
+            if i and i not in allrprovides:
+                allrprovides.append(i)
+
+    if allrprovides:
+        s = ' '.join(origrprovides + allrprovides)
+        bb.debug(1, 'Setting RPROVIDES_%s = "%s"' % (pn, s))
+        d.setVar('RPROVIDES_%s' % pn, s)
 }

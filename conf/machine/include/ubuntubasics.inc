@@ -9,7 +9,7 @@ PREFERRED_VERSION_ubuntu-base = "${UBUNTU_TARGET_VERSION}"
 
 # I am sure there are smarter ways to map the architecture. This works
 # initially. FIX
-UBUNTU_TARGET_ARCH="${@d.getVar('TARGET_ARCH', True).replace("aarch64", "arm64")}"
+UBUNTU_TARGET_ARCH="${@d.getVar('TRANSLATED_TARGET_ARCH', True).replace("aarch64", "arm64")}"
 
 # Downconfigure Yocto environment to not pull in local things
 # We do not want any default post intercepts or special default
@@ -17,6 +17,7 @@ UBUNTU_TARGET_ARCH="${@d.getVar('TARGET_ARCH', True).replace("aarch64", "arm64")
 IMAGE_LINGUAS = ""
 POKY_DEFAULT_EXTRA_RDEPENDS_remove = "packagegroup-core-boot"
 INITRAMFS_IMAGE = ""
+POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 
 # The Yocto glibc version must not exceed the Ubuntu glibc version
 # or Yocto created executables will fail on the Ubuntu image.

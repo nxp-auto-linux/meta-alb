@@ -446,12 +446,14 @@ END_PPA
 	set +x
 }
 
-# empty placeholder, override it in parent script for more functionality
+# Must have to preset all variables properly. It also means that
+# the user of this class should not prepend to avoid ordering issues.
 fakeroot do_aptget_user_update_prepend() {
 
 	aptget_update_presetvars;
 }
 
+# empty placeholder, override it in parent script for more functionality
 fakeroot do_aptget_user_update() {
 
 	:

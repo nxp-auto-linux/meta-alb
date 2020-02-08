@@ -1,7 +1,8 @@
-# We have recipies for:
+# We currently support recipies for:
 # - 16.04.5
 # - 18.04.1
-UBUNTU_TARGET_VERSION ?= "16.04.5"
+#UBUNTU_TARGET_VERSION ?= "16.04.5"
+UBUNTU_TARGET_VERSION ?= "18.04.1"
 
 UBUNTU_TARGET_BASEVERSION ?= "${@os.path.splitext(d.getVar('UBUNTU_TARGET_VERSION', True))[0]}"
 UBUNTU_TARGET_SUBVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[2]}"

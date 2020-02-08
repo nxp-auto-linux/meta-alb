@@ -153,6 +153,7 @@ ${PSEUDO_LOCALSTATEDIR}:\
 
 ENV_HOST_PROXIES ?= ""
 APTGET_HOST_PROXIES ?= ""
+APTGET_EXECUTABLE ?= "/usr/bin/apt-get"
 
 aptget_update_presetvars() {
 	export PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
@@ -198,6 +199,23 @@ END_PROXY
 
 	export etc_hosts_renamed="${APTGET_CHROOT_DIR}/etc/hosts.yocto"
 	export etc_resolv_conf_renamed="${APTGET_CHROOT_DIR}/etc/resolv.conf.yocto"
+}
+
+fakeroot aptget_populate_cache_from_sstate() {
+	if [ -e "${APTGET_CACHE_DIR}" ]; then
+		mkdir -p "${APTGET_CACHE_DIR}"
+		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check
+		rsync -v -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
+		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check
+	fi
+}
+
+fakeroot aptget_save_cache_into_sstate() {
+	if [ -e "${APTGET_CACHE_DIR}" ]; then
+		mkdir -p "${APTGET_DL_CACHE}"
+		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check
+		rsync -v -d -u -t --include *.deb "${APTGET_CACHE_DIR}/" "${APTGET_DL_CACHE}" 
+	fi
 }
 
 fakeroot aptget_update_begin() {
@@ -277,12 +295,7 @@ END_USER
 	# Yocto environment. If we kept apt packages privately from
 	# a prior run, prepopulate the package cache locally to avoid
 	# costly downloads
-	if [ -e "${APTGET_DL_CACHE}" ]; then
-		mkdir -p "${APTGET_CACHE_DIR}"
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
-		rsync -v -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
-	fi
+	aptget_populate_cache_from_sstate
 
 	# Before we can play with the package manager in any
 	# meaningful way, we need to sync the database.
@@ -444,11 +457,7 @@ fakeroot aptget_update_end() {
 
 	# Once we have done the installation, save off the package
 	# cache locally for repeated use of recipe building
-	if [ -e "${APTGET_CACHE_DIR}" ]; then
-		mkdir -p "${APTGET_DL_CACHE}"
-		rsync -v -d -u -t --include *.deb "${APTGET_CACHE_DIR}/" "${APTGET_DL_CACHE}" 
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
-	fi
+	aptget_save_cache_into_sstate
 
 	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
 		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy clean

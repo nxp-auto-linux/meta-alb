@@ -34,20 +34,26 @@ def dnwp_prefrprov(d):
     # This is really a workaround only, which is limiting the
     # intended flexibility of the mechanism overall. However,
     # I could not find another way to properly set the preferred
-    # rprovider. See also dnwp_nopackagewrites() for where this
-    # really should happen.
+    # rprovider.
     # I wish I knew how to access all package names at that time
     # but the recipes are not parsed yet ...
-    rp = d.getVar('DISTRO_DEFAULT_RPROVIDER')
+    dp = d.getVar('DISTRO_DEFAULT_RPROVIDER') or ''
+    dpdict = bb.utils.explode_dep_versions2(dp)
+    if len(dpdict) > 1:
+        bb.error("DISTRO_DEFAULT_RPROVIDER may have only one (optionally versioned) entry!")
+    for dpkey, dpver in dpdict.items():
+        break
+
     dawp = (d.getVar('DISTRO_ALWAYS_WRITE_PACKAGE') or '').split()
     for pattern in (d.getVar('DISTRO_NEVER_WRITE_PACKAGE') or '').split():
         pnpattern, packagelist, preferredrprovider = (pattern.split(':') + 3 * [None])[:3]
         if not pnpattern:
             bb.error("Missing recipe name in nodistropackage")
-        preferredrprovider = preferredrprovider or rp
+        if not preferredrprovider:
+            preferredrprovider = dpkey
         if preferredrprovider:
             foundalwayswrite = False
-            for dawpatten in dawp:
+            for dawpattern in dawp:
                 dawpnpattern, dawpackagelist, dawpreferredrprovider = (dawpattern.split(':') + 3 * [None])[:3]
                 # Note that we use pnpattern, i.e., this
                 # workaround does not permit us to use real
@@ -76,7 +82,12 @@ python distro_never_write_package_pre () {
 # PREFERRED_RPROVIDER and fix up the RDEPENDS to avoid file-rdeps
 # complaints on packaging.
 def dnwp_fixuprdepends(d):
-    dp = d.getVar('DISTRO_DEFAULT_RPROVIDER')
+    dp = d.getVar('DISTRO_DEFAULT_RPROVIDER') or ''
+    dpdict = bb.utils.explode_dep_versions2(dp)
+    if len(dpdict) > 1:
+        bb.error("DISTRO_DEFAULT_RPROVIDER may have only one (optionally versioned) entry!")
+    for dpkey, dpver in dpdict.items():
+        break
 
     modified = False
     for ppn in (d.getVar('PACKAGES') or '').split():
@@ -87,14 +98,16 @@ def dnwp_fixuprdepends(d):
         for rdep in rdepends:
             foundnordeppkg,  fnrpkglist, fnrprp = dnwp_checkpackagematch(d, rdep, 'DISTRO_NEVER_WRITE_PACKAGE')
             foundrdeppkg,    frpkglist,  frprp  = dnwp_checkpackagematch(d, rdep, 'DISTRO_ALWAYS_WRITE_PACKAGE')
-            origrdep = rdep
+            ver = rdepends[rdep]
             if foundnordeppkg and not foundrdeppkg:
-                fnrprp = fnrprp or dp
+                if not fnrprp:
+                    fnrprp = dpkey
+                    ver = dpver
                 if fnrprp and fnrprp not in newrdepends:
                     rdep = fnrprp
                     rpmodified = True
                     modified = True
-            newrdepends[rdep] = rdepends[origrdep]
+            newrdepends[rdep] = ver
         if rpmodified:
             d.setVar(rdepkey, bb.utils.join_deps(newrdepends, commasep=False))
 
@@ -104,6 +117,7 @@ def dnwp_fixuprdepends(d):
             # it is a reasonable solution to the QA problem.
             d.appendVar('INSANE_SKIP_' +  ppn, ' build-deps')
 
+# This is called once per package. It better be quick
 python () {
     dnwp_fixuprdepends(d)
     dnwp_nopackagewrites(d)

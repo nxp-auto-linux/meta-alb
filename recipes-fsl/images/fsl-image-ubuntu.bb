@@ -3,12 +3,15 @@ require fsl-image-ubuntu-base.bb
 
 # FIX! This include currently requires a different glibc
 # or the packages won't install properly.
-#require kernel-source-debian.inc
-
 # Example for use of "ppa:" to install x2go with xfce4
 APTGET_EXTRA_PPA += "ppa:x2go/stable;"
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
 APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
+
+require kernel-source-debian.inc
+APTGET_EXTRA_PACKAGES += " \
+    libssl-dev \
+"
 
 ROOTFS_POSTPROCESS_COMMAND_append = " do_disable_nm_wait_online;"
 
@@ -42,7 +45,6 @@ APTGET_EXTRA_PACKAGES += " \
     iperf nginx \
     nmap \
     openssh-server \
-    libssl-dev \
 \
     sqlitebrowser \
     libsqlite3-dev \

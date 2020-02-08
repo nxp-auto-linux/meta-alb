@@ -20,18 +20,24 @@ INITRAMFS_IMAGE = ""
 POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 
 # The Yocto glibc version must not exceed the Ubuntu glibc version
-# or Yocto created executables will fail on the Ubuntu image.
+# or Yocto-created executables will fail on the Ubuntu image.
 # We want to be as close as possible to the respective Ubuntu glibc
-# to avoid compatibility issues.
-# The glibc version for a given Ubuntu release is a priori knowledge,
+# version to avoid compatibility issues.
+# The glibc version for a given Ubuntu release is a-priori knowledge,
 # so the suitable Yocto version can be selected here.
-# TODO: This is not really functional yet
-#GLIBCVERSION = '${@ \
-#    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "linaro-2.20", \
-#    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "linaro-2.20", \
-#    "unsupportedubuntuversion" \
-#    , d) \
-#    , d)}'
+# Note that the glibc is not compiled in Ubuntu identical fashion.
+# It remains a glibc that works for Yocto, which is good enough for
+# our purposes.
+# Ubuntu 16.04: max glibc 2.23...
+# Ubuntu 18.04: max glibc 2.27...
+# Ubuntu 19.x: max glibc 2.29...
+GLIBCVERSION = '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "2.23", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.27", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d)}'
+PREFERRED_VERSION_cross-localedef-native = "${GLIBCVERSION}"
 
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"
@@ -120,4 +126,4 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 # would only show up then at image build time.
 DISTRO_DEFAULT_RPROVIDER_class-target = "ubuntu-base (= ${UBUNTU_TARGET_VERSION})"
 
-require conf/machine/include/ubuntutcconf.inc
+#require conf/machine/include/ubuntutcconf.inc

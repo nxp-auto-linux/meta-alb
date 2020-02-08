@@ -44,16 +44,23 @@ APTGET_EXTRA_PACKAGES += "\
 	whiptail \
 	kmod gnupg net-tools netbase \
 "
+# We *MUST* provide all Ubuntu packages in ubuntu-base that we need
+# to install Yocto packages! Packages installed in images via
+# IMAGE_INSTALL will not help to resolve the dependency chain!
 # The following is an incomplete hint at dependency needs to accomodate
 # Yocto packages:
-# - xz-utils: LS2 restool references libs
+# - dtc, xz-utils: LS2 restool references libs
 # - python*, bc, db*: kernel-devsrc has scripts
 # Note how we translate Ubuntu names into Yocto names for proper
 # handling.
 APTGET_EXTRA_PACKAGES += "\
-	xz-utils bzip2 \
-	python3.5 python bc db5.3 \
+    bison \
+    device-tree-compiler \
 	libffi6 \
+    libnss-db \
+    libssl-dev \
+	python3.5 python bc db5.3 \
+	xz-utils bzip2 \
 "
 # Some packages are implicitly present in Ubuntu due to the kernel
 # and rootfs configuration. We pretend to have the respective Yocto
@@ -63,8 +70,15 @@ RPROVIDES_${PN}_ubuntu += " \
 flex \
 "
 RPROVIDES_${PN}_ubuntu += " \
-libgcc1-dev \
 rtld(GNU_HASH) \
+libc6 \
+libc6-utils \
+libc6-extra-nss \
+libc6-thread-db \
+libc6-pcprofile \
+libcrypto1.1 \
+libgcc1-dev \
+libssl1.1 \
 update-alternatives \
 "
 RPROVIDES_${PN}_ubuntu += " \

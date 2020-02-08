@@ -1,0 +1,44 @@
+From 21c492450eac6f9db8e06b858524287ec133b9d2 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 5 Feb 2020 11:53:43 +0100
+Subject: [PATCH] localdef: Hack to compile cross-*-native
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ locale/xlocale.h | 21 +--------------------
+ 1 file changed, 1 insertion(+), 20 deletions(-)
+
+diff --git a/locale/xlocale.h b/locale/xlocale.h
+index e4408e2e99..74dfda7660 100644
+--- a/locale/xlocale.h
++++ b/locale/xlocale.h
+@@ -20,25 +20,6 @@
+ #ifndef _XLOCALE_H
+ #define _XLOCALE_H	1
+ 
+-/* Structure for reentrant locale using functions.  This is an
+-   (almost) opaque type for the user level programs.  The file and
+-   this data structure is not standardized.  Don't rely on it.  It can
+-   go away without warning.  */
+-typedef struct __locale_struct
+-{
+-  /* Note: LC_ALL is not a valid index into this array.  */
+-  struct __locale_data *__locales[13]; /* 13 = __LC_LAST. */
+-
+-  /* To increase the speed of this solution we add some special members.  */
+-  const unsigned short int *__ctype_b;
+-  const int *__ctype_tolower;
+-  const int *__ctype_toupper;
+-
+-  /* Note: LC_ALL is not a valid index into this array.  */
+-  const char *__names[13];
+-} *__locale_t;
+-
+-/* POSIX 2008 makes locale_t official.  */
+-typedef __locale_t locale_t;
++typedef struct __locale_struct *__locale_t;
+ 
+ #endif /* xlocale.h */
+-- 
+2.17.1
+

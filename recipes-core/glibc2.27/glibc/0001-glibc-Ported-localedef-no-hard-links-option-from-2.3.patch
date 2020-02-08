@@ -1,0 +1,113 @@
+From 813a8710eee8874183b202d7c4f9b11dca07aa38 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 5 Feb 2020 07:35:05 +0100
+Subject: [PATCH] glibc: Ported localedef --no-hard-links option from 2.30 to
+ 2.27
+
+Need this because Yocto libc-package.bbclass relies on it.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ locale/programs/localedef.c | 12 +++++++++++-
+ locale/programs/localedef.h |  1 +
+ locale/programs/locfile.c   | 21 +++++++++++++++++----
+ 3 files changed, 29 insertions(+), 5 deletions(-)
+
+diff --git a/locale/programs/localedef.c b/locale/programs/localedef.c
+index e0a3ad5a83..826dbd8301 100644
+--- a/locale/programs/localedef.c
++++ b/locale/programs/localedef.c
+@@ -85,6 +85,9 @@ static bool replace_archive;
+ /* If true list archive content.  */
+ static bool list_archive;
+ 
++/* If true create hard links to other locales (default).  */
++bool hard_links = true;
++
+ /* Maximum number of retries when opening the locale archive.  */
+ int max_locarchive_open_retry = 10;
+ 
+@@ -105,7 +108,8 @@ void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ #define OPT_BIG_ENDIAN 401
+ #define OPT_NO_WARN 402
+ #define OPT_WARN 403
+-#define OPT_UINT32_ALIGN 404
++#define OPT_NO_HARD_LINKS 404
++#define OPT_UINT32_ALIGN 405
+ 
+ /* Definitions of arguments for argp functions.  */
+ static const struct argp_option options[] =
+@@ -121,6 +125,8 @@ static const struct argp_option options[] =
+   { NULL, 0, NULL, 0, N_("Output control:") },
+   { "force", 'c', NULL, 0,
+     N_("Create output even if warning messages were issued") },
++  { "no-hard-links", OPT_NO_HARD_LINKS, NULL, 0,
++    N_("Do not create hard links between installed locales") },
+   { "prefix", OPT_PREFIX, N_("PATH"), 0, N_("Optional output file prefix") },
+   { "posix", OPT_POSIX, NULL, 0, N_("Strictly conform to POSIX") },
+   { "quiet", OPT_QUIET, NULL, 0,
+@@ -394,6 +400,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
+       /* Enable the warnings.  */
+       set_warnings (arg, true);
+       break;
++    case OPT_NO_HARD_LINKS:
++      /* Do not hard link to other locales.  */
++      hard_links = false;
++      break;
+     case OPT_UINT32_ALIGN:
+       uint32_align_mask = strtol (arg, NULL, 0) - 1;
+       break;
+diff --git a/locale/programs/localedef.h b/locale/programs/localedef.h
+index 0083faceab..e2b39e78f3 100644
+--- a/locale/programs/localedef.h
++++ b/locale/programs/localedef.h
+@@ -118,6 +118,7 @@ extern const char *repertoire_global;
+ extern int max_locarchive_open_retry;
+ extern bool no_archive;
+ extern const char *alias_file;
++extern bool hard_links;
+ 
+ 
+ /* Prototypes for a few program-wide used functions.  */
+diff --git a/locale/programs/locfile.c b/locale/programs/locfile.c
+index b41e77bd8d..5afdb08fc3 100644
+--- a/locale/programs/locfile.c
++++ b/locale/programs/locfile.c
+@@ -705,7 +705,7 @@ write_locale_data (const char *output_path, int catidx, const char *category,
+   size_t cnt, step, maxiov;
+   int fd;
+   char *fname;
+-  const char **other_paths;
++  const char **other_paths = NULL;
+   uint32_t header[2];
+   size_t n_elem;
+   struct iovec vec[3];
+@@ -830,9 +830,22 @@ failure while writing data for category `%s'"), category);
+ 
+   close (fd);
+ 
+-  /* Compare the file with the locale data files for the same category in
+-     other locales, and see if we can reuse it, to save disk space.  */
+-  other_paths = siblings (output_path);
++  /* Compare the file with the locale data files for the same category
++     in other locales, and see if we can reuse it, to save disk space.
++     If the user specified --no-hard-links to localedef then hard_links
++     is false, other_paths remains NULL and we skip the optimization
++     below.  The use of --no-hard-links is distribution specific since
++     some distros have post-processing hard-link steps and so doing this
++     here is a waste of time.  Worse than a waste of time in rpm-based
++     distributions it can result in build determinism issues from
++     build-to-build since some files may get a hard link in one pass but
++     not in another (if the files happened to be created in parallel).  */
++  if (hard_links)
++    other_paths = siblings (output_path);
++
++  /* If there are other paths, then walk the sibling paths looking for
++     files with the same content so we can hard link and reduce disk
++     space usage.  */
+   if (other_paths != NULL)
+     {
+       struct stat64 fname_stat;
+-- 
+2.17.1
+

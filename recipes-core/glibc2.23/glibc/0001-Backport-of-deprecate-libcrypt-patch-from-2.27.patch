@@ -1,0 +1,235 @@
+From 84f683e3f6f184112525fe2e177ca8566f4d4c07 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 5 Feb 2020 11:27:14 +0100
+Subject: [PATCH] Backport of deprecate libcrypt patch from 2.27
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Background information:
+
+https://sourceware.org/ml/libc-alpha/2017-08/msg01257.html
+https://fedoraproject.org/wiki/Changes/Replace_glibc_libcrypt_with_libxcrypt
+
+Upstream-Status: Submitted [libc-alpha@sourceware.org]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+From: Zack Weinberg <zackw@panix.com>
+Subject: [PATCH] Deprecate libcrypt and don't build it by default
+
+Back in June, Björn Esser proposed to add OpenBSD-compatible bcrypt
+support to our implementation of crypt(3), and Zack Weinberg replied
+that it might actually make more sense to _remove_ libcrypt from
+glibc, freeing up libcrypt.so.1 and crypt.h to be provided by a
+separate project that could move faster.  (For instance, libxcrypt:
+https://github.com/besser82/libxcrypt)
+
+This patch disables build and installation of libcrypt by default.  It
+can be re-enabled with --enable-obsolete-crypt to configure.  Unlike
+libnsl, we do *not* install a runtime shared library; that's left to
+the replacement.  (Unlike the SunRPC situation, I think we can
+probably drop this code altogether in a release or two.)
+
+The function prototypes for crypt and encrypt are removed from
+unistd.h, and the function prototype for setkey is removed from
+stdlib.h; they do *not* come back with --enable-obsolete-crypt.  This
+means glibc no longer provides the POSIX CRYPT option, and the macro
+_XOPEN_CRYPT is also removed from unistd.h to indicate that.
+(_SC_XOPEN_CRYPT is still defined, but sysconf(_SC_XOPEN_CRYPT) will
+return -1 at runtime.)  These functions are also unconditionally
+removed from conform/data/{stdlib,unistd}.h-data.
+
+	* posix/unistd.h (_XOPEN_CRYPT, crypt, encrypt): Don't declare.
+	* stdlib/stdlib.h (setkey): Don't declare.
+
+	* configure.ac (--enable-obsolete-crypt): New configure option.
+	* configure: Regenerate.
+	* config.make.in (build-obsolete-crypt): New makefile variable.
+	* crypt/Banner: Delete file.
+	* crypt/Makefile: Don't build anything unless
+	$(build-obsolete-crypt) is 'yes'.
+	* sysdeps/sparc/sparc32/sparcv9/multiarch/Makefile: Only add things
+	to libcrypt-sysdep_routines when $(build-obsolete-crypt) is 'yes'.
+	* sysdeps/sparc/sparc64/multiarch/Makefile: Likewise.
+	* sysdeps/unix/sysv/linux/arm/Makefile: Likewise.
+
+	* conform/Makefile: Only include libcrypt.a in linknamespace tests
+	when $(build-obsolete-crypt) is 'yes'.
+	* conform/data/stdlib.h-data (setkey): Don't expect.
+	* conform/data/unistd.h-data (crypt, encrypt): Don't expect.
+	* elf/Makefile: Only perform various tests of libcrypt.so/libcrypt.a
+	when $(build-obsolete-crypt) is 'yes'.
+	* elf/tst-linkall-static.c: Don't include crypt.h when USE_CRYPT
+	is false.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+
+---
+ config.make.in             |  1 +
+ configure                  | 13 +++++++++++++
+ configure.ac               |  8 ++++++++
+ conform/Makefile           |  4 ++++
+ conform/data/stdlib.h-data |  1 -
+ conform/data/unistd.h-data |  8 +-------
+ crypt/Makefile             |  5 +++++
+ 7 files changed, 32 insertions(+), 8 deletions(-)
+
+diff --git a/config.make.in b/config.make.in
+index 05ed6eca4b..1b9ded4587 100644
+--- a/config.make.in
++++ b/config.make.in
+@@ -71,6 +71,7 @@ multi-arch = @multi_arch@
+ 
+ mach-interface-list = @mach_interface_list@
+ 
++build-obsolete-crypt = @build_obsolete_crypt@
+ nss-crypt = @libc_cv_nss_crypt@
+ 
+ # Configuration options.
+diff --git a/configure b/configure
+index 7888a3f072..ccd9249d0b 100755
+--- a/configure
++++ b/configure
+@@ -661,6 +661,7 @@ add_on_subdirs
+ add_ons
+ build_pt_chown
+ build_nscd
++build_obsolete_crypt
+ link_obsolete_rpc
+ libc_cv_nss_crypt
+ enable_werror
+@@ -769,6 +770,7 @@ enable_werror
+ enable_multi_arch
+ enable_nss_crypt
+ enable_obsolete_rpc
++enable_obsolete_crypt
+ enable_systemtap
+ enable_build_nscd
+ enable_nscd
+@@ -1436,6 +1438,7 @@ Optional Features:
+   --enable-nss-crypt      enable libcrypt to use nss
+   --enable-obsolete-rpc   build and install the obsolete RPC code for
+                           link-time usage
++  --enable-obsolete-crypt build and install the obsolete libcrypt library
+   --enable-systemtap      enable systemtap static probe points [default=no]
+   --disable-build-nscd    disable building and installing the nscd daemon
+   --disable-nscd          library functions will not contact the nscd daemon
+@@ -3566,6 +3569,16 @@ if test "$link_obsolete_rpc" = yes; then
+ 
+ fi
+ 
++# Check whether --enable-obsolete-crypt was given.
++if test "${enable_obsolete_crypt+set}" = set; then :
++  enableval=$enable_obsolete_crypt; build_obsolete_crypt=$enableval
++else
++  build_obsolete_crypt=no
++fi
++
++
++
++
+ # Check whether --enable-systemtap was given.
+ if test "${enable_systemtap+set}" = set; then :
+   enableval=$enable_systemtap; systemtap=$enableval
+diff --git a/configure.ac b/configure.ac
+index 6908a9918f..9a8eaf3a02 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -345,6 +345,14 @@ if test "$link_obsolete_rpc" = yes; then
+   AC_DEFINE(LINK_OBSOLETE_RPC)
+ fi
+ 
++AC_ARG_ENABLE([obsolete-crypt],
++              AC_HELP_STRING([--enable-obsolete-crypt],
++                             [build and install the obsolete libcrypt library]),
++              [build_obsolete_crypt=$enableval],
++              [build_obsolete_crypt=no])
++AC_SUBST(build_obsolete_crypt)
++
++
+ AC_ARG_ENABLE([systemtap],
+               [AS_HELP_STRING([--enable-systemtap],
+ 	       [enable systemtap static probe points @<:@default=no@:>@])],
+diff --git a/conform/Makefile b/conform/Makefile
+index fddeaa1768..9c4aea623c 100644
+--- a/conform/Makefile
++++ b/conform/Makefile
+@@ -263,6 +263,10 @@ linknamespace-libs-XOPEN2K = $(linknamespace-libs)
+ linknamespace-libs-POSIX2008 = $(linknamespace-libs)
+ linknamespace-libs-XOPEN2K8 = $(linknamespace-libs)
+ 
++ifeq ($(build-obsolete-crypt),yes)
++linknamespace-libs-XPG4 += $(common-objpfx)crypt/libcrypt.a
++endif
++
+ $(linknamespace-symlist-stdlibs-tests): $(objpfx)symlist-stdlibs-%: \
+ 					$(linknamespace-libs)
+ 	LC_ALL=C $(READELF) -W -s $(linknamespace-libs-$*) > $@; \
+diff --git a/conform/data/stdlib.h-data b/conform/data/stdlib.h-data
+index abe296a2ab..7f7916d793 100644
+--- a/conform/data/stdlib.h-data
++++ b/conform/data/stdlib.h-data
+@@ -142,7 +142,6 @@ function {unsigned short int*} seed48 (unsigned short int[3])
+ function int setenv (const char*, const char*, int)
+ #endif
+ #if !defined ISO && !defined ISO99 && !defined ISO11 && !defined POSIX && !defined POSIX2008
+-function void setkey (const char*)
+ function {char*} setstate (char*)
+ #endif
+ function void srand (unsigned int)
+diff --git a/conform/data/unistd.h-data b/conform/data/unistd.h-data
+index 9c00d44551..324436dcb4 100644
+--- a/conform/data/unistd.h-data
++++ b/conform/data/unistd.h-data
+@@ -435,10 +435,7 @@ function int chroot (const char*)
+ function int chown (const char*, uid_t, gid_t)
+ function int close (int)
+ function size_t confstr (int, char*, size_t)
+-#if !defined POSIX && !defined POSIX2008
+-function {char*} crypt (const char*, const char*)
+-#endif
+-#if defined XPG3 || defined XPG4 || defined UNIX98
++#if defined XPG4 || defined XPG42 || defined UNIX98
+ function {char*} ctermid (char*)
+ function {char*} cuserid (char*)
+ #endif
+@@ -447,9 +444,6 @@ allow cuserid
+ #endif
+ function int dup (int)
+ function int dup2 (int, int)
+-#if !defined POSIX && !defined POSIX2008
+-function void encrypt (char[64], int)
+-#endif
+ function int execl (const char*, const char*, ...)
+ function int execle (const char*, const char*, ...)
+ function int execlp (const char*, const char*, ...)
+diff --git a/crypt/Makefile b/crypt/Makefile
+index c8b8579a93..14a36396d9 100644
+--- a/crypt/Makefile
++++ b/crypt/Makefile
+@@ -22,6 +22,8 @@ subdir	:= crypt
+ 
+ include ../Makeconfig
+ 
++ifeq ($(build-obsolete-crypt),yes)
++
+ headers := crypt.h
+ 
+ extra-libs := libcrypt
+@@ -50,9 +52,11 @@ tests += md5test sha256test sha512test
+ # machine over a minute.
+ xtests = md5test-giant
+ endif
++endif
+ 
+ include ../Rules
+ 
++ifeq ($(build-obsolete-crypt),yes)
+ ifneq ($(nss-crypt),yes)
+ md5-routines := md5 $(filter md5%,$(libcrypt-sysdep_routines))
+ sha256-routines := sha256 $(filter sha256%,$(libcrypt-sysdep_routines))
+@@ -69,3 +73,4 @@ $(addprefix $(objpfx),$(tests)): $(objpfx)libcrypt.so
+ else
+ $(addprefix $(objpfx),$(tests)): $(objpfx)libcrypt.a
+ endif
++endif

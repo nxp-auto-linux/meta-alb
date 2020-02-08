@@ -65,19 +65,22 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 	bash \
 	base-files \
 	bc \
-	bison \
+    bison \
 	bluez5 \
 	bzip2 \
 	coreutils \
 	db \
 	diffutils \
 	dpkg \
+    dtc \
 	flex \
 	glibc \
 	glibc-locale \
 	gcc-runtime \
 	gdbm \
 	initscripts \
+    libc6 \
+    libc6-utils \
 	libffi \
 	libgcc \
 	liblzma \
@@ -96,8 +99,24 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 	xz \
 	zlib \
 "
-# All the runtime above should come from ubuntu-base,
+
+# We have some packages which we do not want to have in a target
+# image because they are available as Ubuntu-native packages.
+# Given that we can't set a PREFERRED_RPROVIDER in an image recipe
+# we need to isolate those packages globally.
+DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
+    openssl-conf \
+    openssl-dev \
+    openssl-qoriq \
+    openssl-qoriq-dev \
+"
+
+# All the runtime above should come from ubuntu-base or a derived image
 # but only for the target, not for native elements.
+# The trick is that we need to retarget everything to one recipe because
+# at configuration time we cannot predict algorithmically which derived
+# images would add the final apt packages. Any "missing" dependencies
+# would only show up then at image build time.
 DISTRO_DEFAULT_RPROVIDER_class-target = "ubuntu-base (= ${UBUNTU_TARGET_VERSION})"
 
 require conf/machine/include/ubuntutcconf.inc

@@ -75,7 +75,7 @@ APTGET_EXTRA_PACKAGES += " \
 
 # Instruct QEMU to append (inject) the path to the jdk library to LD_LIBRARY_PATH
 # (required by openjdk-8-jdk)
-APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-8-openjdk-${DEBIAN_TARGET_ARCH}/jre/lib/${TRANSLATED_TARGET_ARCH}/jli"
+APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-8-openjdk-${UBUNTU_TARGET_ARCH}/jre/lib/${TRANSLATED_TARGET_ARCH}/jli"
 
 # bluez must not be allowed to (re)start any services, otherwise install will fail
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev python-bluez avahi-daemon rtkit"

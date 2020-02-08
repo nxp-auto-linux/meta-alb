@@ -12,6 +12,8 @@ PREFERRED_VERSION_ubuntu-base = "${UBUNTU_TARGET_VERSION}"
 UBUNTU_TARGET_ARCH="${@d.getVar('TARGET_ARCH', True).replace("aarch64", "arm64")}"
 
 # Downconfigure Yocto environment to not pull in local things
+# We do not want any default post intercepts or special default
+# packages added.
 IMAGE_LINGUAS = ""
 POKY_DEFAULT_EXTRA_RDEPENDS_remove = "packagegroup-core-boot"
 INITRAMFS_IMAGE = ""
@@ -96,6 +98,6 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 "
 # All the runtime above should come from ubuntu-base,
 # but only for the target, not for native elements.
-DISTRO_DEFAULT_RPROVIDER_class-target = "ubuntu-base"
+DISTRO_DEFAULT_RPROVIDER_class-target = "ubuntu-base (= ${UBUNTU_TARGET_VERSION})"
 
 require conf/machine/include/ubuntutcconf.inc

@@ -2,12 +2,11 @@ SUMMARY = "A prebuilt Ubuntu Base image as baseline for custom work"
 require ubuntu-license.inc
 SECTION = "devel"
 
-# Ubuntu 18.04.1
+# Ubuntu 18.04.1 baseline
 SRC_URI[md5sum] = "2e647934f42da7b878262a0cf857b0e8"
 SRC_URI[sha256sum] = "6f465ec321b9d90e3e6627f337d187390c7ec828f861b4053e60c2a225b909fe"
 
 require ubuntu-base.inc
-require ubuntu-tarfiles_${PV}.inc
 
 # There are some basic differences between different Ubuntu versions.
 # We try not to address them in the generic recipe

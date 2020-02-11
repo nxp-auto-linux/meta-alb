@@ -73,7 +73,6 @@ PACKAGES-CORE-MISC += "\
     inetutils-ifconfig \
     inetutils-logger \
     inetutils-traceroute \
-    inetutils-syslogd \
     inetutils-ftp \
     inetutils-ftpd \
     inetutils-telnet \

@@ -16,7 +16,7 @@ INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc"
 DEPENDS_append_qoriq-arm64 = " change-file-endianess-native dtc-native tcl-native"
 DEPENDS_append_qoriq-arm = " change-file-endianess-native dtc-native tcl-native"
-DEPENDS_append_qoriq-ppc = " boot-format-native"
+DEPENDS_append_qoriq-ppc = " boot-format-native bc-native"
 
 SRC_URI = "git://source.codeaurora.org/external/qoriq/qoriq-components/u-boot;nobranch=1 \
 "
@@ -25,18 +25,18 @@ SRCREV = "00cde476c84275124a51cb55a53a253cd75fba6c"
 S = "${WORKDIR}/git"
 
 python () {
-    if d.getVar("TCMODE", True) == "external-fsl":
+    if d.getVar("TCMODE") == "external-fsl":
         return
 
-    ml = d.getVar("MULTILIB_VARIANTS", True)
-    arch = d.getVar("OVERRIDES", True)
+    ml = d.getVar("MULTILIB_VARIANTS")
+    arch = d.getVar("OVERRIDES")
 
     if "e5500-64b:" in arch or "e6500-64b:" in arch:
         if not "lib32" in ml:
             raise bb.parse.SkipPackage("Building the u-boot for this arch requires multilib to be enabled")
         sys_multilib = d.getVar('TARGET_VENDOR') + 'mllib32-linux'
         sys_original = d.getVar('TARGET_VENDOR') + '-' + d.getVar('TARGET_OS')
-        workdir = d.getVar('WORKDIR').replace(sys_original,sys_multilib)
+        workdir = d.getVar('WORKDIR')
         d.setVar('DEPENDS_append', ' lib32-gcc-cross-powerpc lib32-libgcc')
         d.setVar('PATH_append', ':' + d.getVar('STAGING_BINDIR_NATIVE') + '/powerpc' + sys_multilib)
         d.setVar('TOOLCHAIN_OPTIONS', '--sysroot=' + workdir + '/lib32-recipe-sysroot')
@@ -46,7 +46,7 @@ python () {
             raise bb.parse.SkipRecipe("Building the u-boot for this arch requires multilib to be enabled")
         sys_multilib = d.getVar('TARGET_VENDOR') + 'mllib64-linux'
         sys_original = d.getVar('TARGET_VENDOR') + '-' + d.getVar('TARGET_OS')
-        workdir = d.getVar('WORKDIR').replace(sys_original,sys_multilib)
+        workdir = d.getVar('WORKDIR')
         d.setVar('DEPENDS_append', ' lib64-gcc-cross-aarch64 lib64-libgcc')
         d.setVar('PATH_append', ':' + d.getVar('STAGING_BINDIR_NATIVE') + '/aarch64' + sys_multilib)
         d.setVar('TOOLCHAIN_OPTIONS', '--sysroot=' + workdir + '/lib64-recipe-sysroot')

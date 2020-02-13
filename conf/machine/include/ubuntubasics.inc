@@ -67,45 +67,45 @@ INIT_MANAGER = "systemd"
 # the recipe.
 require conf/machine/include/nodistropackage.inc
 DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
-	alsa-conf \
-	alsa-lib \
-	update-alternatives \
-	bash \
-	base-files \
-	bc \
+    alsa-conf \
+    alsa-lib \
+    update-alternatives \
+    bash \
+    base-files \
+    bc \
     bison \
-	bluez5 \
-	bzip2 \
-	coreutils \
-	db \
-	diffutils \
-	dpkg \
+    bluez5 \
+    bzip2 \
+    coreutils \
+    db \
+    diffutils \
+    dpkg \
     dtc \
-	flex \
-	glibc \
-	glibc-locale \
-	gcc-runtime \
-	gdbm \
-	initscripts \
+    flex \
+    glibc \
+    glibc-locale \
+    gcc-runtime \
+    gdbm \
+    initscripts \
     libc6 \
     libc6-utils \
-	libffi \
-	libgcc \
-	liblzma \
-	libpam \
-	libsqlite3 \
-	m4 \
-	ncurses \
-	netbase \
-	opkg-utils \
-	perl \
-	python3 \
-	qemuwrapper-cross \
-	sqlite3 \
-	readline \
-	util-linux \
-	xz \
-	zlib \
+    libffi \
+    libgcc \
+    liblzma \
+    libpam \
+    libsqlite3 \
+    m4 \
+    ncurses \
+    netbase \
+    opkg-utils \
+    perl \
+    python3 \
+    qemuwrapper-cross \
+    sqlite3 \
+    readline \
+    util-linux \
+    xz \
+    zlib \
 "
 
 # We have some packages which we do not want to have in a target

@@ -184,7 +184,7 @@ aptget_update_presetvars() {
 $ENV_HOST_PROXIES
 END_PROXY
 		if [ "$proxy_string" != "proxy" ]; then
-			bb_warn "Invalid proxy \"$proxy\""
+			bbwarn "Invalid proxy \"$proxy\""
 			continue
 		fi
 
@@ -203,7 +203,7 @@ END_PROXY
 
 fakeroot aptget_populate_cache_from_sstate() {
 	if [ -e "${APTGET_CACHE_DIR}" ]; then
-		mkdir -p "${APTGET_CACHE_DIR}"
+		mkdir -p "${APTGET_DL_CACHE}"
 		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check
 		rsync -v -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
 		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check

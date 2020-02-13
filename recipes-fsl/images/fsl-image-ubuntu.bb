@@ -4,9 +4,15 @@ require fsl-image-ubuntu-base.bb
 # FIX! This include currently requires a different glibc
 # or the packages won't install properly.
 # Example for use of "ppa:" to install x2go with xfce4
-APTGET_EXTRA_PPA += "ppa:x2go/stable;"
+# Comment x2go for now as aptget fails 
+#APTGET_EXTRA_PPA += "ppa:x2go/stable;"
+#APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
+# Use vnc as alternative to x2go
+#APTGET_EXTRA_PACKAGES += "vnc4server"
+APTGET_EXTRA_PACKAGES += "x11vnc"
+IMAGE_INSTALL_append += " x11vnc-init"
+
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
-APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
 
 require kernel-source-debian.inc
 APTGET_EXTRA_PACKAGES += " \

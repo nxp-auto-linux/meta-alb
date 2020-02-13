@@ -76,6 +76,7 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
     bison \
     bluez5 \
     bzip2 \
+    ca-certificates \
     coreutils \
     db \
     diffutils \
@@ -94,6 +95,7 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
     liblzma \
     libpam \
     libsqlite3 \
+    libxml2 \
     m4 \
     ncurses \
     netbase \
@@ -101,6 +103,7 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
     perl \
     python3 \
     qemuwrapper-cross \
+    shared-mime-info \
     sqlite3 \
     readline \
     util-linux \

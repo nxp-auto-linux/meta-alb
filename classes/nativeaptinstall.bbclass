@@ -77,7 +77,7 @@ APTGET_EXTRA_PACKAGES_SERVICES_DISABLED ?= ""
 APTGET_CHROOT_DIR ?= "${D}"
 
 # Set this to anything but 0 to skip performing apt-get upgrade
-APTGET_SKIP_UPGRADE ?= "0"
+APTGET_SKIP_UPGRADE ?= "1"
 
 # Set this to anything but 0 to skip performing apt-get full-upgrade
 APTGET_SKIP_FULLUPGRADE ?= "1"

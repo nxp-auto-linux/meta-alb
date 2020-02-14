@@ -59,6 +59,7 @@ APTGET_EXTRA_PACKAGES += "\
 	libffi6 \
     libnss-db \
     libssl-dev \
+    openssl \
 	python3.5 python bc db5.3 \
 	xz-utils bzip2 \
 "
@@ -68,6 +69,9 @@ APTGET_EXTRA_PACKAGES += "\
 RPROVIDES_${PN}_ubuntu += " \
 /bin/sh \
 flex \
+"
+RPROVIDES_${PN}_ubuntu += " \
+shared-mime-info \
 "
 RPROVIDES_${PN}_ubuntu += " \
 rtld(GNU_HASH) \

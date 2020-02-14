@@ -514,13 +514,27 @@ python do_aptget_update() {
 
 # The various apt packages need to be translated properly into Yocto
 # RPROVIDES_${PN}
-APTGET_ALL_PACKAGES = "${APTGET_EXTRA_PACKAGES} \
+APTGET_ALL_PACKAGES = "\
+        ${APTGET_INIT_PACKAGES} \
+        ${APTGET_EXTRA_PACKAGES} \
 	${APTGET_EXTRA_PACKAGES_LAST} \
 	${APTGET_EXTRA_SOURCE_PACKAGES} \
 	${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} \
 	${APTGET_RPROVIDES} \
 "
 
+# We have some preconceived notions in APTGET_YOCTO_TRANSLATION about
+# the Yocto names we find in the current layer set. If the translation
+# does not match the actual packages, you can get rather weird dependency
+# resolutions that mess up the final result. Rather than silently
+# messing things up, we will hardcode our compatibility here and
+# complain if needed!
+python() {
+        lc = d.getVar("LAYERSERIES_CORENAMES")
+        if "zeus" not in lc:
+                bb.error("nativeaptinstall.bbclass is incompatible to the current layer set")
+                bb.error("You must check APTGET_YOCTO_TRANSLATION and update the anonymous python() function!")
+}
 # Now we translate the various debian package names into Yocto names
 # to be able to set up RPROVIDERS and the like properly. The list
 # below is not exhaustive but covers the currently known use cases.
@@ -528,14 +542,17 @@ APTGET_ALL_PACKAGES = "${APTGET_EXTRA_PACKAGES} \
 # provides the solution, the likelihood is high that a name translation
 # may be missing.
 APTGET_YOCTO_TRANSLATION += "\
-    db5.3:db \
+    libdb5.3:db \
     device-tree-compiler:dtc \
-    libffi6:libffi \
+    libffi6:libffi7 \
     libnss-db:libnss-db2 \
     libpam0g:libpam \
+    libssl1.0.0:libssl1.0 \
+    libssl1.1:libssl1.1 \
     libssl-dev:openssl-dev,openssl-qoriq-dev \
+    openssl:openssl-bin,openssl-qoriq-bin,openssl-conf,openssl-qoriq-conf,openssl-misc,openssl-qoriq-misc \
     python3.5:python3 \
-    xz-utils:xz,liblzma \
+    xz-utils:xz \
     zlib1g:libz1 \
 "
 # This is a really ugly one for us because Yocto does a very fine

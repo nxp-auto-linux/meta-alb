@@ -116,9 +116,13 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 # Given that we can't set a PREFERRED_RPROVIDER in an image recipe
 # we need to isolate those packages globally.
 DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
+    openssl \
+    openssl-bin \
     openssl-conf \
     openssl-dev \
     openssl-qoriq \
+    openssl-qoriq-bin \
+    openssl-qoriq-conf \
     openssl-qoriq-dev \
 "
 

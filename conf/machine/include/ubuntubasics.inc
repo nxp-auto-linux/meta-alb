@@ -1,6 +1,6 @@
 # We currently support recipies for:
 # - 16.04.5
-# - 18.04.1
+# - 18.04.3
 #UBUNTU_TARGET_VERSION ?= "16.04.5"
 UBUNTU_TARGET_VERSION ?= "18.04.3"
 

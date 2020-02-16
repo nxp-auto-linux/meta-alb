@@ -78,7 +78,7 @@ index 6030402b..2afc661c 100644
  #define CLONE_IO                0x80000000      /* Clone io context */
  #endif
 @@ -226,6 +229,21 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,  \
-  return syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5, arg6);  \
+ 	return syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5, arg6);	\
  }
  
 +#define _libc_syscall1(type,name,namelibc,type1,arg1)  \
@@ -197,3 +197,4 @@ index 6030402b..2afc661c 100644
  {
 -- 
 2.17.1
+

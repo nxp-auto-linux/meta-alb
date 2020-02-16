@@ -39,6 +39,7 @@ EGLIBCPATCHES = "\
            file://allow-compile-separate-from-util-linux-hardlink.patch \
            file://0001-glibc-Ported-localedef-no-hard-links-option-from-2.3.patch \
            file://0001-localdef-Hack-to-compile-cross-native.patch \
+           file://0001-Fix-error-unknown-type-name-locale_t.patch \
 "
 # Makes for a rather long rev (22 characters), but...
 #

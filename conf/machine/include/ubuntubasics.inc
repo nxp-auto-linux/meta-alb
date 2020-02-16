@@ -40,6 +40,9 @@ GLIBCVERSION = '${@ \
     , d)}'
 PREFERRED_VERSION_cross-localedef-native = "${GLIBCVERSION}"
 
+PREFERRED_PROVIDER_bison-native = "bison"
+SSTATE_EXCLUDEDEPS_SYSROOT_remove = ".*->bison-native"
+
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"
 

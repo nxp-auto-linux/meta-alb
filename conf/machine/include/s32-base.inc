@@ -28,6 +28,10 @@ VIRTUAL-RUNTIME_syslog = "inetutils-syslogd"
 PREFERRED_VERSION_linux-s32 ?= "4.19"
 PREFERRED_VERSION_u-boot-s32 ?= "2018.07"
 
+# ensure bison is not removed from sysroot, otherwise
+# some build tasks e.g. kernel 'do_merge_delta_config' will fail
+SSTATE_EXCLUDEDEPS_SYSROOT_remove = ".*->bison-native"
+
 UBOOT_BOOTSPACE_SEEK ?= "8"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"
 UBOOT_ENTRYPOINT ?= "80080000"

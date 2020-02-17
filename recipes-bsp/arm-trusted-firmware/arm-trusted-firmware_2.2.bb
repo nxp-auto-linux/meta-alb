@@ -32,10 +32,12 @@ do_deploy() {
         install -d ${DEPLOY_DIR_IMAGE}
         cp ${ATF_BINARIES}/bl2.bin ${DEPLOY_DIR_IMAGE}/bl2-${MACHINE}.bin
         cp ${ATF_BINARIES}/bl31.bin ${DEPLOY_DIR_IMAGE}/bl31-${MACHINE}.bin
+        mv ${TOPDIR}/${ATF_IMAGE_FILE} ${DEPLOY_DIR_IMAGE}/${ATF_IMAGE_FILE}
 }
 
-addtask deploy before do_build after do_compile
-do_deploy[depends] = "virtual/bootloader:do_deploy"
+addtask deploy before do_build after do_add_atf_support
+addtask add_atf_support after do_compile before do_deploy
+do_add_atf_support[depends] = "virtual/bootloader:do_install"
 
 def pad_image(image):
     size = os.path.getsize(image)
@@ -88,7 +90,7 @@ python do_add_atf_support () {
     bl2_file = d.getVar("ATF_BINARIES", True)+ "/" + "bl2.bin"
     bl31_file = d.getVar("ATF_BINARIES", True)+ "/" + "bl31.bin"
     uboot_file = d.getVar("DEPLOY_DIR_IMAGE", True) + "/u-boot.bin"
-    output_file = d.getVar("ATF_IMAGE_OUTPUT", True)
+    output_file = d.getVar("ATF_IMAGE_FILE", True)
     app_boot_code_code_off = int("0x2240", 16)
 
     images = []

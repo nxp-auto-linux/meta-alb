@@ -70,6 +70,9 @@ SDCARD_ROOTFS_EXTRA1_SIZE ?= "0"
 SDCARD_ROOTFS_EXTRA2 ?= ""
 SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
 
+ATF_IMAGE ?= ""
+ATF_IMAGE_FILE ?= ""
+
 SDCARD_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
 SDCARD = "${SDCARD_DEPLOYDIR}/${IMAGE_NAME}.rootfs.sdcard"
 
@@ -94,6 +97,7 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA1', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA2', True) + ':do_deploy' or ''} \
+	${@d.getVar('ATF_IMAGE_FILE', True) and d.getVar('ATF_IMAGE', True) + ':do_deploy' or ''} \
 "
 
 do_image_sdcard[depends] += "${IMAGE_BASENAME}:do_image_ext3"

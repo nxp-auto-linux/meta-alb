@@ -120,6 +120,11 @@ do_install_append() {
             fi
         done
     done
+
+    if [ -n "${ATF_IMAGE}" ]; then
+        install -d ${DEPLOY_DIR_IMAGE}
+        cp ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin
+    fi
 }
 
 FILES_${PN} += "${ENV_STAGE_DIR}"

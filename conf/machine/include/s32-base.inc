@@ -9,18 +9,6 @@ SOC_FAMILY = "s32"
 # Otherwise, intermediate include files should be
 # created for various families (e.g. s32v-base.inc, s32g-base.inc etc)
 
-# NXP Automotive uses gcc 6.3
-# For backwards compatibility, we also support gcc 4.9. To use it,
-# set GCCVERSION = "linaro-4.9", BINUVERSION = "linaro-2.25", GLIBCVERSION = "2.20"
-GCCVERSION ?= "linaro-6.3"
-BINUVERSION ?= "2.29.1"
-GLIBCVERSION ?= "2.26"
-PREFERRED_VERSION_libgfortran ?= "linaro-6.3"
-
-# Enable loop support optimizations for gcc.
-# Not supported for gcc 4.9
-DISTRO_FEATURES_append += " gcc-loop-optimization"
-
 KERNEL_IMAGETYPE ?= "Image"
 
 # required for u-boot
@@ -33,9 +21,16 @@ HOSTTOOLS += "parted mkfs.vfat mcopy"
 PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/kernel = "linux-s32"
-PREFERRED_PROVIDER_virtual/nativesdk-crypt = "nativesdk-glibc"
+
+# sysklogd conflicts with inetutils-syslogd, try to disambiguate here
+VIRTUAL-RUNTIME_syslog = "inetutils-syslogd"
+
 PREFERRED_VERSION_linux-s32 ?= "4.19"
 PREFERRED_VERSION_u-boot-s32 ?= "2018.07"
+
+# ensure bison is not removed from sysroot, otherwise
+# some build tasks e.g. kernel 'do_merge_delta_config' will fail
+SSTATE_EXCLUDEDEPS_SYSROOT_remove = ".*->bison-native"
 
 UBOOT_BOOTSPACE_SEEK ?= "8"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"

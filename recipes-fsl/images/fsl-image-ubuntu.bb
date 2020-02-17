@@ -1,12 +1,23 @@
 # A more complex image with customer required setup
 require fsl-image-ubuntu-base.bb
 
-require kernel-source-debian.inc
-
+# FIX! This include currently requires a different glibc
+# or the packages won't install properly.
 # Example for use of "ppa:" to install x2go with xfce4
-APTGET_EXTRA_PPA += "ppa:x2go/stable;"
+# Comment x2go for now as aptget fails 
+#APTGET_EXTRA_PPA += "ppa:x2go/stable;"
+#APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
+# Use vnc as alternative to x2go
+#APTGET_EXTRA_PACKAGES += "vnc4server"
+APTGET_EXTRA_PACKAGES += "x11vnc"
+IMAGE_INSTALL_append += " x11vnc-init"
+
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
-APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
+
+require kernel-source-debian.inc
+APTGET_EXTRA_PACKAGES += " \
+    libssl-dev \
+"
 
 ROOTFS_POSTPROCESS_COMMAND_append = " do_disable_nm_wait_online;"
 
@@ -40,7 +51,6 @@ APTGET_EXTRA_PACKAGES += " \
     iperf nginx \
     nmap \
     openssh-server \
-    libssl-dev \
 \
     sqlitebrowser \
     libsqlite3-dev \
@@ -73,7 +83,7 @@ APTGET_EXTRA_PACKAGES += " \
 
 # Instruct QEMU to append (inject) the path to the jdk library to LD_LIBRARY_PATH
 # (required by openjdk-8-jdk)
-APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-8-openjdk-${DEBIAN_TARGET_ARCH}/jre/lib/${TRANSLATED_TARGET_ARCH}/jli"
+APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-8-openjdk-${UBUNTU_TARGET_ARCH}/jre/lib/${TRANSLATED_TARGET_ARCH}/jli"
 
 # bluez must not be allowed to (re)start any services, otherwise install will fail
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev python-bluez avahi-daemon rtkit"

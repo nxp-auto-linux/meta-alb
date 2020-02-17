@@ -6,12 +6,6 @@ DEPENDS += "u-boot-mkimage-native dtc-native"
 
 inherit deploy
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/ppa:"
-
-SRC_URI = "git://source.codeaurora.org/external/qoriq/qoriq-components/ppa-generic.git;nobranch=1 \
-"
-SRCREV = "e5641434f00d75634a285341d810df4261daf5de"
-
 S = "${WORKDIR}/git"
 
 python () {

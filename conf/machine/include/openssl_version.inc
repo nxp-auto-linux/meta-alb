@@ -9,16 +9,15 @@
 OPENSSLVERSION ?= "1.1.1c"
 
 def openssl_version(d):
-	newversion = d.getVar('OPENSSLVERSION')
-	d.setVar('PREFERRED_VERSION_openssl', newversion)
-	d.setVar('PREFERRED_VERSION_openssl-native', newversion)
-	d.setVar('PREFERRED_VERSION_nativesdk-openssl', newversion)
-
+    newversion = d.getVar('OPENSSLVERSION')
+    d.setVar('PREFERRED_VERSION_openssl', newversion)
+    d.setVar('PREFERRED_VERSION_openssl-native', newversion)
+    d.setVar('PREFERRED_VERSION_nativesdk-openssl', newversion)
 
 
 addhandler openssl_version_handler
 openssl_version_handler[eventmask] = "bb.event.ConfigParsed"
 python openssl_version_handler () {
-	openssl_version(d)
+    openssl_version(d)
 }
 

@@ -6,6 +6,9 @@ SOC_FAMILY = "fsl-lsch3:ls2:ls208xa"
 
 IMAGE_FSTYPES = "tar.gz ext3"
 
+# required for sdcard deploy
+HOSTTOOLS += "parted mkfs.vfat mcopy udevadm"
+
 EXTRA_IMAGECMD_ext3 = "-i 4096 -L ${IMAGE_NAME}"
 
 EXTRA_IMAGEDEPENDS += "mc-utils management-complex ppa"
@@ -15,7 +18,12 @@ PREMIRRORS_prepend = " git://github.com/qoriq-open-source/ git://source.codeauro
 # No better place for this if it should stay in the layer
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"
 PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
-PREFERRED_PROVIDER_virtual/nativesdk-crypt = "nativesdk-libxcrypt"
+
+# TODO zeus: use legacy mc 10.6, as 10.18 throws a license error
+PREFERRED_VERSION_management-complex = "10.6.0"
+
+# TODO zeus: force using the legacy version of u-boot currently supported by the BSP
+PREFERRED_VERSION_u-boot-qoriq = "2017.12+fslgit"
 
 # For all other elements we use the SDK defaults
 require conf/machine/include/qoriq-arm64.inc

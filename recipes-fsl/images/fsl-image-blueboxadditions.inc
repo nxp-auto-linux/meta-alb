@@ -73,10 +73,13 @@ IMAGE_INSTALL += " \
     gsl-dev \
     mesa \
     mesa-dev \
-    libflann \
-    libflann-dev \
     libproj \
 "
+# TODO zeus: do not build:
+#    libflann \
+#    libflann-dev \
+#
+
 #    gmock-staticdev \
 #    python-pip \
 #    libltdl-dev \

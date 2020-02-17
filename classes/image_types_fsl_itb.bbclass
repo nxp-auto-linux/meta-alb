@@ -122,7 +122,7 @@ IMAGE_CMD_itb () {
                 echo >>${IIF} "        fdt@1 {"
                 echo >>${IIF} "            description = \"Flattened Device Tree blob\";"
                 DTS_BASE_NAME=`basename ${KERNEL_DEVICETREE} | awk -F "." '{print $1}'`
-                echo >>${IIF} "            data = /incbin/(\"${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb\");"
+                echo >>${IIF} "            data = /incbin/(\"${DEPLOY_DIR_IMAGE}/${DTS_BASE_NAME}.dtb\");"
                 echo >>${IIF} "            type = \"flat_dt\";"
                 echo >>${IIF} "            arch = \"${ITB_ARCH}\";"
                 echo >>${IIF} "            compression = \"none\";"

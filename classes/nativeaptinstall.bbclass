@@ -77,7 +77,7 @@ APTGET_EXTRA_PACKAGES_SERVICES_DISABLED ?= ""
 APTGET_CHROOT_DIR ?= "${D}"
 
 # Set this to anything but 0 to skip performing apt-get upgrade
-APTGET_SKIP_UPGRADE ?= "0"
+APTGET_SKIP_UPGRADE ?= "1"
 
 # Set this to anything but 0 to skip performing apt-get full-upgrade
 APTGET_SKIP_FULLUPGRADE ?= "1"
@@ -153,6 +153,7 @@ ${PSEUDO_LOCALSTATEDIR}:\
 
 ENV_HOST_PROXIES ?= ""
 APTGET_HOST_PROXIES ?= ""
+APTGET_EXECUTABLE ?= "/usr/bin/apt-get"
 
 aptget_update_presetvars() {
 	export PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
@@ -183,7 +184,7 @@ aptget_update_presetvars() {
 $ENV_HOST_PROXIES
 END_PROXY
 		if [ "$proxy_string" != "proxy" ]; then
-			bb_warn "Invalid proxy \"$proxy\""
+			bbwarn "Invalid proxy \"$proxy\""
 			continue
 		fi
 
@@ -200,6 +201,23 @@ END_PROXY
 	export etc_resolv_conf_renamed="${APTGET_CHROOT_DIR}/etc/resolv.conf.yocto"
 }
 
+fakeroot aptget_populate_cache_from_sstate() {
+	if [ -e "${APTGET_CACHE_DIR}" ]; then
+		mkdir -p "${APTGET_DL_CACHE}"
+		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check
+		rsync -v -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
+		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check
+	fi
+}
+
+fakeroot aptget_save_cache_into_sstate() {
+	if [ -e "${APTGET_CACHE_DIR}" ]; then
+		mkdir -p "${APTGET_DL_CACHE}"
+		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy check
+		rsync -v -d -u -t --include *.deb "${APTGET_CACHE_DIR}/" "${APTGET_DL_CACHE}" 
+	fi
+}
+
 fakeroot aptget_update_begin() {
 	# Once the basic rootfs is unpacked, we use the local passwd
 	# information.
@@ -207,6 +225,7 @@ fakeroot aptget_update_begin() {
 
 	aptget_update_presetvars;
 
+	aptgetfailure=0
 	# While we do our installation stunt in qemu land, we also want
 	# to be able to use host side networking configs. This means we
 	# need to protect the host and DNS config. We do a bit of a
@@ -277,12 +296,7 @@ END_USER
 	# Yocto environment. If we kept apt packages privately from
 	# a prior run, prepopulate the package cache locally to avoid
 	# costly downloads
-	if [ -e "${APTGET_DL_CACHE}" ]; then
-		mkdir -p "${APTGET_CACHE_DIR}"
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
-		rsync -v -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
-	fi
+	aptget_populate_cache_from_sstate
 
 	# Before we can play with the package manager in any
 	# meaningful way, we need to sync the database.
@@ -293,10 +307,10 @@ END_USER
 	fi
 
 	# Prepare apt to be generically usable
-	chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy update
+	chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy update
 	if [ -n "${APTGET_INIT_PACKAGES}" ]; then
 		x="${APTGET_INIT_PACKAGES}"
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install $x
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy install $x || aptgetfailure=1
 	fi
 
 	if [ -n "${APTGET_EXTRA_PPA}" ]; then
@@ -314,9 +328,9 @@ END_USER
 			APTGET_GPG_BROKEN="1"
 		fi
 		if [ -n "$APTGET_GPG_BROKEN" ]; then
-			chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install curl gnupg2
+			test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy install curl gnupg2 || aptgetfailure=1
 		else
-			chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install gnupg2 dirmngr
+			test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy install gnupg2 dirmngr || aptgetfailure=1
 		fi
 
 		# Tricky variable hack to get word parsing for Yocto
@@ -363,17 +377,17 @@ END_PPA
 			fi
 
 		done
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy update
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy update || aptgetfailure=1
 	fi
 
 	if [ "${APTGET_SKIP_UPGRADE}" = "0" ]; then
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qyf install
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy upgrade
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qyf install || aptgetfailure=1
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy upgrade || aptgetfailure=1
 	fi
 
 	if [ "${APTGET_SKIP_FULLUPGRADE}" = "0" ]; then
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qyf install
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy full-upgrade
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qyf install || aptgetfailure=1
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy full-upgrade || aptgetfailure=1
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}" ]; then
@@ -383,20 +397,20 @@ END_PPA
 		echo >>"${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d" "exit 101"
 		chmod a+x "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
 
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -q -y install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -q -y install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} || aptgetfailure=1
 
 		# remove the workaround
 		rm -rf "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES}" ]; then
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install ${APTGET_EXTRA_PACKAGES}
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy install ${APTGET_EXTRA_PACKAGES} || aptgetfailure=1
 	fi
 
 	if [ -n "${APTGET_EXTRA_SOURCE_PACKAGES}" ]; then
 		# We need this to get source package handling properly
 		# configured for a subsequent apt-get source
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install dpkg-dev
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy install dpkg-dev || aptgetfailure=1
 
 		# For lack of a better idea, we install source packages
 		# into the root user's home. if we could guarantee that
@@ -406,27 +420,40 @@ END_PPA
 		# the chroot directory problem.
 		echo  >"${APTGET_CHROOT_DIR}/aptgetsource.sh" "#!/bin/sh"
 		echo >>"${APTGET_CHROOT_DIR}/aptgetsource.sh" "cd \$1"
-		echo >>"${APTGET_CHROOT_DIR}/aptgetsource.sh" "/usr/bin/apt-get -yq source \$2"
+		echo >>"${APTGET_CHROOT_DIR}/aptgetsource.sh" "${APTGET_EXECUTABLE} -qy source \$2"
 		x="${APTGET_EXTRA_SOURCE_PACKAGES}"
 		for i in $x; do
-			chroot "${APTGET_CHROOT_DIR}" /bin/bash /aptgetsource.sh "/root" "${i}"
+			test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" /bin/bash /aptgetsource.sh "/root" "${i}" || aptgetfailure=1
 		done
 		rm -f "${APTGET_CHROOT_DIR}/aptgetsource.sh"
 	fi
 
+	# Once we have done the installation, save off the package
+	# cache locally for repeated use of recipe building
+	# We also try to save the cache in case of package install errors
+	# to avoid downloads on a subsequent attempt
+	aptget_save_cache_into_sstate
+
+	if [ $aptgetfailure -ne 0 ]; then
+		bberror "${APTGET_EXECUTABLE} failed to execute as expected!"
+		return $aptgetfailure
+	fi
+
 	# The list of installed packages goes into the log
-        echo "Installed packages:"
+	echo "Installed packages:"
 	chroot "${APTGET_CHROOT_DIR}" /usr/bin/dpkg -l | grep '^ii' | awk '{print $2}'
 
 	set +x
 }
 
-# empty placeholder, override it in parent script for more functionality
+# Must have to preset all variables properly. It also means that
+# the user of this class should not prepend to avoid ordering issues.
 fakeroot do_aptget_user_update_prepend() {
 
 	aptget_update_presetvars;
 }
 
+# empty placeholder, override it in parent script for more functionality
 fakeroot do_aptget_user_update() {
 
 	:
@@ -438,20 +465,17 @@ fakeroot aptget_update_end() {
 
 	aptget_update_presetvars;
 
+	aptgetfailure=0
 	if [ -n "${APTGET_EXTRA_PACKAGES_LAST}" ]; then
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy install ${APTGET_EXTRA_PACKAGES_LAST}
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy install ${APTGET_EXTRA_PACKAGES_LAST} || aptgetfailure=1
 	fi
 
 	# Once we have done the installation, save off the package
 	# cache locally for repeated use of recipe building
-	if [ -e "${APTGET_CACHE_DIR}" ]; then
-		mkdir -p "${APTGET_DL_CACHE}"
-		rsync -v -d -u -t --include *.deb "${APTGET_CACHE_DIR}/" "${APTGET_DL_CACHE}" 
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy check
-	fi
+	aptget_save_cache_into_sstate
 
 	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
-		chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-get -qy clean
+		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} -qy clean
 	fi
 
 	# Delete any temp proxy lines we may have added in the target rootfs
@@ -474,41 +498,188 @@ fakeroot aptget_update_end() {
 		fi
 	fi
 
+	if [ $aptgetfailure -ne 0 ]; then
+		bberror "${APTGET_EXECUTABLE} failed to execute as expected!"
+		return $aptgetfailure
+	fi
+
 	set +x
 }
 
 python do_aptget_update() {
-        bb.build.exec_func("aptget_update_begin", d);
-        bb.build.exec_func("do_aptget_user_update", d);
-        bb.build.exec_func("aptget_update_end", d);
+    bb.build.exec_func("aptget_update_begin", d);
+    bb.build.exec_func("do_aptget_user_update", d);
+    bb.build.exec_func("aptget_update_end", d);
 }
 
 # The various apt packages need to be translated properly into Yocto
 # RPROVIDES_${PN}
-APTGET_ALL_PACKAGES = "${APTGET_EXTRA_PACKAGES} \
+APTGET_ALL_PACKAGES = "\
+        ${APTGET_INIT_PACKAGES} \
+        ${APTGET_EXTRA_PACKAGES} \
 	${APTGET_EXTRA_PACKAGES_LAST} \
 	${APTGET_EXTRA_SOURCE_PACKAGES} \
 	${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} \
 	${APTGET_RPROVIDES} \
 "
-python () {
-	pn = (d.getVar('PN', True) or "")
-	packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
-	translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()
 
-	rprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
-	for p in packagelist:
-		appendp = True
-		for t in translations:
-			pkg,yocto = t.split(":")
-			if p == pkg:
-				for i in yocto.split(","):
-					if i not in rprovides:
-						bb.debug(1, 'Adding RPROVIDES_%s = "%s"' % (pn, i))
-						rprovides.append(i)
-						appendp = False
-		if appendp:
-			rprovides.append(p)
-	if rprovides:
-		d.setVar('RPROVIDES_%s' % pn, ' '.join(rprovides))
+# We have some preconceived notions in APTGET_YOCTO_TRANSLATION about
+# the Yocto names we find in the current layer set. If the translation
+# does not match the actual packages, you can get rather weird dependency
+# resolutions that mess up the final result. Rather than silently
+# messing things up, we will hardcode our compatibility here and
+# complain if needed!
+python() {
+        lc = d.getVar("LAYERSERIES_CORENAMES")
+        if "zeus" not in lc:
+                bb.error("nativeaptinstall.bbclass is incompatible to the current layer set")
+                bb.error("You must check APTGET_YOCTO_TRANSLATION and update the anonymous python() function!")
+}
+# Now we translate the various debian package names into Yocto names
+# to be able to set up RPROVIDERS and the like properly. The list
+# below is not exhaustive but covers the currently known use cases.
+# If suddenly Yocto packages show up in the image when Ubuntu already
+# provides the solution, the likelihood is high that a name translation
+# may be missing.
+APTGET_YOCTO_TRANSLATION += "\
+    libdb5.3:db \
+    device-tree-compiler:dtc \
+    libffi6:libffi7 \
+    libnss-db:libnss-db2 \
+    libpam0g:libpam \
+    libssl1.0.0:libssl1.0 \
+    libssl1.1:libssl1.1 \
+    libssl-dev:openssl-dev,openssl-qoriq-dev \
+    openssl:openssl-bin,openssl-qoriq-bin,openssl-conf,openssl-qoriq-conf,openssl-misc,openssl-qoriq-misc \
+    python3.5:python3 \
+    xz-utils:xz \
+    zlib1g:libz1 \
+"
+# This is a really ugly one for us because Yocto does a very fine
+# grained split of libc. Note how we avoid spaces in the wrong places!
+APTGET_YOCTO_TRANSLATION += "\
+	libc6:libc6,glibc,eglibc\
+glibc-thread-db,eglibc-thread-db,\
+glibc-extra-nss,eglibc-extra-nss,\
+glibc-pcprofile,eglibc-pcprofile,\
+libsotruss,libcidn,libmemusage,libsegfault,\
+glibc-gconv-ansi-x3.110,glibc-gconv-armscii-8,glibc-gconv-asmo-449,\
+glibc-gconv-big5hkscs,glibc-gconv-big5,glibc-gconv-brf,\
+glibc-gconv-cp10007,glibc-gconv-cp1125,glibc-gconv-cp1250,\
+glibc-gconv-cp1251,glibc-gconv-cp1252,glibc-gconv-cp1253,\
+glibc-gconv-cp1254,glibc-gconv-cp1255,glibc-gconv-cp1256,\
+glibc-gconv-cp1257,glibc-gconv-cp1258,glibc-gconv-cp737,\
+glibc-gconv-cp770,glibc-gconv-cp771,glibc-gconv-cp772,\
+glibc-gconv-cp773,glibc-gconv-cp774,glibc-gconv-cp775,\
+glibc-gconv-cp932,glibc-gconv-csn-369103,glibc-gconv-cwi,\
+glibc-gconv-dec-mcs,glibc-gconv-ebcdic-at-de-a,\
+glibc-gconv-ebcdic-at-de,glibc-gconv-ebcdic-ca-fr,\
+glibc-gconv-ebcdic-dk-no-a,glibc-gconv-ebcdic-dk-no,\
+glibc-gconv-ebcdic-es-a,glibc-gconv-ebcdic-es,\
+glibc-gconv-ebcdic-es-s,glibc-gconv-ebcdic-fi-se-a,\
+glibc-gconv-ebcdic-fi-se,glibc-gconv-ebcdic-fr,\
+glibc-gconv-ebcdic-is-friss,glibc-gconv-ebcdic-it,\
+glibc-gconv-ebcdic-pt,glibc-gconv-ebcdic-uk,glibc-gconv-ebcdic-us,\
+glibc-gconv-ecma-cyrillic,glibc-gconv-euc-cn,\
+glibc-gconv-euc-jisx0213,glibc-gconv-euc-jp-ms,glibc-gconv-euc-jp,\
+glibc-gconv-euc-kr,glibc-gconv-euc-tw,glibc-gconv-gb18030,\
+glibc-gconv-gbbig5,glibc-gconv-gbgbk,glibc-gconv-gbk,\
+glibc-gconv-georgian-academy,glibc-gconv-georgian-ps,\
+glibc-gconv-gost-19768-74,glibc-gconv-greek7-old,glibc-gconv-greek7,\
+glibc-gconv-greek-ccitt,glibc-gconv-hp-greek8,glibc-gconv-hp-roman8,\
+glibc-gconv-hp-roman9,glibc-gconv-hp-thai8,glibc-gconv-hp-turkish8,\
+glibc-gconv-ibm037,glibc-gconv-ibm038,glibc-gconv-ibm1004,\
+glibc-gconv-ibm1008-420,glibc-gconv-ibm1008,glibc-gconv-ibm1025,\
+glibc-gconv-ibm1026,glibc-gconv-ibm1046,glibc-gconv-ibm1047,\
+glibc-gconv-ibm1097,glibc-gconv-ibm1112,glibc-gconv-ibm1122,\
+glibc-gconv-ibm1123,glibc-gconv-ibm1124,glibc-gconv-ibm1129,\
+glibc-gconv-ibm1130,glibc-gconv-ibm1132,glibc-gconv-ibm1133,\
+glibc-gconv-ibm1137,glibc-gconv-ibm1140,glibc-gconv-ibm1141,\
+glibc-gconv-ibm1142,glibc-gconv-ibm1143,glibc-gconv-ibm1144,\
+glibc-gconv-ibm1145,glibc-gconv-ibm1146,glibc-gconv-ibm1147,\
+glibc-gconv-ibm1148,glibc-gconv-ibm1149,glibc-gconv-ibm1153,\
+glibc-gconv-ibm1154,glibc-gconv-ibm1155,glibc-gconv-ibm1156,\
+glibc-gconv-ibm1157,glibc-gconv-ibm1158,glibc-gconv-ibm1160,\
+glibc-gconv-ibm1161,glibc-gconv-ibm1162,glibc-gconv-ibm1163,\
+glibc-gconv-ibm1164,glibc-gconv-ibm1166,glibc-gconv-ibm1167,\
+glibc-gconv-ibm12712,glibc-gconv-ibm1364,glibc-gconv-ibm1371,\
+glibc-gconv-ibm1388,glibc-gconv-ibm1390,glibc-gconv-ibm1399,\
+glibc-gconv-ibm16804,glibc-gconv-ibm256,glibc-gconv-ibm273,\
+glibc-gconv-ibm274,glibc-gconv-ibm275,glibc-gconv-ibm277,\
+glibc-gconv-ibm278,glibc-gconv-ibm280,glibc-gconv-ibm281,\
+glibc-gconv-ibm284,glibc-gconv-ibm285,glibc-gconv-ibm290,\
+glibc-gconv-ibm297,glibc-gconv-ibm420,glibc-gconv-ibm423,\
+glibc-gconv-ibm424,glibc-gconv-ibm437,glibc-gconv-ibm4517,\
+glibc-gconv-ibm4899,glibc-gconv-ibm4909,glibc-gconv-ibm4971,\
+glibc-gconv-ibm500,glibc-gconv-ibm5347,glibc-gconv-ibm803,\
+glibc-gconv-ibm850,glibc-gconv-ibm851,glibc-gconv-ibm852,\
+glibc-gconv-ibm855,glibc-gconv-ibm856,glibc-gconv-ibm857,\
+glibc-gconv-ibm860,glibc-gconv-ibm861,glibc-gconv-ibm862,\
+glibc-gconv-ibm863,glibc-gconv-ibm864,glibc-gconv-ibm865,\
+glibc-gconv-ibm866nav,glibc-gconv-ibm866,glibc-gconv-ibm868,\
+glibc-gconv-ibm869,glibc-gconv-ibm870,glibc-gconv-ibm871,\
+glibc-gconv-ibm874,glibc-gconv-ibm875,glibc-gconv-ibm880,\
+glibc-gconv-ibm891,glibc-gconv-ibm901,glibc-gconv-ibm902,\
+glibc-gconv-ibm9030,glibc-gconv-ibm903,glibc-gconv-ibm904,\
+glibc-gconv-ibm905,glibc-gconv-ibm9066,glibc-gconv-ibm918,\
+glibc-gconv-ibm921,glibc-gconv-ibm922,glibc-gconv-ibm930,\
+glibc-gconv-ibm932,glibc-gconv-ibm933,glibc-gconv-ibm935,\
+glibc-gconv-ibm937,glibc-gconv-ibm939,glibc-gconv-ibm943,\
+glibc-gconv-ibm9448,glibc-gconv-iec-p27-1,glibc-gconv-inis-8,\
+glibc-gconv-inis-cyrillic,glibc-gconv-inis,glibc-gconv-isiri-3342,\
+glibc-gconv-iso-10367-box,glibc-gconv-iso-11548-1,\
+glibc-gconv-iso-2022-cn-ext,glibc-gconv-iso-2022-cn,\
+glibc-gconv-iso-2022-jp-3,glibc-gconv-iso-2022-jp,\
+glibc-gconv-iso-2022-kr,glibc-gconv-iso-2033,\
+glibc-gconv-iso-5427-ext,glibc-gconv-iso-5427,glibc-gconv-iso-5428,\
+glibc-gconv-iso646,glibc-gconv-iso-6937-2,glibc-gconv-iso-6937,\
+glibc-gconv-iso8859-10,glibc-gconv-iso8859-11,glibc-gconv-iso8859-13,\
+glibc-gconv-iso8859-14,glibc-gconv-iso8859-15,glibc-gconv-iso8859-16,\
+glibc-gconv-iso8859-1,glibc-gconv-iso8859-2,glibc-gconv-iso8859-3,\
+glibc-gconv-iso8859-4,glibc-gconv-iso8859-5,glibc-gconv-iso8859-6,\
+glibc-gconv-iso8859-7,glibc-gconv-iso8859-8,glibc-gconv-iso8859-9e,\
+glibc-gconv-iso8859-9,glibc-gconv-iso-ir-197,glibc-gconv-iso-ir-209,\
+glibc-gconv-johab,glibc-gconv-koi-8,glibc-gconv-koi8-r,\
+glibc-gconv-koi8-ru,glibc-gconv-koi8-t,glibc-gconv-koi8-u,\
+glibc-gconv-latin-greek-1,glibc-gconv-latin-greek,glibc-gconv-libcns,\
+glibc-gconv-libgb,glibc-gconv-libisoir165,glibc-gconv-libjis,\
+glibc-gconv-libjisx0213,glibc-gconv-libksc,\
+glibc-gconv-mac-centraleurope,glibc-gconv-macintosh,\
+glibc-gconv-mac-is,glibc-gconv-mac-sami,glibc-gconv-mac-uk,\
+glibc-gconv-mik,glibc-gconv-nats-dano,glibc-gconv-nats-sefi,\
+glibc-gconv,glibc-gconv-pt154,glibc-gconv-rk1048,\
+glibc-gconv-sami-ws2,glibc-gconv-shift-jisx0213,glibc-gconv-sjis,\
+glibc-gconvs,glibc-gconv-t.61,glibc-gconv-tcvn5712-1,\
+glibc-gconv-tis-620,glibc-gconv-tscii,glibc-gconv-uhc,\
+glibc-gconv-unicode,glibc-gconv-utf-16,glibc-gconv-utf-32,\
+glibc-gconv-utf-7,glibc-gconv-viscii\
+ \
+"
+
+# If we are using this class, we want to ensure that our recipe or
+# image is also properly listed as providing the needed results
+python () {
+    pn = (d.getVar('PN', True) or "")
+    packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
+    translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()
+
+    origrprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
+    allrprovides = []
+    for p in packagelist:
+        appendp = True
+        rprovides = [p]
+        for t in translations:
+            pkg,yocto = t.split(":")
+            if p == pkg and yocto:
+                rprovides = yocto.split(",")
+                break
+
+        for i in rprovides:
+            if i and i not in allrprovides:
+                allrprovides.append(i)
+
+    if allrprovides:
+        s = ' '.join(origrprovides + allrprovides)
+        bb.debug(1, 'Setting RPROVIDES_%s = "%s"' % (pn, s))
+        d.setVar('RPROVIDES_%s' % pn, s)
 }

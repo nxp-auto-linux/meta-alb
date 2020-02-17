@@ -8,7 +8,6 @@ SRC_URI += " \
     file://externaldhcp.cfg \
     file://init.cfg \
     file://enabledhcpcopts.patch \
-    file://0001-tar-unzip-postpone-creation-of-symlinks-with-suspici.patch \
 "
 
 # disable FTPD - as it's provided by inetutils

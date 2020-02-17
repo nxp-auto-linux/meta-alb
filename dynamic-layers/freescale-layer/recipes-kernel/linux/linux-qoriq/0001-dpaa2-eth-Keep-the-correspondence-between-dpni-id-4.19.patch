@@ -1,0 +1,41 @@
+From 0abfe85840ed85af5c0790c7622e1342f398643c Mon Sep 17 00:00:00 2001
+From: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
+Date: Fri, 15 Mar 2019 13:14:42 +0200
+Subject: [PATCH] dpaa2-eth: Keep the correspondence between dpni id and eth
+ name id
+
+By default, the dpaa2-eth driver is setting an inverse
+correspondence between dpni object id's and eth name id's.
+E.g.: dpni.0 <-> eth3
+      dpni.3 <-> eth0
+We correct this by setting the network interface name index
+from dpni object index.
+
+Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
+---
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
+index ed1d710..68fc712 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
+@@ -3602,6 +3602,15 @@ static int dpaa2_eth_probe(struct fsl_mc_device *dpni_dev)
+ 		goto err_alloc_percpu_extras;
+ 	}
+ 
++	snprintf(net_dev->name, IFNAMSIZ, "eth%d", dpni_dev->obj_desc.id);
++	if (!dev_valid_name(net_dev->name)) {
++		dev_warn(&net_dev->dev,
++			 "netdevice name \"%s\" cannot be used, reverting to default..\n",
++			 net_dev->name);
++		dev_alloc_name(net_dev, "eth%d");
++		dev_warn(&net_dev->dev, "using name \"%s\"\n", net_dev->name);
++	}
++
+ 	err = netdev_init(net_dev);
+ 	if (err)
+ 		goto err_netdev_init;
+-- 
+2.7.4
+

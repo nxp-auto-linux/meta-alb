@@ -81,7 +81,6 @@ PACKAGES-CORE-MISC += "\
     inetutils-inetd \
     inetutils-rsh \
     inetutils-rshd \
-    ipsec-tools \
     libhugetlbfs \
     lmsensors-sensors \
     tcpdump \

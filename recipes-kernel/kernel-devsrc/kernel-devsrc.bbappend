@@ -1,4 +1,4 @@
-
+BB_HASH_IGNORE_MISMATCH = '1'
 inherit linux-kernel-base
 
 KERNEL_VERSION_FULL = "${@get_kernelversion_file('${STAGING_KERNEL_BUILDDIR}')}"
@@ -37,5 +37,9 @@ do_install_append_ubuntu() {
 }
 
 FILES_${PN}_append_ubuntu = " /usr/src/${KERNEL_HEADERS_DIR}"
+
+# Yocto 3 recipe creates a symlink but apparently does not consider that
+# in the FILES statement.
+FILES_${PN}_append = " /usr/src/kernel"
 
 INSANE_SKIP_${PN} = "arch"

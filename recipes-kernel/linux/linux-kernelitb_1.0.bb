@@ -17,6 +17,7 @@ ITB_ROOTFS_NAME_EXT = "-withrootfs"
 FALLBACK_RAMDISK = "fsl-image-itbflash"
 ITB_ROOTFS_BASENAME ?= "${FALLBACK_RAMDISK}"
 DEPENDS = "${FALLBACK_RAMDISK}"
+DEPENDS += "dtc-native"
 do_install[depends] = "${FALLBACK_RAMDISK}:do_image_complete"
 
 require linux-kernelitb.inc

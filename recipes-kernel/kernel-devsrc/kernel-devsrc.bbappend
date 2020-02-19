@@ -1,4 +1,3 @@
-BB_HASH_IGNORE_MISMATCH = '1'
 inherit linux-kernel-base
 
 KERNEL_VERSION_FULL = "${@get_kernelversion_file('${STAGING_KERNEL_BUILDDIR}')}"

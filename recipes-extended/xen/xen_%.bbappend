@@ -1,6 +1,6 @@
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/xen;protocol=https;branch=alb/master"
 
-SRCREV = "086ddbcf7d68e8f7eff46de0dc5e65dbf4c976a2"
+SRCREV = "65ad56e6619e062daec8cdad2757eeb14509eeae"
 
 S = "${WORKDIR}/git"
 

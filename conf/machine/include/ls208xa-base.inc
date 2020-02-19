@@ -19,9 +19,6 @@ PREMIRRORS_prepend = " git://github.com/qoriq-open-source/ git://source.codeauro
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"
 PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
 
-# TODO zeus: use legacy mc 10.6, as 10.18 throws a license error
-PREFERRED_VERSION_management-complex = "10.6.0"
-
 # TODO zeus: force using the legacy version of u-boot currently supported by the BSP
 PREFERRED_VERSION_u-boot-qoriq = "2017.12+fslgit"
 

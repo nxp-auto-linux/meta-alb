@@ -22,9 +22,6 @@ PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/kernel = "linux-s32"
 
-# sysklogd conflicts with inetutils-syslogd, try to disambiguate here
-VIRTUAL-RUNTIME_syslog = "inetutils-syslogd"
-
 PREFERRED_VERSION_linux-s32 ?= "4.19"
 PREFERRED_VERSION_u-boot-s32 ?= "2018.07"
 

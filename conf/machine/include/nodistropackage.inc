@@ -95,7 +95,9 @@ def dnwp_fixuprdepends(d):
         rpmodified = False
         rdepends = bb.utils.explode_dep_versions2(d.getVar(rdepkey) or '')
         newrdepends = {}
+        str_rdeps = ""
         for rdep in rdepends:
+            tmp_rdeps={}
             foundnordeppkg,  fnrpkglist, fnrprp = dnwp_checkpackagematch(d, rdep, 'DISTRO_NEVER_WRITE_PACKAGE')
             foundrdeppkg,    frpkglist,  frprp  = dnwp_checkpackagematch(d, rdep, 'DISTRO_ALWAYS_WRITE_PACKAGE')
             ver = rdepends[rdep]
@@ -108,8 +110,11 @@ def dnwp_fixuprdepends(d):
                     rpmodified = True
                     modified = True
             newrdepends[rdep] = ver
+            # add items one by one to preserve the original order
+            tmp_rdeps[rdep] = ver
+            str_rdeps += "%s " % bb.utils.join_deps(tmp_rdeps, commasep=False)
         if rpmodified:
-            d.setVar(rdepkey, bb.utils.join_deps(newrdepends, commasep=False))
+            d.setVar(rdepkey, str_rdeps)
 
             # If we have changed the rdepends, the result is that the build
             # dependency no longer matches the redepends. This means that we

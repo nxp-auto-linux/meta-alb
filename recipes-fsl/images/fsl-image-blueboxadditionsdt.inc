@@ -4,6 +4,9 @@
 # desktop to use. Hence the "dt" suffix.
 #
 
+inherit distro_features_check
+REQUIRED_DISTRO_FEATURES += "x11 polkit"
+
 # The various gfx related packages are there to support visualization, though
 # some of the selections are quite experimental.
 
@@ -86,4 +89,3 @@ do_rootfs_startup_cleanup() {
     fi
 }
 
-REQUIRED_DISTRO_FEATURES += "x11"

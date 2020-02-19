@@ -28,8 +28,8 @@ hwconfig=fsl_ddr:bank_intlv=auto
 initrd_high=0xffffffffffffffff
 ipaddr=192.168.2.100
 kernel_load=0xa0000000
-kernel_size=0x2a00000
-kernel_start=0x581100000
+kernel_size=0x03000000
+kernel_start=0x581000000
 loadaddr=0x80100000
 mc_addr=0x580a00000
 mc_boot=fsl_mc start mc $mc_addr $dpc_addr && fsl_mc apply dpl $dpl_addr

@@ -37,6 +37,6 @@ IMAGE_INSTALL_append_t4bluebox += " \
 
 # SDK 2.0 does not apply PCDs on T4 by default, which limits performance
 # on the 10G ports unnecessarily
-IMAGE_INSTALL_append_t4bluebox = "\
-    pcd-init \
-"
+#IMAGE_INSTALL_append_t4bluebox = "\
+#    pcd-init \
+#"

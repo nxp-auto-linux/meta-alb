@@ -1,6 +1,6 @@
 DESCRIPTION = "Firmware images for PHYs used on NXP boards"
 LICENSE = "Freescale-EULA"
-LIC_FILES_CHKSUM = "file://EULA;md5=c9ae442cf1f9dd6c13dfad64b0ffe73f"
+LIC_FILES_CHKSUM = "file://EULA;md5=ab61cab9599935bfe9f700405ef00f28"
 
 inherit deploy
 

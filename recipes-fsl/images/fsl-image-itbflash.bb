@@ -16,15 +16,36 @@ LICENSE = "MIT"
 
 include recipes-fsl/images/fsl-image-core-common.inc
 
-IMAGE_INSTALL_append = " \
-    packagegroup-core-ssh-openssh \
+# Our recovery image should have the smallest possible size.
+# So we remove several things.
+PACKAGES-CORE-benchmark = ""
+PACKAGES-CORE_remove = "\
+    gdbserver \
+    lrzsz \
 "
-#    packagegroup-fsl-tools-core \
-#
+PACKAGES-CORE-MISC_remove = "\
+    elfutils \
+    pkgconfig \
+    strongswan \
+    tcpreplay \
+    bridge-utils \
+    inetutils-ftpd \
+    inetutils-telnetd \
+    inetutils-inetd \
+    inetutils-rshd \
+    inetutils-logger \
+    inetutils-rsh \
+    libhugetlbfs \
+    lmsensors-sensors \
+    tcpdump \
+    tcpreplay \
+    iptables \
+"
 
+# Given that it is a recover image, we may want to have some
+# special tools.
 IMAGE_INSTALL_append = " \
     memtester \
-    minicom \
 "
 
 IMAGE_INSTALL_append_ls2 = " \

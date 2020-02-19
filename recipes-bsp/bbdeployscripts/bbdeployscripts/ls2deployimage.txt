@@ -111,6 +111,8 @@ echo "We will search for the image $file ..."
 # Note that the weird indent is intentional as there appear to be
 # length limitations for continued lines in U-Boot. By reducing the
 # indent on complex setenv, we keep content length low.
+# Note that depending on the U-Boot version, 'test' may only compare
+# decimal numbers properly, which is why we do a weird test for 0.
 setenv cmd_flashnorblock '
 echo "Checking 0x$da:" "\\\\c";
 if cmp.b $sa $da $ss; then
@@ -122,7 +124,7 @@ else
   if test $verbose -gt 0; then echo "Comparing NOR to image..."; fi; if cmp.b $sa $da $ss; then ok=1; fi;
 fi;
 '
-if setexpr _hassetexpr 0 + 1; then
+if setexpr x 0 + 1; then
         echo "setexpr command is available. Efficient flash method used ..."
         setenv cmd_flashnorrange '
 verbose=0;
@@ -130,7 +132,8 @@ breakwhile=0;
 ss=80000;
 echo "Erasing/Flashing/Comparing NOR in 0x$ss sized blocks...";
 offset=0;
-while test 0x$offset -lt 0x$ssize && test $breakwhile -eq 0; do
+size=$ssize;
+while test 1$size -ne 10 && test $breakwhile -eq 0; do
   setexpr x $saddr + $offset;
   sa=$x;
   setexpr x $daddr + $offset;
@@ -142,6 +145,8 @@ while test 0x$offset -lt 0x$ssize && test $breakwhile -eq 0; do
   fi;
   setexpr x $offset + $ss;
   offset=$x;
+  setexpr x $size - $ss;
+  size=$x;
 done;'
 else
         echo "setexpr command is unavailable. Standard flash method used ..."
@@ -261,6 +266,7 @@ for bank in 0 4; do
                 echo ""
         fi
 done
+setenv x
 
 if test $ok -gt 0; then
         echo ""

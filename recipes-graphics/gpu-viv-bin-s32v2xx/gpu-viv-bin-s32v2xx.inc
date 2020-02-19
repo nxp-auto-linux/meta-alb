@@ -21,7 +21,7 @@ PE = "1"
 
 # With this declaration and the updated fsl-eula-unpack class, we can detect license file
 # changes properly on a per-recipe basis
-FSL_EULA_CHKSUM = "c9ae442cf1f9dd6c13dfad64b0ffe73f"
+FSL_EULA_CHKSUM = "ab61cab9599935bfe9f700405ef00f28"
 
 inherit fsl-auto-eula-unpack pkgconfig
 

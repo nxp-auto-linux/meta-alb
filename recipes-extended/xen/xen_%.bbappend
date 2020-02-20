@@ -1,4 +1,9 @@
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/xen;protocol=https;branch=alb/master"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+
+SRC_URI = "\
+    git://source.codeaurora.org/external/autobsps32/xen;protocol=https;branch=alb/master \
+    file://0001-xen-trace-Fix-gcc9-alignment-warning.patch \
+"
 
 SRCREV = "65ad56e6619e062daec8cdad2757eeb14509eeae"
 

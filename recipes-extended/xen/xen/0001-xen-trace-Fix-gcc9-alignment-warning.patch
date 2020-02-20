@@ -1,0 +1,56 @@
+From 68b481dfb0723346b9b676cf084dbc954a6d1e43 Mon Sep 17 00:00:00 2001
+From: George Dunlap <george.dunlap@citrix.com>
+Date: Fri, 8 Mar 2019 11:51:40 +0000
+Subject: [PATCH] xen/trace: Fix gcc9 alignment warning
+
+The __packed attribute not only indicates that the individual elements
+of the struct don't need to be aligned with regard to the beginning of
+the struct, but that the struct itself doesn't need to be aligned on
+the stack.  This makes taking the address of the `args` element
+problematic, as you may end up with a non-aligned pointer.
+
+gcc9 notices this and throws the following error:
+
+trace.c: In function '__trace_hypercall':
+trace.c:826:19: error: taking address of packed member of 'struct <anonymous>' may result in an unaligned pointer value
+[-Werror=address-of-packed-member]
+ 826 |     uint32_t *a = d.args;
+
+Fix this by replacing the pointer with an index.
+
+Signed-off-by: George Dunlap <george.dunlap@citrix.com>
+---
+ xen/common/trace.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xen/common/trace.c b/xen/common/trace.c
+index cc294fc384..bd2eba9c4e 100644
+--- a/xen/common/trace.c
++++ b/xen/common/trace.c
+@@ -823,12 +823,12 @@ void __trace_hypercall(uint32_t event, unsigned long op,
+         uint32_t op;
+         uint32_t args[6];
+     } d;
+-    uint32_t *a = d.args;
++    unsigned a = 0;
+ 
+ #define APPEND_ARG32(i)                         \
+     do {                                        \
+         unsigned i_ = (i);                      \
+-        *a++ = args[(i_)];                      \
++        d.args[a++] = args[(i_)];               \
+         d.op |= TRC_PV_HYPERCALL_V2_ARG_32(i_); \
+     } while( 0 )
+ 
+@@ -865,7 +865,7 @@ void __trace_hypercall(uint32_t event, unsigned long op,
+         break;
+     }
+ 
+-    __trace_var(event, 1, sizeof(uint32_t) * (1 + (a - d.args)), &d);
++    __trace_var(event, 1, sizeof(uint32_t) * (1 + a), &d);
+ }
+ 
+ /*
+-- 
+2.17.2 (Apple Git-113)
+

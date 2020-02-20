@@ -20,12 +20,6 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bison-native bc-native"
 SCMVERSION = "y"
 LOCALVERSION = ""
 
-# Updates required for PFE
-DELTA_UBOOT_DEFCONFIG_s32g274aevb = " ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe_config.cfg', '', d)}"
-SRC_URI_append_s32g274aevb = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' file://build/pfe_config.cfg', '', d)} \
-"
-
 # Enable Xen default boot if Xen enabled
 DELTA_UBOOT_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
 SRC_URI += " \

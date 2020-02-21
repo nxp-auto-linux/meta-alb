@@ -1,0 +1,44 @@
+From 2aa4f4220a2b727002f552f6f17b533e2b9b79d7 Mon Sep 17 00:00:00 2001
+From: Jan Petrous <jan.petrous@nxp.com>
+Date: Fri, 21 Feb 2020 10:00:11 +0100
+Subject: [PATCH] Stick on FW 0.4.3
+
+For Auto Linux BSP 24.0 we need to update supported compilers
+what clashes the automatic fw version check. So stick on fixed version.
+
+Signed-off-by: Jan Petrous <jan.petrous@nxp.com>
+---
+ sw/pfe_platform/Makefile        | 2 +-
+ sw/pfe_platform/public/pfe_ct.h | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/sw/pfe_platform/Makefile b/sw/pfe_platform/Makefile
+index 89dba90..dd77116 100644
+--- a/sw/pfe_platform/Makefile
++++ b/sw/pfe_platform/Makefile
+@@ -72,7 +72,7 @@ CCFLAGS_pfe +=	-DGCC_TOOLCHAIN \
+ 				-DPFE_CFG_FIRMWARE_VARIANT=PFE_FW_FULL
+ CCFLAGS_pfe += -D$(TARGET_ARCH_DEF) -D$(TARGET_OS_DEF) -D$(TARGET_ENDIAN_DEF) -D$(TARGET_HW_DEF) -D$(BUILD_PROFILE_DEF)
+ 
+-CCFLAGS_pfe +=-DPFE_CT_H_MD5=$(word 1, $(shell md5sum $(INC_PREFIX)public/pfe_ct.h))
++CCFLAGS_pfe +=-DPFE_CT_H_MD5="53fd64c0cbc413b74bb529d5685a70ce"
+ #Generic compiler flags (which include build type flags)
+ CCFLAGS_all += -Wall -fmessage-length=0
+ CCFLAGS_all += $(CCFLAGS_$(BUILD_PROFILE))
+diff --git a/sw/pfe_platform/public/pfe_ct.h b/sw/pfe_platform/public/pfe_ct.h
+index 2c65818..d8b4529 100644
+--- a/sw/pfe_platform/public/pfe_ct.h
++++ b/sw/pfe_platform/public/pfe_ct.h
+@@ -410,6 +410,9 @@ typedef enum __attribute__((packed))
+ 			|| \
+ 			(((__GNUC__ == 6) && (__GNUC_MINOR__ == 3) && (__GNUC_PATCHLEVEL__ == 1)) \
+ 			&& defined(TARGET_ARCH_aarch64)) \
++			|| \
++			(((__GNUC__ == 9) && (__GNUC_MINOR__ == 2) && (__GNUC_PATCHLEVEL__ == 0)) \
++			&& defined(TARGET_ARCH_aarch64)) \
+ 		) \
+ 	) \
+ 	|| \
+-- 
+2.7.4
+

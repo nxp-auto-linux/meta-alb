@@ -21,6 +21,7 @@ SRC_URI_append += " \
 \
     file://0001-rcw-Fixed-IRQxx_BASE-ordering-for-LS2-parts.patch \
 \
+    file://0001-rcw-Added-a-PEX3-EP-Gen-2-configuration-for-BBMini.patch \
 \
 \
 "

@@ -1,0 +1,37 @@
+From b0ea12729914571e33fefe5d6dc1bd47cb6c3d55 Mon Sep 17 00:00:00 2001
+From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+Date: Thu, 27 Feb 2020 16:57:06 +0200
+Subject: [PATCH] rcw: Added a PEX3 EP Gen 2 configuration for the LS2084A
+ BBMini for testing
+
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+---
+ ...ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw
+
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..a7d9b6c
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw
+@@ -0,0 +1,16 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe EP Gen2 + two lane PCIe RC Gen2 + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_1800_700_1867_1600.rcw>
++
++HOST_AGT_PEX3=1
+-- 
+2.7.4
+

@@ -17,7 +17,7 @@ inherit fsl-eula-unpack
 # Workaround is to use url.path instead of url.localpath.
 
 LIC_FILES_CHKSUM_remove = " file://${FSL_EULA_FILE};md5=d4f548f93b5fe0ee2bc86758c344412d"
-LIC_FILES_CHKSUM_append = " file://${FSL_EULA_FILE};md5=88a13f4f35506a1e6c6049ffb53cffe7"
+LIC_FILES_CHKSUM_append = " file://${FSL_EULA_FILE};md5=ab61cab9599935bfe9f700405ef00f28"
 
 python fsl_bin_do_unpack() {
     src_uri = (d.getVar('SRC_URI', True) or "").split()

@@ -8,8 +8,8 @@ KERNEL_VERSION = "${@'${KERNEL_VERSION_FULL}'.split('+')[0]}"
 KERNEL_CHROOT_DIR ?= "${IMAGE_ROOTFS}"
 
 # set deploy location for ubuntu to match ubuntu's convention for kernel source dir 
-KERNEL_SOURCE_DIR = "kernel-source-${KERNEL_VERSION}"
-KERNEL_SRC_PATH = "/usr/src/${KERNEL_SOURCE_DIR}"
+KERNEL_SOURCE_DIR = "${KERNEL_VERSION}"
+KERNEL_SRC_PATH = "/usr/src/kernel"
 
 # I am sure there are smarter ways to map the architecture. This works
 # initially. FIX

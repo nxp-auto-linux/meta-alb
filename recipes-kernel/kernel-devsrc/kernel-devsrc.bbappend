@@ -1,11 +1,10 @@
 inherit linux-kernel-base
 
-KERNEL_VERSION_FULL = "${@get_kernelversion_file('${STAGING_KERNEL_BUILDDIR}')}"
-KERNEL_VERSION = "${@'${KERNEL_VERSION_FULL}'.split('+')[0]}"
+# KERNEL_VERSION is inherited from .bb file
 
 # override default deploy location for ubuntu to match ubuntu's convention for kernel source dir 
-KERNEL_SOURCE_DIR_ubuntu = "kernel-source-${KERNEL_VERSION}"
-KERNEL_SRC_PATH_ubuntu = "/usr/src/${KERNEL_SOURCE_DIR}"
+KERNEL_SOURCE_DIR_ubuntu = "${KERNEL_VERSION}"
+KERNEL_SRC_PATH_ubuntu = "/usr/src/kernel"
 
 # deploy 'linux-headers-<version>-generic as symlink to KERNEL_SRC_PATH'
 KERNEL_HEADERS_DIR_ubuntu = "linux-headers-${KERNEL_VERSION}-generic"

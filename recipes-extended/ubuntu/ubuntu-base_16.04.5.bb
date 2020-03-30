@@ -43,7 +43,7 @@ libsmartcols1 libsqlite3-0 libss2 libssl1.0.0 libstdc++6 libsystemd0 \
 libtcl8.6 libtinfo5 libudev1 libusb-0.1-4 libustr-1.0-1 libuuid1 \
 libxtables11 login lsb-base makedev mawk mime-support mount \
 multiarch-support ncurses-base ncurses-bin net-tools netbase passwd \
-perl-base procps python python-minimal python2.7 python2.7-minimal \
+perl perl-base procps python python-minimal python2.7 python2.7-minimal \
 python3.5 python3.5-minimal readline-common sed sensible-utils sudo \
 systemd systemd-sysv sysv-rc sysvinit-utils tar tcl tcl8.6 tzdata \
 ubuntu-keyring udev udhcpc util-linux whiptail xz-utils zlib1g \

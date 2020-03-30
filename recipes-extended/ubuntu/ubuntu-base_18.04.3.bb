@@ -50,7 +50,7 @@ libsmartcols1 libsqlite3-0 libss2 libssl-dev libssl1.1 libstdc++6 \
 libsystemd0 libtasn1-6 libtcl8.6 libtinfo5 libudev1 libunistring2 \
 libuuid1 libwind0-heimdal libxml2 libxtables12 libzstd1 login lsb-base \
 lsb-release m4 mawk mime-support mount ncurses-base ncurses-bin \
-net-tools netbase openssl passwd perl-base pinentry-curses \
+net-tools netbase openssl passwd perl perl-base pinentry-curses \
 powermgmt-base procps python python-apt-common python-minimal python2.7 \
 python2.7-minimal python3 python3-apt python3-dbus python3-gi \
 python3-minimal python3-software-properties python3.6 python3.6-minimal \

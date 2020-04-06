@@ -2,7 +2,7 @@ require recipes-bsp/u-boot/u-boot-s32.inc
 
 SRC_URI_prepend = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb-2019.04 "
 
-SRCREV = "0997a621cc84469c54897d6c0b420b0ef1b77a27"
+SRCREV = "2ae51f061a66c15754fc95aba75e81d148b23cca"
 
 # Support for generating default environment
 SRC_URI += " \

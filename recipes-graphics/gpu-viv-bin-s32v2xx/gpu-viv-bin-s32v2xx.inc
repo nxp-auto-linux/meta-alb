@@ -59,6 +59,8 @@ do_install_append () {
     cp -axr ${S}/usr ${D}
     cp -axr ${S}/opt ${D}
 
+    rm -rf ${D}/${includedir}/KHR
+
     mkdir -p ${D}${libdir}/pkgconfig
     install -m 0644 ${WORKDIR}/egl.pc ${D}${libdir}/pkgconfig/egl.pc
     install -m 0644 ${WORKDIR}/glesv2.pc ${D}${libdir}/pkgconfig/glesv2.pc

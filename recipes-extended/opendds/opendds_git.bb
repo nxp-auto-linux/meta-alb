@@ -6,14 +6,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=11ee76f6fb51f69658b5bb8327c50b11"
 
 inherit autotools
 
-S = "${WORKDIR}/OpenDDS-${PV}"
+S = "${WORKDIR}/git"
 B = "${S}"
 
-SRC_URI = "https://github.com/objectcomputing/OpenDDS/releases/download/DDS-3.10/OpenDDS-3.10.tar.gz \
-           file://0001-opendds-Make-Version.h-symlink-path-relative.patch \
-           "
-SRC_URI[md5sum] = "476572bdeb034f8d60b7490ce4595dd9"
-SRC_URI[sha256sum] = "824e900898e5d75f2875ead041bbef654a7a00cb59029f353df868e7fabff50f"
+SRC_URI = "git://github.com/objectcomputing/OpenDDS.git;protocol=https;branch=master"
+SRCREV = "0810ffc3f5c410e64975d66d82159fa4eb0bc394"
+
+DEPENDS += "perl"
+RDEPENDS_${PN}-dev += "perl"
 
 # For the Yocto based build, we need to work around some issues with
 # the special build system of OpenDDS. We want to appear as if we
@@ -27,6 +27,7 @@ export CXX = "${CXX_FOR_BUILD}"
 CONFIGUREOPTS = " --target=linux-cross \
 		  --target-compiler=${CROSSWRAPPERHACK}gcc \
 		  --prefix=${prefix} \
+		  --no-tests \
 		  --verbose \
 "
 
@@ -39,6 +40,10 @@ do_configure_prepend () {
 
 	# The OpenDDS build system requires us to be there
 	cd "${S}"
+}
+
+do_configure() {
+    ./configure ${CONFIGUREOPTS}
 }
 
 write_wrapperhack () {
@@ -57,3 +62,21 @@ do_install_prepend () {
 	# We are only interested in the cross compiled output
 	cd "${B}/build/target"
 }
+
+do_install_append () {
+	rm ${D}${datadir}/dds/dds/Version.h
+    cp ${D}${includedir}/dds/Version.h ${D}${datadir}/dds/dds
+}
+
+FILES_${PN} = " \
+    ${libdir} \
+    ${bindir} \
+"
+
+FILES_${PN}-dev += " \
+    ${libdir}/cmake/OpenDDS/* \
+    ${includedir} \
+    ${datadir} \
+"
+
+BBCLASSEXTEND = "native nativesdk"

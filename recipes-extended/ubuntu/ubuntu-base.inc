@@ -56,7 +56,6 @@ APTGET_EXTRA_PACKAGES += "\
 APTGET_EXTRA_PACKAGES += "\
     bison \
     device-tree-compiler \
-	libffi6 \
     libnss-db \
     libssl-dev \
     openssl \

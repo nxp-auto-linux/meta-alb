@@ -2,10 +2,13 @@
 # - 16.04.5
 # - 18.04.3
 #UBUNTU_TARGET_VERSION ?= "16.04.5"
-UBUNTU_TARGET_VERSION ?= "18.04.3"
+#UBUNTU_TARGET_VERSION ?= "18.04.3"
+UBUNTU_TARGET_VERSION ?= "20.04"
 
-UBUNTU_TARGET_BASEVERSION ?= "${@os.path.splitext(d.getVar('UBUNTU_TARGET_VERSION', True))[0]}"
+UBUNTU_TARGET_MAJORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[0]}"
+UBUNTU_TARGET_MINORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[1]}"
 UBUNTU_TARGET_SUBVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[2]}"
+UBUNTU_TARGET_BASEVERSION ?= "${UBUNTU_TARGET_MAJORVERSION}.${UBUNTU_TARGET_MINORVERSION}"
 PREFERRED_VERSION_ubuntu-base = "${UBUNTU_TARGET_VERSION}"
 
 # I am sure there are smarter ways to map the architecture. This works
@@ -31,14 +34,17 @@ POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 # our purposes.
 # Ubuntu 16.04: max glibc 2.23...
 # Ubuntu 18.04: max glibc 2.27...
-# Ubuntu 19.x: max glibc 2.29...
+# Ubuntu 20.x: max glibc 2.31...
 GLIBCVERSION = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "2.23", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.27", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.31%", \
     "unsupportedubuntuversion" \
+    , d) \
     , d) \
     , d)}'
 PREFERRED_VERSION_cross-localedef-native = "${GLIBCVERSION}"
+BINUVERSION="2.34"
 
 PREFERRED_PROVIDER_bison-native = "bison"
 

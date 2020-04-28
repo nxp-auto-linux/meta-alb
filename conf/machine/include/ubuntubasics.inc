@@ -46,6 +46,17 @@ GLIBCVERSION = '${@ \
 PREFERRED_VERSION_cross-localedef-native = "${GLIBCVERSION}"
 BINUVERSION="2.34"
 
+# More recent Ubuntu versions work with symlinks for the base
+# directories. We can't refer to symlink based files
+DISTRO_FEATURES_append = '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", " usrmerge", \
+   "unsupportedubuntuversion" \
+    , d) \
+    , d) \
+    , d)}'
+
 PREFERRED_PROVIDER_bison-native = "bison"
 
 # This is to be able to pull in the prebuilt Ubuntu rootfs

@@ -12,26 +12,20 @@ require ubuntu-base.inc
 # We try not to address them in the generic recipe
 APTGET_EXTRA_PACKAGES += ""
 
-# Ubuntu 20 unifies things and turns some things into symlinks. This
-# means we should not try to look into ${base_libdir} any longer.
-# Same goes for ${base_bindir} and ${base_sbindir}.
-# We do want to ship the symlinks however!
-FILES_SOLIBSDEV_remove = "${base_libdir}/lib*.so"
-FILES_${PN}_remove = "${base_libdir}/*.so.* ${base_libdir}/udev"
-FILES_${PN}_remove = "${base_libdir}/${TRANSLATED_TARGET_ARCH}-linux-gnu/lib*${SOLIBS}"
-FILES_${PN}_remove = "${base_libdir}/${TRANSLATED_TARGET_ARCH}-linux-gnu/ld*${SOLIBS}"
-FILES_${PN}_remove = "${base_bindir}/*"
-FILES_${PN}_remove = "${base_sbindir}/*"
-FILES_${PN} += "${base_bindir}"
-FILES_${PN} += "${base_sbindir}"
-FILES_${PN}-dbg_${TRANSLATED_TARGET_ARCH}_remove = "${base_libdir}/${TRANSLATED_TARGET_ARCH}-linux-gnu/.debug"
-FILES_${PN}-staticdev_remove = "${base_libdir}/*.a"
+# Ubuntu 20 unifies things and turns some things into symlinks. We
+# solve this with Yocto "usrmerge" but that isn't quite enough.
+# We still need to ship the symlinks.
+# We also need to remove the udev reference as apparently bitbake.conf
+# isn't quite adapted to usrmerge there.
+FILES_${PN}_remove = "/lib/udev"
+FILES_${PN} += "/bin"
+FILES_${PN} += "/sbin"
 
-# The downside of removing the symlink destination content is that we
+# The downside of not having the symlink destination content is that we
 # are missing a few basic files that are must have for dependencies.
 RPROVIDES_${PN}_ubuntu += " \
-    ${base_bindir}/bash \
-    ${base_bindir}/dash \
+    /bin/bash \
+    /bin/dash \
 "
 
 # We should not have a single PROVIDES entry as this package

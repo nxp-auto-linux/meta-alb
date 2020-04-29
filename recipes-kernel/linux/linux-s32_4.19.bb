@@ -1,7 +1,7 @@
 require recipes-kernel/linux/linux-s32.inc
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master"
-SRCREV = "9d2b51c6dfe73455f9475068eb5b6ee5dd300f16"
+SRCREV = "de5348d29cdffdbe11807239c727d725e5f702ab"
 
 # Temporary override 'LIC_FILES_CHKSUM' variable until
 # we officially upgrade to Linux Kernel 4.19

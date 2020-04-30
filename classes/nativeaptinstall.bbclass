@@ -140,7 +140,6 @@ ${PSEUDO_PREFIX}/*:\
 ${PSEUDO_LIBDIR}*/*:\
 ${PSEUDO_LOCALSTATEDIR}*:\
 ${PSEUDO_LOCALSTATEDIR}:\
-/proc/*:\
 /dev/null:\
 /dev/zero:\
 /dev/random:\
@@ -321,6 +320,11 @@ END_USER
 		fi
 	fi
 
+        # This is magic to fool package installations into thinking
+        # better about the rootfs
+        mkdir -p "${APTGET_CHROOT_DIR}/proc/1"
+        ln -s "/" "${APTGET_CHROOT_DIR}/proc/1/root"
+
 	# Prepare apt to be generically usable
 	chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
 	if [ -n "${APTGET_INIT_PACKAGES}" ]; then
@@ -442,6 +446,10 @@ END_PPA
                         aptget_restore_file $x
                 fi
 	fi
+
+        # Obviously we can't have a /proc/1 in an offline rootfs.
+        # So we remove our temporary helper again
+        rm -fr "${APTGET_CHROOT_DIR}/proc/1"
 
 	if [ -n "${APTGET_EXTRA_SOURCE_PACKAGES}" ]; then
 		# We need this to get source package handling properly

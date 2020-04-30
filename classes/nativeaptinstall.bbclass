@@ -215,6 +215,108 @@ fakeroot aptget_restore_file() {
         fi
 }
 
+fakeroot aptget_delete_faketools() {
+        xt="/bin/lsmod"
+        aptget_restore_file $xt
+        x="/__fake_lsmod__"
+        rm "${APTGET_CHROOT_DIR}$x"
+
+        xt="/bin/udevadm"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ]; then
+                xt="/sbin/udevadm"
+        fi
+        aptget_restore_file $xt
+        x="/__fake_udevadm__"
+        rm "${APTGET_CHROOT_DIR}$x"
+
+        xt="/bin/mountpoint"
+        aptget_restore_file $xt
+        x="/__fake_mountpoint__"
+        rm "${APTGET_CHROOT_DIR}$x"
+
+}
+
+fakeroot aptget_install_faketools() {
+        # Very ugly workaround. Turns out that some packages use
+        # lsmod, e.g., console-setup. lsmod wants to access the
+        # module database via sysfs. We are not in a live system,
+        # so sysfs does not exist, which leads to errors. These
+        # errors then make an otherwise perfectly valid install
+        # fail. Our workaround is to temporarily replace lsmod.
+        # This is ok as we don't have any modules loaded anyway.
+        x="/__fake_lsmod__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$x" ]; then
+                cat << EOF >${APTGET_CHROOT_DIR}$x
+#!/bin/sh
+echo 'Module                  Size  Used by'
+EOF
+                chmod a+x "${APTGET_CHROOT_DIR}$x"
+        fi
+        # udevadm shouldn't try to access /sys
+        xt="/bin/lsmod"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$x" ]; then
+                aptget_preserve_file $xt
+                ln -s "$x" "${APTGET_CHROOT_DIR}$xt"
+        fi
+
+        # Turns out that a good number of package installs trigger
+        # udevadm. In the past this was benign and ignored in chroot
+        # environments. This is currently not the case for Ubuntu 20
+        # So we install a fake udevadm temporarily to work around the
+        # problem.
+        x="/__fake_udevadm__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$x" ]; then
+cat << EOF >${APTGET_CHROOT_DIR}$x
+#!/bin/sh
+case \$1 in
+        trigger|control|settle|monitor)
+                echo "udevadm command \$1 ignored"
+                exit 0
+                ;;
+esac
+udevadm.yocto \$@
+EOF
+                chmod a+x "${APTGET_CHROOT_DIR}$x"
+        fi
+        xt="/bin/udevadm"
+        if [ ! -e "${APTGET_CHROOT_DIR}$xt" ]; then
+                xt="/sbin/udevadm"
+        fi
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$x" ]; then
+                aptget_preserve_file $xt
+                ln -s "$x" "${APTGET_CHROOT_DIR}$xt"
+        fi
+
+        # Packages like Java use "mountpoint" to check if "/proc" is
+        # real. For us, it isn't real, so we need to fake things
+        x="/__fake_mountpoint__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$x" ]; then
+                cat << EOF >${APTGET_CHROOT_DIR}$x
+#!/bin/sh
+for i in "\$@"; do
+        case \$i in
+                -*)
+                        # Skip
+                        ;;
+                /proc)
+                        echo "Pretending that /proc is a mountpoint"
+                        exit 0
+                        ;;
+        esac
+done
+mountpoint.yocto \$@
+EOF
+                chmod a+x "${APTGET_CHROOT_DIR}$x"
+        fi
+        # udevadm shouldn't try to access /sys
+        xt="/bin/mountpoint"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$x" ]; then
+                aptget_preserve_file $xt
+                ln -s "$x" "${APTGET_CHROOT_DIR}$xt"
+        fi
+
+}
+
 fakeroot aptget_populate_cache_from_sstate() {
 	if [ -e "${APTGET_CACHE_DIR}" ]; then
 		mkdir -p "${APTGET_DL_CACHE}"
@@ -321,7 +423,7 @@ END_USER
 	fi
 
         # This is magic to fool package installations into thinking
-        # better about the rootfs
+        # good things about our rootfs
         mkdir -p "${APTGET_CHROOT_DIR}/proc/1"
         ln -s "/" "${APTGET_CHROOT_DIR}/proc/1/root"
 
@@ -400,13 +502,17 @@ END_PPA
 	fi
 
 	if [ "${APTGET_SKIP_UPGRADE}" = "0" ]; then
+                aptget_install_faketools
 		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} -f install || aptgetfailure=1
 		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} upgrade || aptgetfailure=1
+                aptget_delete_faketools
 	fi
 
 	if [ "${APTGET_SKIP_FULLUPGRADE}" = "0" ]; then
+                aptget_install_faketools
 		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} -f install || aptgetfailure=1
 		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} full-upgrade || aptgetfailure=1
+                aptget_delete_faketools
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}" ]; then
@@ -417,7 +523,9 @@ END_PPA
 		echo >>"${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d" "exit 101"
 		chmod a+x "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
 
+                aptget_install_faketools
 		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} || aptgetfailure=1
+                aptget_delete_faketools
 
 		# remove the workaround
 		rm -rf "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
@@ -425,26 +533,9 @@ END_PPA
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES}" ]; then
-                # Very ugly workaround. Turns out that some packages use
-                # lsmod, e.g., console-setup. lsmod wants to access the
-                # module database via sysfs. We are not in a live system,
-                # so sysfs does not exist, which leads to errors. These
-                # errors then make an otherwise perfectly valid install
-                # fail. Our workaround is to temporarily replace lsmod.
-                # This is ok as we don't have any modules loaded anyway.
-                x="/bin/lsmod"
-                if [ -e $x ]; then
-                        aptget_preserve_file $x
-                        echo  >"${APTGET_CHROOT_DIR}$x" "#!/bin/sh"
-                        echo  >>"${APTGET_CHROOT_DIR}$x" "echo 'Module                  Size  Used by'"
-                        chmod a+x "${APTGET_CHROOT_DIR}$x"
-                fi
-
+                aptget_install_faketools
                 test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install ${APTGET_EXTRA_PACKAGES} || aptgetfailure=1
-
-                if [ -e $x ]; then
-                        aptget_restore_file $x
-                fi
+                aptget_delete_faketools
 	fi
 
         # Obviously we can't have a /proc/1 in an offline rootfs.

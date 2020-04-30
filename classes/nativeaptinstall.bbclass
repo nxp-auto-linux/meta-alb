@@ -202,6 +202,20 @@ END_PROXY
 	export etc_resolv_conf_renamed="${APTGET_CHROOT_DIR}/etc/resolv.conf.yocto"
 }
 
+fakeroot aptget_preserve_file() {
+        if [ -e "${APTGET_CHROOT_DIR}$1" ]; then
+                rm -f "${APTGET_CHROOT_DIR}$1.yocto"
+                mv "${APTGET_CHROOT_DIR}$1" "${APTGET_CHROOT_DIR}$1.yocto"
+        fi
+}
+
+fakeroot aptget_restore_file() {
+        if [ -e "${APTGET_CHROOT_DIR}$1.yocto" ]; then
+                rm -f "${APTGET_CHROOT_DIR}$1"
+                mv "${APTGET_CHROOT_DIR}$1.yocto" "${APTGET_CHROOT_DIR}$1"
+        fi
+}
+
 fakeroot aptget_populate_cache_from_sstate() {
 	if [ -e "${APTGET_CACHE_DIR}" ]; then
 		mkdir -p "${APTGET_DL_CACHE}"
@@ -394,6 +408,7 @@ END_PPA
 	if [ -n "${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}" ]; then
 		# workaround - deny (re)starting of services, for selected packages, since
 		# they will make the installation fail
+                aptget_preserve_file "/usr/sbin/policy-rc.d"
 		echo  >"${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d" "#!/bin/sh"
 		echo >>"${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d" "exit 101"
 		chmod a+x "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
@@ -402,10 +417,30 @@ END_PPA
 
 		# remove the workaround
 		rm -rf "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
+                aptget_restore_file "/usr/sbin/policy-rc.d"
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES}" ]; then
+                # Very ugly workaround. Turns out that some packages use
+                # lsmod, e.g., console-setup. lsmod wants to access the
+                # module database via sysfs. We are not in a live system,
+                # so sysfs does not exist, which leads to errors. These
+                # errors then make an otherwise perfectly valid install
+                # fail. Our workaround is to temporarily replace lsmod.
+                # This is ok as we don't have any modules loaded anyway.
+                x="/bin/lsmod"
+                if [ -e $x ]; then
+                        aptget_preserve_file $x
+                        echo  >"${APTGET_CHROOT_DIR}$x" "#!/bin/sh"
+                        echo  >>"${APTGET_CHROOT_DIR}$x" "echo 'Module                  Size  Used by'"
+                        chmod a+x "${APTGET_CHROOT_DIR}$x"
+                fi
+
                 test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install ${APTGET_EXTRA_PACKAGES} || aptgetfailure=1
+
+                if [ -e $x ]; then
+                        aptget_restore_file $x
+                fi
 	fi
 
 	if [ -n "${APTGET_EXTRA_SOURCE_PACKAGES}" ]; then

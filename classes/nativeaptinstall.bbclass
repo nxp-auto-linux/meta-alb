@@ -219,7 +219,7 @@ fakeroot aptget_populate_cache_from_sstate() {
 	if [ -e "${APTGET_CACHE_DIR}" ]; then
 		mkdir -p "${APTGET_DL_CACHE}"
 		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} check
-		rsync -v -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
+		rsync -d -u -t --include *.deb "${APTGET_DL_CACHE}/" "${APTGET_CACHE_DIR}"
 		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} check
 	fi
 }
@@ -228,7 +228,7 @@ fakeroot aptget_save_cache_into_sstate() {
 	if [ -e "${APTGET_CACHE_DIR}" ]; then
 		mkdir -p "${APTGET_DL_CACHE}"
 		chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} check
-		rsync -v -d -u -t --include *.deb "${APTGET_CACHE_DIR}/" "${APTGET_DL_CACHE}" 
+		rsync -d -u -t --include *.deb "${APTGET_CACHE_DIR}/" "${APTGET_DL_CACHE}"
 	fi
 }
 

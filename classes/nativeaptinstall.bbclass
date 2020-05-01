@@ -236,42 +236,41 @@ fakeroot aptget_install_fakeproc() {
 fakeroot aptget_delete_faketools() {
         xt="/bin/lsmod"
         xf="/__fake_lsmod__"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
                 aptget_restore_file $xt
         fi
         rm -f "${APTGET_CHROOT_DIR}$xf"
 
         xt="/bin/udevadm"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ]; then
+        if [ ! -L "${APTGET_CHROOT_DIR}$xt" ]; then
                 xt="/sbin/udevadm"
         fi
         xf="/__fake_udevadm__"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
                 aptget_restore_file $xt
         fi
         rm -f "${APTGET_CHROOT_DIR}$xf"
 
         xt="/bin/mountpoint"
         xf="/__fake_mountpoint__"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
                 aptget_restore_file $xt
         fi
         rm -f "${APTGET_CHROOT_DIR}$xf"
 
         xt="/usr/bin/systemctl"
         xf="/__fake_systemctl__"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
                 aptget_restore_file $xt
         fi
         rm -f "${APTGET_CHROOT_DIR}$xf"
 
         xt="/usr/bin/dbus-send"
         xf="/__fake_dbus-send__"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
                 aptget_restore_file $xt
         fi
         rm -f "${APTGET_CHROOT_DIR}$xf"
-
 }
 
 fakeroot aptget_install_faketools() {
@@ -700,8 +699,6 @@ END_PPA
 	# The list of installed packages goes into the log
 	echo "Installed packages:"
 	chroot "${APTGET_CHROOT_DIR}" /usr/bin/dpkg -l | grep '^ii' | awk '{print $2}'
-
-	set +x
 }
 
 # Must have to preset all variables properly. It also means that
@@ -761,8 +758,6 @@ fakeroot aptget_update_end() {
 		bberror "${APTGET_EXECUTABLE} failed to execute as expected!"
 		return $aptgetfailure
 	fi
-
-	set +x
 }
 
 python do_aptget_update() {

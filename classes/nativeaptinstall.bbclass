@@ -156,7 +156,7 @@ ${PSEUDO_LOCALSTATEDIR}:\
 ENV_HOST_PROXIES ?= ""
 APTGET_HOST_PROXIES ?= ""
 APTGET_EXECUTABLE ?= "/usr/bin/apt-get"
-APTGET_DEFAULT_OPTS ?= "-qy"
+APTGET_DEFAULT_OPTS ?= "-qy -o=Dpkg::Use-Pty=0"
 
 aptget_update_presetvars() {
 	export PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
@@ -216,6 +216,21 @@ fakeroot aptget_restore_file() {
                 rm -f "${APTGET_CHROOT_DIR}$1"
                 mv "${APTGET_CHROOT_DIR}$1.yocto" "${APTGET_CHROOT_DIR}$1"
         fi
+}
+
+fakeroot aptget_delete_fakeproc() {
+        # Obviously we can't have a /proc/1 in an offline rootfs.
+        # So we remove our temporary helper again
+        rm -f "${APTGET_CHROOT_DIR}/proc/self"
+        rm -fr "${APTGET_CHROOT_DIR}/proc/1"
+}
+
+fakeroot aptget_install_fakeproc() {
+        # This is magic to fool package installations into thinking
+        # good things about our rootfs and our runtime environment
+        mkdir -p "${APTGET_CHROOT_DIR}/proc/1"
+        ln -s "/" "${APTGET_CHROOT_DIR}/proc/1/root"
+        ln -s "1" "${APTGET_CHROOT_DIR}/proc/self"
 }
 
 fakeroot aptget_delete_faketools() {
@@ -407,7 +422,8 @@ EOF
 }
 
 fakeroot aptget_run_aptget() {
-        bbnote "${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@"
+        xd=`date -R`
+        bbnote "${xd}: ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@"
         aptget_install_faketools
         test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@ || aptgetfailure=1
         aptget_delete_faketools
@@ -503,6 +519,10 @@ END_USER
 		done
 	fi
 
+        # This is magic to fool package installations into thinking
+        # good things about our rootfs
+        aptget_install_fakeproc
+
 	# Yocto environment. If we kept apt packages privately from
 	# a prior run, prepopulate the package cache locally to avoid
 	# costly downloads
@@ -516,13 +536,17 @@ END_USER
 		fi
 	fi
 
-        # This is magic to fool package installations into thinking
-        # good things about our rootfs
-        mkdir -p "${APTGET_CHROOT_DIR}/proc/1"
-        ln -s "/" "${APTGET_CHROOT_DIR}/proc/1/root"
-
 	# Prepare apt to be generically usable
 	chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
+
+        # Ensure that everything is downloaded first. This is an
+        # optimization which will help to avoid failures late in the
+        # game due to bad intenet connections and helps the user.
+        # It means that no matter what else might happen, the package
+        # cache should be properly populated then for reruns.
+        aptget_run_aptget -d install ${APTGET_INIT_FAKETOOLS_PACKAGES} ${APTGET_REMAINING_FAKETOOLS_PACKAGES} ${APTGET_INIT_PACKAGES}
+        aptget_run_aptget -d install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} ${APTGET_EXTRA_PACKAGES} ${APTGET_EXTRA_SOURCE_PACKAGES} ${APTGET_EXTRA_PACKAGES_LAST}
+
 	if [ -n "${APTGET_INIT_FAKETOOLS_PACKAGES}" ]; then
                 # Packages used by faketools are installed
                 # individually so that faketools are used at the right
@@ -641,10 +665,6 @@ END_PPA
                 aptget_run_aptget install ${APTGET_EXTRA_PACKAGES}
 	fi
 
-        # Obviously we can't have a /proc/1 in an offline rootfs.
-        # So we remove our temporary helper again
-        rm -fr "${APTGET_CHROOT_DIR}/proc/1"
-
 	if [ -n "${APTGET_EXTRA_SOURCE_PACKAGES}" ]; then
 		# We need this to get source package handling properly
 		# configured for a subsequent apt-get source
@@ -709,6 +729,9 @@ fakeroot aptget_update_end() {
 	# Once we have done the installation, save off the package
 	# cache locally for repeated use of recipe building
 	aptget_save_cache_into_sstate
+
+        # Remove our temporary helper again
+        aptget_delete_fakeproc
 
 	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
 		aptget_run_aptget clean

@@ -27,7 +27,6 @@ IMAGE_INSTALL_append_ls2084abbmini += " \
 
 APTGET_EXTRA_PACKAGES += " \
     aptitude \
-    openjdk-8-jdk \
     gcc g++ cpp \
     build-essential make makedev automake cmake dkms flex bison\
     gdb u-boot-tools device-tree-compiler \
@@ -72,18 +71,43 @@ APTGET_EXTRA_PACKAGES += " \
 \
     pymacs \
     python-mode \
-    python-scipy \
-    python-virtualenv \
-    python-wstool \
-    tilecache \
 \
     qgit \
-    qt4-designer \
- "
+"
 
+# The following packages are apparently not mainstream enough to be
+# available for any Ubuntu version. Whoever needs them would have
+# to remove the comments appropriately.
+#APTGET_EXTRA_PACKAGES += " \
+#    python-scipy \
+#    python-virtualenv \
+#    python-wstool \
+#    tilecache \
+#    qt4-designer \
+#"
+
+# Installing Java is a bit of loaded topic because it is version
+# dependent. We default to the Java version based on the Ubuntu version
+JAVAVERSION = '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "8", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "8", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "11", \
+   "unknownjavaversion" \
+    , d) \
+    , d) \
+    , d)}'
+JAVALIBPATHSUFFIX = '${@ \
+    oe.utils.conditional("JAVAVERSION", "8", "jre/lib/${TRANSLATED_TARGET_ARCH}/jli", \
+    oe.utils.conditional("JAVAVERSION", "11", "lib/jli", \
+   "unsupportedjavaversion" \
+    , d) \
+    , d)}'
+APTGET_EXTRA_PACKAGES += " \
+    openjdk-${JAVAVERSION}-jre \
+"
 # Instruct QEMU to append (inject) the path to the jdk library to LD_LIBRARY_PATH
-# (required by openjdk-8-jdk)
-APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-8-openjdk-${UBUNTU_TARGET_ARCH}/jre/lib/${TRANSLATED_TARGET_ARCH}/jli"
+# (required by openjdk-${JAVAVERSION}-jdk)
+APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-${JAVAVERSION}-openjdk-${UBUNTU_TARGET_ARCH}/${JAVALIBPATHSUFFIX}"
 
 # bluez must not be allowed to (re)start any services, otherwise install will fail
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev python-bluez avahi-daemon rtkit"

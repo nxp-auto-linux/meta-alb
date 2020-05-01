@@ -403,6 +403,12 @@ EOF
 
 }
 
+fakeroot aptget_run_aptget() {
+        aptget_install_faketools
+        test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@ || aptgetfailure=1
+        aptget_delete_faketools
+}
+
 fakeroot aptget_populate_cache_from_sstate() {
 	if [ -e "${APTGET_CACHE_DIR}" ]; then
 		mkdir -p "${APTGET_DL_CACHE}"
@@ -516,9 +522,7 @@ END_USER
 	if [ -n "${APTGET_INIT_PACKAGES}" ]; then
 		aip="${APTGET_INIT_PACKAGES}"
 		for i in $aip; do
-                        aptget_install_faketools
-                        test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install $i || aptgetfailure=1
-                        aptget_delete_faketools
+                        aptget_run_aptget install $i
                 done
 	fi
 
@@ -537,10 +541,11 @@ END_USER
 			APTGET_GPG_BROKEN="1"
 		fi
 		if [ -n "$APTGET_GPG_BROKEN" ]; then
-			test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install curl gnupg2 || aptgetfailure=1
+			x="gnupg2 curl"
 		else
-			test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install gnupg2 dirmngr || aptgetfailure=1
+			x="gnupg2 dirmngr"
 		fi
+                aptget_run_aptget install $x
 
 		# Tricky variable hack to get word parsing for Yocto
 		# variables in the shell.
@@ -586,21 +591,17 @@ END_PPA
 			fi
 
 		done
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update || aptgetfailure=1
+                chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
 	fi
 
 	if [ "${APTGET_SKIP_UPGRADE}" = "0" ]; then
-                aptget_install_faketools
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} -f install || aptgetfailure=1
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} upgrade || aptgetfailure=1
-                aptget_delete_faketools
+		aptget_run_aptget -f install
+		aptget_run_aptget upgrade
 	fi
 
 	if [ "${APTGET_SKIP_FULLUPGRADE}" = "0" ]; then
-                aptget_install_faketools
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} -f install || aptgetfailure=1
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} full-upgrade || aptgetfailure=1
-                aptget_delete_faketools
+                aptget_run_aptget -f install
+		aptget_run_aptget full-upgrade
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}" ]; then
@@ -611,9 +612,7 @@ END_PPA
 		echo >>"${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d" "exit 101"
 		chmod a+x "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
 
-                aptget_install_faketools
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} || aptgetfailure=1
-                aptget_delete_faketools
+		aptget_run_aptget install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}
 
 		# remove the workaround
 		rm -rf "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
@@ -621,9 +620,7 @@ END_PPA
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES}" ]; then
-                aptget_install_faketools
-                test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install ${APTGET_EXTRA_PACKAGES} || aptgetfailure=1
-                aptget_delete_faketools
+                aptget_run_aptget install ${APTGET_EXTRA_PACKAGES}
 	fi
 
         # Obviously we can't have a /proc/1 in an offline rootfs.
@@ -633,7 +630,7 @@ END_PPA
 	if [ -n "${APTGET_EXTRA_SOURCE_PACKAGES}" ]; then
 		# We need this to get source package handling properly
 		# configured for a subsequent apt-get source
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install dpkg-dev || aptgetfailure=1
+		aptget_run_aptget install dpkg-dev
 
 		# For lack of a better idea, we install source packages
 		# into the root user's home. if we could guarantee that
@@ -688,7 +685,7 @@ fakeroot aptget_update_end() {
 
 	aptgetfailure=0
 	if [ -n "${APTGET_EXTRA_PACKAGES_LAST}" ]; then
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install ${APTGET_EXTRA_PACKAGES_LAST} || aptgetfailure=1
+		aptget_run_aptget install ${APTGET_EXTRA_PACKAGES_LAST}
 	fi
 
 	# Once we have done the installation, save off the package
@@ -696,7 +693,7 @@ fakeroot aptget_update_end() {
 	aptget_save_cache_into_sstate
 
 	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} clean
+		aptget_run_aptget clean
 	fi
 
 	# Delete any temp proxy lines we may have added in the target rootfs

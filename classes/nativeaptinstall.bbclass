@@ -423,8 +423,6 @@ fakeroot aptget_save_cache_into_sstate() {
 fakeroot aptget_update_begin() {
 	# Once the basic rootfs is unpacked, we use the local passwd
 	# information.
-	set -x
-
 	aptget_update_presetvars;
 
 	aptgetfailure=0
@@ -685,8 +683,6 @@ fakeroot do_aptget_user_update() {
 }
 
 fakeroot aptget_update_end() {
-
-	set -x
 
 	aptget_update_presetvars;
 

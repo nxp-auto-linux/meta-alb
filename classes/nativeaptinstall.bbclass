@@ -86,7 +86,7 @@ APTGET_SKIP_FULLUPGRADE ?= "1"
 APTGET_SKIP_CACHECLEAN ?= "0"
 
 # Minimum package needs for apt to work right. Nothing else.
-APTGET_INIT_PACKAGES ?= "apt-transport-https ca-certificates software-properties-common apt-utils"
+APTGET_INIT_PACKAGES ?= "dbus dbus-user-session apt-transport-https ca-certificates software-properties-common apt-utils"
 
 APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${TRANSLATED_TARGET_ARCH}"
 APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
@@ -217,22 +217,42 @@ fakeroot aptget_restore_file() {
 
 fakeroot aptget_delete_faketools() {
         xt="/bin/lsmod"
-        aptget_restore_file $xt
-        x="/__fake_lsmod__"
-        rm "${APTGET_CHROOT_DIR}$x"
+        xf="/__fake_lsmod__"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+                aptget_restore_file $xt
+        fi
+        rm -f "${APTGET_CHROOT_DIR}$xf"
 
         xt="/bin/udevadm"
         if [ -e "${APTGET_CHROOT_DIR}$xt" ]; then
                 xt="/sbin/udevadm"
         fi
-        aptget_restore_file $xt
-        x="/__fake_udevadm__"
-        rm "${APTGET_CHROOT_DIR}$x"
+        xf="/__fake_udevadm__"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+                aptget_restore_file $xt
+        fi
+        rm -f "${APTGET_CHROOT_DIR}$xf"
 
         xt="/bin/mountpoint"
-        aptget_restore_file $xt
-        x="/__fake_mountpoint__"
-        rm "${APTGET_CHROOT_DIR}$x"
+        xf="/__fake_mountpoint__"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+                aptget_restore_file $xt
+        fi
+        rm -f "${APTGET_CHROOT_DIR}$xf"
+
+        xt="/usr/bin/systemctl"
+        xf="/__fake_systemctl__"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+                aptget_restore_file $xt
+        fi
+        rm -f "${APTGET_CHROOT_DIR}$xf"
+
+        xt="/usr/bin/dbus-send"
+        xf="/__fake_dbus-send__"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+                aptget_restore_file $xt
+        fi
+        rm -f "${APTGET_CHROOT_DIR}$xf"
 
 }
 
@@ -244,19 +264,19 @@ fakeroot aptget_install_faketools() {
         # errors then make an otherwise perfectly valid install
         # fail. Our workaround is to temporarily replace lsmod.
         # This is ok as we don't have any modules loaded anyway.
-        x="/__fake_lsmod__"
-        if [ ! -e "${APTGET_CHROOT_DIR}$x" ]; then
-                cat << EOF >${APTGET_CHROOT_DIR}$x
+        xf="/__fake_lsmod__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$xf" ]; then
+                cat << EOF >${APTGET_CHROOT_DIR}$xf
 #!/bin/sh
 echo 'Module                  Size  Used by'
 EOF
-                chmod a+x "${APTGET_CHROOT_DIR}$x"
+                chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
         # udevadm shouldn't try to access /sys
         xt="/bin/lsmod"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$x" ]; then
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
                 aptget_preserve_file $xt
-                ln -s "$x" "${APTGET_CHROOT_DIR}$xt"
+                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
         fi
 
         # Turns out that a good number of package installs trigger
@@ -264,9 +284,9 @@ EOF
         # environments. This is currently not the case for Ubuntu 20
         # So we install a fake udevadm temporarily to work around the
         # problem.
-        x="/__fake_udevadm__"
-        if [ ! -e "${APTGET_CHROOT_DIR}$x" ]; then
-cat << EOF >${APTGET_CHROOT_DIR}$x
+        xf="/__fake_udevadm__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$xf" ]; then
+cat << EOF >${APTGET_CHROOT_DIR}$xf
 #!/bin/sh
 case \$1 in
         trigger|control|settle|monitor)
@@ -276,24 +296,24 @@ case \$1 in
 esac
 udevadm.yocto \$@
 EOF
-                chmod a+x "${APTGET_CHROOT_DIR}$x"
+                chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
         xt="/bin/udevadm"
         if [ ! -e "${APTGET_CHROOT_DIR}$xt" ]; then
                 xt="/sbin/udevadm"
         fi
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$x" ]; then
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
                 aptget_preserve_file $xt
-                ln -s "$x" "${APTGET_CHROOT_DIR}$xt"
+                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
         fi
 
         # Packages like Java use "mountpoint" to check if "/proc" is
         # real. For us, it isn't real, so we need to fake things
-        x="/__fake_mountpoint__"
-        if [ ! -e "${APTGET_CHROOT_DIR}$x" ]; then
-                cat << EOF >${APTGET_CHROOT_DIR}$x
+        xf="/__fake_mountpoint__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$xf" ]; then
+                cat << EOF >${APTGET_CHROOT_DIR}$xf
 #!/bin/sh
-for i in "\$@"; do
+for i in \$@; do
         case \$i in
                 -*)
                         # Skip
@@ -306,13 +326,79 @@ for i in "\$@"; do
 done
 mountpoint.yocto \$@
 EOF
-                chmod a+x "${APTGET_CHROOT_DIR}$x"
+                chmod a+x "${APTGET_CHROOT_DIR}$xf"
+        fi
+        xt="/bin/mountpoint"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
+                aptget_preserve_file $xt
+                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
+        fi
+
+        # Reloading system daemons causes log issues, so we want to
+        # avoid that. We can't reload anything offline anyway.
+        xf="/__fake_systemctl__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$xf" ]; then
+                cat << EOF >${APTGET_CHROOT_DIR}$xf
+#!/bin/sh
+# Hack! If invoked without parameters, we
+# assume is was invoked via a "runlevel" symlink
+# Unfortunately there doesn't seem to be a way
+# to determine the symlink name that invokes a
+# script
+args="runlevel"
+if [ \$# -ne 0 ]; then
+        args="\$@"
+fi
+for i in \$args; do
+        case \$i in
+                runlevel)
+                        echo "N 1"
+                        exit 0
+                        ;;
+                list-units)
+                        echo "UNIT          LOAD   ACTIVE SUB    DESCRIPTION"
+                        echo "rescue.target loaded active active Yoco Installation"
+                        exit 0
+                        ;;
+                is-active|is-failed)
+                        # Nothing is active or failed!
+                        exit 1
+                        ;;
+                daemon-reload|daemon-reexec|reload|restart)
+                        exit 0
+                        ;;
+                list-sockets|list-tiemrs|status|list-machines)
+                        # Silent ok
+                        exit 0
+                        ;;
+        esac
+done
+echo "Invoking: systemctl.yocto \$@"
+systemctl.yocto \$@
+EOF
+                chmod a+x "${APTGET_CHROOT_DIR}$xf"
+        fi
+        xt="/usr/bin/systemctl"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
+                aptget_preserve_file $xt
+                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
+        fi
+
+        # dbus-send is another on of those that do not make sense
+        # offline
+        xf="/__fake_dbus-send__"
+        if [ ! -e "${APTGET_CHROOT_DIR}$xf" ]; then
+                cat << EOF >${APTGET_CHROOT_DIR}$xf
+#!/bin/sh
+exit 20
+EOF
+                chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
         # udevadm shouldn't try to access /sys
-        xt="/bin/mountpoint"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$x" ]; then
+        xt="/usr/bin/dbus-send"
+        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
                 aptget_preserve_file $xt
-                ln -s "$x" "${APTGET_CHROOT_DIR}$xt"
+                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
         fi
 
 }
@@ -430,8 +516,12 @@ END_USER
 	# Prepare apt to be generically usable
 	chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
 	if [ -n "${APTGET_INIT_PACKAGES}" ]; then
-		x="${APTGET_INIT_PACKAGES}"
-		test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install $x || aptgetfailure=1
+		aip="${APTGET_INIT_PACKAGES}"
+		for i in $aip; do
+                        aptget_install_faketools
+                        test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} install $i || aptgetfailure=1
+                        aptget_delete_faketools
+                done
 	fi
 
 	if [ -n "${APTGET_EXTRA_PPA}" ]; then

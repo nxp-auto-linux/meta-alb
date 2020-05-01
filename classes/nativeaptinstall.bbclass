@@ -86,7 +86,10 @@ APTGET_SKIP_FULLUPGRADE ?= "1"
 APTGET_SKIP_CACHECLEAN ?= "0"
 
 # Minimum package needs for apt to work right. Nothing else.
-APTGET_INIT_PACKAGES ?= "dbus dbus-user-session apt-transport-https ca-certificates software-properties-common apt-utils"
+APTGET_INIT_FAKETOOLS_PACKAGES ?= "dbus systemd"
+APTGET_INIT_PACKAGES ?= "dbus-user-session apt-transport-https ca-certificates software-properties-common apt-utils"
+
+APTGET_REMAINING_FAKETOOLS_PACKAGES ?= "kmod"
 
 APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${TRANSLATED_TARGET_ARCH}"
 APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
@@ -404,6 +407,7 @@ EOF
 }
 
 fakeroot aptget_run_aptget() {
+        bbnote "${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@"
         aptget_install_faketools
         test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@ || aptgetfailure=1
         aptget_delete_faketools
@@ -519,11 +523,17 @@ END_USER
 
 	# Prepare apt to be generically usable
 	chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
-	if [ -n "${APTGET_INIT_PACKAGES}" ]; then
-		aip="${APTGET_INIT_PACKAGES}"
-		for i in $aip; do
+	if [ -n "${APTGET_INIT_FAKETOOLS_PACKAGES}" ]; then
+                # Packages used by faketools are installed
+                # individually so that faketools are used at the right
+                # times
+		x="${APTGET_INIT_FAKETOOLS_PACKAGES}"
+		for i in $x; do
                         aptget_run_aptget install $i
                 done
+	fi
+	if [ -n "${APTGET_INIT_PACKAGES}" ]; then
+                aptget_run_aptget install ${APTGET_INIT_PACKAGES}
 	fi
 
 	if [ -n "${APTGET_EXTRA_PPA}" ]; then
@@ -593,6 +603,14 @@ END_PPA
 		done
                 chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
 	fi
+
+        # Packages used by faketools are installed
+        # individually so that faketools are used at the right
+        # times
+        x="${APTGET_REMAINING_FAKETOOLS_PACKAGES}"
+        for i in $x; do
+                aptget_run_aptget install $i
+        done
 
 	if [ "${APTGET_SKIP_UPGRADE}" = "0" ]; then
 		aptget_run_aptget -f install

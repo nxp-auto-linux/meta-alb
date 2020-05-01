@@ -96,10 +96,6 @@ APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
 
 DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native coreutils-native"
 
-# script and function references which reside in a different location
-# in staging, or references that have to be taken from chroot afterall.
-PSEUDO_CHROOT_XTRANSLATION = ""
-
 # To run native executables required by some installation scripts
 PSEUDO_CHROOT_XPREFIX="${STAGING_BINDIR_NATIVE}/qemu-${TRANSLATED_TARGET_ARCH}"
 

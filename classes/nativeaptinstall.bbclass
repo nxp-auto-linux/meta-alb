@@ -538,13 +538,14 @@ END_USER
 	# Prepare apt to be generically usable
 	chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
 
-        # Ensure that everything is downloaded first. This is an
+        # See that everything is downloaded first. This is an
         # optimization which will help to avoid failures late in the
         # game due to bad intenet connections and helps the user.
         # It means that no matter what else might happen, the package
         # cache should be properly populated then for reruns.
-        aptget_run_aptget -d install ${APTGET_INIT_FAKETOOLS_PACKAGES} ${APTGET_REMAINING_FAKETOOLS_PACKAGES} ${APTGET_INIT_PACKAGES}
-        aptget_run_aptget -d install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} ${APTGET_EXTRA_PACKAGES} ${APTGET_EXTRA_SOURCE_PACKAGES} ${APTGET_EXTRA_PACKAGES_LAST}
+        # Given how we do the PPA setup, we have to work this in two
+        # stages though and can't download everything right away.
+        aptget_run_aptget -d install ${APTGET_INIT_FAKETOOLS_PACKAGES} ${APTGET_INIT_PACKAGES}
 
 	if [ -n "${APTGET_INIT_FAKETOOLS_PACKAGES}" ]; then
                 # Packages used by faketools are installed
@@ -626,6 +627,13 @@ END_PPA
 		done
                 chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
 	fi
+
+        # After the PPA has been set up, download everything else.
+        aptget_run_aptget -d install ${APTGET_REMAINING_FAKETOOLS_PACKAGES} \
+                        ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED} \
+                        ${APTGET_EXTRA_PACKAGES} \
+                        ${APTGET_EXTRA_SOURCE_PACKAGES} \
+                        ${APTGET_EXTRA_PACKAGES_LAST}
 
         # Packages used by faketools are installed
         # individually so that faketools are used at the right

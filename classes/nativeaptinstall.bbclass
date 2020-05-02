@@ -566,14 +566,18 @@ END_USER
 
 		# For apt-key to be reliable, we need both gpg and dirmngr
 		# As workaround for an 18.04 gpg regressions, we also use curl
-		APTGET_GPG_BROKEN=""
+                # In fact, for now we use it generally, because gpg can't
+                # talk to dirmngr properly in the emulated environment.
+                # This needs to be debugged (FIX!), but the curl method
+                # works, too.
+		APTGET_GPG_BROKEN="1"
 		if [ "$DISTRO_RELEASE" = "18.04" ]; then
 			APTGET_GPG_BROKEN="1"
 		fi
 		if [ -n "$APTGET_GPG_BROKEN" ]; then
-			x="gnupg2 curl"
+			x="gnupg curl"
 		else
-			x="gnupg2 dirmngr"
+			x="gnupg dirmngr"
 		fi
                 aptget_run_aptget install $x
 
@@ -581,7 +585,6 @@ END_USER
 		# variables in the shell.
 		x="${APTGET_EXTRA_PPA}"
 		for ppa in $x; do
-
 			IFS=';' read -r ppa_addr ppa_server ppa_hash ppa_type ppa_file_orig <<END_PPA
 $ppa
 END_PPA
@@ -612,14 +615,14 @@ END_PPA
 			if [ -n "$APTGET_GPG_BROKEN" ]; then
 				HTTPPPASERVER=`echo $ppa_server | sed "s/hkp:/http:/g"`
 				mkdir -p "${APTGET_CHROOT_DIR}/tmp/gpg"
+                                mkdir -p "${APTGET_CHROOT_DIR}/etc/apt/trusted.gpg.d/"
 				chmod 0600 "${APTGET_CHROOT_DIR}/tmp/gpg"
 				chroot "${APTGET_CHROOT_DIR}" /usr/bin/curl -sL "$HTTPPPASERVER/pks/lookup?op=get&search=0x$ppa_hash" | chroot "${APTGET_CHROOT_DIR}" /usr/bin/gpg --homedir /tmp/gpg --import || true
-				chroot "${APTGET_CHROOT_DIR}" /usr/bin/gpg --homedir /tmp/gpg --export $ppa_hash | chroot "${APTGET_CHROOT_DIR}" /usr/bin/tee "/etc/apt/trusted.gpg.d/$ppa_file_orig.gpg"
+				chroot "${APTGET_CHROOT_DIR}" /usr/bin/gpg --homedir /tmp/gpg --export $ppa_hash > "${APTGET_CHROOT_DIR}/etc/apt/trusted.gpg.d/$ppa_file_orig.gpg"
 				rm -rf "${APTGET_CHROOT_DIR}/tmp/gpg"
 			else
 				chroot "${APTGET_CHROOT_DIR}" /usr/bin/apt-key adv --keyserver $ppa_server $ppa_proxy --recv-key $ppa_hash
 			fi
-
 		done
                 chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} update
 	fi

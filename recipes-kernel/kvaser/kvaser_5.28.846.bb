@@ -55,9 +55,9 @@ do_compile() {
 	oe_runmake KERNEL_PATH="${STAGING_KERNEL_DIR}" KERNEL_VERSION="${KERNEL_VERSION}" CC="${CC}" LD="${LD}" AR="${AR}" O="${STAGING_KERNEL_BUILDDIR}" ${MODULES} ${LIBS}
 }
 
-MODULES_DIR = "/lib/modules/${KERNEL_VERSION}/kernel/drivers"
+MODULES_DIR = "${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers"
 KVASER_DIR = "/usr/kvaser"
-LIB_DIR = "/lib"
+LIB_DIR = "${base_libdir}"
 EXAMPLES_BASE = "${KVASER_DIR}/canlib"
 
 do_install() {

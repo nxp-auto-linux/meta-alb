@@ -9,7 +9,7 @@
 inherit siteinfo
 inherit deploy
 
-DEPENDS = "u-boot-tools-native"
+DEPENDS = "u-boot-tools-native coreutils-native"
 
 S = "${WORKDIR}"
 
@@ -47,6 +47,12 @@ get_default_env () {
 
 do_compile () {
 	for envname in ${UBOOT_ENV_NAME}; do
+                # We must never ever modify the source file or repeated
+                # invocations will work with messed up data!
+                # Given that we do not have a separate workdir established,
+                # we use the destination dir
+                cat ${S}/${envname}.txt > ${S}/${envname}.work
+
 		# Concatenate default environment from u-boot with environment file ${UBOOT_ENV_NAME}.txt
 		# In the future we should merge them, i.e. override variable definitions from 
 		# default environment with those from the environment file ${UBOOT_ENV_NAME}, so that
@@ -56,14 +62,17 @@ do_compile () {
 		if [ -n "${DEFAULT_ENV}" ]; then
 			DEFAULT_ENV_FILE="${DEFAULT_ENV_PATH}/${DEFAULT_ENV}${envtype}.txt"
 			if [ -e "$DEFAULT_ENV_FILE" ]; then
-				cat "$DEFAULT_ENV_FILE" ${S}/${envname}.txt > ${S}/temp.txt
-				mv -f ${S}/temp.txt ${S}/${envname}.txt
+				cat "$DEFAULT_ENV_FILE" ${S}/${envname}.txt > ${S}/${envname}.work
 			fi
 		fi
 		# remove any empty lines which might break the environment
-		sed '/^[[:space:]]*$/d' -i ${S}/${envname}.txt
+		sed '/^[[:space:]]*$/d' -i ${S}/${envname}.work
 
-		sed -e "s#<machine>#${MACHINE}#" -e "s#<fdt_name>#$(basename `echo ${KERNEL_DEVICETREE} | awk '{ print $1 }'`)#" -e 's#<kernel_name>#${UBOOT_KERNEL_IMAGETYPE}#' -i ${S}/${envname}.txt
+                # Take the last entry for all duplicate entries
+                tac ${S}/${envname}.work | sort -u -t= -b -k1,1 > ${S}/temp.work
+                mv -f ${S}/temp.work ${S}/${envname}.work
+
+		sed -e "s#<machine>#${MACHINE}#" -e "s#<fdt_name>#$(basename `echo ${KERNEL_DEVICETREE} | awk '{ print $1 }'`)#" -e 's#<kernel_name>#${UBOOT_KERNEL_IMAGETYPE}#' -i ${S}/${envname}.work
 		for envsize in ${UBOOT_ENV_IMAGE_SIZE}; do
 			if echo "$envsize" | grep ":"; then
 				suffix="-${envsize%:*}"
@@ -78,7 +87,7 @@ do_compile () {
 				srcsuffix=""
 			fi
 			echo "*** $srcsuffix/$suffix *** $envsize ***"
-			mkenvimage ${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '', '-b', d)} -s ${envsize} ${UBOOT_ENV_PAD} -o ${S}/${envname}${suffix}.bin ${envname}${srcsuffix}.txt
+			mkenvimage ${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '', '-b', d)} -s ${envsize} ${UBOOT_ENV_PAD} -o ${S}/${envname}${suffix}.bin ${S}/${envname}${srcsuffix}.work
 		done
 	done
 }

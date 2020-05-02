@@ -1,16 +1,33 @@
 # A more complex image with customer required setup
 require fsl-image-ubuntu-base.bb
 
-# FIX! This include currently requires a different glibc
-# or the packages won't install properly.
 # Example for use of "ppa:" to install x2go with xfce4
-# Comment x2go for now as aptget fails 
-#APTGET_EXTRA_PPA += "ppa:x2go/stable;"
-#APTGET_EXTRA_PACKAGES += "x2goserver x2goserver-xsession"
-# Use vnc as alternative to x2go
-#APTGET_EXTRA_PACKAGES += "vnc4server"
-APTGET_EXTRA_PACKAGES += "x11vnc"
-IMAGE_INSTALL_append += " x11vnc-init"
+# At this time, this is not available for all versions, so we
+# also show how to do a VNC alternative.
+APTGET_EXTRA_PPA += '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "ppa:x2go/stable;", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "ppa:x2go/stable;", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d) \
+    , d)}'
+APTGET_EXTRA_PACKAGES += '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "x2goserver x2goserver-xsession", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "x2goserver x2goserver-xsession", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d) \
+    , d)}'
+IMAGE_INSTALL_append = '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc-init", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d) \
+    , d)}'
 
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
 

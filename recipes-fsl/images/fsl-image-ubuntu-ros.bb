@@ -14,9 +14,14 @@ def get_rosversion(d):
         return 'kinetic'
     if d.getVar('UBUNTU_TARGET_BASEVERSION', True) == '18.04':
         return 'melodic'
+    if d.getVar('UBUNTU_TARGET_BASEVERSION', True) == '20.04':
+        return 'noetic'
     return 'undefined'
 ROS_VERSION = "${@get_rosversion(d)}"
-ROS_PACKAGES += " \
+
+ROS_PPA = "http://packages.ros.org/ros/ubuntu;hkp://keyserver.ubuntu.com:80;C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654;deb;ros-latest.list"
+
+ROS_PACKAGES_KINETIC_MELODIC = " \
     python-catkin-tools \
     python-rosinstall \
     python-rosinstall-generator \
@@ -24,7 +29,7 @@ ROS_PACKAGES += " \
 "
 
 # ROS packages, to be installed after ROS setup
-ROS_PACKAGES += " \
+ROS_PACKAGES_KINETIC_MELODIC += " \
     ros-${ROS_VERSION}-camera-calibration-parsers \
     ros-${ROS_VERSION}-desktop \
     ros-${ROS_VERSION}-geographic-msgs \
@@ -36,14 +41,21 @@ ROS_PACKAGES += " \
     ros-${ROS_VERSION}-tf2-web-republisher \
     ros-${ROS_VERSION}-robot \
 "
+
+ROS_PACKAGES_NOETIC = "  \
+    ros-${ROS_VERSION}-desktop-full \
+"
+
+ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'kinetic', '${ROS_PACKAGES_KINETIC_MELODIC}', '', d)}"
 ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'kinetic', 'ros-${ROS_VERSION}-web-video-server', '', d)}"
+ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'noetic', '${ROS_PACKAGES_NOETIC}', '', d)}"
 
 ADD_ROS_PACKAGES ?= "${ROS_PACKAGES}"
 APTGET_EXTRA_PACKAGES_LAST += " \
     ${ADD_ROS_PACKAGES} \
 "
 
-APTGET_EXTRA_PPA += "http://packages.ros.org/ros/ubuntu;hkp://ha.pool.sks-keyservers.net:80;C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654;deb;ros-latest.list"
+APTGET_EXTRA_PPA += "${ROS_PPA}"
 
 fakeroot do_aptget_user_update_append() {
 

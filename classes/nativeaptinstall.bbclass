@@ -205,22 +205,28 @@ END_PROXY
 		fi
 	done
 
-	export etc_hosts_renamed="${APTGET_CHROOT_DIR}/etc/hosts.yocto"
-	export etc_resolv_conf_renamed="${APTGET_CHROOT_DIR}/etc/resolv.conf.yocto"
 }
 
 fakeroot aptget_preserve_file() {
-        if [ -e "${APTGET_CHROOT_DIR}$1" ]; then
-                rm -f "${APTGET_CHROOT_DIR}$1.yocto"
-                mv "${APTGET_CHROOT_DIR}$1" "${APTGET_CHROOT_DIR}$1.yocto"
+        if [ -e "${APTGET_CHROOT_DIR}$1" ] || [ -L "${APTGET_CHROOT_DIR}$1" ]; then
+                mv -f "${APTGET_CHROOT_DIR}$1" "${APTGET_CHROOT_DIR}$1.yocto"
+                return
         fi
+        false
+}
+
+aptget_file_is_preserved() {
+        test -e "${APTGET_CHROOT_DIR}$1.yocto" || test -L "${APTGET_CHROOT_DIR}$1.yocto"
 }
 
 fakeroot aptget_restore_file() {
-        if [ -e "${APTGET_CHROOT_DIR}$1.yocto" ]; then
-                rm -f "${APTGET_CHROOT_DIR}$1"
-                mv "${APTGET_CHROOT_DIR}$1.yocto" "${APTGET_CHROOT_DIR}$1"
+        if aptget_file_is_preserved "$1"; then
+                mv -f "${APTGET_CHROOT_DIR}$1.yocto" "${APTGET_CHROOT_DIR}$1"
         fi
+}
+
+aptget_link_is_pointing_to() {
+        test -L "${APTGET_CHROOT_DIR}$1" && test "`readlink ${APTGET_CHROOT_DIR}$1`" = "$2"
 }
 
 fakeroot aptget_delete_fakeproc() {
@@ -238,51 +244,32 @@ fakeroot aptget_install_fakeproc() {
         ln -s "1" "${APTGET_CHROOT_DIR}/proc/self"
 }
 
-fakeroot aptget_delete_faketools() {
-        xt="/bin/lsmod"
-        xf="/__fake_lsmod__"
-        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
-                aptget_restore_file $xt
+fakeroot aptget_delete_faketool() {
+        if aptget_link_is_pointing_to $1 $2; then
+                aptget_restore_file $1
         fi
-        rm -f "${APTGET_CHROOT_DIR}$xf"
+        rm -f "${APTGET_CHROOT_DIR}$2"
+}
 
+fakeroot aptget_install_faketool() {
+        if ! aptget_link_is_pointing_to $1 $2; then
+                if aptget_preserve_file $1; then
+                        ln -s "$2" "${APTGET_CHROOT_DIR}$1"
+                fi
+        fi
+}
+
+fakeroot aptget_delete_faketools() {
+        aptget_delete_faketool "/bin/lsmod"         "/__fake_lsmod__"
         xt="/bin/udevadm"
-        if [ ! -L "${APTGET_CHROOT_DIR}$xt" ]; then
+        if ! aptget_file_is_preserved $xt; then
                 xt="/sbin/udevadm"
         fi
-        xf="/__fake_udevadm__"
-        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
-                aptget_restore_file $xt
-        fi
-        rm -f "${APTGET_CHROOT_DIR}$xf"
-
-        xt="/bin/mountpoint"
-        xf="/__fake_mountpoint__"
-        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
-                aptget_restore_file $xt
-        fi
-        rm -f "${APTGET_CHROOT_DIR}$xf"
-
-        xt="/usr/bin/systemctl"
-        xf="/__fake_systemctl__"
-        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
-                aptget_restore_file $xt
-        fi
-        rm -f "${APTGET_CHROOT_DIR}$xf"
-
-        xt="/usr/bin/dbus-send"
-        xf="/__fake_dbus-send__"
-        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
-                aptget_restore_file $xt
-        fi
-        rm -f "${APTGET_CHROOT_DIR}$xf"
-
-        xt="/usr/bin/dpkg"
-        xf="/__dpkgwrapper__"
-        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
-                aptget_restore_file $xt
-        fi
-        rm -f "${APTGET_CHROOT_DIR}$xf"
+        aptget_delete_faketool $xt                  "/__fake_udevadm__"
+        aptget_delete_faketool "/bin/mountpoint"    "/__fake_mountpoint__"
+        aptget_delete_faketool "/usr/bin/systemctl" "/__fake_systemctl__"
+        aptget_delete_faketool "/usr/bin/dbus-send" "/__fake_dbus-send__"
+        aptget_delete_faketool "/usr/bin/dpkg"      "/__dpkgwrapper__"
 }
 
 fakeroot aptget_install_faketools() {
@@ -301,18 +288,13 @@ echo 'Module                  Size  Used by'
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
-        # udevadm shouldn't try to access /sys
-        xt="/bin/lsmod"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
-                aptget_preserve_file $xt
-                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
-        fi
+        aptget_install_faketool "/bin/lsmod"            $xf
 
         # Turns out that a good number of package installs trigger
         # udevadm. In the past this was benign and ignored in chroot
         # environments. This is currently not the case for Ubuntu 20
         # So we install a fake udevadm temporarily to work around the
-        # problem.
+        # problem which in fact simplifies installs for all versions.
         xf="/__fake_udevadm__"
         if [ ! -e "${APTGET_CHROOT_DIR}$xf" ]; then
 cat << EOF >${APTGET_CHROOT_DIR}$xf
@@ -331,10 +313,7 @@ EOF
         if [ ! -e "${APTGET_CHROOT_DIR}$xt" ]; then
                 xt="/sbin/udevadm"
         fi
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
-                aptget_preserve_file $xt
-                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
-        fi
+        aptget_install_faketool $xt                     $xf
 
         # Packages like Java use "mountpoint" to check if "/proc" is
         # real. For us, it isn't real, so we need to fake things
@@ -357,11 +336,7 @@ mountpoint.yocto \$@
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
-        xt="/bin/mountpoint"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
-                aptget_preserve_file $xt
-                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
-        fi
+        aptget_install_faketool "/bin/mountpoint"       $xf
 
         # Reloading system daemons causes log issues, so we want to
         # avoid that. We can't reload anything offline anyway.
@@ -407,11 +382,7 @@ systemctl.yocto \$@
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
-        xt="/usr/bin/systemctl"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
-                aptget_preserve_file $xt
-                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
-        fi
+        aptget_install_faketool "/usr/bin/systemctl"    $xf
 
         # dbus-send is another on of those that do not make sense
         # offline
@@ -423,12 +394,7 @@ exit 20
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
-        # udevadm shouldn't try to access /sys
-        xt="/usr/bin/dbus-send"
-        if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
-                aptget_preserve_file $xt
-                ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
-        fi
+        aptget_install_faketool "/usr/bin/dbus-send"    $xf
 
 	if [ "${APTGET_USE_NATIVE_DPKG}" != "0" ]; then
                 # We can speed up specfic operations.
@@ -447,11 +413,8 @@ dpkg.yocto \$@
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
 
-                xt="/usr/bin/dpkg"
-                if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
-                        aptget_preserve_file $xt
-                        ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
-                fi
+
+                aptget_install_faketool "/usr/bin/dpkg" $xf
         fi
 }
 
@@ -491,16 +454,10 @@ fakeroot aptget_update_begin() {
 	# need to protect the host and DNS config. We do a bit of a
 	# convoluted stunt here to hopefully be flexible enough about
 	# different rootfs types.
-	if [ -e "${APTGET_CHROOT_DIR}/etc/hosts" ]; then
-		rm -f "$etc_hosts_renamed"
-		mv "${APTGET_CHROOT_DIR}/etc/hosts" "$etc_hosts_renamed"
-	fi
-	cp "/etc/hosts" "${APTGET_CHROOT_DIR}/etc/hosts"
-	if [ -e "${APTGET_CHROOT_DIR}/etc/resolv.conf" ]; then
-		rm -f "$etc_resolv_conf_renamed"
-		mv "${APTGET_CHROOT_DIR}/etc/resolv.conf" "$etc_resolv_conf_renamed"
-	fi
-	cp "/etc/resolv.conf" "${APTGET_CHROOT_DIR}/etc/resolv.conf"
+	cp "/etc/hosts" "${APTGET_CHROOT_DIR}/__etchosts__"
+        aptget_install_faketool "/etc/hosts" "/__etchosts__"
+	cp "/etc/resolv.conf" "${APTGET_CHROOT_DIR}/__etcresolvconf__"
+        aptget_install_faketool "/etc/resolv.conf" "/__etcresolvconf__"
 
 	# apt may not be fully configured at this stage
 	mkdir -p "${APTGET_CHROOT_DIR}/etc/apt"
@@ -797,18 +754,8 @@ fakeroot aptget_update_end() {
 
 	# Now that we are done in qemu land, we reinstate the original
 	# networking config of our target rootfs.
-	# We really should do this only if the targets have not been
-	# modified during installation. Hmm. Remove vs. Merge? FIX?
-	if [ -e "$etc_hosts_renamed" ]; then
-		mv -f "$etc_hosts_renamed" "${APTGET_CHROOT_DIR}/etc/hosts" 
-	fi
-	if [ -e "$etc_resolv_conf_renamed" ]; then
-		if [ ! -L "${APTGET_CHROOT_DIR}/etc/resolv.conf" ]; then
-			mv -f "$etc_resolv_conf_renamed" "${APTGET_CHROOT_DIR}/etc/resolv.conf"
-		else
-			rm -f "$etc_resolv_conf_renamed"
-		fi
-	fi
+        aptget_delete_faketool "/etc/hosts" "/__etchosts__"
+        aptget_delete_faketool "/etc/resolv.conf" "/__etcresolvconf__"
 
 	if [ $aptgetfailure -ne 0 ]; then
 		bberror "${APTGET_EXECUTABLE} failed to execute as expected!"

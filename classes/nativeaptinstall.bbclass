@@ -403,6 +403,9 @@ EOF
 #!/bin/sh
 for i in \$@; do
         case \$i in
+                --)
+                        break
+                        ;;
                 --unpack)
                         ${DPKG_NATIVE} --admindir=/var/lib/dpkg --instdir=/  \$@
                         exit

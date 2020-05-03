@@ -85,6 +85,10 @@ APTGET_SKIP_FULLUPGRADE ?= "1"
 # Set this to anything but 0 to skip performing apt-get clean at the end
 APTGET_SKIP_CACHECLEAN ?= "0"
 
+# For perfect compatibility, we run in emulation only.
+# We can however speed up package installs to some extent
+APTGET_USE_NATIVE_DPKG ?= "1"
+
 # Minimum package needs for apt to work right. Nothing else.
 APTGET_INIT_FAKETOOLS_PACKAGES ?= "dbus systemd"
 APTGET_INIT_PACKAGES ?= "dbus-user-session apt-transport-https ca-certificates software-properties-common apt-utils"
@@ -94,10 +98,14 @@ APTGET_REMAINING_FAKETOOLS_PACKAGES ?= "kmod"
 APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${TRANSLATED_TARGET_ARCH}"
 APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
 
-DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native coreutils-native"
+DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native coreutils-native dpkg-native"
+
+# We need the proper parameter version for the tool
+APTGET_TARGET_ARCH="${@d.getVar('TRANSLATED_TARGET_ARCH', True).replace("aarch64", "arm64")}"
 
 # To run native executables required by some installation scripts
 PSEUDO_CHROOT_XPREFIX="${STAGING_BINDIR_NATIVE}/qemu-${TRANSLATED_TARGET_ARCH}"
+DPKG_NATIVE="${STAGING_BINDIR_NATIVE}/dpkg"
 
 # When running in qemu, we don't really want libpseudo as qemu is already
 # running with libpseudo. We want to be as chroot as possible and we
@@ -147,6 +155,7 @@ ${PSEUDO_LOCALSTATEDIR}:\
 /dev/pts:\
 /dev/pts/*:\
 /dev/ptmx:\
+${DPKG_NATIVE}:\
 "
 
 ENV_HOST_PROXIES ?= ""
@@ -263,6 +272,13 @@ fakeroot aptget_delete_faketools() {
 
         xt="/usr/bin/dbus-send"
         xf="/__fake_dbus-send__"
+        if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
+                aptget_restore_file $xt
+        fi
+        rm -f "${APTGET_CHROOT_DIR}$xf"
+
+        xt="/usr/bin/dpkg"
+        xf="/__dpkgwrapper__"
         if [ -L "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" = "$xf" ]; then
                 aptget_restore_file $xt
         fi
@@ -414,6 +430,29 @@ EOF
                 ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
         fi
 
+	if [ "${APTGET_USE_NATIVE_DPKG}" != "0" ]; then
+                # We can speed up specfic operations.
+                xf="/__dpkgwrapper__"
+                cat << EOF >${APTGET_CHROOT_DIR}$xf
+#!/bin/sh
+for i in \$@; do
+        case \$i in
+                --unpack)
+                        ${DPKG_NATIVE} --admindir=/var/lib/dpkg --instdir=/  \$@
+                        exit
+                        ;;
+        esac
+done
+dpkg.yocto \$@
+EOF
+                chmod a+x "${APTGET_CHROOT_DIR}$xf"
+
+                xt="/usr/bin/dpkg"
+                if [ -e "${APTGET_CHROOT_DIR}$xt" ] && [ "`readlink ${APTGET_CHROOT_DIR}$xt`" != "$xf" ]; then
+                        aptget_preserve_file $xt
+                        ln -s "$xf" "${APTGET_CHROOT_DIR}$xt"
+                fi
+        fi
 }
 
 fakeroot aptget_run_aptget() {
@@ -522,6 +561,16 @@ END_USER
 	# a prior run, prepopulate the package cache locally to avoid
 	# costly downloads
 	aptget_populate_cache_from_sstate
+
+	if [ "${APTGET_USE_NATIVE_DPKG}" != "0" ]; then
+                # We need to establish the proper architecture globally, so
+                # that we do not pick it up from dpkg. We may use a native
+                # dpkg for some things, so we do not want to run into issues
+                # as dpkg-native defaults to host architecture.
+                mkdir -p "${APTGET_CHROOT_DIR}/etc/apt/apt.conf.d"
+                chroot "${APTGET_CHROOT_DIR}" /usr/bin/dpkg --add-architecture ${APTGET_TARGET_ARCH}
+                echo >"${APTGET_CHROOT_DIR}/etc/apt/apt.conf.d/01yoctoinstallarchitecture" "APT::Architecture \"${APTGET_TARGET_ARCH}\";"
+        fi
 
 	# Before we can play with the package manager in any
 	# meaningful way, we need to sync the database.

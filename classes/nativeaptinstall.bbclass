@@ -251,6 +251,13 @@ fakeroot aptget_delete_faketool() {
         rm -f "${APTGET_CHROOT_DIR}$2"
 }
 
+fakeroot aptget_always_install_faketool() {
+        if ! aptget_link_is_pointing_to $1 $2; then
+                aptget_preserve_file $1 || true
+                ln -s "$2" "${APTGET_CHROOT_DIR}$1"
+        fi
+}
+
 fakeroot aptget_install_faketool() {
         if ! aptget_link_is_pointing_to $1 $2; then
                 if aptget_preserve_file $1; then
@@ -643,7 +650,7 @@ END_PPA
                         ${APTGET_EXTRA_SOURCE_PACKAGES} \
                         ${APTGET_EXTRA_PACKAGES_LAST}
 
-        # Packages used by faketools are installed
+        # Packages affected by faketools are installed
         # individually so that faketools are used at the right
         # times
         x="${APTGET_REMAINING_FAKETOOLS_PACKAGES}"
@@ -664,16 +671,15 @@ END_PPA
 	if [ -n "${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}" ]; then
 		# workaround - deny (re)starting of services, for selected packages, since
 		# they will make the installation fail
-                aptget_preserve_file "/usr/sbin/policy-rc.d"
-		echo  >"${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d" "#!/bin/sh"
-		echo >>"${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d" "exit 101"
-		chmod a+x "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
+                echo  >"${APTGET_CHROOT_DIR}/__usrsbinpolicy-rc.d__" "#!/bin/sh"
+                echo >>"${APTGET_CHROOT_DIR}/__usrsbinpolicy-rc.d__" "exit 101"
+                chmod a+x "${APTGET_CHROOT_DIR}/__usrsbinpolicy-rc.d__"
+                aptget_always_install_faketool "/usr/sbin/policy-rc.d" "/__usrsbinpolicy-rc.d__"
 
 		aptget_run_aptget install ${APTGET_EXTRA_PACKAGES_SERVICES_DISABLED}
 
 		# remove the workaround
-		rm -rf "${APTGET_CHROOT_DIR}/usr/sbin/policy-rc.d"
-                aptget_restore_file "/usr/sbin/policy-rc.d"
+                aptget_delete_faketool "/usr/sbin/policy-rc.d" "/__usrsbinpolicy-rc.d__"
 	fi
 
 	if [ -n "${APTGET_EXTRA_PACKAGES}" ]; then

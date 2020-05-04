@@ -185,8 +185,44 @@ aptget_update_presetvars() {
 
 	# Add any proxies from the host, according to
 	# https://wiki.yoctoproject.org/wiki/Working_Behind_a_Network_Proxy
-	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
+        # Note that we split environment setup and rootfs setup!
+        # Rootfs proxy setup is only done once in aptget_setup_proxies
+        # Environment setup needs to be done every time in
+        # aptget_update_presetvars
 
+	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
+	while [ -n "$ENV_HOST_PROXIES" ]; do
+		IFS=" =_" read -r proxy_type proxy_string proxy_val ENV_HOST_PROXIES <<END_PROXY
+$ENV_HOST_PROXIES
+END_PROXY
+		if [ "$proxy_string" != "proxy" ]; then
+			# We already warn when setting up the rootfs
+                        #bbwarn "Invalid proxy \"$proxy\""
+			continue
+		fi
+
+		export QEMU_SET_ENV="$QEMU_SET_ENV,${proxy_type}_${proxy_string}=$proxy_val"
+	done
+
+}
+
+fakeroot aptget_setup_proxies() {
+	# Add any proxies from the host, according to
+	# https://wiki.yoctoproject.org/wiki/Working_Behind_a_Network_Proxy
+        # Note that we split environment setup and rootfs setup!
+        # Rootfs proxy setup is only done once in aptget_setup_proxies
+        # Environment setup needs to be done every time in
+        # aptget_update_presetvars
+
+	# apt may not be fully configured at this stage
+        mkdir -p "${APTGET_CHROOT_DIR}/etc/apt/apt.conf.d"
+
+        # We use the faketool mechanism to install our proxies in a
+        # reversible way
+        xf="/__etc_apt_apt.conf.d_01yoctoinstallproxies__"
+        rm -f "${APTGET_CHROOT_DIR}$xf"
+
+	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
 	while [ -n "$ENV_HOST_PROXIES" ]; do
 		IFS=" =_" read -r proxy_type proxy_string proxy_val ENV_HOST_PROXIES <<END_PROXY
 $ENV_HOST_PROXIES
@@ -196,15 +232,24 @@ END_PROXY
 			continue
 		fi
 
-		export QEMU_SET_ENV="$QEMU_SET_ENV,${proxy_type}_${proxy_string}=$proxy_val"
-
 		# If APTGET_HOST_PROXIES is not defined in local.conf, then
 		# apt.conf is populated using proxy information in ENV_HOST_PROXIES
 		if [ -z "${APTGET_HOST_PROXIES}" ]; then
-			echo >>"${APTGET_CHROOT_DIR}/etc/apt/apt.conf" "Acquire::$proxy_type::proxy \"$proxy_val/\"; /* Yocto */"
+			echo >>"${APTGET_CHROOT_DIR}$xf" "Acquire::$proxy_type::proxy \"$proxy_val/\"; /* Yocto */"
 		fi
 	done
 
+	APTGET_HOST_PROXIES="${APTGET_HOST_PROXIES}"
+	while [ -n "$APTGET_HOST_PROXIES" ]; do
+		read -r proxy <<END_PROXY
+$APTGET_HOST_PROXIES
+END_PROXY
+		echo >>"${APTGET_CHROOT_DIR}$xf" "$proxy"
+	done
+
+        if [ -e $xf ]; then
+                aptget_always_install_faketool "/etc/apt/apt.conf.d/01yoctoinstallproxies" $xf
+        fi
 }
 
 fakeroot aptget_preserve_file() {
@@ -469,17 +514,6 @@ fakeroot aptget_update_begin() {
 	cp "/etc/resolv.conf" "${APTGET_CHROOT_DIR}/__etcresolvconf__"
         aptget_install_faketool "/etc/resolv.conf" "/__etcresolvconf__"
 
-	# apt may not be fully configured at this stage
-	mkdir -p "${APTGET_CHROOT_DIR}/etc/apt"
-
-	APTGET_HOST_PROXIES="${APTGET_HOST_PROXIES}"
-	while [ -n "$APTGET_HOST_PROXIES" ]; do
-		read -r proxy <<END_PROXY
-$APTGET_HOST_PROXIES
-END_PROXY
-		echo >>"${APTGET_CHROOT_DIR}/etc/apt/apt.conf" "$proxy"
-	done
-
 	# We need to set at least one (dummy) user and we set passwords for all of them.
 	# useradd is not debian, but good enough for now.
 	# Technically, this should be done at image generation time,
@@ -528,6 +562,9 @@ END_USER
 	# a prior run, prepopulate the package cache locally to avoid
 	# costly downloads
 	aptget_populate_cache_from_sstate
+
+        # From this point on, we may need network access
+        aptget_setup_proxies
 
 	if [ "${APTGET_USE_NATIVE_DPKG}" != "0" ]; then
                 # We need to establish the proper architecture globally, so
@@ -748,6 +785,10 @@ fakeroot aptget_update_end() {
 	# Once we have done the installation, save off the package
 	# cache locally for repeated use of recipe building
 	aptget_save_cache_into_sstate
+
+        # Remove any proxy instrumentation
+        xf="/__etc_apt_apt.conf.d_01yoctoinstallproxies__"
+        aptget_delete_faketool "/etc/apt/apt.conf.d/01yoctoinstallproxies" $xf
 
         # Remove our temporary helper again
         aptget_delete_fakeproc

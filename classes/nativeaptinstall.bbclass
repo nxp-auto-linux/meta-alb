@@ -357,7 +357,7 @@ case \$1 in
                 exit 0
                 ;;
 esac
-udevadm.yocto \$@
+udevadm.yocto "\$@"
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
@@ -384,7 +384,7 @@ for i in \$@; do
                         ;;
         esac
 done
-mountpoint.yocto \$@
+mountpoint.yocto "\$@"
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
@@ -430,7 +430,7 @@ for i in \$args; do
         esac
 done
 echo "Invoking: systemctl.yocto \$@"
-systemctl.yocto \$@
+systemctl.yocto "\$@"
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
         fi
@@ -459,12 +459,12 @@ for i in \$@; do
                         break
                         ;;
                 --unpack)
-                        ${DPKG_NATIVE} --admindir=/var/lib/dpkg --instdir=/  \$@
+                        ${DPKG_NATIVE} --admindir=/var/lib/dpkg --instdir=/  "\$@"
                         exit
                         ;;
         esac
 done
-dpkg.yocto \$@
+dpkg.yocto "\$@"
 EOF
                 chmod a+x "${APTGET_CHROOT_DIR}$xf"
 
@@ -477,7 +477,7 @@ fakeroot aptget_run_aptget() {
         xd=`date -R`
         bbnote "${xd}: ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@"
         aptget_install_faketools
-        test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@ || aptgetfailure=1
+        test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} "$@" || aptgetfailure=1
         aptget_delete_faketools
 }
 

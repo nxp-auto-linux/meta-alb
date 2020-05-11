@@ -20,7 +20,7 @@ IMAGE_INSTALL += " \
 "
 
 # Benchmark tools
-IMAGE_INSTALL += "dhrystone"
+IMAGE_INSTALL += "dhrystone fio"
 
 # Add packages required for OpenMPI demo
 # TODO: add them to the RDEPENDS list in the OpenMPI demo recipe
@@ -43,3 +43,5 @@ IMAGE_INSTALL_append_ls2 = " ${LXC_INSTALL_PACKAGES}"
 # SFTP server
 IMAGE_INSTALL_append = " openssh openssh-sftp openssh-sftp-server "
 
+# Other useful tools
+IMAGE_INSTALL_append = " rsync irqbalance "

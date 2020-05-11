@@ -7,6 +7,8 @@ SRC_URI += "\
 \
 	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-4.19.patch \
 	file://0001-dpaa2-eth-Keep-the-correspondence-between-dpni-id-4.19.patch \
+\
+	file://0001-dpaa2-eth-did-not-handle-the-rx-buffer-size-alignmen.patch \
 "
 #
 

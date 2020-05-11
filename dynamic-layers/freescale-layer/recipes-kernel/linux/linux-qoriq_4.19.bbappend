@@ -5,9 +5,10 @@ SRC_URI += "\
 	file://0001-kernel-Added-phy-ioctl-support-to-the-DPAA2-dpmac-dr.patch \
 	file://0001-kernel-phylib-ioctl-now-translates-C45-properly-for-.patch \
 \
-	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-wh.patch \
-    file://0001-dpaa2-eth-Keep-the-correspondence-between-dpni-id-4.19.patch \
+	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-4.19.patch \
+	file://0001-dpaa2-eth-Keep-the-correspondence-between-dpni-id-4.19.patch \
 "
+#
 
 # We don't know at this stage if we want to keep or drop these. They
 # are likely to be obsoleted by the next kernel pick.

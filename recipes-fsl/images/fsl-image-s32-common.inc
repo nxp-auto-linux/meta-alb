@@ -17,12 +17,15 @@ IMAGE_INSTALL_append_s32v2xx += "\
     u-boot-s32 \
 "
 
+IPCSHM ??= ""
+IPCSHM_s32 ?= "${@oe.utils.conditional("PREFERRED_VERSION_linux-s32", "5.4", "", "ipc-shm", d)}"
+
 # Support for Inter-Process(or) Communication over Shared Memory (ipc-shm) under Linux
-IMAGE_INSTALL_append_s32v234evb += " ipc-shm "
-IMAGE_INSTALL_append_s32v234sbc += " ipc-shm "
-IMAGE_INSTALL_append_s32g274aevb += " ipc-shm "
-IMAGE_INSTALL_append_s32g274ardb += " ipc-shm "
-IMAGE_INSTALL_append_s32r45xevb += " ipc-shm "
+IMAGE_INSTALL_append_s32v234evb += " ${IPCSHM} "
+IMAGE_INSTALL_append_s32v234sbc += " ${IPCSHM} "
+IMAGE_INSTALL_append_s32g274aevb += " ${IPCSHM} "
+IMAGE_INSTALL_append_s32g274ardb += " ${IPCSHM} "
+IMAGE_INSTALL_append_s32r45xevb += " ${IPCSHM} "
 
 IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"
 IMAGE_INSTALL_append_s32g274aevb = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe', '', d)}"

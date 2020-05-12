@@ -52,8 +52,8 @@ SRC_URI_append_t4bluebox += " \
 # pci vdev sources
 SRC_URI_append_ls1043ardb += " \
     git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=pci-vdev;name=pci-vdev;destsuffix=git/drivers/pci/pci-vdev \
-    file://0001-Add-support-for-building-NXP-VETH-module.patch \
-    file://0001-LS1043A-Adjust-device-tree-ranges-for-PCIe.patch \
+    file://0001-Add-support-for-building-NXP-VETH-module-4.19.90.patch \
+    file://0001-LS1043A-Adjust-device-tree-ranges-for-PCIe-4.19.90.patch \
     file://pci-vdev.cfg \
 "
 

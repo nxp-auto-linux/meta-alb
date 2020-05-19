@@ -786,21 +786,16 @@ fakeroot aptget_update_end() {
 	# cache locally for repeated use of recipe building
 	aptget_save_cache_into_sstate
 
+	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
+		aptget_run_aptget clean
+	fi
+
         # Remove any proxy instrumentation
         xf="/__etc_apt_apt.conf.d_01yoctoinstallproxies__"
         aptget_delete_faketool "/etc/apt/apt.conf.d/01yoctoinstallproxies" $xf
 
         # Remove our temporary helper again
         aptget_delete_fakeproc
-
-	if [ "${APTGET_SKIP_CACHECLEAN}" = "0" ]; then
-		aptget_run_aptget clean
-	fi
-
-	# Delete any temp proxy lines we may have added in the target rootfs
-	if [ -f "${APTGET_CHROOT_DIR}/etc/apt/apt.conf" ]; then
-		sed -i '/^Acquire::.+; \/* Yocto *\/\s*$/d' "${APTGET_CHROOT_DIR}/etc/apt/apt.conf"
-	fi
 
 	# Now that we are done in qemu land, we reinstate the original
 	# networking config of our target rootfs.

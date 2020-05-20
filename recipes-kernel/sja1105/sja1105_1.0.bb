@@ -6,17 +6,16 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 inherit module
 
-# SJA for kernel 4.14
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
 SRCREV = "7a26f3662d99c60dd411af25bedaef222adf49bb"
 
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
 
-# For older kernel versions, currently only 4.14 is supported
-OLD_KERNEL_INCLUDE = "sja1105-old-${KERNEL_VER}.inc"
+# Customizations for some kernel versions
+OTHER_KERNEL_INCLUDE = "sja1105-append-${KERNEL_VER}.inc"
 
-include ${OLD_KERNEL_INCLUDE}
+include ${OTHER_KERNEL_INCLUDE}
 
 S = "${WORKDIR}/git"
 DESTDIR = "${D}"

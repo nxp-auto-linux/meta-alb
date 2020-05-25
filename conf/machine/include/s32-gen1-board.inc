@@ -25,3 +25,7 @@ FLASHIMAGE_ROOTFS_SUFFIX = "cpio.gz.u-boot"
 FLASHIMAGE_ROOTFS_FILE = "${DEPLOY_DIR_IMAGE}/${FLASHIMAGE_ROOTFS}-${MACHINE}.${FLASHIMAGE_ROOTFS_SUFFIX}"
 
 IMAGE_FSTYPES += "${FLASHIMAGE_ROOTFS_SUFFIX}"
+
+# Add extra sdcard partition with rootfs image if Xen enabled
+SDCARD_ROOTFS_EXTRA1 = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${SDCARD_ROOTFS}', '', d)}"
+SDCARD_ROOTFS_EXTRA1_SIZE = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${ROOTFS_SIZE}', '0', d)}"

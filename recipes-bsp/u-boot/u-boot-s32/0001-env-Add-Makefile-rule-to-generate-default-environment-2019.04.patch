@@ -1,6 +1,6 @@
-From 06d4dee43f17a92f3814f96cf8a05795e6a04425 Mon Sep 17 00:00:00 2001
-From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-Date: Fri, 22 May 2020 09:38:23 +0000
+From 7c917321919926e17886f3fbb1e909d350da2f62 Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Tue, 26 May 2020 13:13:39 +0300
 Subject: [PATCH] env: Add Makefile rule to generate default environment
 
 Add new rule `env-default` to dump the default
@@ -13,10 +13,10 @@ Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index d1aa6f7..7a3c658 100644
+index d28c5f1..ff2bc21 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -810,6 +810,7 @@ endif
+@@ -819,6 +819,7 @@ endif
  
  # Always append ALL so that arch config.mk's can add custom ones
  ALL-y += u-boot.srec u-boot.bin u-boot.sym System.map binary_size_check
@@ -24,7 +24,7 @@ index d1aa6f7..7a3c658 100644
  
  ALL-$(CONFIG_ONENAND_U_BOOT) += u-boot-onenand.bin
  ifeq ($(CONFIG_SPL_FSL_PBL),y)
-@@ -1046,6 +1047,10 @@ u-boot.ldr:	u-boot
+@@ -1154,6 +1155,10 @@ u-boot.ldr:	u-boot
  		$(LDR) -T $(CONFIG_CPU) -c $@ $< $(LDR_FLAGS)
  		$(BOARD_SIZE_CHECK)
  
@@ -34,7 +34,7 @@ index d1aa6f7..7a3c658 100644
 +
  # binman
  # ---------------------------------------------------------------------------
- quiet_cmd_binman = BINMAN  $@
+ # Use 'make BINMAN_DEBUG=1' to enable debugging
 -- 
 2.7.4
 

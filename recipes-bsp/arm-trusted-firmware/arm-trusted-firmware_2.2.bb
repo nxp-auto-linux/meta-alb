@@ -4,14 +4,17 @@ DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
+DEPENDS += "dtc-native"
+
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 # ATF repository
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https;branch=alb/master"
-SRCREV ?= "40328123b7df1f8a959f2c5ea07982e2e033a1bc"
+SRCREV ?= "5073929b2f7d2ac447937d61ab2887379c506835"
 
 PLATFORM_s32g274aevb = "s32g"
+PLATFORM_s32g274ardb = "s32g"
 BUILD_TYPE = "release"
 
 ATF_BINARIES = "${B}/${PLATFORM}/${BUILD_TYPE}"
@@ -25,7 +28,13 @@ EXTRA_OEMAKE += "\
 
 do_compile() {
         unset LDFLAGS
-        oe_runmake -C ${S}
+
+	# fiptool (currently being integrated) requires a BL33 image; until we
+	# finish integration, we'll just pass some dummy file, to appease the
+	# script; it will not be used in the actual SD card image
+	BL33_DUMMY=`mktemp` && echo 1 > ${BL33_DUMMY}
+	oe_runmake -C ${S} BL33=${BL33_DUMMY}
+	rm -rf ${BL33_DUMMY}
 }
 
 do_deploy() {
@@ -114,4 +123,4 @@ python do_add_atf_support () {
     return
 }
 
-COMPATIBLE_MACHINE = "s32g274aevb"
+COMPATIBLE_MACHINE = "s32g274aevb|s32g274ardb"

@@ -9,7 +9,6 @@ ATF_UBOOT_ENTRYPOINT = "0x34020000"
 
 # Image offsets on the SD-card. Deployment in SRAM is controlled at runtime and
 # via IVT.
-ATF_BL31SSRAM_MMC_OFFSET = "213000"
 ATF_BL2_MMC_OFFSET = "1b2000"
 ATF_BL31_MMC_OFFSET = "1f2000"
 ATF_UBOOT_MMC_OFFSET = "2000"

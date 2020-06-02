@@ -43,7 +43,6 @@ do_deploy() {
 	cp -v ${ATF_BINARIES}/bl31.bin ${DEPLOY_DIR_IMAGE}/bl31-${MACHINE}.bin
 	# Copy the dtb with a different name, to avoid name clashes with the kernel dtb
 	cp -v ${ATF_BINARIES}/fdts/s32g274aevb.dtb ${DEPLOY_DIR_IMAGE}/fsl-${MACHINE}-atf.dtb
-	cp -v ${ATF_BINARIES}/bl31.bin ${DEPLOY_DIR_IMAGE}/bl31SSRAM-${MACHINE}.bin
 	mv -v ${TOPDIR}/${ATF_IMAGE_FILE} ${DEPLOY_DIR_IMAGE}/${ATF_IMAGE_FILE}
 }
 
@@ -105,7 +104,6 @@ python do_add_atf_support () {
     # Currently there is only one dtb for both RDB and EVB, and its name is
     # hard-coded based on EVB platform.
     atf_dtb_file = d.getVar("ATF_BINARIES", True) + "/" + "fdts/s32g274aevb.dtb"
-    bl31ssram_file = d.getVar("ATF_BINARIES", True) + "/" + "bl31SSRAM.bin"
     uboot_file = d.getVar("DEPLOY_DIR_IMAGE", True) + "/u-boot.bin"
 
     output_file = str(d.getVar("ATF_IMAGE_FILE", True))
@@ -115,17 +113,11 @@ python do_add_atf_support () {
     os.system("cp {} {} -vf".format(bl2_file, dst))
     os.system("cp {} {} -vf".format(bl31_file, dst))
     os.system("cp {} {} -vf".format(atf_dtb_file, dst))
-    os.system("cp {} {} -vf".format(bl31ssram_file, dst))
     os.system("cp {} {} -vf".format(uboot_file, dst))
 
     # Generate IVT
     dst = tmp + "/" + "ivt.sdcard.0"
     write_ivt(dst, int(str(d.getVar("ATF_BL2_MMC_OFFSET", True)), 16))
-
-    # Generate BL31SSRAM image
-    src = tmp + "/" + "bl31SSRAM.bin"
-    dst = tmp + "/" + "bl31SSRAM.sdcard." + d.getVar("ATF_BL31SSRAM_MMC_OFFSET", True)
-    os.system("cp {} {}".format(src, dst))
 
     # Generate BL2 image
     rsp = int(str(d.getVar("ATF_BL2_LOADADDR", True)), 16)

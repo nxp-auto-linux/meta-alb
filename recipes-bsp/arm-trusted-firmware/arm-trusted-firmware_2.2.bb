@@ -11,7 +11,7 @@ B = "${WORKDIR}/build"
 
 # ATF repository
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https;branch=alb/master"
-SRCREV ?= "0b7437253e602943ff26d7e4c82f3e0874d378f1"
+SRCREV ?= "4f912f0e6ca27ef7304467c44df11159c689d0db"
 
 PLATFORM_s32g274aevb = "s32g"
 PLATFORM_s32g274ardb = "s32g"

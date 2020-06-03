@@ -78,4 +78,4 @@ SRC_URI += "\
 SRC_URI_append_gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'file://build/pcie_s32gen1.cfg', '', d)}"
 DELTA_KERNEL_DEFCONFIG_append_s32g274aevb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
 DELTA_KERNEL_DEFCONFIG_append_s32g274ardb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
-DELTA_KERNEL_DEFCONFIG_append_s32r45xevb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append_s32r45evb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"

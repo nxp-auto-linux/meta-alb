@@ -5,6 +5,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
 DEPENDS += "dtc-native xxd-native"
+DEPENDS += "openssl-native"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
@@ -13,28 +14,44 @@ B = "${WORKDIR}/build"
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https;branch=alb/master"
 SRCREV ?= "4f912f0e6ca27ef7304467c44df11159c689d0db"
 
+SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
+
 PLATFORM_s32g274aevb = "s32g"
 PLATFORM_s32g274ardb = "s32g"
 BUILD_TYPE = "release"
 
 ATF_BINARIES = "${B}/${PLATFORM}/${BUILD_TYPE}"
 
-EXTRA_OEMAKE += "\
+BL33_DUMMY = "${B}/bl33_dummy"
+
+EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
                 ARCH=${TARGET_ARCH} \
                 BUILD_BASE=${B} \
                 PLAT=${PLATFORM} \
                 "
 
+# FIXME: Allow linking of 'tools' binaries with native libraries
+#        used for generating the boot logo and other tools used
+#        during the build process.
+EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS}" \
+                 HOSTLD="${BUILD_LD} -L${STAGING_BASE_LIBDIR_NATIVE} \
+                 -Wl,-rpath,${STAGING_LIBDIR_NATIVE} \
+                 -Wl,-rpath,${STAGING_BASE_LIBDIR_NATIVE}" \
+                 LIBPATH="${STAGING_LIBDIR_NATIVE}" \
+                 HOSTSTRIP=true'
+
 do_compile() {
 	unset LDFLAGS
+	unset CFLAGS
+	unset CPPFLAGS
 
 	# fiptool (currently being integrated) requires a BL33 image; until we
 	# finish integration, we'll just pass some dummy file, to appease the
 	# script; it will not be used in the actual SD card image
-	BL33_DUMMY=`mktemp` && echo 1 > ${BL33_DUMMY}
-	oe_runmake -C ${S} BL33=${BL33_DUMMY}
-	rm -rf ${BL33_DUMMY}
+	echo 1 > "${BL33_DUMMY}"
+	oe_runmake -C ${S} BL33="${BL33_DUMMY}" all
+	rm -rf "${BL33_DUMMY}"
 }
 
 do_deploy() {

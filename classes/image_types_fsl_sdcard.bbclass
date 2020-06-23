@@ -95,8 +95,10 @@ SDCARDIMAGE_BOOT_EXTRA2 ?= ""
 SDCARDIMAGE_BOOT_EXTRA2_FILE ?= ""
 
 SDCARD_ROOTFS_EXTRA1 ?= ""
+SDCARD_ROOTFS_EXTRA1_FILE ?= ""
 SDCARD_ROOTFS_EXTRA1_SIZE ?= "0"
 SDCARD_ROOTFS_EXTRA2 ?= ""
+SDCARD_ROOTFS_EXTRA2_FILE ?= ""
 SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
 
 ATF_IMAGE ?= ""
@@ -126,6 +128,8 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA1', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA2', True) + ':do_deploy' or ''} \
 	${@d.getVar('ATF_IMAGE_FILE', True) and d.getVar('ATF_IMAGE', True) + ':do_deploy' or ''} \
+	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1', True) + ':do_deploy' or ''} \
+	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2', True) + ':do_deploy' or ''} \
 "
 
 SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_fsl_lsch3_sdcard"
@@ -299,8 +303,8 @@ generate_fsl_lsch3_sdcard () {
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
 	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
-	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
+	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
+	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
 	parted ${SDCARD} print
 
 	# Fill RCW into the boot block
@@ -315,8 +319,8 @@ generate_fsl_lsch3_sdcard () {
 	# Burn Partition
 	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
 	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1}
-	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2}
+	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
+	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
 }
 
 #

@@ -8,7 +8,7 @@ IMAGE_FSTYPES += "ext3"
 
 # Specific definitions for .sdcard image generation
 IMAGE_FSTYPES += "sdcard"
-SDCARD_ROOTFS = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ext3"
+SDCARD_ROOTFS = "ext3"
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 IMAGE_CLASSES += "image_types_fsl_sdcard"
 

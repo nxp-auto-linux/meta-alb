@@ -102,8 +102,7 @@ SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
 ATF_IMAGE ?= ""
 ATF_IMAGE_FILE ?= ""
 
-SDCARD_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
-SDCARD = "${SDCARD_DEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.sdcard"
+SDCARD = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.sdcard"
 
 # Set default alignment to 4MB [in KiB]
 BASE_IMAGE_ROOTFS_ALIGNMENT ?= "4096"
@@ -421,7 +420,7 @@ IMAGE_CMD_sdcard () {
 		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${SDCARD_ROOTFS_EXTRA2_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
 	fi
 
-	cd ${SDCARD_DEPLOYDIR}
+	cd ${IMGDEPLOYDIR}
 
 	# Initialize a sparse file
 	dd if=/dev/zero of=${SDCARD} bs=1 count=0 seek=$(expr 1024 \* ${SDCARD_SIZE})

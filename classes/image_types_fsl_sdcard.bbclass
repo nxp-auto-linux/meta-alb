@@ -6,7 +6,7 @@ IMAGE_TYPES += "sdcard"
 BOOTDD_VOLUME_ID ?= "boot_${MACHINE}"
 
 UBOOT_REALSUFFIX_SDCARD ?= ".${UBOOT_SUFFIX_SDCARD}"
-IMAGE_BOOTLOADER ?= "u-boot"
+IMAGE_BOOTLOADER ?= "${@d.getVar('PREFERRED_PROVIDER_virtual/bootloader', True) or 'u-boot'}"
 
 UBOOT_TYPE_SDCARD ?= "sdcard"
 UBOOT_BASENAME_SDCARD ?= "u-boot"
@@ -242,7 +242,7 @@ generate_fsl_lsch3_sdcard () {
 
 	# Burn bootloader
 	case "${IMAGE_BOOTLOADER}" in
-	        u-boot)
+	        u-boot*)
 	        if [ -n "${SPL_BINARY}" ]; then
 	                dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
 	                dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1
@@ -315,7 +315,7 @@ generate_imx_sdcard () {
 		bberror "The imx-bootlets is not supported for i.MX based machines"
 		exit 1
 		;;
-		u-boot)
+		u-boot*)
 		if [ -n "${SPL_BINARY}" ]; then
 			dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET}) bs=1
 			dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_NAME_SDCARD} of=${SDCARD} conv=notrunc seek=$(expr ${UBOOT_BOOTSPACE_OFFSET} \+ 0x11000) bs=1

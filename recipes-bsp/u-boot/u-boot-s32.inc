@@ -118,6 +118,8 @@ do_install_append() {
     if [ -n "${ATF_IMAGE}" ]; then
         install -d ${DEPLOY_DIR_IMAGE}
         cp ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin
+        install -d ${DEPLOY_DIR_IMAGE}/tools
+        cp ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage
     fi
 }
 

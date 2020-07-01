@@ -8,6 +8,7 @@ SRC_URI += " \
     file://externaldhcp.cfg \
     file://init.cfg \
     file://enabledhcpcopts.patch \
+    file://0001-Remove-stime-function-calls.patch \
 "
 
 # disable FTPD - as it's provided by inetutils

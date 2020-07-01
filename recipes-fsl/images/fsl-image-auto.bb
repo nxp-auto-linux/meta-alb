@@ -26,6 +26,9 @@ IMAGE_INSTALL += "dhrystone fio"
 # TODO: add them to the RDEPENDS list in the OpenMPI demo recipe
 IMAGE_INSTALL += "imagemagick gnuplot mpich mpich-dev"
 
+# Userspace support for QSPI Flash under Linux for S32GEN1 platforms
+IMAGE_INSTALL_append_gen1 = " mtd-utils "
+
 # Supporting complex evaluation scenarios
 IMAGE_INSTALL += "openssl-misc"
 IMAGE_INSTALL_append_s32 += "openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"

@@ -167,6 +167,22 @@ APTGET_HOST_PROXIES ?= ""
 APTGET_EXECUTABLE ?= "/usr/bin/apt-get"
 APTGET_DEFAULT_OPTS ?= "-qy -o=Dpkg::Use-Pty=0"
 
+aptget_determine_host_proxies() {
+	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
+	if [ -z "$ENV_HOST_PROXIES" ]; then
+		if [ -n "${http_proxy}" ]; then
+			ENV_HOST_PROXIES="$ENV_HOST_PROXIES http_proxy=${http_proxy}"
+		fi
+		if [ -n "${https_proxy}" ]; then
+			ENV_HOST_PROXIES="$ENV_HOST_PROXIES https_proxy=${https_proxy}"
+		fi
+		if [ -n "${ftp_proxy}" ]; then
+			ENV_HOST_PROXIES="$ENV_HOST_PROXIES ftp_proxy=${ftp_proxy}"
+		fi
+	fi
+	export ENV_HOST_PROXIES="$ENV_HOST_PROXIES"
+}
+
 aptget_update_presetvars() {
 	export PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
 
@@ -194,10 +210,16 @@ aptget_update_presetvars() {
         # Environment setup needs to be done every time in
         # aptget_update_presetvars
 
-	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
+	aptget_determine_host_proxies
 	while [ -n "$ENV_HOST_PROXIES" ]; do
-		IFS=" =_" read -r proxy_type proxy_string proxy_val ENV_HOST_PROXIES <<END_PROXY
+		IFS=" " read -r proxy_line ENV_HOST_PROXIES <<END_PROXY
 $ENV_HOST_PROXIES
+END_PROXY
+		IFS="=" read -r proxy_name proxy_val <<END_PROXY
+$proxy_line
+END_PROXY
+		IFS="_" read -r proxy_type proxy_string <<END_PROXY
+$proxy_name
 END_PROXY
 		if [ "$proxy_string" != "proxy" ]; then
 			# We already warn when setting up the rootfs
@@ -226,10 +248,16 @@ fakeroot aptget_setup_proxies() {
         xf="/__etc_apt_apt.conf.d_01yoctoinstallproxies__"
         rm -f "${APTGET_CHROOT_DIR}$xf"
 
-	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
+	aptget_determine_host_proxies
 	while [ -n "$ENV_HOST_PROXIES" ]; do
-		IFS=" =_" read -r proxy_type proxy_string proxy_val ENV_HOST_PROXIES <<END_PROXY
+		IFS=" " read -r proxy_line ENV_HOST_PROXIES <<END_PROXY
 $ENV_HOST_PROXIES
+END_PROXY
+		IFS="=" read -r proxy_name proxy_val <<END_PROXY
+$proxy_line
+END_PROXY
+		IFS="_" read -r proxy_type proxy_string <<END_PROXY
+$proxy_name
 END_PROXY
 		if [ "$proxy_string" != "proxy" ]; then
 			bbwarn "Invalid proxy \"$proxy\""
@@ -251,7 +279,7 @@ END_PROXY
 		echo >>"${APTGET_CHROOT_DIR}$xf" "$proxy"
 	done
 
-        if [ -e $xf ]; then
+        if [ -e "${APTGET_CHROOT_DIR}$xf" ]; then
                 aptget_always_install_faketool "/etc/apt/apt.conf.d/01yoctoinstallproxies" $xf
         fi
 }

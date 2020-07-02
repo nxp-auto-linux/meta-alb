@@ -4,5 +4,7 @@ SRC_URI += " \
 "
 
 do_install_append() {
-	install -m 0644 ${WORKDIR}/default_urandom ${D}${sysconfdir}/default/rng-tools
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+		install -m 0644 ${WORKDIR}/default_urandom ${D}${sysconfdir}/default/rng-tools
+	fi
 }

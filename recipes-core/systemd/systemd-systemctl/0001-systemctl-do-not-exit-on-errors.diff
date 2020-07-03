@@ -1,0 +1,34 @@
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Fri, 16 Nov 2018 10:58:32 +0200
+Subject: [PATCH] systemctl-native: do not exit on missing units
+
+This workaround is used in order to ensure images are successfully completed,
+even if some services are missing.
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+---
+ systemctl | 4 +++-
+ 1 file changed, 4 insertion(+), 1 deletion(-)
+
+diff a/systemctl b/systemctl
+--- a/systemctl
++++ b/systemctl
+@@ -175,7 +175,8 @@
+             if path.exists():
+                 return path
+
+-        raise SystemdUnitNotFoundError(self.root, unit)
++        print("Could not find systemd unit {} in {}".format(unit, self.root))
++        return None
+
+     def _process_deps(self, config, service, location, prop, dirstem):
+         systemdir = self.root / SYSCONFDIR / "systemd" / "system"
+@@ -201,6 +202,8 @@
+             unit = self.unit
+
+         path = self._path_for_unit(unit)
++        if path is None:
++            return None
+
+         if path.is_symlink():
+             # ignore aliases

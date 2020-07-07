@@ -1,0 +1,54 @@
+From 8decc1cf91defb1ccb6d0411063a8cab9ae625f5 Mon Sep 17 00:00:00 2001
+From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+Date: Wed, 30 Oct 2019 01:37:24 +0200
+Subject: [PATCH] vnet: remove iommu-map for pcie in dts
+
+This is a workaround for vnet, to fix arm-smmu errors:
+"arm-smmu 5000000.iommu: Unhandled context fault: fsr=0x402,iova=0x83a0000000, fsynr=0x0, cb=2"
+
+Signed-off-by: Radu Morus <Radu.Morus@nxp.com>
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+[Rebased on 5.4]
+Signed-off-by: Priyanka Jain <priyanka.jain@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+index 30929586970f..cad6f5c34627 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+@@ -634,7 +634,6 @@
+			num-viewport = <6>;
+			bus-range = <0x0 0xff>;
+			msi-parent = <&its>;
+-			iommu-map = <0 &smmu 0 1>;	/* This is fixed-up by u-boot */
+			#interrupt-cells = <1>;
+			interrupt-map-mask = <0 0 0 7>;
+			interrupt-map = <0000 0 0 1 &gic 0 0 0 109 4>,
+@@ -656,7 +655,6 @@
+			num-viewport = <6>;
+			bus-range = <0x0 0xff>;
+			msi-parent = <&its>;
+-			iommu-map = <0 &smmu 0 1>;	/* This is fixed-up by u-boot */
+			#interrupt-cells = <1>;
+			interrupt-map-mask = <0 0 0 7>;
+			interrupt-map = <0000 0 0 1 &gic 0 0 0 114 4>,
+@@ -678,7 +676,6 @@
+			num-viewport = <256>;
+			bus-range = <0x0 0xff>;
+			msi-parent = <&its>;
+-			iommu-map = <0 &smmu 0 1>;	/* This is fixed-up by u-boot */
+			#interrupt-cells = <1>;
+			interrupt-map-mask = <0 0 0 7>;
+			interrupt-map = <0000 0 0 1 &gic 0 0 0 119 4>,
+@@ -700,7 +697,6 @@
+			num-viewport = <6>;
+			bus-range = <0x0 0xff>;
+			msi-parent = <&its>;
+-			iommu-map = <0 &smmu 0 1>;	/* This is fixed-up by u-boot */
+			#interrupt-cells = <1>;
+			interrupt-map-mask = <0 0 0 7>;
+			interrupt-map = <0000 0 0 1 &gic 0 0 0 124 4>,
+--
+2.7.4

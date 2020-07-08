@@ -18,7 +18,8 @@
 #   APTGET_EXTRA_PACKAGES_LAST - the list of debian packages (space separated) to be
 #                           installed over the existing root filesystem, after all packages
 #                           in APTGET_EXTRA_PACKAGES is installed and all operations in
-#                           'do_aptget_update' have been executed
+#                           'do_aptget_userupdate' have been executed.
+#							'do_aptget_finaluserupdate' will be executed then.
 #   APTGET_EXTRA_SOURCE_PACKAGES - the list of debian source packages (space separated)
 #                                  to be installed over the existing root filesystem
 #   APTGET_EXTRA_PACKAGES_SERVICES_DISABLED - the list of debian packages (space separated)
@@ -46,8 +47,11 @@
 #                      to automatically correct dependencies
 #   APTGET_INIT_PACKAGES - (optional) For apt to work right on arbitrary setups, some
 #                      minimum packages are needed. This is preset appropriately but may be changed.
-# - define function 'do_aptget_user_update' (optional) containing all custom processing that
+# - append to function 'do_aptget_user_update' (optional) containing all custom processing that
 #          normally require to be executed under chroot (with root privileges)
+# - append to function 'do_aptget_user_finalupdate' (optional) containing all custom processing that
+#          normally require to be executed under chroot (with root privileges)
+# 		   after APTGET_EXTRA_PACKAGES_LAST has been processed.
 # - call function 'do_aptget_update' either directly (e.g. call it from 'do_install')
 #        or indirectly (e.g. add it to the variable 'ROOTFS_POSTPROCESS_COMMAND')
 #
@@ -773,7 +777,20 @@ fakeroot do_aptget_user_update() {
 	:
 }
 
-fakeroot aptget_update_end() {
+# Must have to preset all variables properly. It also means that
+# the user of this class should not prepend to avoid ordering issues.
+fakeroot do_aptget_user_finalupdate_prepend() {
+
+	aptget_update_presetvars;
+}
+
+# empty placeholder, override it in parent script for more functionality
+fakeroot do_aptget_user_finalupdate() {
+
+	:
+}
+
+fakeroot aptget_update_extrapackageslast() {
 
 	aptget_update_presetvars;
 
@@ -782,6 +799,17 @@ fakeroot aptget_update_end() {
 		aptget_run_aptget install ${APTGET_EXTRA_PACKAGES_LAST}
 	fi
 
+	if [ $aptgetfailure -ne 0 ]; then
+		bberror "${APTGET_EXECUTABLE} failed to execute as expected!"
+		return $aptgetfailure
+	fi
+}
+
+fakeroot aptget_update_end() {
+
+	aptget_update_presetvars;
+
+	aptgetfailure=0
 	# Once we have done the installation, save off the package
 	# cache locally for repeated use of recipe building
 	aptget_save_cache_into_sstate
@@ -801,17 +829,45 @@ fakeroot aptget_update_end() {
 	# networking config of our target rootfs.
         aptget_delete_faketool "/etc/hosts" "/__etchosts__"
         aptget_delete_faketool "/etc/resolv.conf" "/__etcresolvconf__"
-
-	if [ $aptgetfailure -ne 0 ]; then
-		bberror "${APTGET_EXECUTABLE} failed to execute as expected!"
-		return $aptgetfailure
-	fi
 }
 
 python do_aptget_update() {
     bb.build.exec_func("aptget_update_begin", d);
     bb.build.exec_func("do_aptget_user_update", d);
+    bb.build.exec_func("aptget_update_extrapackageslast", d);
+    bb.build.exec_func("do_aptget_user_finalupdate", d);
     bb.build.exec_func("aptget_update_end", d);
+}
+
+# We don't want to simply use the image.bbclass invocation of systemctl
+# because that setup may be not quite compatible to our target rootfs.
+# So if the target rootfs provides systemctl, we use the target rootfs
+# version instead for better compatibility. Using the native one may
+# just lead to failure on a complex rootfs that relies on full
+# functionality (as is happening for Ubuntu 20 in a complex image setup 
+# with sshd.service). The Yocto systemctl is not the real thing.
+# The solution is to do the equivalent of
+# image.bbclass/systemd_preset_all when finishing up the Ubuntu install,
+# but in the Ubuntu rootfs chroot context with the proper variable setup.
+# We still provide the fallback to have classic behavior in the unlikely
+# case of a weird target rootfs without systemctl.
+IMAGE_FEATURES_append = " stateless-rootfs"
+fakeroot do_aptget_user_finalupdate_append() {
+	# This code is only executed when an image is built so that it
+	# does not affect non-image package generation.
+	if [ -n "${IMGDEPLOYDIR}" ]; then
+		if [ -e "${APTGET_CHROOT_DIR}${root_prefix}/lib/systemd/systemd" ]; then
+			bbnote "Presetting systemd services via systemctl..."
+			if [ -e "${APTGET_CHROOT_DIR}${root_prefix}/bin/systemctl" ]; then
+				chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/bin/systemctl --root=/ --preset-mode=enable-only preset-all
+			else
+				# Fall back to the image.bbclass systemd_preset_all method
+				# using the fake systemctl script
+				systemctl --root="${APTGET_CHROOT_DIR}" --preset-mode=enable-only preset-all
+			fi
+			bbnote "Done presetting systemd services via systemctl"
+		fi
+	fi
 }
 
 # The various apt packages need to be translated properly into Yocto

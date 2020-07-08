@@ -28,5 +28,7 @@ SRC_URI += " \
     file://0001-pseudo-Another-missing-EAR3-patch.patch \
     file://0001-pseudo-Diagnostic-cleanup-for-utimensat.patch \
     file://0001-pseudo-realpath-wrapper-did-not-chroot-translation-p.patch \
+\
+    file://0001-pseudo-did-not-treat-softlinks-correctly-in-chroot.patch \
 "
 

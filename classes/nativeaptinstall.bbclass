@@ -413,7 +413,7 @@ for i in \$args; do
                         ;;
                 list-units)
                         echo "UNIT          LOAD   ACTIVE SUB    DESCRIPTION"
-                        echo "rescue.target loaded active active Yoco Installation"
+                        echo "rescue.target loaded active active Yocto Installation"
                         exit 0
                         ;;
                 is-active|is-failed)
@@ -423,7 +423,7 @@ for i in \$args; do
                 daemon-reload|daemon-reexec|reload|restart)
                         exit 0
                         ;;
-                list-sockets|list-tiemrs|status|list-machines)
+                list-sockets|list-timers|status|list-machines)
                         # Silent ok
                         exit 0
                         ;;

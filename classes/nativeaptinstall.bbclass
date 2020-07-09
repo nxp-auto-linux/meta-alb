@@ -870,6 +870,27 @@ fakeroot do_aptget_user_finalupdate_append() {
 	fi
 }
 
+# This function is a "safe" trick to run something once on startup
+# in a systemd environment.
+# aptget_install_oneshot_service <name> <description> <command>
+# aptget_install_oneshot_service "makescripts" "Build kernel scripts" "/usr/bin/make V=1 -C /usr/src/kernel scripts"
+fakeroot aptget_install_oneshot_service() {
+	cat >"${APTGET_CHROOT_DIR}${root_prefix}/lib/systemd/system/nxpyocto_$1.service" <<EOF
+[Unit]
+Description=NXP Yocto: $2
+
+[Service]
+Type=oneshot
+ExecStart=$3
+ExecStartPost=${root_prefix}/bin/systemctl disable %n
+
+[Install]
+WantedBy=default.target
+EOF
+	chmod 0644 "${APTGET_CHROOT_DIR}${root_prefix}/lib/systemd/system/nxpyocto_$1.service"
+	chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/bin/systemctl enable nxpyocto_$1.service
+}
+
 # The various apt packages need to be translated properly into Yocto
 # RPROVIDES_${PN}
 APTGET_ALL_PACKAGES = "\

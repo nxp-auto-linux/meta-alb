@@ -1,32 +1,35 @@
-From cb8e73f54e9113b92d200302764da0471a1e23c2 Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Mon, 24 Apr 2017 18:10:07 +0200
+From 25d43dc4b8c3f1a578c34faec7db67191d8eca0f Mon Sep 17 00:00:00 2001
+From: Priyanka Jain <priyanka.jain@nxp.com>
+Date: Mon, 6 Jul 2020 14:18:45 +0530
 Subject: [PATCH] kernel: Added BB Mini device tree
 
+Signed-off-by: Heinz Wrobel <heinz.wrobel@nxp.com>
+[Rebased to Linux 5.4]
+Signed-off-by: Priyanka Jain <priyanka.jain@nxp.com>
 ---
- arch/arm64/boot/dts/freescale/Makefile             |   1 +
- .../boot/dts/freescale/fsl-ls2084a-bbmini.dts      | 161 +++++++++++++++++++++
- 2 files changed, 162 insertions(+)
+ arch/arm64/boot/dts/freescale/Makefile        |   1 +
+ .../boot/dts/freescale/fsl-ls2084a-bbmini.dts | 157 ++++++++++++++++++
+ 2 files changed, 158 insertions(+)
  create mode 100644 arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
 
 diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
-index 6d5df45bd705..0e7890287946 100644
+index 5e05e0be3aeb..030a226bfec8 100644
 --- a/arch/arm64/boot/dts/freescale/Makefile
 +++ b/arch/arm64/boot/dts/freescale/Makefile
-@@ -10,6 +10,7 @@ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2080a-rdb.dtb
+@@ -45,6 +45,7 @@ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2081a-rdb.dtb
  dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2080a-simu.dtb
  dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2088a-qds.dtb
  dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2088a-rdb.dtb
 +dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2084a-bbmini.dtb
-  
- always		:= $(dtb-y)
- subdir-y	:= $(dts-dirs)
+ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-lx2160a-qds.dtb
+ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-lx2160a-rdb.dtb
+
 diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
 new file mode 100644
-index 000000000000..6472bb27598a
+index 000000000000..5df9e634fad6
 --- /dev/null
 +++ b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
-@@ -0,0 +1,161 @@
+@@ -0,0 +1,157 @@
 +/*
 + * Device Tree file for NXP BlueBox Mini
 + *
@@ -74,10 +77,6 @@ index 000000000000..6472bb27598a
 +	     compatible = "fsl,ls2088a-qds-qixis", "fsl,ls2080a-qds-qixis",
 +			  "fsl,fpga-qixis";
 +	};
-+};
-+
-+&ftm0 {
-+	status = "okay";
 +};
 +
 +&i2c0 {
@@ -188,6 +187,5 @@ index 000000000000..6472bb27598a
 +&dpmac7 {
 +	phy-handle = <&mdio2_phy3>;
 +};
--- 
-2.12.2
-
+--
+2.7.4

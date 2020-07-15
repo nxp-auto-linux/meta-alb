@@ -1,12 +1,11 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
+PV = "5.4"
 SRC_URI += "\
 	file://0001-kernel-LS2-RDB-device-tree-was-not-quite-correct.patch \
 	file://0001-kernel-Added-phy-ioctl-support-to-the-DPAA2-dpmac-dr.patch \
-	file://0001-kernel-phylib-ioctl-now-translates-C45-properly-for-.patch \
-\
-	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-wh.patch \
-	file://0001-dpaa2-eth-Keep-the-correspondence-between-dpni-id-an.patch \
+	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-wh-5.4.patch \
+    file://0001-dpaa2-eth-Keep-the-correspondence-between-dpni-id-4.19.patch \
 "
 
 # We don't know at this stage if we want to keep or drop these. They

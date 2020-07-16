@@ -1,17 +1,20 @@
-From 75cc74dd98e68ddfe62046d4d4839dcd5d8af49a Mon Sep 17 00:00:00 2001
+From 827c85db189da21275044b1c42e7eab3af138eb2 Mon Sep 17 00:00:00 2001
 From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-Date: Fri, 15 May 2020 15:14:15 +0000
+Date: Thu, 16 Jul 2020 10:05:26 +0300
 Subject: [PATCH] sja: Update sja for kernel 5.4
 
 Removed unused APIs, updated the ones that changed.
+Add a call to 'phy_start' in 'attach_phydev' method in order
+to perform aneg settings and schedule a link state check.
 
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
 ---
- switchdev/src/sja1105p_switchdev.c | 119 +------------------------------------
- 1 file changed, 2 insertions(+), 117 deletions(-)
+ switchdev/src/sja1105p_switchdev.c | 120 +----------------------------
+ 1 file changed, 4 insertions(+), 116 deletions(-)
 
 diff --git a/switchdev/src/sja1105p_switchdev.c b/switchdev/src/sja1105p_switchdev.c
-index 9a46fb6..6c5f928 100644
+index 9a46fb6..824cdb8 100644
 --- a/switchdev/src/sja1105p_switchdev.c
 +++ b/switchdev/src/sja1105p_switchdev.c
 @@ -65,7 +65,7 @@ static struct nxp_private_data_struct nxp_private_data;
@@ -154,7 +157,7 @@ index 9a46fb6..6c5f928 100644
  /******************************registration************************************/
  /* get the device tree node corresponding to a given logical port,
   * returns NULL if not found
-@@ -924,11 +816,6 @@ void attach_phydev(struct net_device *netdev)
+@@ -924,10 +816,8 @@ void attach_phydev(struct net_device *netdev)
  	if (err)
  		goto phydev_attach_error;
  
@@ -162,11 +165,12 @@ index 9a46fb6..6c5f928 100644
 -	 * This ensures adjust_link() is called at least once
 -	 */
 -	phydev->state = PHY_CHANGELINK;
--
++	/* schedule a link state check */
++	phy_start(phydev);
+ 
  	if (verbosity > 0)
  		netdev_alert(netdev, "connected phy [%x] (state: [%x], link [%x]) to port [%d], attached_dev [%s]\n",
- 			phydev->mdio.addr, phydev->state, phydev->link, nxp_port->port_num, (phydev->attached_dev)?phydev->attached_dev->name:"none");
-@@ -1023,8 +910,6 @@ int register_ports(struct nxp_private_data_struct *pr_data)
+@@ -1023,8 +913,6 @@ int register_ports(struct nxp_private_data_struct *pr_data)
  
  		/* populate netdev */
  		netdev->netdev_ops = &nxp_port_netdev_ops;
@@ -176,5 +180,5 @@ index 9a46fb6..6c5f928 100644
  		/* Flags:
  		 * 	- Does not change network namespaces. Device is network
 -- 
-2.7.4
+2.17.1
 

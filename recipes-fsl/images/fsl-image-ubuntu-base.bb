@@ -7,6 +7,7 @@ PV = "${@d.getVar('PREFERRED_VERSION_ubuntu-base', True) or '1.0'}"
 
 IMAGE_LINGUAS = ""
 IMAGE_INSTALL = ""
+DEPENDS += "shadow-native"
 inherit image
 export PACKAGE_INSTALL = "${IMAGE_INSTALL}"
 

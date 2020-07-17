@@ -16,7 +16,7 @@ inherit nativeaptinstall
 APTGET_CHROOT_DIR = "${IMAGE_ROOTFS}"
 APTGET_SKIP_UPGRADE = "1"
 
-ROOTFS_POSTPROCESS_COMMAND_append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager;"
+ROOTFS_POSTPROCESS_COMMAND_append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager; do_systemd_service_fixup; do_getty_fixup; "
 
 # This must be added first as it provides the foundation for
 # subsequent modifications to the rootfs
@@ -144,6 +144,36 @@ fakeroot do_enable_network_manager() {
 	set +x
 }
 
+fakeroot do_systemd_service_fixup() {
+	# The systemd preset will enable @ services but doesn't know
+	# about their corresponding device name, so we get bad links
+	# in the systemd config referencing nothing. This confuses the
+	# startup and leads to unnecessary waits
+	find ${APTGET_CHROOT_DIR}${sysconfdir}/systemd -name "*@.service" -execdir rm {} \;
+}
+
+fakeroot do_getty_fixup() {
+	# Our machine configuration specifies which TTY's are to be used.
+	# This code is similar to the Yocto systemd-serialgetty.bb
+	# recipe. We ignore the baudrate currently however, and leave
+	# this up to Ubuntu
+	if [ ! -z "${SERIAL_CONSOLES}" ] ; then
+		if [ -d ${APTGET_CHROOT_DIR}${sysconfdir}/systemd/system/getty.target.wants/ ]; then
+			if [ -e ${APTGET_CHROOT_DIR}${systemd_unitdir}/system/serial-getty@.service ]; then
+
+				tmp="${SERIAL_CONSOLES}"
+				for entry in $tmp ; do
+					baudrate=`echo $entry | sed 's/\;.*//'`
+					ttydev=`echo $entry | sed -e 's/^[0-9]*\;//' -e 's/\;.*//'`
+
+					# enable the service
+					ln -sf ${systemd_unitdir}/system/serial-getty@.service \
+						${APTGET_CHROOT_DIR}${sysconfdir}/systemd/system/getty.target.wants/serial-getty@$ttydev.service
+				done
+			fi
+		fi
+	fi
+}
 
 IMAGE_ROOTFS_SIZE ?= "8192"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"

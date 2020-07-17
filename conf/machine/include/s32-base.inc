@@ -42,7 +42,7 @@ MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 
 # we do not want to have getty running on tty1 as we run
 # auto-serial-console there USE_VT = "0"
-SERIAL_CONSOLE ?= "115200 ttyLF0"
+SERIAL_CONSOLES ?= "115200;ttyLF0"
 
 SOC_DEFAULT_IMAGE_FSTYPES = "tar.gz"
 IMAGE_FSTYPES ?= "${SOC_DEFAULT_IMAGE_FSTYPES}"

@@ -12,7 +12,7 @@ B = "${WORKDIR}/build"
 
 # ATF repository
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https;branch=alb/master"
-SRCREV ?= "545960eceb3d4fabd2cc48d838187a07a5b62297"
+SRCREV ?= "b770f35efdf033329f75148c343cf897792fd853"
 
 SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 

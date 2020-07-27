@@ -1,7 +1,7 @@
 Linux: 4.19.31
 Linux-rt: 4.19.31-rt18
 Linux versions: 4.19 4.14
-U-boot: 2018.07
+U-boot: 2020.04
 Ubuntu target: 16.04.3
 Yocto: 3.0 "zeus"
 Gcc: linaro-6.3-r2017.02

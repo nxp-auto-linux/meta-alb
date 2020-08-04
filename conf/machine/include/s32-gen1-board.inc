@@ -29,3 +29,6 @@ IMAGE_FSTYPES += "${FLASHIMAGE_ROOTFS_SUFFIX}"
 # Add extra sdcard partition with rootfs image if Xen enabled
 SDCARD_ROOTFS_EXTRA1 = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${SDCARD_ROOTFS}', '', d)}"
 SDCARD_ROOTFS_EXTRA1_SIZE = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${ROOTFS_SIZE}', '0', d)}"
+
+# Reserve a binary space of 0x1f0000, needed when TF-A and HSE_FW are used.
+SDCARD_BINARY_SPACE = "2031616"

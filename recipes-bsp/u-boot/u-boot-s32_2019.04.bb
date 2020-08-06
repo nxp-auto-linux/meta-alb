@@ -1,6 +1,6 @@
 require recipes-bsp/u-boot/u-boot-s32.inc
 
-SRC_URI_prepend = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=alb-2019.04 "
+SRC_URI_prepend = "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https;branch=release/bsp25.2 "
 
 SRCREV = "63065a52b26a7bf781947b0b6f93408ac9317786"
 

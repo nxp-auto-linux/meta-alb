@@ -15,6 +15,7 @@ EXTRA_OEMAKE_append_s32v2xx += "CONFIG_EARLY_PRINTK=s32v2xx"
 
 FILES_${PN}-scripts-common += " ${sysconfdir}/xen/*.cfg"
 
+addtask deploy after do_install
 do_deploy_append() {
 	# Create relative symbolic link for xen
 	if [ -f ${D}/boot/xen ]; then

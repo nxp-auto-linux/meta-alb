@@ -16,7 +16,7 @@ PFE_FW_BIN ?= "s32g_pfe_class.fw"
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
 	file://${PFE_LOCAL_FIRMWARE_DIR}/${PFE_FW_BIN} \
 	"
-SRCREV = "b7e4db0073d606f0ef0dd7d637a75dee64956afb"
+SRCREV = "c05d882a4a743439a995a275635525c9aadd0b42"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
 # since 'aarch64-fsl-linux-strip' fails with error code 1 when parsing the firmware

@@ -1,5 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
+# Equivalent to the LSDK 20.04 release
+SRCREV = "c5f3ab9ac163f5c86a5c1ed163afaf24f2eea669"
+
 COMMONSRC_URI = " \
 	file://0001-kernel-Added-BB-Mini-device-tree-4.19.patch \
 	file://0001-gpio-workaround-for-gpio-interrupts.patch \

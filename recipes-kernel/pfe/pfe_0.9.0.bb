@@ -1,6 +1,6 @@
 # Copyright 2019-2020 NXP
 #
-# This is the PFE driver for Linux kernel 4.19
+# This is the PFE driver for Linux kernel 4.19 and 5.4
 
 SUMMARY = "Linux driver for the Packet Forwarding Engine hardware"
 LICENSE = "Freescale-EULA"
@@ -16,7 +16,7 @@ PFE_FW_BIN ?= "s32g_pfe_class.fw"
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
 	file://${PFE_LOCAL_FIRMWARE_DIR}/${PFE_FW_BIN} \
 	"
-SRCREV = "3a65aba0df68558e28f2ba7eb6ca58e6c4f8f941"
+SRCREV = "b7e4db0073d606f0ef0dd7d637a75dee64956afb"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
 # since 'aarch64-fsl-linux-strip' fails with error code 1 when parsing the firmware
@@ -31,7 +31,7 @@ INSTALL_DIR = "${D}/lib/modules/${KERNEL_VERSION}/kernel/drivers/net/ethernet/nx
 FW_INSTALL_DIR = "${D}/lib/firmware"
 FW_INSTALL_NAME ?= "s32g_pfe_class.fw"
 
-EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 all"
+EXTRA_OEMAKE_append = " KBUILD_MODPOST_WARN=0 KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 all"
 
 module_do_install() {
 	install -D ${MDIR}/pfeng.ko ${INSTALL_DIR}/pfeng.ko

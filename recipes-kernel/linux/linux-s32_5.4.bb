@@ -1,7 +1,7 @@
 require recipes-kernel/linux/linux-s32.inc
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb-5.4"
-SRCREV = "8853bd0d505611ee28045fac3304ce5064b38a2e"
+SRCREV = "a61df2b50dced4c83b8af1fb484ec3dcedfda7a1"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 

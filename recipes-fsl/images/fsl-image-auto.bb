@@ -22,6 +22,8 @@ IMAGE_INSTALL += " \
 # Benchmark tools
 IMAGE_INSTALL += "dhrystone fio"
 
+IMAGE_INSTALL_append_gen1 = " perf"
+
 # Add packages required for OpenMPI demo
 # TODO: add them to the RDEPENDS list in the OpenMPI demo recipe
 IMAGE_INSTALL += "imagemagick gnuplot mpich mpich-dev"

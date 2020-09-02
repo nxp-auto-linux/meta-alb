@@ -20,8 +20,12 @@ PE = "1"
 SRC_URI[md5sum] = "aa0fd134249c113daf977e2300ea4394"
 FSL_LOCAL_MIRROR ?= "file://."
 
+KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
+KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
+GPU_VIV_VERSION = "${@oe.utils.conditional('KERNEL_VER', '5.4', '6.4.0.p2', '6.2.4.p4', d)}"
+
 SRC_URI = " git://source.codeaurora.org/external/autobsps32/gpu;branch=alb/master;protocol=https \
-           ${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-6.4.0.p2-hardfp.run;fsl-eula=true \
+           ${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-${GPU_VIV_VERSION}-hardfp.run;fsl-eula=true \
           "
 SRCREV = "926c8e57ec103740ede3a8ad9c264e8cbc8c03fc"
 
@@ -33,7 +37,7 @@ LIC_FILES_CHKSUM = "file://${S}/test/sdk/inc/gc_sdk.h;endline=26;md5=e4ea72ff916
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} V=1'
 
 do_compile_prepend() {
-    export VIVANTE_USERSPACE="${WORKDIR}/gpu-viv-bin-s32v234-6.4.0.p2-hardfp"
+    export VIVANTE_USERSPACE="${WORKDIR}/gpu-viv-bin-s32v234-${GPU_VIV_VERSION}-hardfp"
     export ORIG_LFLAGS=" --sysroot=${PKG_CONFIG_SYSROOT_DIR} ${LDFLAGS}"
     export ORIG_PFLAGS=" --sysroot=${PKG_CONFIG_SYSROOT_DIR} ${LDFLAGS}"
     export CXXFLAGS=" --sysroot=${PKG_CONFIG_SYSROOT_DIR} ${CXXFLAGS} "

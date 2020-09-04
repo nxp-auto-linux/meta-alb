@@ -3,8 +3,8 @@
 # This is the PFE driver for Linux kernel 4.19 and 5.4
 
 SUMMARY = "Linux driver for the Packet Forwarding Engine hardware"
-LICENSE = "Freescale-EULA"
-LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=116de28c37181b72b36566106a941904"
+LICENSE = "GPL-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE-GPL2.txt;md5=5dcdfe25f21119aa5435eab9d0256af7"
 
 inherit module deploy
 

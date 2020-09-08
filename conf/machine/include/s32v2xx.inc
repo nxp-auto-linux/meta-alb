@@ -16,7 +16,7 @@ IMAGE_CLASSES += "image_types_fsl_sdcard"
 IMAGE_CLASSES += "image_types_fsl_flashimage"
 
 UBOOT_CONFIG ?= "sdcard"
-UBOOT_CONFIG[sdcard] = "${MACHINE}_config,,u-boot.${UBOOT_SUFFIX}"
+UBOOT_CONFIG[sdcard] ?= "${MACHINE}_config,,u-boot.${UBOOT_SUFFIX}"
 
 # Setting the following variable disables the AVB TX queues (1 and 2) on S32V234 
 # to prevent a FEC TX queue timeout that occurs when using NFS root filesystem.

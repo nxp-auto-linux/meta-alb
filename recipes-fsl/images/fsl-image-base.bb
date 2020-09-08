@@ -48,3 +48,6 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-i
 # Enable Xen and add Xen Packages
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-xen.inc', '', d)}
 
+# S32V234 camera card support
+IMAGE_INSTALL_append_s32v234campp = " init-net"
+

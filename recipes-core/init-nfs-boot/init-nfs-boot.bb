@@ -1,4 +1,4 @@
-# Copyright 2017-2018 NXP
+# Copyright 2017-2020 NXP
 # Copy local init script in rootfs init
 
 LICENSE = "MIT"
@@ -6,15 +6,17 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SUMMARY = "Add custom nfs init script in rootfs"
 
-inherit insane
+INIT_SCRIPT ?= "init-nfs-boot"
+
+DEPENDS_append_s32v234campp += "init-net"
 
 SRC_URI += " \
-    file://init-nfs-boot \
+    file://${INIT_SCRIPT} \
 "
 FILES_${PN} += "/init"
 
 do_install() {
-    install -m 755 ${WORKDIR}/init-nfs-boot ${D}/${base_prefix}/init
+    install -m 755 ${WORKDIR}/${INIT_SCRIPT} ${D}/${base_prefix}/init
 }
 
 # Needed to avoid warning concerning /bin/bash

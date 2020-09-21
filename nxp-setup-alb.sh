@@ -19,7 +19,7 @@
 #
 # Add options for the script
 # Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
-# Copyright 2016-2018 NXP
+# Copyright 2016-2018, 2020 NXP
 #  Modifications by:
 #          Heinz Wrobel <heinz.wrobel@nxp.com>
 #          Ionut Vicovan <ionut.vicovan@nxp.com>
@@ -266,6 +266,7 @@ LAYER_LIST=" \
     meta-alb \
     meta-alb-dev \
     meta-vnp \
+    meta-gvip \
     \
     $extra_layers \
 "

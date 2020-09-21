@@ -62,39 +62,6 @@ do_merge_delta_config() {
 }
 addtask merge_delta_config before do_configure after do_patch
 
-
-
-do_compile_append() {
-    if [ ${SOC_FAMILY} = "s32:s32v:s32v2xx" ]; then
-        unset i j k
-        for config in ${UBOOT_MACHINE}; do
-            i=`expr $i + 1`;
-            for type in ${UBOOT_CONFIG}; do
-                j=`expr $j + 1`;
-                for binary in ${UBOOT_BINARIES}; do
-                    k=`expr $k + 1`
-                    if [ $j -eq $i ] && [ $k -eq $i ]; then
-                        # Generate an u-boot image which can be flashed and booted via QSPI
-                        if [ "qspi" = "${type}" ];then
-                            cp -r ${S}/tools/s32v234-qspi/ ${B}/${config}/tools/s32v234-qspi/
-                            cd ${B}/${config}/tools/s32v234-qspi/
-                            oe_runmake
-                            mv -f ${B}/${config}/${binary} ${B}/${config}/${binary}.nospi
-                            cp ${B}/${config}/tools/s32v234-qspi/${binary}.qspi ${B}/${config}/${binary}
-                            cp ${B}/${config}/${binary} ${B}/${config}/u-boot-${type}.${UBOOT_SUFFIX}
-                            cd -
-                        fi
-                        cp ${config}/${binary} ${config}/u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX}
-                    fi
-                done
-                unset k
-            done
-            unset j
-        done
-        unset i
-    fi
-}
-
 ENV_STAGE_DIR = "${datadir}/env"
 
 do_install_append() {

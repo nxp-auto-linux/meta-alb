@@ -265,6 +265,7 @@ LAYER_LIST=" \
     \
     meta-alb \
     meta-alb-dev \
+    meta-aa-integration \
     meta-vnp \
     meta-gvip \
     \

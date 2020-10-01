@@ -19,5 +19,4 @@ do_install() {
     install -m 755 ${WORKDIR}/${INIT_SCRIPT} ${D}/${base_prefix}/init
 }
 
-# Needed to avoid warning concerning /bin/bash
-INSANE_SKIP_${PN} = "file-rdeps"
+RDEPENDS_${PN} += "bash"

@@ -2,7 +2,8 @@
 #
 # Boot Linux from ramdisk, start networking services, insert kernel modules
 # Boot actual rootfs from NFS, as provided by command line parameters
-# Copyright 2018 NXP
+# Copyright 2018-2020 NXP
+#
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
@@ -58,19 +59,28 @@ if [ -z "$nfsroot" ]; then
 	exec /bin/bash
 fi
 
-lsmod | grep -q "^sja1105pqrs\b" > /dev/null ||
-    insmod /lib/modules/`uname -r`/kernel/drivers/spi/sja1105pqrs.ko
-lsmod | grep -q "^nxp\b" > /dev/null ||
-    insmod /lib/modules/`uname -r`/kernel/drivers/net/phy/nxp/nxp.ko
+# Setup network modules directly by insmod or by startup script
+# before enabling the networking service
+if [ -e "/init-ip-link.sh" ]; then
+	/bin/bash -c "source /init-ip-link.sh"
+else
+	lsmod | grep -q "^sja1105pqrs\b" > /dev/null ||
+	    insmod /lib/modules/`uname -r`/kernel/drivers/spi/sja1105pqrs.ko
+	lsmod | grep -q "^nxp\b" > /dev/null ||
+	    insmod /lib/modules/`uname -r`/kernel/drivers/net/phy/nxp/nxp.ko
 
-# Wait for sja to finish programming
-if lsmod | grep -q "^sja1105pqrs\b"; then
-    while [ "$(lsmod | grep "^sja1105pqrs\b" | awk '{ print $3}')" != "0" ]; do
-        sleep 1
-    done
+	# Wait for sja to finish programming
+	if lsmod | grep -q "^sja1105pqrs\b"; then
+	    while [ "$(lsmod | grep "^sja1105pqrs\b" | awk '{ print $3}')" != "0" ]; do
+		sleep 1
+	    done
+	fi
 fi
 
+echo "Starting RPCBind"
 /etc/init.d/rpcbind start
+
+echo "Starting networking"
 /etc/init.d/networking start
 
 if [ "$ip" ] && [ "$device" ]; then

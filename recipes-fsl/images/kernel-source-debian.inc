@@ -18,14 +18,18 @@ DEBIAN_TARGET_ARCH="${@d.getVar('TRANSLATED_TARGET_ARCH', True).replace("aarch64
 # Ensure minimum build dependencies are installed for target builds
 APTGET_EXTRA_PACKAGES += "coreutils make gcc bison flex mawk libssl-dev"
 
+# Build the kernel scripts and modules_prepare in QEMU/pseudo (default) or
+# build them in deferred systemd service at first boot (set it to "1")
+KERNEL_DEVSRC_DEFER_TO_SYSTEMD ?= ""
+
 fakeroot do_aptget_user_update_append() {
 
 	if [ -e "${KERNEL_CHROOT_DIR}/${KERNEL_SRC_PATH}" ]; then
-		if [ -e "${KERNEL_CHROOT_DIR}${root_prefix}/lib/systemd/system" ]; then
+		if [ -e "${KERNEL_CHROOT_DIR}${root_prefix}/lib/systemd/system" ] && [ "${KERNEL_DEVSRC_DEFER_TO_SYSTEMD}" == "1" ]; then
 			aptget_install_oneshot_service "makescripts" "Build kernel scripts" "/usr/bin/make V=1 -C ${KERNEL_SRC_PATH} scripts"
+			aptget_install_oneshot_service "makemodules" "Build kernel modules_prepare" "/usr/bin/make -C ${KERNEL_SRC_PATH} modules_prepare"
 		else
-			# Very slooooooow fallback
-			/usr/bin/yes "" | ARCH=${DEBIAN_TARGET_ARCH} chroot "${KERNEL_CHROOT_DIR}" /usr/bin/make V=1 -C "${KERNEL_SRC_PATH}" scripts
+			/usr/bin/yes "" | ARCH=${DEBIAN_TARGET_ARCH} chroot "${KERNEL_CHROOT_DIR}" /usr/bin/make -C "${KERNEL_SRC_PATH}" scripts modules_prepare ${PARALLEL_MAKE}
 		fi
 	fi
 

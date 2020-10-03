@@ -1,0 +1,155 @@
+From 49d34a85605fc0b42f37b282119d9505e93ee047 Mon Sep 17 00:00:00 2001
+From: Dan Nica <dan.nica@nxp.com>
+Date: Fri, 2 Oct 2020 20:55:36 +0300
+Subject: [PATCH] s32g274a-rdb2: Add support for S32G-VNP-RDB2
+
+On RDB2, GPIO30 is used to emulate DSPI CS.
+
+This commit also resolves some issues:
+	* The RCNT field of the SPI message was always set to the
+	  reserved value of 0.
+	* The address of the RESET_CTRL_0 register was defined
+	  incorrectly.
+	* The dev_id_idx variable was being used un-initialized
+	  in sja1110_pre_switch_upload(...)
+
+Signed-off-by: Ryder Gong <ryder.gong@nxp.com>
+Signed-off-by: Dan Nica <dan.nica@nxp.com>
+---
+ sja1110_init.c | 51 ++++++++++++++++++++++++++++++++++++++++++++-------
+ sja1110_init.h |  5 +++--
+ 2 files changed, 47 insertions(+), 9 deletions(-)
+
+diff --git a/sja1110_init.c b/sja1110_init.c
+index b8d4eaf..3b960e4 100644
+--- a/sja1110_init.c
++++ b/sja1110_init.c
+@@ -45,7 +45,8 @@
+ /*******************************************************************************
+  * Global variables
+  ******************************************************************************/
+-static const u32 device_id_list[] = {SJA1110_VAL_DEVICEID};
++static const u32 device_id_list[] = {SJA1110_VAL_DEVICEID,
++				     SJA1110_VAL_DEVICEID | 1};
+ #define NUM_DEVICE_IDS ARRAY_SIZE(device_id_list)
+ 
+ struct sja1110_state g_state;
+@@ -91,7 +92,7 @@ static u32 sja1110_read_reg(struct sja1110_priv *sja1110, u32 reg_addr)
+ 
+ 	cmd[0] = cpu_to_le32(CMD_ENCODE_RWOP(CMD_RD_OP) |
+ 			     CMD_ENCODE_ADDR(reg_addr) |
+-			     CMD_ENCODE_WRD_CNT(0));
++			     CMD_ENCODE_WRD_CNT(1));
+ 	cmd[1] = 0;
+ 
+ 	ret = sja1110_spi_transfer(sja1110, (u8*)cmd, (u8*)resp, 8, 8);
+@@ -205,13 +206,14 @@ static int sja1110_pre_switch_upload(struct sja1110_priv *sja1110,
+ 				     const u8 *cfg_data, int cfg_size)
+ {
+ 	int dev_id_idx, ret = -EINVAL;
+-	u32 registerValue, cfg_device_id;
++	u32 regval, cfg_device_id;
+ 
+ 	/* read the device id */
+-	registerValue = sja1110_read_reg(sja1110, D_ID_ADDR);
+-	if (sja1110_check_device_id(registerValue) < 0) {
++	regval = sja1110_read_reg(sja1110, D_ID_ADDR);
++	dev_id_idx = sja1110_check_device_id(regval);
++	if (dev_id_idx < 0) {
+ 		dev_err(&sja1110->spi->dev,
+-			"Device id 0x%x is not supported!\n", registerValue);
++			"Device id 0x%x is not supported!\n", regval);
+ 		goto out;
+ 	}
+ 
+@@ -443,7 +445,8 @@ static int sja1110_uc_parse_status_many(struct sja1110_priv *sja1110,
+ 			goto out;
+ 		}
+ 
+-		if (uc_status.status != DOWNLOADING ||
++		if ((uc_status.status != DOWNLOADING &&
++		     uc_status.status != VALIDATING_IMG_META_DATA) ||
+ 		    uc_status.err_code != NO_ERROR) {
+ 			dev_err(&sja1110->spi->dev,
+ 				"[%s] Upload error detected in status message %d (status=0x%x,err=0x%x)\n",
+@@ -676,6 +679,13 @@ static int sja1110_init_hw(struct sja1110_priv *sja1110)
+ 		goto out_return;
+ 	}
+ 
++	if (gpio_is_valid(sja1110->spi->cs_gpio)) {
++		if (sja1110->spi->mode & SPI_CS_HIGH)
++			gpio_set_value(sja1110->spi->cs_gpio, 1);
++		else
++			gpio_set_value(sja1110->spi->cs_gpio, 0);
++	}
++
+ 	dev_info(&sja1110->spi->dev, "[%s] loaded fw '%s'\n", __func__,
+ 		sja1110->bin_name);
+ 
+@@ -702,6 +712,12 @@ static int sja1110_init_hw(struct sja1110_priv *sja1110)
+ 
+ 
+ out_release:
++	if (gpio_is_valid(sja1110->spi->cs_gpio)) {
++		if (sja1110->spi->mode & SPI_CS_HIGH)
++			gpio_set_value(sja1110->spi->cs_gpio, 0);
++		else
++			gpio_set_value(sja1110->spi->cs_gpio, 1);
++	}
+ 	release_firmware(fw);
+ out_return:
+ 	mutex_unlock(&sja1110->lock);
+@@ -1036,6 +1052,27 @@ static int sja1110_probe(struct spi_device *spi)
+ 		/* switch static config */
+ 		dev_info(&spi->dev, "probing switch\n");
+ 
++		if (gpio_is_valid(spi->cs_gpio)) {
++			struct gpio_desc *desc = gpio_to_desc(spi->cs_gpio);
++
++			if (spi->mode & SPI_CS_HIGH)
++				ret = gpiod_direction_output_raw(desc, 0);
++			else
++				ret = gpiod_direction_output_raw(desc, 1);
++			if (ret)
++				dev_err(&spi->dev,
++					"gpiod_direction_output_raw.ret=%d\n",
++					ret);
++		} else {
++			if (spi->cs_gpio != -ENOENT) {
++				dev_err(&sja1110->spi->dev,
++				"[%s] Error: GPIO %d is set but not valid\n",
++					__func__, sja1110->spi->cs_gpio);
++				ret = -EINVAL;
++				goto out;
++			}
++		}
++
+ 		strncpy(sja1110->bin_name, config_name, PATH_LEN);
+ 		sja1110->bin_name[PATH_LEN - 1] = 0;
+ 
+diff --git a/sja1110_init.h b/sja1110_init.h
+index d8f38ec..88d0f1f 100644
+--- a/sja1110_init.h
++++ b/sja1110_init.h
+@@ -56,7 +56,8 @@ enum uc_status {
+ 	WAITING      = 0x33,
+ 	DOWNLOADING  = 0x34,
+ 	VERIFYING    = 0x35,
+-	COMPLETED    = 0x36
++	COMPLETED    = 0x36,
++	VALIDATING_IMG_META_DATA = 0x37,
+ };
+ enum uc_err_code {
+ 	SFDP_FAILURE                = 0x51,
+@@ -91,7 +92,7 @@ enum uc_err_code {
+ #define CONFIG_START_ADDRESS   (0x20000UL)  /**< Start Address of the configuration */
+ #define D_ID_ADDR              (0x0UL)      /**< Address of the deviceId register */
+ #define CONFIGURATIONFLAG_ADDR (0x1UL)      /**< Address of the configurationFlags register */
+-#define R_CTRL_ADDR            (0x1C6000UL) /**< Address of the resetCtrl register */
++#define R_CTRL_ADDR            (0x1C6100UL) /* RESET_CTRL_0 */
+ #define RESET_CTRL_COLDRESET   BIT(5)
+ #define RESET_DELAY_US         50
+ #define CGU_SPI_BASE_ADDR      (0x1C6400UL)
+-- 
+2.7.4
+

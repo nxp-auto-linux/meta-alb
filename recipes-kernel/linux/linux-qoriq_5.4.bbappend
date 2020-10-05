@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:${THISDIR}/files:"
 
 
 COMMONSRC_URI = " \
@@ -68,3 +68,5 @@ DELTA_KERNEL_DEFCONFIG_append_ls1043ardb += " pci-vdev.cfg"
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.cfg', '', d)}"
 
 SRC_URI_append_ls2084abbmini += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'file://0001-pcie-ls2-kernel-support-for-pcie-demos-icc-and-user-spa.patch', '', d)}"
+
+require gcc75compat.inc

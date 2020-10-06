@@ -27,5 +27,5 @@ FLASHIMAGE_ROOTFS_FILE = "${DEPLOY_DIR_IMAGE}/${FLASHIMAGE_ROOTFS}-${MACHINE}.${
 IMAGE_FSTYPES += "${FLASHIMAGE_ROOTFS_SUFFIX}"
 
 # Add extra sdcard partition with rootfs image if Xen enabled
-SDCARD_ROOTFS_EXTRA1 = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${SDCARD_ROOTFS}', '', d)}"
-SDCARD_ROOTFS_EXTRA1_SIZE = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${ROOTFS_SIZE}', '0', d)}"
+SDCARD_ROOTFS_EXTRA1_FILE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}', '', d)}"
+SDCARD_ROOTFS_EXTRA1_SIZE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${ROOTFS_SIZE}', '0', d)}"

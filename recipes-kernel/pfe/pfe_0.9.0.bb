@@ -64,4 +64,4 @@ RPROVIDES_${PN} = " \
 	kernel-module-pfeng${KERNEL_MODULE_PACKAGE_SUFFIX} \
 	"
 
-COMPATIBLE_MACHINE = "s32g274aevb|s32g274ardb"
+COMPATIBLE_MACHINE = "s32g274aevb|s32g274ardb|s32g274ardb2"

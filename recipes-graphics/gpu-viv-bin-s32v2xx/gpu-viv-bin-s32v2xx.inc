@@ -30,12 +30,12 @@ inherit fsl-auto-eula-unpack pkgconfig
 # of the binaries for different version of kernel.
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
-PV = "${@oe.utils.conditional("KERNEL_VER", "4.1", "6.2.2", "6.4.0", d)}"
+PV = "${@oe.utils.conditional("KERNEL_VER", "5.4", "6.4.0", "6.2.4", d)}"
 
 # We may have a version suffix for various path elements
-PVS = "${@oe.utils.conditional("PV", "6.4.0", ".p2", "", d)}"
+PVS = "${@oe.utils.conditional("PV", "6.4.0", ".p2", ".p4", d)}"
 LIC_FILES_MD5 = "${@oe.utils.conditional("PV", "6.4.0", \
-	"f01fe31fae02a620fd468b2e68e7222b", "e4ea72ff91665efb91435921a29148b7", d)}"
+	"f01fe31fae02a620fd468b2e68e7222b", "f5411d7aeec487c2c1ffcc664e866832", d)}"
 LIC_FILES_CHKSUM = "file://usr/include/gc_vdk.h;endline=26;md5=${LIC_FILES_MD5}"
 
 

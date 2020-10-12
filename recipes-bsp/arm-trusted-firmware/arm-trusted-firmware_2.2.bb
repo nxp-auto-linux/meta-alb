@@ -18,6 +18,7 @@ SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 
 PLATFORM_s32g274aevb = "s32g"
 PLATFORM_s32g274ardb = "s32g"
+PLATFORM_s32g274ardb2 = "s32g"
 BUILD_TYPE = "release"
 
 ATF_BINARIES = "${B}/${PLATFORM}/${BUILD_TYPE}"

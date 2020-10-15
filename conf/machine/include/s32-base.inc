@@ -1,5 +1,5 @@
 require conf/machine/include/soc-family.inc
-require conf/machine/include/arm/arch-arm64.inc
+require conf/machine/include/tune-cortexa53.inc
 
 SOC_FAMILY = "s32"
 
@@ -71,3 +71,4 @@ BBMASK = "u-boot-qoriq linux-qoriq"
 # Xen Examples support variables
 DOM0LESS_ROOTFS ?= "fsl-image-dom0less"
 XEN_EXAMPLE ?= "xen-examples-default"
+DEFAULTTUNE_s32 ?= "cortexa53-crypto"

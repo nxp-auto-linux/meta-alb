@@ -4,5 +4,7 @@
 
 require kernel-module-galcore.inc
 
-SRC_URI = " git://source.codeaurora.org/external/autobsps32/galcore;branch=alb/master;protocol=https "
+URL ?= "git://source.codeaurora.org/external/autobsps32/galcore;protocol=https"
+BRANCH ?= "${RELEASE_BASE}-${PV}"
+SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV = "9f423e2942f5093ff51ef4a78f99dd92a915c595"

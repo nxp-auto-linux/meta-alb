@@ -6,7 +6,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 inherit module
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
+URL ?= "git://source.codeaurora.org/external/autobsps32/sja1105x;protocol=https"
+BRANCH ?= "${RELEASE_BASE}"
+SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV = "8569b7eccbf55f83b516425ac2bf75e928f29afc"
 
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"

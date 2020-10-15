@@ -1,6 +1,9 @@
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://pcie_virt_eth/COPYING;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/alb-demos;branch=alb/master;protocol=https"
+
+URL ?= "git://source.codeaurora.org/external/autobsps32/alb-demos;protocol=https"
+BRANCH ?= "${RELEASE_BASE}"
+SRC_URI = "${URL};branch=${BRANCH}"
 
 S = "${WORKDIR}/git"
 SRCREV = "264a88d49aff18a2739351c8f53fc279ae5c9577"

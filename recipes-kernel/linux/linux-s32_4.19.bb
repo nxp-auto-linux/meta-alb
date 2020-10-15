@@ -1,6 +1,8 @@
 require recipes-kernel/linux/linux-s32.inc
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=alb/master"
+URL ?= "git://source.codeaurora.org/external/autobsps32/linux;protocol=https"
+BRANCH ?= "${RELEASE_BASE}-${PV}-rt"
+SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV = "03141fd4dbdc01c5a12a8908ddf40690e852a1ba"
 
 # Temporary override 'LIC_FILES_CHKSUM' variable until

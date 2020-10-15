@@ -24,8 +24,10 @@ SRC_URI_append_ls2 += " \
 "
 
 # add sources for virtual ethernet over PCIe
+VNET_URL ?= "git://source.codeaurora.org/external/autobsps32/vnet;protocol=https"
+VNET_BRANCH ?= "${RELEASE_BASE}"
 SRC_URI_append_ls2084abbmini += " \
-    git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=alb/master;name=vnet;destsuffix=git/drivers/net/vnet \
+    ${VNET_URL};branch=${VNET_BRANCH};name=vnet;destsuffix=git/drivers/net/vnet \
     file://0001-vnet-Add-initial-support-to-build-driver-in-kernel-4.19.patch \
     file://vnet_ls2.cfg \
     file://0001-vnet-remove-iommu-map-for-pcie-in-dts-5.4.patch \

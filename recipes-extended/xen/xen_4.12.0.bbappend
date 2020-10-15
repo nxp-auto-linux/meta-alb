@@ -1,7 +1,11 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
+MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
+
+URL ?= "git://source.codeaurora.org/external/autobsps32/xen;protocol=https"
+BRANCH ?= "${RELEASE_BASE}-${MAJ_VER}"
 SRC_URI = "\
-    git://source.codeaurora.org/external/autobsps32/xen;protocol=https;branch=alb/master \
+    ${URL};branch=${BRANCH} \
     file://0001-xen-trace-Fix-gcc9-alignment-warning.patch \
 "
 

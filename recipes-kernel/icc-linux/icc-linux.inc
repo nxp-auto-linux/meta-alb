@@ -4,7 +4,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8c0323a6a5e94cd2a72b8fb935e90fcd"
 
 inherit module
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/icc-linux;branch=alb/master;protocol=https"
+URL ?= "git://source.codeaurora.org/external/autobsps32/icc-linux;protocol=https"
+BRANCH ?= "${RELEASE_BASE}"
+SRC_URI = "${URL};branch=${BRANCH}"
 SRC_URI += "file://0001-icc-change-shared-mem-reservation-due-to-conflict.patch"
 
 export INSTALL_MOD_DIR="icc-linux"

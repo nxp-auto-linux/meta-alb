@@ -2,7 +2,10 @@
 
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=d1fe458e57ae72e9abc9aff2684690d0"
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/alb-demos;branch=alb/master;protocol=https"
+
+URL ?= "git://source.codeaurora.org/external/autobsps32/alb-demos;protocol=https"
+BRANCH ?= "${RELEASE_BASE}"
+SRC_URI = "${URL};branch=${BRANCH}"
 
 S = "${WORKDIR}/git"
 SRCREV = "e278f9622870a525e99c76c8722d04eb63a7033e"

@@ -30,3 +30,7 @@ KERNEL_FEC_LIMIT_TX ?= "1"
 PREFERRED_PROVIDER_virtual/egl = "${@bb.utils.contains("DISTRO_FEATURES", "gpu", "gpu-viv-bin-s32v2xx", "mesa", d)}"
 PREFERRED_PROVIDER_virtual/libgles1 = "${@bb.utils.contains("DISTRO_FEATURES", "gpu", "gpu-viv-bin-s32v2xx", "mesa", d)}"
 PREFERRED_PROVIDER_virtual/libgles2 = "${@bb.utils.contains("DISTRO_FEATURES", "gpu", "gpu-viv-bin-s32v2xx", "mesa", d)}"
+
+KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
+KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
+PREFERRED_VERSION_kernel-module-galcore = "${@oe.utils.conditional('KERNEL_VER', '5.4', '6.4.0', '6.2.4', d)}"

@@ -1,15 +1,17 @@
-Linux: 4.19.31
-Linux-rt: 4.19.31-rt18
-Linux versions: 4.19 4.14
+Linux: 5.4.24
+Linux-rt: 5.4.24-rt15
+Linux versions: 5.4 4.19
 U-boot: 2020.04
-Ubuntu target: 16.04.3
+Ubuntu target: 16.04.5 18.04.3 20.04
 Yocto: 3.0 "zeus"
-Gcc: linaro-6.3-r2017.02
-Glibc: 2.26
-Binutils: 2.29.1
-Xen: 4.10.1
-Openssl: 1.0.2p
-ROS: kinetic
-GPU: 6.2.4
-IPCF: 0.8.6
-Adaptive Autosar: R18-10
+Gcc: 9.2.0
+Glibc: 2.30
+Binutils: 2.32.0
+Xen: 4.12.0
+Lxc: 3.2.1
+Docker: 18.09.7
+Openssl: 1.1.1d
+ROS: kinetic melodic
+GPU: 6.4.0
+IPCF: 1.0
+Adaptive Autosar: R19-11

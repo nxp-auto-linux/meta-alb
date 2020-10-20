@@ -16,7 +16,7 @@ require recipes-fsl/images/crosslayer-rootfs-full.inc
 #
 IMAGE_FSTYPESTEMP := "${IMAGE_FSTYPES}"
 
-require recipes-fsl/images/${IMAGE_ROOTFS_REQ}.bb
+require ${IMAGE_ROOTFS_REQ}.bb
 
 # Both appends below are required. First to fix the assignment in
 # fsl-image-networking, and the second to fix the qoriq override

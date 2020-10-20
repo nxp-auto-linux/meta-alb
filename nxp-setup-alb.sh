@@ -274,7 +274,7 @@ LAYER_LIST=" \
 "
 
 LSLAYERS=" \
-    meta-qoriq-demos \
+    meta-qoriq \
     meta-security \
 "
 

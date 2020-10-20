@@ -35,14 +35,14 @@ PROGNAME="nxp-setup-alb.sh"
 MACHINEEXCLUSION="^imx|^twr"
 # Which machine types are ARM based and need the linaro toolchain?
 # This should be done properly by checking the conf files, really
-ARMMACHINE="^ls|^s32"
+ARMMACHINE="^ls|^s32|^lx"
 
 
 DEFAULT_DISTRO="fsl-auto"
 COMPANY="NXP"
 
 # Any bluebox or LS machine type
-BBLSMACHINE=".+bbmini|.+bluebox|ls.+"
+BBLSMACHINE=".+bbmini|.+bluebox.+|ls.+|lx.+"
 
 
 # Any s32v234* machine type

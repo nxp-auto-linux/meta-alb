@@ -24,8 +24,11 @@ IMAGE_INSTALL += " \
 "
 
 # We want easy installation of the BlueBox image to the target
+# Supported for any Layerscape Gen3 except LX2
+DEPLOYSCRIPTS ?= "bbdeployscripts"
+DEPLOYSCRIPTS_lx2160a = ""
 DEPENDS_append_fsl-lsch3 = " \
-    bbdeployscripts \
+    ${DEPLOYSCRIPTS} \
 "
 
 # Ease of use additions to the rootfs

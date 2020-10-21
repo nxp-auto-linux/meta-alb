@@ -77,8 +77,11 @@ IMAGE_INSTALL_append_fsl-lsch3 += "\
 "
 
 # We want easy installation of the BlueBox image to the target
+# Supported for any Layerscape Gen3 except LX2
+DEPLOYSCRIPTS ?= "bbdeployscripts"
+DEPLOYSCRIPTS_lx2160a = ""
 DEPENDS_append_fsl-lsch3 = " \
-    bbdeployscripts \
+    ${DEPLOYSCRIPTS} \
 "
 
 # Support for SJA1105 swich under Linux

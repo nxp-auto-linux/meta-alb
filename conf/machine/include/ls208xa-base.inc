@@ -48,3 +48,6 @@ BOOT_SPACE ?= "65536"
 
 # Other types of images
 IMAGE_CLASSES += "image_types_fsl_itb image_types_fsl_flashimage"
+
+# Deploy rootfs type for bluebox images
+IMAGE_ROOTFS_DEP_EXT ?= "ext3"

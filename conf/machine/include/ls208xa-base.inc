@@ -22,6 +22,10 @@ PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
 # TODO zeus: force using the legacy version of u-boot currently supported by the BSP
 PREFERRED_VERSION_u-boot-qoriq = "2017.12+fslgit"
 
+# Add and force using version 10.24.0, latest available with LS2084 support
+# 10.24.1 from meta-qoriq does not have LS2084 support
+PREFERRED_VERSION_management-complex = "10.24.0"
+
 PREFERRED_VERSION_rng-tools ?= "5"
 
 # For all other elements we use the SDK defaults

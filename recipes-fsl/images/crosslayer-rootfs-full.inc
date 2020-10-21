@@ -13,5 +13,3 @@ BASE_CORE_IMAGE_s32 = '${@oe.utils.conditional("IMAGE_ROOTFS_REQ", "fsl-image-au
 EXTRA_REQUIRE_s32 = '${@oe.utils.conditional("IMAGE_ROOTFS_REQ", "fsl-image-auto", "", "fsl-image-base.bb fsl-image-s32-common.inc", d)}'
 
 IMAGE_ROOTFS_DEP ?= "${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-qoriq", "fsl-image-networking", "fsl-image-base", d)}"
-
-IMAGE_ROOTFS_DEP_EXT ?= "ext3"

@@ -77,9 +77,10 @@ else
 fi
 
 SOURCESDIR="sources"
+ALBROOTDIR=${ROOTDIR}/${SOURCESDIR}/meta-alb
 
 # Validate by size that this file is (the same as) the original one in meta-alb
-ORIGINALFILE="`find \"$ROOTDIR/$SOURCESDIR\" -name $PROGNAME`"
+ORIGINALFILE="`find \"$ALBROOTDIR\" -name $PROGNAME`"
 if [ -e "$ORIGINALFILE" ]; then
 
     PROGSIZE=`ls -l "$ROOTDIR/$PROGNAME" | cut -d' ' -f 5`
@@ -105,7 +106,6 @@ if [ -e ${ROOTDIR}/${SOURCESDIR}/oe-core ]; then
     OEROOTDIR=${ROOTDIR}/${SOURCESDIR}/oe-core
 fi
 FSLROOTDIR=${ROOTDIR}/${SOURCESDIR}/meta-freescale
-ALBROOTDIR=${ROOTDIR}/${SOURCESDIR}/meta-alb
 PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
@@ -249,6 +249,16 @@ do
 done
 OPTIND=$OLD_OPTIND
 
+ALB_LAYER_LIST=" \
+    meta-alb \
+    meta-alb-dev \
+    meta-aa-integration \
+    meta-vnp \
+    meta-gvip \
+    \
+    $extra_layers \
+"
+
 LAYER_LIST=" \
     meta-openembedded/meta-oe \
     meta-openembedded/meta-multimedia \
@@ -263,14 +273,6 @@ LAYER_LIST=" \
     meta-linaro/meta-optee \
     \
     meta-freescale \
-    \
-    meta-alb \
-    meta-alb-dev \
-    meta-aa-integration \
-    meta-vnp \
-    meta-gvip \
-    \
-    $extra_layers \
 "
 
 LSLAYERS=" \
@@ -289,8 +291,14 @@ if [ $? -eq 0 ]; then
         meta-linaro/meta-linaro-toolchain \
     "
 
-    add_layers_for_machines "${S32V234LAYERS}" "${S32V234MACHINE}"
     add_layers_for_machines "${LSLAYERS}" "${BBLSMACHINE}"
+
+    # ALB layers after LSLAYERS, to make sure ALB .bbappends are applied last
+    LAYER_LIST="$LAYER_LIST \
+    $ALB_LAYER_LIST \
+    "
+
+    add_layers_for_machines "${S32V234LAYERS}" "${S32V234MACHINE}"
 
 fi
  

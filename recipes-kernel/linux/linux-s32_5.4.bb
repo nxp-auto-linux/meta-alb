@@ -69,9 +69,7 @@ DEPENDS = "flex-native bison-native bc-native"
 
 # Enable Xen booting
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-kernel/linux/linux-yocto_virtualization.inc', '', d)}
-DELTA_KERNEL_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_watchdog.cfg', '', d)}"
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen.cfg', '', d)}"
-SRC_URI_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_watchdog.cfg', '', d)} "
 SRC_URI += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://xen.cfg', '', d)} "
 

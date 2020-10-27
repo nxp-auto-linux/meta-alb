@@ -28,6 +28,7 @@ PREFERRED_VERSION_u-boot-qoriq = "2017.12+fslgit"
 PREFERRED_VERSION_management-complex = "10.24.0"
 
 PREFERRED_VERSION_rng-tools ?= "5"
+PREFERRED_VERSION_tcpreplay = "4.3.2"
 
 # For all other elements we use the SDK defaults
 require conf/machine/include/qoriq-arm64.inc

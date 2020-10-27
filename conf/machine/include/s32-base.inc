@@ -26,6 +26,7 @@ PREFERRED_VERSION_linux-s32 ?= "5.4"
 PREFERRED_VERSION_u-boot-s32 ?= "2020.04"
 
 PREFERRED_VERSION_rng-tools ?= "5"
+PREFERRED_VERSION_tcpreplay ?= "4.3.2"
 
 # ensure bison is not removed from sysroot, otherwise
 # some build tasks e.g. kernel 'do_merge_delta_config' will fail

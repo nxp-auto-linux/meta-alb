@@ -9,11 +9,14 @@ APTGET_CHROOT_DIR = "${D}"
 S = "${WORKDIR}/rootfs"
 B = "${S}"
 
-ROOTFS="ubuntu-base-${UBUNTU_TARGET_VERSION}-base-${UBUNTU_TARGET_ARCH}.tar.gz"
+UBUNTU_CDIMAGE_LOC ?= "cdimage.ubuntu.com/ubuntu-base/releases/${UBUNTU_TARGET_BASEVERSION}/release"
+UBUNTU_ROOTFS ?= "ubuntu-base-${UBUNTU_TARGET_VERSION}-base-${UBUNTU_TARGET_ARCH}.tar.gz"
 SRC_URI = " \
-	http://cdimage.ubuntu.com/ubuntu-base/releases/${UBUNTU_TARGET_BASEVERSION}/release/${ROOTFS};unpack=0;subdir=rootfs \
+	http://${UBUNTU_CDIMAGE_LOC}/${UBUNTU_ROOTFS};unpack=0;subdir=rootfs \
 	file://fstab \
 "
+
+ROOTFS = "${@d.getVar('UBUNTU_ROOTFS',True).split(';')[0]}"
 
 # Note that we still populate_sysroot because otherwise manifest
 # updates through staging would not happen.

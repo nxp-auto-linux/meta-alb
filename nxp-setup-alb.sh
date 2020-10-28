@@ -260,6 +260,7 @@ LAYER_LIST=" \
     meta-openembedded/meta-perl \
     meta-openembedded/meta-xfce \
     meta-virtualization \
+    meta-linaro/meta-optee \
     \
     meta-freescale \
     \

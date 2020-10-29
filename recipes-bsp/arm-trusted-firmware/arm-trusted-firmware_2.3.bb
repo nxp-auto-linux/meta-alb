@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
 DEPENDS += "dtc-native xxd-native"
 DEPENDS += "openssl-native"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os', '', d)}"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
@@ -25,12 +26,19 @@ BUILD_TYPE = "release"
 
 ATF_BINARIES = "${B}/${PLATFORM}/${BUILD_TYPE}"
 
+OPTEE_ARGS = " \
+                BL32=${DEPLOY_DIR_IMAGE}/optee/tee-header_v2.bin \
+                BL32_EXTRA1=${DEPLOY_DIR_IMAGE}/optee/tee-pager_v2.bin \
+                SPD=opteed \
+                "
+
 EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
                 ARCH=${TARGET_ARCH} \
                 BUILD_BASE=${B} \
                 PLAT=${PLATFORM} \
                 "
+EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '${OPTEE_ARGS}', '', d)}"
 
 # FIXME: Allow linking of 'tools' binaries with native libraries
 #        used for generating the boot logo and other tools used

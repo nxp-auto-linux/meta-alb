@@ -79,3 +79,10 @@ SRC_URI_append_gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'file://
 DELTA_KERNEL_DEFCONFIG_append_s32g274aevb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
 DELTA_KERNEL_DEFCONFIG_append_s32g274ardb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
 DELTA_KERNEL_DEFCONFIG_append_s32r45evb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
+
+# Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
+DELTA_KERNEL_DEFCONFIG_append_s32g274aevb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"
+SRC_URI_append_s32g274aevb = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee.cfg', '', d)}"
+
+DELTA_KERNEL_DEFCONFIG_append_s32g274ardb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"
+SRC_URI_append_s32g274ardb = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee.cfg', '', d)}"

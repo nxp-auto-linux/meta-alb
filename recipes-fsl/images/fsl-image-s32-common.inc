@@ -33,3 +33,7 @@ IMAGE_INSTALL_append += "\
     can-utils \
     iproute2 \
 "
+
+# Add OP-TEE user-space components
+IMAGE_INSTALL_append_s32g274aevb = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
+IMAGE_INSTALL_append_s32g274ardb = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"

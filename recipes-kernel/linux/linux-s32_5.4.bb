@@ -81,3 +81,10 @@ DELTA_KERNEL_DEFCONFIG_append_gen1 += " ${@bb.utils.contains('DISTRO_FEATURES', 
 # Enable 100MB BAR support for S32G and R
 SRC_URI_append_gen1 += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-large-bars', \
 	'0001-s32gen1-Increase-reserved-mem-and-EP-BAR-2-to-100MB.patch', '', d)}"
+
+# Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
+DELTA_KERNEL_DEFCONFIG_append_s32g274aevb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"
+SRC_URI_append_s32g274aevb = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee.cfg', '', d)}"
+
+DELTA_KERNEL_DEFCONFIG_append_s32g274ardb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"
+SRC_URI_append_s32g274ardb = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee.cfg', '', d)}"

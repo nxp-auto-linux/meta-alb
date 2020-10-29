@@ -32,6 +32,17 @@ SRC_URI += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'file://build/atf_config.cfg', '', d)} \
 "
 
+# Enable OP-TEE
+DELTA_UBOOT_DEFCONFIG_append_s32g274aevb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
+SRC_URI_append_s32g274aevb = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
+"
+
+DELTA_UBOOT_DEFCONFIG_append_s32g274ardb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
+SRC_URI_append_s32g274ardb = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
+"
+
 # FIXME: Allow linking of 'tools' binaries with native libraries
 #        used for generating the boot logo and other tools used
 #        during the build process.

@@ -17,10 +17,8 @@ IMAGE_INSTALL_append_s32v2xx += "\
     u-boot-s32 \
 "
 
-IPCSHM ??= ""
-IPCSHM_s32 ?= "${@oe.utils.conditional("PREFERRED_VERSION_linux-s32", "5.4", "", "ipc-shm", d)}"
-
 # Support for Inter-Process(or) Communication over Shared Memory (ipc-shm) under Linux
+IPCSHM ?= "ipc-shm"
 IMAGE_INSTALL_append_s32v234evb += " ${IPCSHM} "
 IMAGE_INSTALL_append_s32v234sbc += " ${IPCSHM} "
 IMAGE_INSTALL_append_s32g274aevb += " ${IPCSHM} "

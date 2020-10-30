@@ -79,3 +79,7 @@ SRC_URI += "\
 SRC_URI_append_gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', \
     'file://build/pcie_s32gen1.cfg', '', d)}"
 DELTA_KERNEL_DEFCONFIG_append_gen1 += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
+
+# Enable 100MB BAR support for S32G and R
+SRC_URI_append_gen1 += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-large-bars', \
+	'0001-s32gen1-Increase-reserved-mem-and-EP-BAR-2-to-100MB.patch', '', d)}"

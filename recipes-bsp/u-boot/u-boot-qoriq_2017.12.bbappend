@@ -12,6 +12,7 @@ SRC_URI += "\
 	file://0001-env-Fix-environment-location-flash-mmc.patch \
 	file://0001-ls2084ardb_defconfig-Config-was-broken-and-U-Boot-di.patch \
 	file://0001-u-boot-qoriq-Fix-build-with-gcc-9.x.patch \
+	file://0001-ls2084abbmini-Change-StreamID-allocation.patch \
 "
 
 SRCREV_ls1043ardb = "9f7df1b406ff11409021cd2112beedd6b57bb600"

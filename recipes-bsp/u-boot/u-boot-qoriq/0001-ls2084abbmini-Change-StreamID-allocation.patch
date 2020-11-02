@@ -1,0 +1,33 @@
+From 3d1c58f0076c6072c840f4a7ca2faf2019a4140b Mon Sep 17 00:00:00 2001
+From: Jakub Sosnovec <jakub.sosnovec@nxp.com>
+Date: Mon, 2 Nov 2020 12:34:43 +0100
+Subject: [PATCH] ls2084abbmini Change StreamID allocation
+
+---
+ arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h b/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h
+index f464dda83f..d4e686dc85 100644
+--- a/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h
++++ b/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h
+@@ -84,14 +84,14 @@
+ #define FSL_PEX_STREAM_ID_START		7
+ 
+ #if defined(CONFIG_ARCH_LS2080A)
+-#define FSL_PEX_STREAM_ID_END		22
++#define FSL_PEX_STREAM_ID_END		42
+ #elif defined(CONFIG_ARCH_LS1088A)
+ #define FSL_PEX_STREAM_ID_END		18
+ #endif
+ 
+ 
+ /* DPAA2 - set in MC DPC and alloced by MC */
+-#define FSL_DPAA2_STREAM_ID_START	23
++#define FSL_DPAA2_STREAM_ID_START	43
+ #define FSL_DPAA2_STREAM_ID_END		63
+ 
+ #endif
+-- 
+2.17.1
+

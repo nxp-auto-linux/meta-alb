@@ -2,9 +2,8 @@ SUMMARY = "A prebuilt Ubuntu Base image as baseline for custom work"
 require ubuntu-license.inc
 SECTION = "devel"
 
-# Ubuntu 18.04.1
-SRC_URI[md5sum] = "2e647934f42da7b878262a0cf857b0e8"
-SRC_URI[sha256sum] = "6f465ec321b9d90e3e6627f337d187390c7ec828f861b4053e60c2a225b909fe"
+# Ubuntu 18.04.5
+SRC_URI[sha256sum] = "9327cf905e818c38ba04605e40fbe11ac6548537786dc12936ca5819f8a563ad"
 
 require ubuntu-base.inc
 require ubuntu-tarfiles_${PV}.inc

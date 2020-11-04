@@ -28,8 +28,6 @@ IMAGE_INSTALL_append = " \
     openssl-engines \
 "
 
-IMAGE_FSTYPES_qoriq = "tar.gz ext2.gz.u-boot ext2.gz"
-
 inherit fsl-utils
 ROOTFS_POSTPROCESS_COMMAND += "rootfs_copy_core_image;"
 do_image_complete[depends] += "fsl-image-networking:do_image_complete"

@@ -1,4 +1,4 @@
-require recipes-bsp/ppa/ppa.inc
+require ppa.inc
 
 DEPENDS += "cst-native"
 

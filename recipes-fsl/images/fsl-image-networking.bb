@@ -5,7 +5,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 CORE_IMAGE_EXTRA_INSTALL += "udev-extraconf lsb-release"
 CORE_IMAGE_EXTRA_INSTALL_append_qoriq = " udev-rules-qoriq"
 
-IMAGE_FSTYPES = "tar.gz ext2.gz ext2.gz.u-boot jffs2 ubi cpio.gz"
+IMAGE_FSTYPES = "tar.gz cpio.gz"
 
 SUMMARY = "Small image to be used for evaluating the Freescale socs"
 DESCRIPTION = "Small image which includes some helpful tools and \
@@ -22,3 +22,7 @@ IMAGE_INSTALL_append = " \
     packagegroup-fsl-networking-core \
     packagegroup-fsl-tools-audio \
 "
+
+IMAGE_ROOTFS_DEP_EXT ??= "ext2.gz"
+
+IMAGE_FSTYPES_append = " ${IMAGE_ROOTFS_DEP_EXT}"

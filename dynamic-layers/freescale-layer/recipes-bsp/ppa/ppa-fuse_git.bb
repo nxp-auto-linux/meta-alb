@@ -1,4 +1,6 @@
-require recipes-bsp/ppa/ppa.inc
+FILESEXTRAPATHS_prepend := "${THISDIR}:"
+
+require ppa.inc
 
 DEPENDS += "cst-native"
 

@@ -1,0 +1,113 @@
+#
+# This is the default NOR flash environment shipped for the LX2 side of the BlueBox3
+#
+#----------------------------------------------------------------------
+# The following macros with angle brackets will be automagically
+# replaced when building the binary environment:
+#       <fdt_name>      Basename of KERNEL_DEVICETREE
+#       <kernel_name>   UBOOT_KERNEL_IMAGETYPE if it has been set,
+#                       otherwise KERNEL_IMAGETYPE
+#       <machine>       MACHINE
+#----------------------------------------------------------------------
+#
+BOARD=<machine>
+arch=arm
+baudrate=115200
+bd_part=1:2
+bd_type=mmc
+board=<machine>
+board_name=<machine>
+boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; env exists secureboot && load ${devtype} ${devnum}:${distro_bootpart} ${scripthdraddr} ${prefix}${boot_script_hdr} && esbc_validate ${scripthdraddr};source ${scriptaddr}
+boot_efi_binary=if fdt addr ${fdt_addr_r}; then bootefi bootmgr ${fdt_addr_r};else bootefi bootmgr ${fdtcontroladdr};fi;load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} efi/boot/bootaa64.efi; if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r};else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi
+boot_extlinux=sysboot ${devtype} ${devnum}:${distro_bootpart} any ${scriptaddr} ${prefix}${boot_syslinux_conf}
+boot_net_usb_start=usb start
+boot_pci_enum=pci enum
+boot_prefixes=/ /boot/
+boot_script_dhcp=boot.scr.uimg
+boot_script_hdr=hdr_lx2160bluebox3_bs.out
+boot_scripts=lx2160bluebox3_boot.scr
+boot_syslinux_conf=extlinux/extlinux.conf
+boot_targets=usb0 mmc0 mmc1 scsi0 dhcp
+bootargs=console=ttyAMA0,115200 root=/dev/ram0 earlycon=pl011,mmio32,0x21c0000 ramdisk_size=0x2000000 default_hugepagesz=1024m hugepagesz=1024m hugepages=2 pci=pcie_bus_perf
+bootargs_sdhc=setenv bootargs console=$console root=/dev/$bootdev earlycon=pl011,mmio32,0x21c0000 default_hugepagesz=1024m hugepagesz=1024m hugepages=2 pci=pcie_bus_perf
+bootargsextra=noinitrd
+bootcmd=run distro_bootcmd; run xspi_bootcmd; env exists secureboot && esbc_halt
+bootcmd_dhcp=run boot_net_usb_start; run boot_pci_enum; if dhcp ${scriptaddr} ${boot_script_dhcp}; then source ${scriptaddr}; fi;setenv efi_fdtfile ${fdtfile}; setenv efi_old_vci ${bootp_vci};setenv efi_old_arch ${bootp_arch};setenv bootp_vci PXEClient:Arch:00011:UNDI:003000;setenv bootp_arch 0xb;if dhcp ${kernel_addr_r}; then tftpboot ${fdt_addr_r} dtb/${efi_fdtfile};if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r}; else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi;fi;setenv bootp_vci ${efi_old_vci};setenv bootp_arch ${efi_old_arch};setenv efi_fdtfile;setenv efi_old_arch;setenv efi_old_vci;
+bootcmd_mmc0=setenv mmcdev 0; if run loadcmd_sdhc; then run bootcmd_sdhc; fi
+bootcmd_mmc1=devnum=1; run mmc_boot
+bootcmd_scsi0=devnum=0; run scsi_boot
+bootcmd_sdhc=echo Booting ITB from SDHC (mmc0)...; setenv bootdev mmcblk${mmcdev}p${mmcpart}; run bootargs_sdhc; fsl_mc apply dpl 0x80d00000; bootm $load_addr -
+bootcmd_usb0=devnum=0; run usb_boot
+bootdelay=3
+bootdev=mmcblk0p2
+console=ttyAMA0,38400n8
+cpu=armv8
+devplist=1 2
+dimg=fsl-lx2160a-bluebox3.dtb
+distro_bootcmd=scsi_need_init=; setenv nvme_need_init; for target in ${boot_targets}; do run bootcmd_${target}; done
+efi_dtb_prefixes=/ /dtb/ /dtb/current/
+eth1addr=00:04:9F:17:DE:D1
+eth2addr=00:04:9F:17:DE:D2
+eth3addr=00:04:9F:17:DE:D3
+eth4addr=00:04:9F:17:DE:D4
+eth5addr=00:04:9F:17:DE:D5
+eth6addr=00:04:9F:17:DE:D7
+eth7addr=00:04:9F:17:DE:D8
+ethact=e1000#0
+ethaddr=00:04:9F:17:DE:D0
+ethprime=e1000#0
+fdt_addr=0x64f00000
+fdt_addr_r=0x90000000
+fdt_high=0xa0000000
+fdtcontroladdr=fbb30f00
+fdtheader_addr_r=0x80100000
+hwconfig=fsl_ddr:bank_intlv=auto
+ibargset=setenv bootargs console=ttyAMA0,115200 root=$rdev rootwait earlycon=pl011,mmio32,0x21c0000 iommu.passthrough=1 pci=pcie_bus_perf
+iboot=run ibargset && load $bd_type $bd_part 0xa0000000 /$kimg && load $bd_type $bd_part 0x80000000 /$dimg && booti 0xa0000000 - 0x80000000
+initrd_high=0xffffffffffffffff
+ipaddr=192.168.3.7
+kernel_addr_r=0x81000000
+kernel_addr_sd=0x8000
+kernel_name=boot/kernel.itb
+kernel_size=0x2800000
+kernel_size_sd=0x1d000
+kernel_start=0x1000000
+kernelhdr_addr_sd=0x3000
+kernelhdr_size_sd=0x20
+kernelheader_addr_r=0x80200000
+kernelheader_size=0x40000
+kernelheader_start=0x600000
+kimg=Image
+load_addr=0xa0000000
+load_efi_dtb=load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${prefix}${efi_fdtfile}
+loadcmd_sdhc=echo Searching for boot image on SD-Card (mmc0)...; mmc rescan && mmc info && ext4load mmc ${mmcdev}:${mmcpart} $load_addr $kernel_name
+mcinitcmd=mmc read 0x80a00000 0x5000 0x1800; mmc read 0x80e00000 0x7000 0x800; fsl_mc start mc 0x80a00000 0x80e00000; mmc read 0x80d00000 0x6800 0x800
+mcmemsize=0x70000000
+mmc_boot=if mmc dev ${devnum}; then devtype=mmc; run scan_dev_for_boot_part; fi
+mmcdev=0
+mmcpart=2
+nvme_boot=run boot_pci_enum; run nvme_init; if nvme dev ${devnum}; then devtype=nvme; run scan_dev_for_boot_part; fi
+nvme_init=if ${nvme_need_init}; then setenv nvme_need_init false; nvme scan; fi
+ramdisk_addr=0x800000
+ramdisk_size=0x2000000
+rdev=/dev/mmcblk1p4
+scan_dev_for_boot=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for prefix in ${boot_prefixes}; do run scan_dev_for_extlinux; run scan_dev_for_scripts; done;run scan_dev_for_efi;
+scan_dev_for_boot_part=part list ${devtype} ${devnum} devplist; env exists devplist || setenv devplist 1; for distro_bootpart in ${devplist}; do if fstype ${devtype} ${devnum}:${distro_bootpart} bootfstype; then run scan_dev_for_boot; fi; done
+scan_dev_for_efi=setenv efi_fdtfile ${fdtfile}; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${efi_fdtfile}; then run load_efi_dtb; fi;done;if test -e ${devtype} ${devnum}:${distro_bootpart} efi/boot/bootaa64.efi; then echo Found EFI removable media binary efi/boot/bootaa64.efi; run boot_efi_binary; echo EFI LOAD FAILED: continuing...; fi; setenv efi_fdtfile
+scan_dev_for_extlinux=if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${boot_syslinux_conf}; then echo Found ${prefix}${boot_syslinux_conf}; run boot_extlinux; echo SCRIPT FAILED: continuing...; fi
+scan_dev_for_scripts=for script in ${boot_scripts}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${script}; then echo Found U-Boot script ${prefix}${script}; run boot_a_script; echo SCRIPT FAILED: continuing...; fi; done
+scriptaddr=0x80000000
+scripthdraddr=0x80080000
+scsi_boot=run scsi_init; if scsi dev ${devnum}; then devtype=scsi; run scan_dev_for_boot_part; fi
+scsi_init=if ${scsi_need_init}; then scsi_need_init=false; scsi scan; fi
+serdes0=0
+serdes1=0
+serdes2=0
+serverip=192.168.3.1
+soc=fsl-layerscape
+stderr=serial_pl01x
+stdin=serial_pl01x
+stdout=serial_pl01x
+usb_boot=usb start; if usb dev ${devnum}; then devtype=usb; run scan_dev_for_boot_part; fi
+vendor=freescale
+xspi_bootcmd=echo Trying load from flexspi..;sf probe 0:0 && sf read $load_addr $kernel_start $kernel_size ; env exists secureboot &&sf read $kernelheader_addr_r $kernelheader_start $kernelheader_size && esbc_validate ${kernelheader_addr_r};  bootm $load_addr#$BOARD

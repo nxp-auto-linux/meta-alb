@@ -9,7 +9,7 @@ SRC_URI = "\
     file://0001-xen-trace-Fix-gcc9-alignment-warning.patch \
 "
 
-SRCREV = "50f5b9b385b541a7cc30411cb7e8391d379f461b"
+SRCREV = "74371f7bf7f218c0e4eb4638b585ea34ddcebe5a"
 
 S = "${WORKDIR}/git"
 

@@ -22,7 +22,7 @@ require fsl-image-emptyrootfs.inc
 IMAGE_TYPES_MASKED := "${IMAGE_FSTYPES}"
 IMAGE_FSTYPES += "flashimage"
 
-inherit distro_features_check
+inherit features_check
 
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 

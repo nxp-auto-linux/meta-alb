@@ -2,7 +2,6 @@ require crosslayer-image-full.inc
 
 EXTRA_REQUIRE ?= ""
 require ${EXTRA_REQUIRE}
-inherit distro_features_check
 
 require fsl-image-blueboxadditions.inc
 # Do not include virtualization user space libraries for s32v

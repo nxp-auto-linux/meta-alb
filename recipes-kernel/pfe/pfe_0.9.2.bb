@@ -16,7 +16,7 @@ PFE_FW_BIN ?= "s32g_pfe_class.fw"
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
 	file://${PFE_LOCAL_FIRMWARE_DIR}/${PFE_FW_BIN} \
 	"
-SRCREV = "0046ccdcc7a70afececdccfca33620f7b08ac88b"
+SRCREV = "cfcb4a56c7349ec186ac807f73e56b0cc5777ffd"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
 # since 'aarch64-fsl-linux-strip' fails with error code 1 when parsing the firmware
@@ -31,7 +31,7 @@ INSTALL_DIR = "${D}/lib/modules/${KERNEL_VERSION}/kernel/drivers/net/ethernet/nx
 FW_INSTALL_DIR = "${D}/lib/firmware"
 FW_INSTALL_NAME ?= "s32g_pfe_class.fw"
 
-EXTRA_OEMAKE_append = " KBUILD_MODPOST_WARN=0 KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 all"
+EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 all"
 
 module_do_install() {
 	install -D ${MDIR}/pfeng.ko ${INSTALL_DIR}/pfeng.ko

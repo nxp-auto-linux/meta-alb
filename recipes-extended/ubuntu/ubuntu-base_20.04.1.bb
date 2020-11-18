@@ -2,9 +2,8 @@ SUMMARY = "A prebuilt Ubuntu Base image as baseline for custom work"
 require ubuntu-license.inc
 SECTION = "devel"
 
-# Ubuntu 20.04 baseline
-SRC_URI[md5sum] = "00bf76c3cc43ae4e5301365765437139"
-SRC_URI[sha256sum] = "435b5007bac7ef5ca89b9815b0b9104108934cb9a5a261cc5c251fefaa41d47e"
+# Ubuntu 20.04.1 baseline
+SRC_URI[sha256sum] = "269709ecd5c506f229f10983f990c394278b202ca29f089844e2e5c2b80ad8b4"
 
 require ubuntu-base.inc
 

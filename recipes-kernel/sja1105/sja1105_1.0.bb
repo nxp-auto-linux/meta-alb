@@ -9,7 +9,7 @@ inherit module
 URL ?= "git://source.codeaurora.org/external/autobsps32/sja1105x;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV = "8569b7eccbf55f83b516425ac2bf75e928f29afc"
+SRCREV = "7ca70ccdd2717344a4f8433044920af719b4d0a3"
 
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'

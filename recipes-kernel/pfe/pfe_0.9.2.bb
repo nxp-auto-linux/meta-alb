@@ -34,7 +34,7 @@ FW_INSTALL_DIR = "${D}/lib/firmware"
 FW_INSTALL_CLASS_NAME ?= "s32g_pfe_class.fw"
 FW_INSTALL_UTIL_NAME ?= "s32g_pfe_util.fw"
 
-EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 all"
+EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 PFE_CFG_IP_VERSION=PFE_CFG_IP_VERSION_NPU_7_14 all"
 
 module_do_install() {
 	install -D ${MDIR}/pfeng.ko ${INSTALL_DIR}/pfeng.ko

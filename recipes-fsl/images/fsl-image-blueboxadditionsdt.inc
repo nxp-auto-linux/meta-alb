@@ -4,7 +4,7 @@
 # desktop to use. Hence the "dt" suffix.
 #
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES += "x11 polkit"
 
 # The various gfx related packages are there to support visualization, though

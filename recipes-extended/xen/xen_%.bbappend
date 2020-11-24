@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
+MAJ_VER = "${XEN_REL}"
 
 URL ?= "git://source.codeaurora.org/external/autobsps32/xen;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${MAJ_VER}"

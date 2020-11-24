@@ -263,6 +263,7 @@ LAYER_LIST=" \
     meta-openembedded/meta-oe \
     meta-openembedded/meta-multimedia \
     meta-openembedded/meta-python \
+    meta-openembedded/meta-python2 \
     meta-openembedded/meta-networking \
     meta-openembedded/meta-gnome \
     meta-openembedded/meta-filesystems \

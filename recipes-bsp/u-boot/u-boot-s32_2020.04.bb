@@ -1,4 +1,4 @@
-require recipes-bsp/u-boot/u-boot-s32.inc
+require recipes-bsp/u-boot/u-boot-nxp.inc
 
 URL ?= "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"

@@ -2,9 +2,7 @@ require recipes-bsp/u-boot/u-boot.inc
 
 inherit fsl-u-boot-localversion
 
-DESCRIPTION = "U-boot provided by NXP with focus on S32 chipsets"
-PROVIDES = "virtual/bootloader u-boot"
-
+SUMMARY = "U-boot provided by NXP"
 LICENSE = "GPLv2 & BSD-3-Clause & BSD-2-Clause & LGPL-2.0 & LGPL-2.1"
 LIC_FILES_CHKSUM = " \
     file://Licenses/gpl-2.0.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
@@ -14,21 +12,25 @@ LIC_FILES_CHKSUM = " \
     file://Licenses/lgpl-2.1.txt;md5=4fbd65380cdd255951079008b364516c \
 "
 
-INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bison-native bc-native"
+DEPENDS_append = " libgcc dtc-native bison-native bc-native"
+DEPENDS_append_qoriq-ppc = " boot-format-native"
+
+PROVIDES = "virtual/bootloader u-boot"
 
 SCMVERSION = "y"
 LOCALVERSION = ""
 
 # Enable Xen default boot if Xen enabled
-DELTA_UBOOT_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
-SRC_URI += " \
+DELTA_UBOOT_DEFCONFIG_append_s32 = " ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
+SRC_URI_append_s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_config.cfg', '', d)} \
 "
 
+DELTA_UBOOT_DEFCONFIG ?= ""
+
 # Enable Arm Trusted Firmware
-DELTA_UBOOT_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
-SRC_URI += " \
+DELTA_UBOOT_DEFCONFIG_append_s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
+SRC_URI_append_s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'file://build/atf_config.cfg', '', d)} \
 "
 
@@ -38,17 +40,11 @@ SRC_URI_append_s32g2 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
 "
 
-# FIXME: Allow linking of 'tools' binaries with native libraries
-#        used for generating the boot logo and other tools used
-#        during the build process.
-EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS}" \
-                 HOSTLDFLAGS="${BUILD_LDFLAGS}" \
-                 HOSTSTRIP=true'
-
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 USRC ?= ""
 S = '${@oe.utils.conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
+B = "${WORKDIR}/build"
 
 do_merge_delta_config[dirs] = "${B}"
 do_merge_delta_config() {
@@ -70,7 +66,7 @@ addtask merge_delta_config before do_configure after do_patch
 
 ENV_STAGE_DIR = "${datadir}/env"
 
-do_install_append() {
+do_install_append_s32() {
     unset i j
     mkdir -p ${D}${ENV_STAGE_DIR}
     # we should have one config
@@ -91,11 +87,9 @@ do_install_append() {
     if [ -n "${ATF_IMAGE}" ]; then
         install -d ${DEPLOY_DIR_IMAGE}
         cp ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin
-        install -d ${DEPLOY_DIR_IMAGE}/tools
-        cp ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage
     fi
 }
 
 FILES_${PN} += "${ENV_STAGE_DIR}"
 
-COMPATIBLE_MACHINE = "s32"
+COMPATIBLE_MACHINE = "s32|qoriq"

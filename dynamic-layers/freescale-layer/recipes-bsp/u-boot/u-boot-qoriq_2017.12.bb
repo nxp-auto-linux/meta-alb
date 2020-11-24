@@ -1,4 +1,4 @@
-require recipes-bsp/u-boot/u-boot.inc
+require u-boot.inc
 
 DESCRIPTION = "U-Boot provided by Freescale with focus on QorIQ boards"
 PROVIDES += "u-boot"

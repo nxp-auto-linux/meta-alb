@@ -34,5 +34,5 @@ do_deploy() {
 
 addtask deploy before do_build after do_unpack
 
-COMPATIBLE_MACHINE = "s32v344sim|s32r45sim|s32g274sim"
+COMPATIBLE_MACHINE = "s32r45sim|s32g274sim"
 

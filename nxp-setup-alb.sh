@@ -51,6 +51,9 @@ S32V234MACHINE="s32v234.+"
 # Any Ubuntu machine type
 UBUNTUMACHINE=".+ubuntu"
 
+# Error codes
+EINVAL=128
+
 if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
     echo "ERROR: This script needs to be sourced."
     SCRIPT_PATH=`readlink -f $0`
@@ -323,14 +326,14 @@ if [ -n "${MACHINE}" ]; then
         fi
     done
 else
-    usage && clean_up && return
+    usage && clean_up && return $EINVAL
 fi
 
 if [ -n "${MACHINELAYER}" ]; then 
     echo "Configuring for ${MACHINE} and distro ${DISTRO}..."
 else
     echo -e "\nThe \$MACHINE you have specified ($MACHINE) is not supported by this build setup."
-    usage && clean_up && return
+    usage && clean_up && return $EINVAL
 fi
 
 # set default jobs and threads

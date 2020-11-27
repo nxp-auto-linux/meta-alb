@@ -68,10 +68,6 @@ do_compile () {
 		# remove any empty lines which might break the environment
 		sed '/^[[:space:]]*$/d' -i ${S}/${envname}.work
 
-                # Take the last entry for all duplicate entries
-                tac ${S}/${envname}.work | sort -u -t= -b -k1,1 > ${S}/temp.work
-                mv -f ${S}/temp.work ${S}/${envname}.work
-
 		sed -e "s#<machine>#${MACHINE}#" -e "s#<fdt_name>#$(basename `echo ${KERNEL_DEVICETREE} | awk '{ print $1 }'`)#" -e 's#<kernel_name>#${UBOOT_KERNEL_IMAGETYPE}#' -i ${S}/${envname}.work
 		for envsize in ${UBOOT_ENV_IMAGE_SIZE}; do
 			if echo "$envsize" | grep ":"; then

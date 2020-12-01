@@ -20,12 +20,11 @@ IMAGE_INSTALL += "pciutils"
 # Add iputils package, for ping support
 IMAGE_INSTALL += "iputils"
 
-# For LS2, dpl-examples, management-complex, restool is a machine dependency.
+# For LS2/LX2, dpl-examples, management-complex, restool is a machine dependency.
 # rcw is dependency for image_types_fsl_flashimage.
-# restool is also added for other LS2 flavors, except ls2084*. Leave it commented by now.
-#IMAGE_INSTALL_append_fsl-lsch3 += " \
-#    restool \
-#"
+IMAGE_INSTALL_append_fsl-lsch3 += " \
+    restool \
+"
 
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234evb = " sja1105 "

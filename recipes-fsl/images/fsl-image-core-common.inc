@@ -92,6 +92,15 @@ PACKAGES-CORE-MISC_append_fsl-lsch3 = "\
     iptables \
 "
 
+PACKAGES-CORE-MISC_append_lx2160a = "\
+    dce \
+	restool \
+	kexec \
+	kdump \
+	vmcore-dmesg \
+	memtester \
+"
+
 IMAGE_INSTALL += "\
     ${PACKAGES-CORE} \
     ${PACKAGES-CORE-MISC} \

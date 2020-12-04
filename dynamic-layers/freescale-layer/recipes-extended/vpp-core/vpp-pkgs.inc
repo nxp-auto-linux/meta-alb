@@ -194,18 +194,18 @@ FILES_${PN} = " \
 		${libdir}/libvppapiclient.so.0 \
 		${libdir}/libvppapiclient.so.0.0.0 \
 		${libdir}/libvppcom.so.19.09 \
-                ${libdir}/libvppapiclient.so.19.09  \
-                ${libdir}/libsvm.so.19.09 \
-                ${libdir}/libvcl_ldpreload.so.19.09 \
-                ${libdir}/libvlibmemoryclient.so.19.09 \
-                ${libdir}/libvnet.so.19.09 \
-                ${libdir}/libvapiclient.so.19.09 \
-                ${libdir}/libvlibmemory.so.19.09 \
-                ${libdir}/libvppinfra.so.19.09 \
-                ${libdir}/usr/lib/libvppcom.so.19.09 \
-                ${libdir}/libvlib.so.19.09 \
-                ${libdir}/libvatplugin.so.19.09 \
-                ${libdir}/libsvmdb.so.19.09 \
+		${libdir}/libvatplugin.so.20.12 \
+		${libdir}/libvppcom.so.20.12 \
+		${libdir}/libsvmdb.so.20.12 \
+		${libdir}/libvlib.so.20.12 \
+		${libdir}/libvcl_ldpreload.so.20.12 \
+		${libdir}/libvppinfra.so.20.12 \
+		${libdir}/libsvm.so.20.12 \
+		${libdir}/libvnet.so.20.12 \
+		${libdir}/libvlibmemoryclient.so.20.12 \
+		${libdir}/libvapiclient.so.20.12 \
+		${libdir}/libvppapiclient.so.20.12 \
+		${libdir}/libvlibmemory.so.20.12 \
 		${libdir}/libvppcom.so.0.0.0 \
 		${libdir}/libvppinfra.so.0 \
 		${libdir}/libvppinfra.so.0.0.0 \

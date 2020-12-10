@@ -183,6 +183,10 @@ aptget_determine_host_proxies() {
 	export ENV_HOST_PROXIES="$ENV_HOST_PROXIES"
 }
 
+# We want to ensure that during packaging we use the same
+# passwd/group file that we used during build up of the rootfs.
+PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
+
 aptget_update_presetvars() {
 	export PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
 
@@ -938,7 +942,7 @@ APTGET_ALL_PACKAGES = "\
 # complain if needed!
 python() {
         lc = d.getVar("LAYERSERIES_CORENAMES")
-        if "zeus" not in lc:
+        if ("dunfell" not in lc) and ("gatesgarth" not in lc):
                 bb.error("nativeaptinstall.bbclass is incompatible to the current layer set")
                 bb.error("You must check APTGET_YOCTO_TRANSLATION and update the anonymous python() function!")
 }

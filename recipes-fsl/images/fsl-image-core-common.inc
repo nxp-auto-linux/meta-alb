@@ -92,14 +92,19 @@ PACKAGES-CORE-MISC_append_fsl-lsch3 = "\
     iptables \
 "
 
-PACKAGES-CORE-MISC_append_lx2160a = "\
+PACKAGES-CORE-DPAA2 = "\
     dce \
 	restool \
+"
+
+PACKAGES-CORE-DBG = "\
 	kexec \
 	kdump \
 	vmcore-dmesg \
 	memtester \
 "
+
+PACKAGES-CORE-MISC_append_lx2160a = " ${PACKAGES-CORE-DPAA2} ${PACKAGES-CORE-DBG}"
 
 IMAGE_INSTALL += "\
     ${PACKAGES-CORE} \

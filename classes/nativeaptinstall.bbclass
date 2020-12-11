@@ -1068,8 +1068,13 @@ glibc-gconv-utf-7,glibc-gconv-viscii\
 "
 
 # If we are using this class, we want to ensure that our recipe or
-# image is also properly listed as providing the needed results
+# is also properly listed as rproviding the needed results
+# Images should not be rproviding anything as they don't result
+# in packages, i.e., they are not a dependency resultion element!
 python () {
+    if bb.data.inherits_class("image", d):
+        return
+
     pn = (d.getVar('PN', True) or "")
     packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
     translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()

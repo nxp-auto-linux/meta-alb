@@ -92,35 +92,48 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
     update-alternatives \
     bash \
     base-files \
+    base-passwd \
     bc \
     bison \
     bluez5 \
+    busybox \
     bzip2 \
     ca-certificates \
     coreutils \
     db \
+    dbus \
     diffutils \
     dpkg \
     dtc \
+    e2fsprogs \
+    ethtool \
+    file \
+    findutils \
     flex \
     glibc \
     glibc-locale \
     gcc-runtime \
     gdbm \
     initscripts \
+    iproute2 \
+    iputils-ping \
+    kmod \
     libc6 \
     libc6-utils \
     libffi \
     libgcc \
     liblzma \
     libpam \
+    libpam-runtime \
     libsqlite3 \
     libxml2 \
     m4 \
     ncurses \
     netbase \
+    net-tools \
     opkg-utils \
     perl \
+    procps \
     python3 \
     qemuwrapper-cross \
     shared-mime-info \

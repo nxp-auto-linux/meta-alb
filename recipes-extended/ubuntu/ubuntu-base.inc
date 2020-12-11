@@ -28,7 +28,7 @@ do_populate_sdk[noexec] = "1"
 # to look at any build- or runtime-dependencies or debug symbols!
 # We have quite a number of deficiencies to ignore. The Ubuntu packages
 # and rootfs do not really conform to Yocto rules.
-INSANE_SKIP_${PN} += "already-stripped build-deps file-rdeps dev-so staticdev"
+INSANE_SKIP_${PN} += "already-stripped build-deps file-rdeps dev-so staticdev mime"
 INHIBIT_DEFAULT_DEPS = "1"
 
 # We need to keep all the other recipes happy that will rely on us

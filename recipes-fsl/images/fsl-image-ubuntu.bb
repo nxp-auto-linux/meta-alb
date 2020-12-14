@@ -20,7 +20,7 @@ APTGET_EXTRA_PACKAGES += '${@ \
     , d) \
     , d) \
     , d)}'
-IMAGE_INSTALL_append = '${@ \
+IMAGE_INSTALL_append += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc-init", \

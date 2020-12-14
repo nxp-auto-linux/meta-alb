@@ -30,8 +30,8 @@ INHIBIT_SYSROOT_STRIP = "1"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"
-INSTALL_DIR = "${D}/lib/modules/${KERNEL_VERSION}/kernel/drivers/net/ethernet/nxp/pfe"
-FW_INSTALL_DIR = "${D}/lib/firmware"
+INSTALL_DIR = "${D}/${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/ethernet/nxp/pfe"
+FW_INSTALL_DIR = "${D}/${base_libdir}/firmware"
 FW_INSTALL_CLASS_NAME ?= "s32g_pfe_class.fw"
 FW_INSTALL_UTIL_NAME ?= "s32g_pfe_util.fw"
 

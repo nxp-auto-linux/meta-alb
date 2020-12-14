@@ -92,6 +92,8 @@ IMAGE_INSTALL_append_s32v234evb += "\
     sja1105 \
 "
 
+require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
+
 fakeroot do_update_host() {
 	set -x
 

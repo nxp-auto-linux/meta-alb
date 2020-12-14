@@ -1,6 +1,6 @@
-PV = "3.9.0"
+PV = "3.11.0"
 
-SRCREV = "f7f5a3ad2e8601bf2f846992d0b10aae3e3e5530"
+SRCREV = "9a7dc598591990349d88b4dba3a37aadd6851295"
 
 INSANE_SKIP_${PN} += "ldflags"
 

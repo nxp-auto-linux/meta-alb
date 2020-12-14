@@ -1,6 +1,6 @@
-PV = "3.9.0"
+PV = "3.11.0"
 
-SRCREV = "f461e1d47fcc82eaa67508a3d796c11b7d26656e"
+SRCREV = "159e295d5cc3ad2275ab15fe544620f6604d4ba4"
 
 DEPENDS += "python3-pycryptodomex-native"
 

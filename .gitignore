@@ -1,0 +1,7 @@
+# Vim temporary files
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+
+*.orig
+*.rej
+*~

@@ -2,6 +2,8 @@ PV = "3.11.0"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+
 URL ?= "git://source.codeaurora.org/external/autobsps32/optee_os;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${MAJ_VER}"
 SRC_URI = "\

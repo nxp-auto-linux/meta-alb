@@ -6,4 +6,5 @@ DEPENDS += "python3-pycryptodomex-native"
 
 EXTRA_OEMAKE += " \
                 WITH_OPENSSL=n \
+                LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
                 "

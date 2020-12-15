@@ -24,7 +24,7 @@ DESTDIR = "${D}"
 EXTRA_OEMAKE_append = " INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} MYCOMPILER=${CROSS_COMPILE}gcc "
 EXTRA_OEMAKE_append_s32v234evb = " MYPLATFORM=evb "
 EXTRA_OEMAKE_append_s32v234bbmini = " MYPLATFORM=bbmini "
-EXTRA_OEMAKE_append_s32g274aevb = " MYPLATFORM=gplat "
+EXTRA_OEMAKE_append_s32g2evb = " MYPLATFORM=gplat "
 EXTRA_OEMAKE_append_s32g274ardb = " MYPLATFORM=rdb "
 
 KERNEL_MODULE_AUTOLOAD += "sja1105pqrs"
@@ -35,7 +35,7 @@ FILES_${PN} += "${sysconfdir}/modules-load.d/*"
 PROVIDES = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
-COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini|s32g274aevb|s32g274ardb"
+COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini|s32g2evb|s32g274ardb"
 INHIBIT_PACKAGE_STRIP = "1"
 
 DEPENDS_append = " coreutils-native"

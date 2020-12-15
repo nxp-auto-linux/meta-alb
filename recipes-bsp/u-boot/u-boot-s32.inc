@@ -33,13 +33,8 @@ SRC_URI += " \
 "
 
 # Enable OP-TEE
-DELTA_UBOOT_DEFCONFIG_append_s32g274aevb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
-SRC_URI_append_s32g274aevb = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
-"
-
-DELTA_UBOOT_DEFCONFIG_append_s32g274ardb += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
-SRC_URI_append_s32g274ardb = " \
+DELTA_UBOOT_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
+SRC_URI_append_s32g2 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
 "
 

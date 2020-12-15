@@ -21,12 +21,10 @@ IMAGE_INSTALL_append_s32v2xx += "\
 IPCSHM ?= "ipc-shm"
 IMAGE_INSTALL_append_s32v234evb += " ${IPCSHM} "
 IMAGE_INSTALL_append_s32v234sbc += " ${IPCSHM} "
-IMAGE_INSTALL_append_s32g274aevb += " ${IPCSHM} "
-IMAGE_INSTALL_append_s32g274ardb += " ${IPCSHM} "
+IMAGE_INSTALL_append_s32g2 += " ${IPCSHM} "
 IMAGE_INSTALL_append_s32r45evb += " ${IPCSHM} "
 
 IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"
-IMAGE_INSTALL_append_s32g274aevb = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe', ' pfe', '', d)}"
 
 # Support CAN interfaces under Linux
 IMAGE_INSTALL_append += "\
@@ -35,5 +33,4 @@ IMAGE_INSTALL_append += "\
 "
 
 # Add OP-TEE user-space components
-IMAGE_INSTALL_append_s32g274aevb = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
-IMAGE_INSTALL_append_s32g274ardb = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
+IMAGE_INSTALL_append_s32g2 = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"

@@ -1,4 +1,4 @@
-SRCREV ?= "456957aaa1391e0dfa969e2dd97b87c51a79444e"
+SRCREV ?= "6c46c30c717b8484fb3b7f6e7c2af9b2bbf649f6"
 
 XEN_REL ?= "4.14"
 XEN_BRANCH ?= "stable-${XEN_REL}"

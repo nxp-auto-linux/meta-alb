@@ -70,7 +70,7 @@ RDEPENDS_packagegroup-fsl-extend-misc = "\
     ccache \
     chkconfig \
     curl \
-    dhcp-client \
+    dhcpcd \
     diffstat \
     dtc \
     gettext-runtime \

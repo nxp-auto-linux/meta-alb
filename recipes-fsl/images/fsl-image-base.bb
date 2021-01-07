@@ -11,7 +11,7 @@ IMAGE_INSTALL += " \
     kernel-image \
     kernel-modules \
     setserial \
-    dhcp-client \
+    dhcpcd \
 "
 
 # Add pciutils package

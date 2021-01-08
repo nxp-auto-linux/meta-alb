@@ -1,5 +1,5 @@
-From cd0f63efbef2f79c032abbee0dc8db84e46cb1d8 Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
+From 4279c02b29fa6dafe15ad5e6a604bb30cd4f13f0 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@freescale.com>
 Date: Thu, 19 Oct 2017 07:02:06 +0200
 Subject: [PATCH 01/15] pseudo: Enabled utimensat/ftimens
 
@@ -10,10 +10,10 @@ This required a makewrappers change to permit array arguments to wrappers
  2 files changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/makewrappers b/makewrappers
-index e9191ed..d149b17 100755
+index 232c08d..1c281d5 100755
 --- a/makewrappers
 +++ b/makewrappers
-@@ -131,27 +131,28 @@ class Argument:
+@@ -120,27 +120,28 @@ class Argument:
              else:
                  # nothing to do.
                  self.vararg_wraps = None
@@ -47,7 +47,7 @@ index e9191ed..d149b17 100755
  
          # spacing between type and name, needed if type ends with a character
          # which could be part of an identifier
-@@ -159,12 +160,13 @@ class Argument:
+@@ -148,12 +149,13 @@ class Argument:
              self.spacer = ' '
  
      def decl(self, comment=False, wrap=False):
@@ -65,7 +65,7 @@ index e9191ed..d149b17 100755
          if self.vararg:
              if self.vararg_wraps:
 diff --git a/ports/unix/wrapfuncs.in b/ports/unix/wrapfuncs.in
-index 5f30ae6..78fa855 100644
+index bd2706f..4980bce 100644
 --- a/ports/unix/wrapfuncs.in
 +++ b/ports/unix/wrapfuncs.in
 @@ -27,6 +27,8 @@ char *tmpnam(char *s);
@@ -75,8 +75,8 @@ index 5f30ae6..78fa855 100644
 +int utimensat(int dirfd, const char *path, const struct timespec times[2], int flags);
 +int futimens(int fd, const struct timespec times[2]);
  # needed because libc stdio does horrible things with inline asm syscalls
- FILE *fopen(const char *path, const char *mode);
- int fclose(FILE *fp);
+ FILE *fopen(const char *path, const char *mode); /* noignore_path=1 */
+ int fclose(FILE *fp);  /* noignore_path=1 */
 -- 
-1.8.3.1
+2.17.1
 

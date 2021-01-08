@@ -42,6 +42,11 @@ SRC_URI += "\
     file://build/tmu.config \
 "
 
+# Perf patches
+SRC_URI += " \
+    file://perf/0001-perf-cs-etm-Move-definition-of-traceid_list-global-v.patch \
+"
+
 # Following patch disables the AVB TX queues (1 and 2) in order to prevent
 # a FEC TX queue timeout that occurs when using NFS root filesystem.
 # This issue occurs on S32V234.

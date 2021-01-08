@@ -30,6 +30,7 @@ distance away from the sbrk(0) boundary. This keeps the heap
 alive. The distance is currently hardcoded to 16MB.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
  linux-user/elfload.c | 77 +++++++++++++++++++++++++++++++++++++++++---
  1 file changed, 73 insertions(+), 4 deletions(-)
@@ -38,7 +39,7 @@ diff --git a/linux-user/elfload.c b/linux-user/elfload.c
 index bd43c481..a209f17d 100644
 --- a/linux-user/elfload.c
 +++ b/linux-user/elfload.c
-@@ -1741,6 +1741,26 @@ static abi_ulong copy_elf_strings(int argc, char **argv, char *scratch,
+@@ -1736,6 +1736,26 @@ static abi_ulong copy_elf_strings(int argc, char **argv, char *scratch,
      return p;
  }
  
@@ -65,7 +66,7 @@ index bd43c481..a209f17d 100644
  /* Older linux kernels provide up to MAX_ARG_PAGES (default: 32) of
   * argument/environment space. Newer kernels (>2.6.33) allow more,
   * dependent on stack size, but guarantee at least 32 pages for
-@@ -1762,7 +1782,20 @@ static abi_ulong setup_arg_pages(struct linux_binprm *bprm,
+@@ -1757,7 +1757,20 @@ static abi_ulong setup_arg_pages(struct linux_binprm *bprm,
          guard = qemu_real_host_page_size;
      }
  
@@ -87,43 +88,7 @@ index bd43c481..a209f17d 100644
                          MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
      if (error == -1) {
          perror("mmap stack");
-@@ -2042,6 +2075,9 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-     return sp;
- }
- 
-+#ifndef QEMU_SBRK_DISTANCE
-+#define QEMU_SBRK_DISTANCE (16*1024*1024)
-+#endif
- unsigned long init_guest_space(unsigned long host_start,
-                                unsigned long host_size,
-                                unsigned long guest_start,
-@@ -2054,6 +2090,25 @@ unsigned long init_guest_space(unsigned long host_start,
- 
-     assert(host_start || host_size);
- 
-+    if (!fixed) {
-+        unsigned long real_start;
-+        /* We need to make sure that we do not map our guest inside
-+         * the heap of our process itself. This can happen and if qemu then
-+         * needs to allocate from its heap and fails, the emulation
-+         * won't last long anymore.
-+         */
-+        real_start = (unsigned long)sbrk(0);
-+
-+        /* In terms of virtual space, we want qemu to retain some
-+         * brk() capability, so we "round" up. This should likely
-+         * be configurable somehow
-+         */
-+        real_start += QEMU_SBRK_DISTANCE;
-+        if (host_start < real_start) {
-+            host_start = real_start;
-+        }
-+    }
-+
-     /* If just a starting address is given, then just verify that
-      * address.  */
-     if (host_start && !host_size) {
-@@ -2292,6 +2347,8 @@ static void load_elf_image(const char *image_name, int image_fd,
+@@ -2381,6 +2381,8 @@ static void load_elf_image(const char *image_name, int image_fd,
      int i, retval;
      const char *errmsg;
  
@@ -132,19 +97,21 @@ index bd43c481..a209f17d 100644
      /* First of all, some simple consistency checks */
      errmsg = "Invalid ELF image for this architecture";
      if (!elf_check_ident(ehdr)) {
-@@ -2345,9 +2402,8 @@ static void load_elf_image(const char *image_name, int image_fd,
-            image is pre-linked, LOADDR will be non-zero.  Since we do
-            not supply MAP_FIXED here we'll use that address if and
-            only if it remains available.  */
--        load_addr = target_mmap(loaddr, hiaddr - loaddr, PROT_NONE,
--                                MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
--                                -1, 0);
-+        load_addr = elf_target_mmap(info, hiaddr - loaddr, PROT_NONE,
-+                                MAP_PRIVATE | MAP_ANON | MAP_NORESERVE);
-         if (load_addr == -1) {
-             goto exit_perror;
-         }
-@@ -2793,6 +2849,19 @@ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
+@@ -2472,10 +2472,9 @@ static void load_elf_image(const char *image_name, int image_fd,
+      * In both cases, we will overwrite pages in this range with mappings
+      * from the executable.
+      */
+-    load_addr = target_mmap(loaddr, hiaddr - loaddr, PROT_NONE,
+-                            MAP_PRIVATE | MAP_ANON | MAP_NORESERVE |
+-                            (ehdr->e_type == ET_EXEC ? MAP_FIXED : 0),
+-                            -1, 0);
++    load_addr = elf_target_mmap(info, hiaddr - loaddr, PROT_NONE,
++                               MAP_PRIVATE | MAP_ANON | MAP_NORESERVE |
++                               (ehdr->e_type == ET_EXEC ? MAP_FIXED : 0));
+     if (load_addr == -1) {
+         goto exit_perror;
+     }
+@@ -2917,6 +2917,19 @@ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
      }
  
      if (elf_interpreter) {

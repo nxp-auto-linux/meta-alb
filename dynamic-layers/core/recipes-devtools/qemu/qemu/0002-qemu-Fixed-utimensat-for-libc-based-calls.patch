@@ -10,15 +10,16 @@ manually.
 The utimensat patch itself is also easier now.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
  linux-user/syscall.c | 34 +++++++++++++++++++++-------------
  1 file changed, 21 insertions(+), 13 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 2afc661c..9f96553d 100644
+index 198285ca..08fede67 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -245,6 +245,14 @@ static type name (type1 arg1,type2 arg2,type3 arg3)				\
+@@ -261,6 +261,14 @@ static type name (type1 arg1,type2 arg2,type3 arg3)        \
   return syscall(__NR_##name, arg1, arg2, arg3);        \
  }
  
@@ -33,7 +34,7 @@ index 2afc661c..9f96553d 100644
  #define __NR_sys_uname __NR_uname
  #define __NR_sys_getcwd1 __NR_getcwd
  #define __NR_sys_getdents __NR_getdents
-@@ -391,17 +399,8 @@ static int sys_getcwd1(char *buf, size_t size)
+@@ -412,17 +420,8 @@ _syscall2(int, sys_getcwd1, char *, buf, size_t, size)
  
  #ifdef TARGET_NR_utimensat
  #if defined(__NR_utimensat)
@@ -44,16 +45,16 @@ index 2afc661c..9f96553d 100644
 -static int sys_utimensat(int dirfd, const char *pathname,
 -                         const struct timespec times[2], int flags)
 -{
-- if (do_libcsyscall)
--   return utimensat(dirfd, pathname, times, flags);
-- return syscall(__NR_utimensat, dirfd, pathname, &times[0], flags);
+-    if (do_libcsyscall)
+-        return utimensat(dirfd, pathname, times, flags);
+-    return syscall(__NR_utimensat, dirfd, pathname, &times[0], flags);
 -}
 +#define __NR_sys_utimensat __NR_utimensat
 +_libc_syscall4(int,sys_utimensat,utimensat,int,dirfd,const char*,pathname,const struct timespec *,times,int,flags);
  #else
  static int sys_utimensat(int dirfd, const char *pathname,
                           const struct timespec times[2], int flags)
-@@ -11345,8 +11344,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -11930,8 +11929,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
                  target_to_host_timespec(ts+1, arg3+sizeof(struct target_timespec));
                  tsp = ts;
              }

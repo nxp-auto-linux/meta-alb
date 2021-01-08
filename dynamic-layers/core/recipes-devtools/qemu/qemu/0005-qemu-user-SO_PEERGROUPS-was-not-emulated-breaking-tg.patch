@@ -12,6 +12,7 @@ silently report it as unsupported. If it is known on the host at
 build time, we try a translation.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
  linux-user/alpha/sockbits.h   |  2 ++
  linux-user/generic/sockbits.h |  2 ++
@@ -76,8 +77,8 @@ diff --git a/linux-user/syscall.c b/linux-user/syscall.c
 index 57debf3e..3bbcc7e8 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -2319,6 +2319,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-         case TARGET_SO_SNDTIMEO:
+@@ -2452,6 +2452,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+         /* These don't just return a single integer */
          case TARGET_SO_PEERNAME:
              goto unimplemented;
 +        case TARGET_SO_PEERGROUPS: {
@@ -121,9 +122,9 @@ index 57debf3e..3bbcc7e8 100644
 +#endif
 +            break;
 +        }
-         case TARGET_SO_PEERCRED: {
-             struct ucred cr;
-             socklen_t crlen;
+         case TARGET_SO_RCVTIMEO: {
+             struct timeval tv;
+             socklen_t tvlen;
 -- 
 2.17.1
 

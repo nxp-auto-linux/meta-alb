@@ -9,13 +9,14 @@ way. And for execve, the output of any successful execution did
 not even show at all.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
  linux-user/strace.c    | 38 ++++++++++++++++++++++++++++++++++++--
- linux-user/strace.list | 34 +++++++++++++++++-----------------
- 2 files changed, 53 insertions(+), 19 deletions(-)
+ linux-user/strace.list | 26 +++++++++++++-------------
+ 2 files changed, 49 insertions(+), 15 deletions(-)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index e4bd5fa7..d9e293be 100644
+index 13981341..83708728 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
 @@ -144,8 +144,10 @@ print_signal(abi_ulong arg, int last)
@@ -29,16 +30,16 @@ index e4bd5fa7..d9e293be 100644
      }
      if (signal_name == NULL) {
          print_raw_param("%ld", arg, last);
-@@ -698,7 +700,7 @@ print_execve(const struct syscallname *name,
+@@ -692,7 +694,7 @@ print_execve(const struct syscallname *name,
          }
      }
  
--    gemu_log("NULL})");
-+    gemu_log("NULL})...\n");
+-    qemu_log("NULL})");
++    qemu_log("NULL})...\n");
  }
  
  #ifdef TARGET_NR_ipc
-@@ -1146,6 +1148,7 @@ print_file_mode(abi_long mode, int last)
+@@ -1251,6 +1253,7 @@ print_file_mode(abi_long mode, int last)
  {
      const char *sep = "";
      const struct flags *m;
@@ -46,16 +47,16 @@ index e4bd5fa7..d9e293be 100644
  
      for (m = &mode_flags[0]; m->f_string != NULL; m++) {
          if ((m->f_value & mode) == m->f_value) {
-@@ -1158,7 +1161,7 @@ print_file_mode(abi_long mode, int last)
+@@ -1263,7 +1266,7 @@ print_file_mode(abi_long mode, int last)
  
      mode &= ~S_IFMT;
      /* print rest of the mode as octal */
 -    if (mode != 0)
 +    if (mode != 0 || !origmode)
-         gemu_log("%s%#o", sep, (unsigned int)mode);
+         qemu_log("%s%#o", sep, (unsigned int)mode);
  
-     gemu_log("%s", get_comma(last));
-@@ -2652,6 +2655,23 @@ print_mmap(const struct syscallname *name,
+     qemu_log("%s", get_comma(last));
+@@ -2920,6 +2923,23 @@ print_mmap(const struct syscallname *name,
  #define print_mmap2     print_mmap
  #endif
  
@@ -79,7 +80,7 @@ index e4bd5fa7..d9e293be 100644
  #ifdef TARGET_NR_mprotect
  static void
  print_mprotect(const struct syscallname *name,
-@@ -2776,6 +2796,20 @@ print_tgkill(const struct syscallname *name,
+@@ -3044,6 +3064,20 @@ print_tgkill(const struct syscallname *name,
  }
  #endif
  
@@ -101,28 +102,19 @@ index e4bd5fa7..d9e293be 100644
  static void
  print_statx(const struct syscallname *name,
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 1de4319d..6339bad5 100644
+index a04706a5..4af4af74 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
 @@ -122,7 +122,7 @@
- { TARGET_NR_dup2, "dup2" , NULL, NULL, NULL },
+ { TARGET_NR_dup2, "dup2" , "%s(%d,%d)", NULL, NULL },
  #endif
  #ifdef TARGET_NR_dup3
--{ TARGET_NR_dup3, "dup3" , NULL, NULL, NULL },
+-{ TARGET_NR_dup3, "dup3" , "%s(%d,%d,%d)", NULL, NULL },
 +{ TARGET_NR_dup3, "dup3" , "%s(%d,%d,%#x)", NULL, NULL },
  #endif
  #ifdef TARGET_NR_epoll_create
- { TARGET_NR_epoll_create, "epoll_create" , NULL, NULL, NULL },
-@@ -251,7 +251,7 @@
- { TARGET_NR_fstatfs64, "fstatfs64" , "%s(%d,%p)", NULL, NULL },
- #endif
- #ifdef TARGET_NR_fsync
--{ TARGET_NR_fsync, "fsync" , NULL, NULL, NULL },
-+{ TARGET_NR_fsync, "fsync" , "%s(%d)", NULL, NULL },
- #endif
- #ifdef TARGET_NR_ftime
- { TARGET_NR_ftime, "ftime" , NULL, NULL, NULL },
-@@ -275,10 +275,10 @@
+ { TARGET_NR_epoll_create, "epoll_create", "%s(%d)", NULL, NULL },
+@@ -276,10 +276,10 @@
  { TARGET_NR_getcwd, "getcwd" , "%s(%p,%d)", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getdents
@@ -135,12 +127,8 @@ index 1de4319d..6339bad5 100644
  #endif
  #ifdef TARGET_NR_getdomainname
  { TARGET_NR_getdomainname, "getdomainname" , NULL, NULL, NULL },
-@@ -287,22 +287,22 @@
- { TARGET_NR_getdtablesize, "getdtablesize" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_getegid
--{ TARGET_NR_getegid, "getegid" , NULL, NULL, NULL },
-+{ TARGET_NR_getegid, "getegid" , "%s()", NULL, NULL },
+@@ -291,19 +291,19 @@
+ { TARGET_NR_getegid, "getegid" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getegid32
 -{ TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
@@ -154,8 +142,7 @@ index 1de4319d..6339bad5 100644
 +{ TARGET_NR_geteuid32, "geteuid32" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getgid
--{ TARGET_NR_getgid, "getgid" , NULL, NULL, NULL },
-+{ TARGET_NR_getgid, "getgid" , "%s()", NULL, NULL },
+ { TARGET_NR_getgid, "getgid" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getgid32
 -{ TARGET_NR_getgid32, "getgid32" , NULL, NULL, NULL },
@@ -163,7 +150,7 @@ index 1de4319d..6339bad5 100644
  #endif
  #ifdef TARGET_NR_getgroups
  { TARGET_NR_getgroups, "getgroups" , NULL, NULL, NULL },
-@@ -387,13 +387,13 @@
+@@ -388,13 +388,13 @@
  { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_gettimeofday
@@ -178,17 +165,8 @@ index 1de4319d..6339bad5 100644
 +{ TARGET_NR_getuid32, "getuid32" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getxattr
- { TARGET_NR_getxattr, "getxattr" , NULL, NULL, NULL },
-@@ -513,7 +513,7 @@
- { TARGET_NR_lremovexattr, "lremovexattr" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_lseek
--{ TARGET_NR_lseek, "lseek" , NULL, NULL, NULL },
-+{ TARGET_NR_lseek, "lseek" , "%s(%d,%d,%d)", NULL, NULL },
- #endif
- #ifdef TARGET_NR_lsetxattr
- { TARGET_NR_lsetxattr, "lsetxattr" , NULL, NULL, NULL },
-@@ -612,7 +612,7 @@
+ { TARGET_NR_getxattr, "getxattr" , NULL, print_getxattr, NULL },
+@@ -616,7 +616,7 @@
  { TARGET_NR_mq_unlink, "mq_unlink" , NULL, print_mq_unlink, NULL },
  #endif
  #ifdef TARGET_NR_mremap
@@ -197,7 +175,7 @@ index 1de4319d..6339bad5 100644
  #endif
  #ifdef TARGET_NR_msgctl
  { TARGET_NR_msgctl, "msgctl" , NULL, NULL, NULL },
-@@ -1059,7 +1059,7 @@
+@@ -1063,7 +1063,7 @@
  { TARGET_NR_profil, "profil" , NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_pselect6
@@ -206,7 +184,7 @@ index 1de4319d..6339bad5 100644
  #endif
  #ifdef TARGET_NR_ptrace
  { TARGET_NR_ptrace, "ptrace" , NULL, NULL, NULL },
-@@ -1215,7 +1215,7 @@
+@@ -1219,7 +1219,7 @@
  { TARGET_NR_sched_yield, "sched_yield" , NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_seccomp
@@ -215,7 +193,7 @@ index 1de4319d..6339bad5 100644
  #endif
  #ifdef TARGET_NR_security
  { TARGET_NR_security, "security" , NULL, NULL, NULL },
-@@ -1621,7 +1621,7 @@
+@@ -1625,7 +1625,7 @@
  { TARGET_NR_vserver, "vserver" , NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_wait4
@@ -224,7 +202,7 @@ index 1de4319d..6339bad5 100644
  #endif
  #ifdef TARGET_NR_waitid
  { TARGET_NR_waitid, "waitid" , "%s(%#x,%d,%p,%#x)", NULL, NULL },
-@@ -1645,7 +1645,7 @@
+@@ -1649,7 +1649,7 @@
  { TARGET_NR_sync_file_range2, "sync_file_range2", NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_pipe2

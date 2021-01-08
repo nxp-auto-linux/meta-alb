@@ -9,6 +9,7 @@ When SO_PEERSEC failed to work properly it turned out that
 the length arg/result method was not properly implemented.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
  linux-user/syscall.c | 79 ++++++++++++++++++++++++++++++--------------
  1 file changed, 54 insertions(+), 25 deletions(-)
@@ -17,7 +18,7 @@ diff --git a/linux-user/syscall.c b/linux-user/syscall.c
 index 9f96553d..dcf3519c 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -2307,6 +2307,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+@@ -2444,6 +2444,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
      abi_long ret;
      int len, val;
      socklen_t lv;
@@ -25,7 +26,7 @@ index 9f96553d..dcf3519c 100644
  
      switch(level) {
      case TARGET_SOL_SOCKET:
-@@ -2332,22 +2333,25 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+@@ -2501,22 +2501,25 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
              crlen = sizeof(cr);
              ret = get_errno(getsockopt(sockfd, level, SO_PEERCRED,
                                         &cr, &crlen));
@@ -59,24 +60,8 @@ index 9f96553d..dcf3519c 100644
 -            }
              break;
          }
-         case TARGET_SO_LINGER:
-@@ -2442,6 +2446,15 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-         case TARGET_SO_ACCEPTCONN:
-             optname = SO_ACCEPTCONN;
-             goto int_case;
-+        case TARGET_SO_PEERSEC:
-+            optname = SO_PEERSEC;
-+            if (get_user_u32(len, optlen))
-+                return -TARGET_EFAULT;
-+            if (len < 0)
-+                return -TARGET_EINVAL;
-+            addr = alloca(len);
-+            lv = len;
-+            goto generic_case;
-         default:
-             goto int_case;
-         }
-@@ -2453,24 +2466,40 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+         case TARGET_SO_PEERSEC: {
+@@ -2644,24 +2644,40 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
              return -TARGET_EFAULT;
          if (len < 0)
              return -TARGET_EINVAL;
@@ -131,7 +116,7 @@ index 9f96553d..dcf3519c 100644
          break;
      case SOL_IP:
          switch(optname) {
-@@ -2493,7 +2522,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+@@ -2684,7 +2684,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
                  return -TARGET_EFAULT;
              if (len < 0)
                  return -TARGET_EINVAL;
@@ -140,7 +125,7 @@ index 9f96553d..dcf3519c 100644
              ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
              if (ret < 0)
                  return ret;
-@@ -2554,7 +2583,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+@@ -2745,7 +2745,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
                  return -TARGET_EFAULT;
              if (len < 0)
                  return -TARGET_EINVAL;

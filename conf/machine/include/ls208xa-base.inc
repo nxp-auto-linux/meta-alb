@@ -29,6 +29,7 @@ PREFERRED_VERSION_management-complex = "10.24.0"
 
 PREFERRED_VERSION_rng-tools ?= "5"
 PREFERRED_VERSION_tcpreplay = "4.3.3"
+PREFERRED_VERSION_dpdk = "19.11-20.04"
 
 # For all other elements we use the SDK defaults
 require conf/machine/include/qoriq-arm64.inc

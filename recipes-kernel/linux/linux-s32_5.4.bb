@@ -33,6 +33,9 @@ DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu',
 DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "tmu.config"
 DELTA_KERNEL_DEFCONFIG_append_s32v234evb += "tmu.config"
 
+# LLCE CAN Drivers
+DELTA_KERNEL_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', 'llce_can.config', '', d)}"
+
 SRC_URI += "\
     file://build/blueboxconfig_s32v234pcie_${PV}.cfg \
     file://build/containers_${PV}.config \
@@ -40,6 +43,7 @@ SRC_URI += "\
     file://build/virtio \
     file://build/gpu.config \
     file://build/tmu.config \
+    file://build/llce_can.config \
 "
 
 # Following patch disables the AVB TX queues (1 and 2) in order to prevent

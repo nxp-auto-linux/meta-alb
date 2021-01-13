@@ -38,6 +38,10 @@ EXTRA_OECONF = " \
 
 CFLAGS += " -mtls-dialect=trad -DCLIB_LOG2_CACHE_LINE_BYTES=6 -I${OPENSSL_PATH}/usr/include  -L${OPENSSL_PATH}/lib"
 
+# Add -fcommon to CFLAGS to silence "multiple definition" errors
+# due to gcc 10 setting -fno-common by default
+CFLAGS += " -fcommon"
+
 do_install_append() {
         mkdir -p ${D}/etc/vpp
         cp ${S}/src/vpp/conf/startup.conf ${D}/etc/vpp/startup.conf

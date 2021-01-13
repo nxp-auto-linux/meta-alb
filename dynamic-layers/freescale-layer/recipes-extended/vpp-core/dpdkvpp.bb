@@ -44,6 +44,11 @@ EXTRA_OEMAKE += 'ETHTOOL_LIB_PATH="${S}/examples/ethtool/lib/${RTE_TARGET}" RTE_
     OPENSSL_PATH="${STAGING_DIR_HOST}" RTE_KERNELDIR="${STAGING_KERNEL_DIR}" \
     RTE_KERNELDIR_OUT="${STAGING_KERNEL_BUILDDIR}" EXAMPLES_BUILD_DIR="${RTE_TARGET}" \
 '
+
+# Add -fcommon to CFLAGS to silence "multiple definition" errors
+# due to gcc 10 setting -fno-common by default
+TOOLCHAIN_OPTIONS += "-fcommon"
+
 do_configure () {
 	#############################################################
 	### default value for prefix is "usr", unsetting it, so it

@@ -51,6 +51,9 @@ S32V234MACHINE="s32v234.+"
 # Any Ubuntu machine type
 UBUNTUMACHINE=".+ubuntu"
 
+# Supported yocto version
+YOCTOVERSION="gatesgarth"
+
 # Error codes
 EINVAL=128
 
@@ -442,6 +445,15 @@ for layer in $(eval echo $LAYER_LIST); do
         awk '/  \"/ && !x {print "'"  ${append_layer}"' \\"; x=1} 1' \
             conf/bblayers.conf > conf/bblayers.conf~
         mv conf/bblayers.conf~ conf/bblayers.conf
+
+        # check if layer is compatible with supported yocto version.
+        # if not, make it so.
+        conffile_path="${append_layer}/conf/layer.conf"
+        yocto_compatible=`grep "LAYERSERIES_COMPAT" "${conffile_path}" | grep "${YOCTOVERSION}"`
+        if [ -z "${yocto_compatible}" ]; then
+		    sed -E "/LAYERSERIES_COMPAT/s/(\".*)\"/\1 $YOCTOVERSION\"/g" -i "${conffile_path}"
+		    echo Layer ${layer} updated for ${YOCTOVERSION}.
+		fi
     fi
 done
 

@@ -66,6 +66,16 @@ TARGET_CPPFLAGS = "-I${STAGING_DIR_TARGET}${includedir}"
 TARGET_CPPFLAGS += "-Wno-error=missing-attributes \
 -Wno-error=array-bounds -Wno-error=stringop-truncation \
 "
+
+GCC_MAJORVERSION ?= "${@d.getVar('GCCVERSION', True).rsplit('.')[0]}"
+EXTRA_TARGET_CPPFLAGS = '${@ \
+    oe.utils.conditional("GCC_MAJORVERSION", "10", \
+    "-Wno-error=zero-length-bounds \
+     -Wno-error=maybe-uninitialized \
+     ", "", d)}'
+
+TARGET_CPPFLAGS += "${EXTRA_TARGET_CPPFLAGS}"
+
 #EXTRA_OECONF_append = " --disable-werror"
 
 GLIBC_BROKEN_LOCALES = ""

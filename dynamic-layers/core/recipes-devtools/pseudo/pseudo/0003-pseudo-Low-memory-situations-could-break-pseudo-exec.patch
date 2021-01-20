@@ -1,0 +1,29 @@
+From 690ecb79fef76c951906e892e86b3181f844b62b Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Tue, 19 Jan 2021 17:29:48 +0100
+Subject: [PATCH 3/4] pseudo: Low memory situations could break pseudo exec
+ magic
+
+When finding an executable one return path did not properly reinstate
+pseudo magic.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ pseudo_client.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pseudo_client.c b/pseudo_client.c
+index fee8c4a..6b5a127 100644
+--- a/pseudo_client.c
++++ b/pseudo_client.c
+@@ -2614,6 +2614,7 @@ pseudo_exec_path(const char **filenamep, int search_path, char * const**argvp) {
+ 
+ 			if(!fullpath) {
+ 				pseudo_diag("couldn't allocate intermediate full path.\n");
++				pseudo_magic();
+ 				return -1;
+ 			}
+ 			strcpy(fullpath, path);
+-- 
+2.17.1
+

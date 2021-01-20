@@ -30,5 +30,10 @@ SRC_URI += " \
     file://0001-pseudo-realpath-wrapper-did-not-chroot-translation-p.patch \
 \
     file://0001-pseudo-did-not-treat-softlinks-correctly-in-chroot.patch \
+\
+    file://0001-pseudo-white-space-fix-to-allow-safe-editing.patch \
+    file://0002-pseudo-More-whitespace-fixing.patch \
+    file://0003-pseudo-Low-memory-situations-could-break-pseudo-exec.patch \
+    file://0004-pseudo-executable-script-recognition-wasn-t-fully-ro.patch \
 "
 

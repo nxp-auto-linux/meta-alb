@@ -1,0 +1,124 @@
+From fafdab85622aff53cef1a1fbfbd7b12440a059c8 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Tue, 19 Jan 2021 16:51:37 +0100
+Subject: [PATCH 2/4] pseudo: More whitespace fixing
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ pseudo_client.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/pseudo_client.c b/pseudo_client.c
+index 7bd8eae..fee8c4a 100644
+--- a/pseudo_client.c
++++ b/pseudo_client.c
+@@ -1117,13 +1117,13 @@ client_ping(void) {
+ 		server_pid = 0;
+ 		return 1;
+ 	} else {
+-                /* The server tells us whether or not to log things. */
+-                if (ack->result == RESULT_SUCCEED) {
+-                        pseudo_client_logging = 1;
+-                } else {
+-                        pseudo_client_logging = 0;
+-                }
+-        }
++		/* The server tells us whether or not to log things. */
++		if (ack->result == RESULT_SUCCEED) {
++			pseudo_client_logging = 1;
++		} else {
++			pseudo_client_logging = 0;
++		}
++	}
+ 	pseudo_debug(PDBGF_CLIENT | PDBGF_VERBOSE, "ping ok\n");
+ 	return 0;
+ }
+@@ -1327,7 +1327,7 @@ pseudo_client_request(pseudo_msg_t *msg, size_t len, const char *path) {
+ 	 */
+ 	pseudo_debug(PDBGF_CLIENT | PDBGF_VERBOSE, "sending a message: ino %llu\n",
+ 		(unsigned long long) msg->ino);
+-        for (tries = 0; tries < PSEUDO_RETRIES; ++tries) {
++	for (tries = 0; tries < PSEUDO_RETRIES; ++tries) {
+ 		pseudo_evlog(PDBGF_CLIENT, "try %d, connect fd is %d\n", tries, connect_fd);
+ 		rc = pseudo_msg_send(connect_fd, msg, len, path);
+ 		if (rc != 0) {
+@@ -1510,7 +1510,7 @@ static char *patternlistmatchespath(const char *patternlist, const char *path, c
+ }
+ 
+ int ischrootpath(const char *basepath) {
+-    if (pseudo_chroot_len && basepath &&
++	if (pseudo_chroot_len && basepath &&
+ 		strlen(basepath) >= pseudo_chroot_len &&
+ 		!memcmp(basepath, pseudo_chroot, pseudo_chroot_len) &&
+ 		(basepath[pseudo_chroot_len] == '\0' || basepath[pseudo_chroot_len] == '/')) {
+@@ -1656,7 +1656,7 @@ base_path(int dirfd, const char *path, int leave_last) {
+ 		}
+ 	}
+ 
+-    newpath = pseudo_fix_path(basepath, path, minlen, baselen, NULL, leave_last, readlink_chroot_file);
++	newpath = pseudo_fix_path(basepath, path, minlen, baselen, NULL, leave_last, readlink_chroot_file);
+ 	pseudo_debug(PDBGF_PATH, "base_path[%s]: %s</>%s => %s\n",
+ 		leave_last ? "nofollow" : "follow",
+ 		basepath ? basepath : "<nil>",
+@@ -1679,7 +1679,7 @@ int pseudo_client_ignore_path_chroot(const char *path, int ignore_chroot) {
+ 		env = pseudo_get_value("PSEUDO_IGNORE_PATHS");
+ 		if (env) {
+ 			char *p = env;
+-        	        while (*p) {
++			while (*p) {
+ 				char *next = strchr(p, ',');
+ 				if (!next)
+ 				    next = strchr(p, '\0');
+@@ -2090,8 +2090,8 @@ pseudo_client_op(pseudo_op_t op, int access, int fd, int dirfd, const char *path
+ #ifdef PSEUDO_PROFILING
+ 		struct timeval tv1_ipc, tv2_ipc;
+ #endif
+-                if (!pseudo_op_wait(msg.op))
+-                        msg.type = PSEUDO_MSG_FASTOP;
++		if (!pseudo_op_wait(msg.op))
++			msg.type = PSEUDO_MSG_FASTOP;
+ 		pseudo_debug(PDBGF_CLIENT | PDBGF_VERBOSE, "sending request [ino %llu]\n", (unsigned long long) msg.ino);
+ #ifdef PSEUDO_PROFILING
+ 		gettimeofday(&tv1_ipc, NULL);
+@@ -2332,7 +2332,7 @@ static int exec_chroot_scriptcheck(const char **filenamep, char * const**argvp,
+ 			/* parse out the interpreter and arg as
+ 			 * the kernel does it in binfmt_script.c
+ 			 */
+-            scriptcheck[sizeof(scriptcheck) - 1] = '\0';
++			scriptcheck[sizeof(scriptcheck) - 1] = '\0';
+ 			s = strchr(scriptcheck, '\n');
+ 			if (s)
+ 				*s = 0;
+@@ -2461,9 +2461,9 @@ static int exec_chroot_scriptcheck(const char **filenamep, char * const**argvp,
+ 
+ 		/* Ask caller to recheck the path now */
+ 		return 1;
+-    }
++	}
+ 
+-    return 0;
++	return 0;
+ }
+ 
+ 
+@@ -2525,7 +2525,7 @@ pseudo_exec_path(const char **filenamep, int search_path, char * const**argvp) {
+ 		else
+ 			candidate = pseudo_fix_path(NULL, filename, 0, 0, NULL, 0, readlink_chroot);
+ 
+-        if (pseudo_chroot_len) {
++		if (pseudo_chroot_len) {
+ 			checkscript = exec_chroot_scriptcheck(filenamep, argvp, filename, candidate);
+ 			if (checkscript) {
+ 				pseudo_magic();
+@@ -2600,7 +2600,7 @@ pseudo_exec_path(const char **filenamep, int search_path, char * const**argvp) {
+ 					len = strlen(dir);
+ 			}
+ 			else
+-			    dir = pseudo_fix_path(pseudo_cwd, path, 0, pseudo_cwd_len, &len, 0, readlink_chroot);
++				dir = pseudo_fix_path(pseudo_cwd, path, 0, pseudo_cwd_len, &len, 0, readlink_chroot);
+ 			if (dir) {
+ 				candidate = pseudo_fix_path(dir, filename, 0, len, NULL, 0, readlink_chroot);
+ 				pseudo_debug(PDBGF_CLIENT, "exec_path: got %s for non-absolute path\n", candidate);
+-- 
+2.17.1
+

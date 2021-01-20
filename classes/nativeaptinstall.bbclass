@@ -160,6 +160,9 @@ ${PSEUDO_LOCALSTATEDIR}:\
 /dev/pts/*:\
 /dev/ptmx:\
 ${DPKG_NATIVE}:\
+/proc/self/fd/*:\
+/proc/self/fd:\
+/proc/self/maps:\
 "
 
 ENV_HOST_PROXIES ?= ""
@@ -188,6 +191,11 @@ aptget_determine_host_proxies() {
 PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
 
 aptget_update_presetvars() {
+	# To avoid useless and complicated directory references outside
+	# our chroot that just make processing more complex and time
+	# consuming, we work in the chroot directory
+	cd "${APTGET_CHROOT_DIR}"
+
 	export PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
 
 	# All this depends on the updated pseudo-native with better 
@@ -513,7 +521,12 @@ fakeroot aptget_run_aptget() {
         xd=`date -R`
         bbnote "${xd}: ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} $@"
         aptget_install_faketools
+
+        # We operate in our fake root dir, but we need to ensure we
+        # override PWD or the emulated code will see a path outside
+        export PWD="/"
         test $aptgetfailure -ne 0 || chroot "${APTGET_CHROOT_DIR}" ${APTGET_EXECUTABLE} ${APTGET_DEFAULT_OPTS} "$@" || aptgetfailure=1
+
         aptget_delete_faketools
 }
 
@@ -942,7 +955,7 @@ APTGET_ALL_PACKAGES = "\
 # complain if needed!
 python() {
         lc = d.getVar("LAYERSERIES_CORENAMES")
-        if ("dunfell" not in lc) and ("gatesgarth" not in lc):
+        if ("zeus" not in lc) and ("dunfell" not in lc) and ("gatesgarth" not in lc):
                 bb.error("nativeaptinstall.bbclass is incompatible to the current layer set")
                 bb.error("You must check APTGET_YOCTO_TRANSLATION and update the anonymous python() function!")
 }
@@ -1067,7 +1080,7 @@ glibc-gconv-utf-7,glibc-gconv-viscii\
  \
 "
 
-# If we are using this class, we want to ensure that our recipe or
+# If we are using this class, we want to ensure that our recipe
 # is also properly listed as rproviding the needed results
 # Images should not be rproviding anything as they don't result
 # in packages, i.e., they are not a dependency resultion element!

@@ -11,7 +11,5 @@ SRC_URI += "\
 	file://0007-qemu-user-Subject-PATCH-qemu-user-Improved-diagnosti.patch \
 	file://0008-qemu-user-builtin-strace-much-more-comprehensive.patch \
 \
-	file://0009-qemu-user-Loading-an-elf-broke-the-heap-for-that-elf.patch \
-\
 	file://0001-qemu-user-strace-didn-t-print-faccessat-correctly.patch \
 "

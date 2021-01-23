@@ -7,15 +7,16 @@ Turns out that a pathological file could have confused the script
 recognition. Now the check is still a bit silly but at least robust.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
- pseudo_client.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ pseudo_client.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/pseudo_client.c b/pseudo_client.c
-index 6b5a127..e052058 100644
+index df24f89..f5b60cd 100644
 --- a/pseudo_client.c
 +++ b/pseudo_client.c
-@@ -2320,9 +2320,11 @@ static int exec_chroot_scriptcheck(const char **filenamep, char * const**argvp,
+@@ -2336,9 +2336,11 @@ static int exec_chroot_scriptcheck(const char **filenamep, char * const**argvp,
  	int splitargs = 0;
  	int extraargc = 0;
  	int changeargv0 = 0;
@@ -28,11 +29,13 @@ index 6b5a127..e052058 100644
  	if (foundscript) {
  		pseudo_debug(PDBGF_CLIENT, "exec path chroot checking for script in %s (argv[0]='%s')\n", chrootfile, (*argvp)[0]);
  		foundscript = 0;
-@@ -2333,7 +2335,7 @@ static int exec_chroot_scriptcheck(const char **filenamep, char * const**argvp,
+@@ -2348,8 +2350,8 @@ static int exec_chroot_scriptcheck(const char **filenamep, char * const**argvp,
+ 			/* parse out the interpreter and arg as
  			 * the kernel does it in binfmt_script.c
  			 */
- 			scriptcheck[sizeof(scriptcheck) - 1] = '\0';
+-            scriptcheck[sizeof(scriptcheck) - 1] = '\0';
 -			s = strchr(scriptcheck, '\n');
++			scriptcheck[sizeof(scriptcheck) - 1] = '\0';
 +			s = strchr(&scriptcheck[2], '\n');
  			if (s)
  				*s = 0;

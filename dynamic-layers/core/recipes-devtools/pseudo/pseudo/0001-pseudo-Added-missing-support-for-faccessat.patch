@@ -48,11 +48,11 @@ index 0000000..0ba30e7
 + * }
 + */
 diff --git a/ports/linux/wrapfuncs.in b/ports/linux/wrapfuncs.in
-index c39a138..a1f9377 100644
+index 80221fc..20fc565 100644
 --- a/ports/linux/wrapfuncs.in
 +++ b/ports/linux/wrapfuncs.in
-@@ -5,6 +5,7 @@ int __lxstat(int ver, const char *path, struct stat *buf); /* flags=AT_SYMLINK_N
- int __fxstat(int ver, int fd, struct stat *buf);
+@@ -6,6 +6,7 @@ int __fxstat(int ver, int fd, struct stat *buf);
+ int lchmod(const char *path, mode_t mode); /* flags=AT_SYMLINK_NOFOLLOW */
  int lchown(const char *path, uid_t owner, gid_t group); /* flags=AT_SYMLINK_NOFOLLOW */
  int __fxstatat(int ver, int dirfd, const char *path, struct stat *buf, int flags);
 +int faccessat(int dirfd, const char *path, int mode, int flags);

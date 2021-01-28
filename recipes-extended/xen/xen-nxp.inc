@@ -5,7 +5,10 @@ URL ?= "git://source.codeaurora.org/external/autobsps32/xen;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "\
     ${URL};branch=${BRANCH} \
+    file://xen-arm64-implement-atomic-fetch-add.patch \
     file://0001-menuconfig-mconf-cfg-Allow-specification-of-ncurses-location.patch \
+    file://0001-python-pygrub-pass-DISTUTILS-xen-4.14.patch \
+    file://0001-xen-build-temporarily-inhibit-Werror-4.14.patch \
 "
 
 SRCREV = "6c46c30c717b8484fb3b7f6e7c2af9b2bbf649f6"

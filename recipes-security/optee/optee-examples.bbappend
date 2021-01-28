@@ -8,6 +8,4 @@ EXTRA_OEMAKE += " \
 
 INSANE_SKIP_${PN} += "ldflags"
 
-inherit python3native
-
 DEPENDS += "python3-pycryptodomex-native"

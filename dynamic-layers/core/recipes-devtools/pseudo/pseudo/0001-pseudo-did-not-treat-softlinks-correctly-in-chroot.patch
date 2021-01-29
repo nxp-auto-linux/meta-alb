@@ -1,4 +1,4 @@
-From 70e7d3a98d9fd703d2d1a682b555fd87b9902d71 Mon Sep 17 00:00:00 2001
+From cae37e28b6bf5a0d3d4032b948098422c9b62e2f Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Date: Wed, 8 Jul 2020 01:26:13 -0700
 Subject: [PATCH] pseudo did not treat softlinks correctly in chroot
@@ -16,14 +16,14 @@ complex rootfs and likely some other things.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
- pseudo_client.c | 75 +++++++++++++++++++++++++++++++++++++++++++------
+ pseudo_client.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++-------
  1 file changed, 66 insertions(+), 9 deletions(-)
 
 diff --git a/pseudo_client.c b/pseudo_client.c
-index bda1584..a590677 100644
+index b330fee..b192b36 100644
 --- a/pseudo_client.c
 +++ b/pseudo_client.c
-@@ -1527,16 +1527,73 @@ readlink_chroot(const char *path, char *buf, size_t bufsiz) {
+@@ -1494,16 +1494,73 @@ readlink_chroot(const char *path, char *buf, size_t bufsiz) {
  	pseudo_debug(PDBGF_CHROOT, "readlink_chroot(%s,...)\n", path);
  	linklen = readlink(path, buf, bufsiz);
  	/* symlinks within a chroot environment should be treated as such
@@ -105,7 +105,7 @@ index bda1584..a590677 100644
  		}
  	}
  
-@@ -1599,7 +1656,7 @@ base_path(int dirfd, const char *path, int leave_last) {
+@@ -1562,7 +1619,7 @@ base_path(int dirfd, const char *path, int leave_last) {
  		}
  	}
  
@@ -115,5 +115,5 @@ index bda1584..a590677 100644
  		leave_last ? "nofollow" : "follow",
  		basepath ? basepath : "<nil>",
 -- 
-2.17.1
+2.7.4
 

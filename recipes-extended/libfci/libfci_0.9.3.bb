@@ -8,8 +8,8 @@ DEPENDS = "pfe"
 PR = "r0"
  
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
-SRCREV = "cfcb4a56c7349ec186ac807f73e56b0cc5777ffd"
-S = "${WORKDIR}/git/"
+SRCREV = "def922b2caf25f9f8a251d672d092c27244b3bcc"
+S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"
 LIBBUILDDIR = "${S}/sw/xfci/libfci/build/release/"
 

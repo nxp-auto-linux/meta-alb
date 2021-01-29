@@ -19,7 +19,7 @@ SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN} \
 	file://0001-pfe_compiler.h-Loosen-compiler-version-check-for-GCC.patch \
 	"
-SRCREV = "cfcb4a56c7349ec186ac807f73e56b0cc5777ffd"
+SRCREV = "def922b2caf25f9f8a251d672d092c27244b3bcc"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
 # since 'aarch64-fsl-linux-strip' fails with error code 1 when parsing the firmware

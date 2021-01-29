@@ -1,21 +1,20 @@
-From 37b7b0e980770bdebf961129af18e62d4afaa1e4 Mon Sep 17 00:00:00 2001
+From 0092e2ce18354eadf170119643845afb61e919db Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 8 Jan 2021 15:32:30 +0200
+Date: Sat, 25 Jan 2020 15:32:30 +0100
 Subject: [PATCH] pseudo: Added missing support for faccessat()
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
- ports/linux/guts/faccessat.c | 30 ++++++++++++++++++++++++++++++
- ports/linux/wrapfuncs.in     |  1 +
+ ports/linux/linux/guts/faccessat.c | 30 ++++++++++++++++++++++++++++++
+ ports/linux/wrapfuncs.in           |  1 +
  2 files changed, 31 insertions(+)
- create mode 100644 ports/linux/guts/faccessat.c
+ create mode 100644 ports/linux/linux/guts/faccessat.c
 
-diff --git a/ports/linux/guts/faccessat.c b/ports/linux/guts/faccessat.c
+diff --git a/ports/linux/linux/guts/faccessat.c b/ports/linux/linux/guts/faccessat.c
 new file mode 100644
 index 0000000..0ba30e7
 --- /dev/null
-+++ b/ports/linux/guts/faccessat.c
++++ b/ports/linux/linux/guts/faccessat.c
 @@ -0,0 +1,30 @@
 +/*
 + * Copyright (c) 2017 Wind River Systems; see
@@ -48,16 +47,16 @@ index 0000000..0ba30e7
 + * }
 + */
 diff --git a/ports/linux/wrapfuncs.in b/ports/linux/wrapfuncs.in
-index 80221fc..20fc565 100644
+index a05de68..58f6a82 100644
 --- a/ports/linux/wrapfuncs.in
 +++ b/ports/linux/wrapfuncs.in
-@@ -6,6 +6,7 @@ int __fxstat(int ver, int fd, struct stat *buf);
- int lchmod(const char *path, mode_t mode); /* flags=AT_SYMLINK_NOFOLLOW */
+@@ -5,6 +5,7 @@ int __lxstat(int ver, const char *path, struct stat *buf); /* flags=AT_SYMLINK_N
+ int __fxstat(int ver, int fd, struct stat *buf);
  int lchown(const char *path, uid_t owner, gid_t group); /* flags=AT_SYMLINK_NOFOLLOW */
  int __fxstatat(int ver, int dirfd, const char *path, struct stat *buf, int flags);
 +int faccessat(int dirfd, const char *path, int mode, int flags);
- int openat(int dirfd, const char *path, int flags, ...{mode_t mode}); /* flags=flags&O_NOFOLLOW, noignore_path=1 */
- int __openat_2(int dirfd, const char *path, int flags); /* flags=flags&O_NOFOLLOW, noignore_path=1 */
+ int openat(int dirfd, const char *path, int flags, ...{mode_t mode}); /* flags=flags&O_NOFOLLOW */
+ int __openat_2(int dirfd, const char *path, int flags); /* flags=flags&O_NOFOLLOW */
  int mknod(const char *path, mode_t mode, dev_t dev); /* real_func=pseudo_mknod */
 -- 
 2.17.1

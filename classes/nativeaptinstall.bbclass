@@ -978,11 +978,13 @@ APTGET_YOCTO_TRANSLATION += "\
     python3.5:python3 \
     xz-utils:xz \
     zlib1g:libz1 \
+    ncurses-base:ncurses-terminfo-base \
+    libmpc3:libmpc \
 "
 # This is a really ugly one for us because Yocto does a very fine
 # grained split of libc. Note how we avoid spaces in the wrong places!
 APTGET_YOCTO_TRANSLATION += "\
-	libc6:libc6,glibc,eglibc\
+	libc6:libc6,libc6-utils,glibc,eglibc\
 glibc-thread-db,eglibc-thread-db,\
 glibc-extra-nss,eglibc-extra-nss,\
 glibc-pcprofile,eglibc-pcprofile,\

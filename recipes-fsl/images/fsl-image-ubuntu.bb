@@ -5,27 +5,21 @@ require fsl-image-ubuntu-base.bb
 # At this time, this is not available for all versions, so we
 # also show how to do a VNC alternative.
 APTGET_EXTRA_PPA += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "ppa:x2go/stable;", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "ppa:x2go/stable;", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "", \
     "unsupportedubuntuversion" \
     , d) \
-    , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "x2goserver x2goserver-xsession", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "x2goserver x2goserver-xsession", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc", \
     "unsupportedubuntuversion" \
     , d) \
-    , d) \
     , d)}'
 IMAGE_INSTALL_append += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc-init", \
     "unsupportedubuntuversion" \
-    , d) \
     , d) \
     , d)}'
 
@@ -106,11 +100,9 @@ APTGET_EXTRA_PACKAGES += " \
 # Installing Java is a bit of loaded topic because it is version
 # dependent. We default to the Java version based on the Ubuntu version
 JAVAVERSION = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "8", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "8", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "11", \
    "unknownjavaversion" \
-    , d) \
     , d) \
     , d)}'
 JAVALIBPATHSUFFIX = '${@ \
@@ -130,20 +122,6 @@ APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-${JAVAVERSION}-openjdk-${UBUNTU_
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev python-bluez avahi-daemon rtkit"
 
 APTGET_SKIP_UPGRADE = "0"
-
-fakeroot do_disable_nm_wait_online() {
-	set -x
-
-	# In xenial, not in bionic, we want to mask NetworkManager-wait-online service
-	# as it runs: '/usr/bin/nm-online -s -q --timeout=30', which fails at boot time,
-	# adding a delay of 'timeout' seconds, although the network interfaces are
-	# working properly.
-	if [ "${UBUNTU_TARGET_BASEVERSION}" = "16.04" ]; then
-		ln -sf "/dev/null" "${APTGET_CHROOT_DIR}/etc/systemd/system/NetworkManager-wait-online.service"
-	fi
-
-	set +x
-}
 
 # 2GB of free space to root fs partition (at least 1.5 GB needed during the Bazel build)
 IMAGE_ROOTFS_EXTRA_SPACE = "2000000"

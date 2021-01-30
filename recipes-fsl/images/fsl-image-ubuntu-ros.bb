@@ -10,8 +10,6 @@ IMAGE_INSTALL += "\
 # ROS packages go at the end, since there is some 
 # Install dependencies for building ROS packages
 def get_rosversion(d):
-    if d.getVar('UBUNTU_TARGET_BASEVERSION', True) == '16.04':
-        return 'kinetic'
     if d.getVar('UBUNTU_TARGET_BASEVERSION', True) == '18.04':
         return 'melodic'
     if d.getVar('UBUNTU_TARGET_BASEVERSION', True) == '20.04':

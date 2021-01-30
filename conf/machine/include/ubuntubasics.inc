@@ -1,8 +1,6 @@
 # We currently support recipies for:
-# - 16.04.6
 # - 18.04.5
 # - 20.04.1
-#UBUNTU_TARGET_VERSION ?= "16.04.6"
 #UBUNTU_TARGET_VERSION ?= "18.04.5"
 UBUNTU_TARGET_VERSION ?= "20.04.1"
 
@@ -33,15 +31,12 @@ POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 # Note that the glibc is not compiled in Ubuntu identical fashion.
 # It remains a glibc that works for Yocto, which is good enough for
 # our purposes.
-# Ubuntu 16.04: max glibc 2.23...
 # Ubuntu 18.04: max glibc 2.27...
 # Ubuntu 20.x: max glibc 2.31...
 GLIBCVERSION = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "2.23", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.27", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.31%", \
     "unsupportedubuntuversion" \
-    , d) \
     , d) \
     , d)}'
 PREFERRED_VERSION_cross-localedef-native = "${GLIBCVERSION}"
@@ -50,11 +45,9 @@ BINUVERSION="2.34"
 # More recent Ubuntu versions work with symlinks for the base
 # directories. We can't refer to symlink based files
 DISTRO_FEATURES_append = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "16.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", " usrmerge", \
    "unsupportedubuntuversion" \
-    , d) \
     , d) \
     , d)}'
 

@@ -25,11 +25,15 @@ KERNEL_DEVSRC_DEFER_TO_SYSTEMD ?= ""
 fakeroot do_aptget_user_update_append() {
 
 	if [ -e "${KERNEL_CHROOT_DIR}/${KERNEL_SRC_PATH}" ]; then
-		if [ -e "${KERNEL_CHROOT_DIR}${root_prefix}/lib/systemd/system" ] && [ "${KERNEL_DEVSRC_DEFER_TO_SYSTEMD}" == "1" ]; then
+		if [ -e "${KERNEL_CHROOT_DIR}${root_prefix}/lib/systemd/system" -a "${KERNEL_DEVSRC_DEFER_TO_SYSTEMD}" = "1" ]; then
 			aptget_install_oneshot_service "makescripts" "Build kernel scripts" "/usr/bin/make V=1 -C ${KERNEL_SRC_PATH} scripts"
 			aptget_install_oneshot_service "makemodules" "Build kernel modules_prepare" "/usr/bin/make -C ${KERNEL_SRC_PATH} modules_prepare"
 		else
-			/usr/bin/yes "" | ARCH=${DEBIAN_TARGET_ARCH} chroot "${KERNEL_CHROOT_DIR}" /usr/bin/make -C "${KERNEL_SRC_PATH}" scripts modules_prepare ${PARALLEL_MAKE}
+			PRECOMPILE_SCRIPTS_ERROR="0"
+			(/usr/bin/yes "" | ARCH=${DEBIAN_TARGET_ARCH} chroot "${KERNEL_CHROOT_DIR}" /usr/bin/make V=1 -C "${KERNEL_SRC_PATH}" scripts modules_prepare ${PARALLEL_MAKE}) || PRECOMPILE_SCRIPTS_ERROR="1"
+			if [ "x$PRECOMPILE_SCRIPTS_ERROR" = "x1" ]; then
+				bbwarn "Scripts from kernel source tree failed to pre-compile. Please consider building them manually on target."
+			fi
 		fi
 	fi
 

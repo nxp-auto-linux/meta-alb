@@ -139,6 +139,7 @@ libpanelw5 \
 libtic5 \
 libtinfo5 \
 ncurses-terminfo-base \
+glibc-utils \
 "
 
 # A few things are provided where we don't have a Yocto equivalent

@@ -1,6 +1,6 @@
-From 50bb487042b9f77deae2bae31b2ade25eb35fd54 Mon Sep 17 00:00:00 2001
+From 68e7e2a2b548e18202cf2315a201ee50131a685d Mon Sep 17 00:00:00 2001
 From: Ionut-Valentin Vicovan <Ionut.Vicovan@nxp.com>
-Date: Mon, 6 Apr 2020 09:46:34 +0300
+Date: Fri, 5 Feb 2021 09:57:27 +0200
 Subject: [PATCH] Update busybox template to handle nosuid/suid flavors of
  busybox
 
@@ -20,14 +20,14 @@ Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
 Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
 ---
- templates/lxc-busybox.in | 106 ++++++++++++++++++++++++++-------------
- 1 file changed, 70 insertions(+), 36 deletions(-)
+ templates/lxc-busybox.in | 108 ++++++++++++++++++++++++++-------------
+ 1 file changed, 72 insertions(+), 36 deletions(-)
 
 diff --git a/templates/lxc-busybox.in b/templates/lxc-busybox.in
-index 761e5dd..2e836ee 100644
+index effdb73..83b93f8 100644
 --- a/templates/lxc-busybox.in
 +++ b/templates/lxc-busybox.in
-@@ -51,7 +51,6 @@ USERNS="$(in_userns)"
+@@ -56,7 +56,6 @@ USERNS="$(in_userns)"
  install_busybox()
  {
    rootfs="${1}"
@@ -35,12 +35,22 @@ index 761e5dd..2e836ee 100644
    res=0
    fstree="\
  ${rootfs}/selinux \
-@@ -133,13 +132,7 @@ EOF
+@@ -75,7 +74,9 @@ ${rootfs}/mnt \
+ ${rootfs}/tmp \
+ ${rootfs}/var/log \
+ ${rootfs}/var/run \
++${rootfs}/usr/share/udhcpc \
+ ${rootfs}/dev/pts \
++${rootfs}/dev/shm \
+ ${rootfs}/lib \
+ ${rootfs}/usr/lib \
+ ${rootfs}/lib64 \
+@@ -136,13 +137,7 @@ EOF
    # writable and readable for other
    chmod 644 "${rootfs}/etc/inittab" || return 1
  
 -  # Look for the pathname of "default.script" from the help of udhcpc
--  DEF_SCRIPT=`${BUSYBOX_EXE} udhcpc -h 2>&1 | grep -- '-s,--script PROG' | cut -d'/' -f2- | cut -d')' -f1`
+-  DEF_SCRIPT=`${BUSYBOX_EXE} udhcpc --help 2>&1 | egrep -- '-s.*Run PROG' | cut -d'/' -f2- | cut -d')' -f1`
 -  DEF_SCRIPT_DIR=`dirname /${DEF_SCRIPT}`
 -  mkdir -p ${rootfs}/${DEF_SCRIPT_DIR}
 -  chmod 644 ${rootfs}/${DEF_SCRIPT_DIR} || return 1
@@ -50,7 +60,7 @@ index 761e5dd..2e836ee 100644
  #!/bin/sh
  case "\$1" in
    deconfig)
-@@ -176,7 +169,7 @@ esac
+@@ -179,7 +174,7 @@ esac
  exit 0
  EOF
  
@@ -59,7 +69,7 @@ index 761e5dd..2e836ee 100644
  
   return "${res}"
  }
-@@ -184,40 +177,53 @@ EOF
+@@ -187,40 +182,52 @@ EOF
  configure_busybox()
  {
    rootfs="${1}"
@@ -89,7 +99,6 @@ index 761e5dd..2e836ee 100644
 +  # copy busybox in the rootfs
 +  if ! cp $bbpath "${rootfs}/bin"; then
 +    echo "ERROR: Failed to copy ${bb_binary} binary" 1>&2
-+    return 1
    fi
  
 -
@@ -119,15 +128,15 @@ index 761e5dd..2e836ee 100644
 +    # /etc/fstab must exist for "mount -a"
 +    touch "${rootfs}/etc/fstab"
 +  fi
-+
-+  if [ ! -x "${rootfs}/bin/passwd" -a -f "${rootfs}/bin/passwd" ]; then
-+    # passwd exec must be setuid
-+    chmod +s "${rootfs}/bin/passwd"
-+  fi
  
 -  # passwd exec must be setuid
 -  chmod +s "${rootfs}/bin/passwd"
 -  touch "${rootfs}/etc/shadow"
++  if [ ! -x "${rootfs}/bin/passwd" -a -f "${rootfs}/bin/passwd" ]; then
++    # passwd exec must be setuid
++    chmod +s "${rootfs}/bin/passwd"
++  fi
++
 +  if [ ! -f "${rootfs}/etc/shadow" ]; then
 +    touch "${rootfs}/etc/shadow"
 +    # add empty password for root
@@ -136,7 +145,7 @@ index 761e5dd..2e836ee 100644
  
    return 0
  }
-@@ -344,14 +350,42 @@ if [ -z "$rootfs" ]; then
+@@ -348,14 +355,43 @@ if [ -z "$rootfs" ]; then
    fi
  fi
  
@@ -163,6 +172,7 @@ index 761e5dd..2e836ee 100644
 +  cd $rootfs/bin && ln -s $bb_binary busybox && cd -
 +  bb_configured=1
 +fi
++
 +bb_binary=`which busybox.suid`
 +if [ -f "$bb_binary" ]; then
 +  configure_busybox $rootfs busybox.suid
@@ -178,7 +188,7 @@ index 761e5dd..2e836ee 100644
 +  configure_busybox $rootfs busybox
 +  if [ $? -ne 0 ]; then
 +    echo "failed to configure busybox template"
-+	exit 1
++    exit 1
 +  fi
  fi
  

@@ -1,0 +1,36 @@
+From dc6579fe23e80101c82efa02e0bfc1291261568c Mon Sep 17 00:00:00 2001
+From: Ciprian Costea <ciprianmarian.costea@nxp.com>
+Date: Fri, 5 Feb 2021 10:01:19 +0200
+Subject: [PATCH] lxc: network: Add corner case on ifup
+
+'netdev->name' can reach 'ifup' with an empty value
+causing network init and therefore starting of a lxc container
+to fail unnecessary.
+
+Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
+---
+ src/lxc/network.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/lxc/network.c b/src/lxc/network.c
+index cf1a0a6..0707890 100644
+--- a/src/lxc/network.c
++++ b/src/lxc/network.c
+@@ -3423,9 +3423,11 @@ static int lxc_network_setup_in_child_namespaces_common(struct lxc_netdev *netde
+ 
+ 	/* set the network device up */
+ 	if (netdev->flags & IFF_UP) {
+-		err = lxc_netdev_up(netdev->name);
+-		if (err)
+-			return log_error_errno(-1, -err, "Failed to set network device \"%s\" up", netdev->name);
++		if (strlen(netdev->name) > 0) {
++			err = lxc_netdev_up(netdev->name);
++			if (err)
++				return log_error_errno(-1, -err, "Failed to set network device \"%s\" up", netdev->name);
++		}
+ 
+ 		/* the network is up, make the loopback up too */
+ 		err = lxc_netdev_up("lo");
+-- 
+2.17.1
+

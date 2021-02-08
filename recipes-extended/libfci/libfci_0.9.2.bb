@@ -9,7 +9,7 @@ PR = "r0"
  
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRCREV = "cfcb4a56c7349ec186ac807f73e56b0cc5777ffd"
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"
 LIBBUILDDIR = "${S}/sw/xfci/libfci/build/release/"
 

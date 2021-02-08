@@ -1,6 +1,6 @@
 DESCRIPTION = "Vector Packet Processing"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 PV = "19.01"
 
 LICENSE = "Apache-2.0"

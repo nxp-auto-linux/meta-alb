@@ -9,10 +9,10 @@ SRC_URI += "file://${NXP_FIRMWARE_LOCAL_DIR}/dte.bin \
 
 do_install_append () {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', 'true', 'false', d)}; then
-		install -m 0644 ${WORKDIR}/dte.bin ${D}/lib/firmware/dte.bin
-		install -m 0644 ${WORKDIR}/frpe.bin ${D}/lib/firmware/frpe.bin
-		install -m 0644 ${WORKDIR}/ppe_tx.bin ${D}/lib/firmware/ppe_tx.bin
-		install -m 0644 ${WORKDIR}/ppe_rx.bin ${D}/lib/firmware/ppe_rx.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/dte.bin ${D}/lib/firmware/dte.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/frpe.bin ${D}/lib/firmware/frpe.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_tx.bin ${D}/lib/firmware/ppe_tx.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_rx.bin ${D}/lib/firmware/ppe_rx.bin
 	fi
 }
 

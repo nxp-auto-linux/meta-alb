@@ -87,7 +87,16 @@ do_install_append_s32() {
     if [ -n "${ATF_IMAGE}" ]; then
         install -d ${DEPLOY_DIR_IMAGE}
         cp ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin
+        install -d ${DEPLOY_DIR_IMAGE}/tools
+        cp -f ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage
     fi
+}
+
+python do_clean_append () {
+    """clear the custom added files"""
+
+    mkimage = os.path.join(d.getVar("DEPLOY_DIR_IMAGE"), "/tools/mkimage")
+    oe.path.remove(mkimage)
 }
 
 FILES_${PN} += "${ENV_STAGE_DIR}"

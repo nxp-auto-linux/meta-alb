@@ -17,7 +17,6 @@ PFE_FW_UTIL_BIN ?= "s32g_pfe_util.fw"
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN} \
-	file://0001-pfe_compiler.h-Loosen-compiler-version-check-for-GCC.patch \
 	"
 SRCREV = "def922b2caf25f9f8a251d672d092c27244b3bcc"
 

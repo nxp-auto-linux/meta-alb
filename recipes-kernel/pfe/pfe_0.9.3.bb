@@ -13,6 +13,7 @@ NXP_FIRMWARE_LOCAL_DIR ?= "."
 
 PFE_FW_CLASS_BIN ?= "s32g_pfe_class.fw"
 PFE_FW_UTIL_BIN ?= "s32g_pfe_util.fw"
+PFENF_SUPPORT_CUT11 ?= "0"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
@@ -35,7 +36,10 @@ FW_INSTALL_DIR = "${D}/${base_libdir}/firmware"
 FW_INSTALL_CLASS_NAME ?= "s32g_pfe_class.fw"
 FW_INSTALL_UTIL_NAME ?= "s32g_pfe_util.fw"
 
-EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 PFE_CFG_IP_VERSION=PFE_CFG_IP_VERSION_NPU_7_14 all"
+# Allow user to build Linux PFE driver (pfeng) for S32G2 silicon cut 1.1
+# by adding option to the local.conf:
+# PFENF_SUPPORT_CUT11 = "1"
+EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 ${@oe.utils.ifelse(d.getVar('PFENF_SUPPORT_CUT11') == '1', 'PFE_CFG_IP_VERSION=PFE_CFG_IP_VERSION_NPU_7_14', '')} all"
 
 module_do_install() {
 	install -D ${MDIR}/pfeng.ko ${INSTALL_DIR}/pfeng.ko

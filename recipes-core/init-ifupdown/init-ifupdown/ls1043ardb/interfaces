@@ -6,29 +6,29 @@ iface lo inet loopback
 
 auto fm1-mac1
 iface fm1-mac1 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto fm1-mac2
 iface fm1-mac2 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto fm1-mac3
 iface fm1-mac3 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto fm1-mac4
 iface fm1-mac4 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto fm1-mac5
 iface fm1-mac5 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto fm1-mac6
 iface fm1-mac6 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto fm1-mac9
 iface fm1-mac9 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 

@@ -7,19 +7,19 @@ iface lo inet loopback
 auto pfe0
 iface pfe0 inet dhcp
 pre-up [ -L /sys/class/net/pfe0 ]
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto pfe1
 iface pfe1 inet dhcp
 pre-up [ -L /sys/class/net/pfe1 ]
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto pfe2
 iface pfe2 inet dhcp
 pre-up [ -L /sys/class/net/pfe2 ]
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto eth0
 iface eth0 inet dhcp
 pre-up [ -L /sys/class/net/eth0 ]
-dhclient_opts -nw
+dhcpcd_opts -b

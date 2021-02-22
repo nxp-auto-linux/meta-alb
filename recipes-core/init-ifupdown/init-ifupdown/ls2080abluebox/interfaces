@@ -6,18 +6,18 @@ iface lo inet loopback
 
 auto eth0
 iface eth0 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto eth1
 iface eth1 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto eth2
 iface eth2 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 auto eth3
 iface eth3 inet dhcp
-dhclient_opts -nw
+dhcpcd_opts -b
 
 

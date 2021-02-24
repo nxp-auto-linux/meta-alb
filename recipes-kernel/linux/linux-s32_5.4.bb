@@ -3,7 +3,7 @@ require recipes-kernel/linux/linux-s32.inc
 URL ?= "git://source.codeaurora.org/external/autobsps32/linux;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}-rt"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV = "21992936690967185febef34eeac80560ab54af1"
+SRCREV = "fc7ed6e7468665e664533dedc3ae443eca2d0adc"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 

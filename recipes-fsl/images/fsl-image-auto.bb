@@ -47,7 +47,7 @@ IMAGE_INSTALL_append_ls2 = " ${LXC_INSTALL_PACKAGES}"
 IMAGE_INSTALL_append = " openssh openssh-sftp openssh-sftp-server "
 
 # Other useful tools
-IMAGE_INSTALL_append = " rsync irqbalance i2c-tools"
+IMAGE_INSTALL_append = " rsync irqbalance i2c-tools spidev-test"
 
 # PCIe demos and test apps
 PCIE_INSTALL_PACKAGES ?= " demo-pcie-shared-mem demo-virt-eth"

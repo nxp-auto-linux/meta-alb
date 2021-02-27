@@ -40,6 +40,9 @@ IMAGE_INSTALL += "\
    linux-kernelitb-norootfs-image \
 "
 
+# S32V234 camera card network support
+IMAGE_INSTALL_append_s32v234campp = " init-net"
+
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "\
 	network-manager \
 "

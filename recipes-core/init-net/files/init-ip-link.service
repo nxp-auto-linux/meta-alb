@@ -1,0 +1,12 @@
+[Unit]
+Description=SJA bridge/switch start service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /etc/init.d/init-ip-link.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

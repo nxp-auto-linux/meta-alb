@@ -40,13 +40,6 @@ SRCREV_vnet = "7d3c52dc3c6564e92bbbc0d0b6aa11e73174fed0"
 #    file://dpaa2debugfs.cfg \
 #"
 
-SRC_URI_append_t4bluebox += " \
-    ${COMMONSRC_URI} \
-    file://t4blueboxconfig \
-    file://enablegfxhwt4.cfg \
-"
-
-
 # pci vdev sources
 SRC_URI_append_ls1043ardb += " \
     git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=pci-vdev;name=pci-vdev;destsuffix=git/drivers/pci/pci-vdev \
@@ -63,8 +56,7 @@ DELTA_KERNEL_DEFCONFIG_append_ls2 = " ls2blueboxconfig dpaa2qdma.cfg dpaa2debugf
 DELTA_KERNEL_DEFCONFIG_append_ls2084abbmini = " vnet_ls2.cfg gpio.cfg"
 
 #DELTA_KERNEL_DEFCONFIG_append_ls2 = " enablegfxhwls2.cfg"
-DELTA_KERNEL_DEFCONFIG_append_t4bluebox = " t4blueboxconfig ${COMMONDELTA_KERNEL_DEFCONFIG}"
-#DELTA_KERNEL_DEFCONFIG_append_t4bluebox = " enablegfxhwt4.cfg"
+
 DELTA_KERNEL_DEFCONFIG_append_ls1043ardb = " ${COMMONDELTA_KERNEL_DEFCONFIG}"
 DELTA_KERNEL_DEFCONFIG_append_ls1043ardb += " pci-vdev.cfg"
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.cfg', '', d)}"

@@ -18,7 +18,6 @@ LINUX_REPLACESCRIPT_NAME_SH ?= "bbreplacerootfs"
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2080abluebox ?= "ls2deployimage "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2084abluebox ?= "ls2deployimage "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2084abbmini  ?= "ls2deployimage ls2factoryprep "
-UBOOT_DEPLOYSCRIPT_NAME_prepend_t4bluebox      ?= "t4deployimage "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls1012abluebox ?= "ls1nordeployimage "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls1043abluebox ?= "ls1nordeployimage "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls1046abluebox ?= "ls1nordeployimage "
@@ -29,7 +28,6 @@ SRC_URI = "file://${UBOOT_DEPLOYSCRIPT_NAME_ITS}.its \
            file://ls1nordeployimage.txt \
            file://ls2deployimage.txt \
            file://ls2factoryprep.txt \
-           file://t4deployimage.txt \
 "
 
 S = "${WORKDIR}"

@@ -14,7 +14,6 @@ SRC_URI_append += " \
     file://0002-Corrected-blockcopy-command-for-fetching-SDHC-U-Boot.patch \
 \
 \
-    file://0001-rcw-Support-for-LS1012ARDB-added-mirroring-binary-va.patch \
     file://0001-rcw-Added-meta-bluebox-related-boards-to-the-Makefil.patch \
 \
     file://0001-rcw-Enabled-proper-RCW-swap-for-functional-QSPI-boot.patch \
@@ -39,7 +38,6 @@ MACHINEBASELINE_ls1043avnpevb ?= "ls1043ardb"
 
 # We need some aliases for the BB image on standard eval boards to
 # avoid duplicating their RCW setups needlessly.
-M_ls1012abluebox = "ls1012ardb"
 M_ls1043abluebox = "ls1043ardb"
 M_ls1046abluebox = "ls1046ardb"
 

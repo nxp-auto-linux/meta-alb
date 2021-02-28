@@ -21,7 +21,6 @@
 #       fsl-image-blueboxbootflash-<platform>.flashimage
 #
 # where <platform> can be:
-#       - ls1012abluebox
 #       - ls1043abluebox
 #       - ls1046abluebox
 #
@@ -60,7 +59,6 @@ echo ""
 
 #----------------------------------------------------------------------
 # We determine the image file we need. This can be either
-# - LS1012A RDB
 # - LS1043A RDB
 # - LS1046A RDB
 # - TBD
@@ -69,28 +67,6 @@ flashtype="<unknownflashtype>"
 file="<unknownimagefile>"
 
 # BIG ENDIAN!
-if itest.b *0x01ee00a4 -eq 0x87 && itest.b *0x01ee00a5 -eq 0x04; then
-	echo "This script is running on LS1012A ..."
-	echo "Assuming LS1012ARDB ..."
-	flashtype='QSPI'
-	file='fsl-image-blueboxbootflash-ls1012abluebox.flashimage'
-	neededfilesize=04000000     # 64MiB
-	setenv switchtobank0 "i2c mw 0x24 0x7 0xfc; i2c mw 0x24 0x3 0xfe"
-	saddr_0_1=a0000000
-	daddr_0_1=00000000
-	ssize_0_1=04000000
-	saddr_0_2=a0000000
-	daddr_0_2=00000000
-	ssize_0_2=04000000
-	setenv switchtobank4 "i2c mw 0x24 0x7 0xfc; i2c mw 0x24 0x3 0xf5"
-	saddr_4_1=a0000000
-	daddr_4_1=00000000
-	ssize_4_1=04000000
-	saddr_4_2=a0000000
-	daddr_4_2=00000000
-	ssize_4_2=04000000
-fi
-
 if itest.b *0x01ee00a4 -eq 0x87 && itest.b *0x01ee00a5 -eq 0x92; then
 	echo "This script is running on LS1043A ..."
 	echo "Assuming LS1043ARDB ..."

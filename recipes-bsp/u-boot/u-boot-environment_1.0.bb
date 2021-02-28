@@ -42,7 +42,6 @@ UBOOT_ENV_NAME_MAP_s32 = " \
 # I don't like this, but until I have a better solution, this is it.
 UBOOT_ENV_IMAGE_SIZE_ls1043ardb = "131072 nand:8192 sdcard:8192"
 UBOOT_ENV_IMAGE_SIZE_ls1043abluebox = "131072 nand:8192 sdcard:8192"
-UBOOT_ENV_IMAGE_SIZE_ls1012a = "262144"
 
 # For the factory image, we support a special environment
 UBOOT_ENV_NAME_append_ls2084abbmini = " u-boot-flashenv-factory"

@@ -1,2 +1,2 @@
 # Ensure the BlueBoxes are included
-COMPATIBLE_MACHINE_append = "|(ls2080abluebox|ls2084abluebox|t4bluebox)"
+COMPATIBLE_MACHINE_append = "|(ls2080abluebox|ls2084abluebox)"

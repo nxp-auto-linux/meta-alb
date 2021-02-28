@@ -29,13 +29,3 @@ IMAGE_INSTALL_append_ls2084abluebox = " \
     lmsensors-fancontrol \
     lmsensors-pwmconfig \
 "
-IMAGE_INSTALL_append_t4bluebox += " \
-    lmsensors-fancontrol \
-    lmsensors-pwmconfig \
-"
-
-# SDK 2.0 does not apply PCDs on T4 by default, which limits performance
-# on the 10G ports unnecessarily
-#IMAGE_INSTALL_append_t4bluebox = "\
-#    pcd-init \
-#"

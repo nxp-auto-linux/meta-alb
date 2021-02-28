@@ -27,12 +27,6 @@
             type = "script";
             compression = "none";
         };
-        t4deployflash@1 {
-            description = "T4 NOR flash deployment script";
-            data = /incbin/("t4deployimage.txt");
-            type = "script";
-            compression = "none";
-        };
     };
 
 };

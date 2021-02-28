@@ -5,7 +5,6 @@ DEPENDS += "change-file-endianess-native"
 SRCREV = "baa4117294631db9e6ac2baa03ed5bdb793d7a81"
 
 SRC_URI_append += " \
-    file://t4bluebox.patch \
     file://0001-Complete-ls2bluebox-RCW-setup-based-on-LS2080ARM-Rev.patch \
     file://0001-rcw-Support-for-LS2084A-in-BB-Classic.patch \
     file://0001-rcw-Basic-support-for-LS2084A-in-BB-Mini.patch \

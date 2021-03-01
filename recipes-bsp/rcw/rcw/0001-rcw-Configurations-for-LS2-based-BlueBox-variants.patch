@@ -1,0 +1,1032 @@
+From be6b1a57b38569a9a47f67ca146139029244166c Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Mon, 1 Mar 2021 10:44:17 +0100
+Subject: [PATCH] rcw: Configurations for LS2 based BlueBox variants
+
+This is a cleanup compared to prior BSPs.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ Makefile                                      |  1 +
+ ...cw_ffffpphh_0x2a_0x41_1800_500_1867ddr.rcw | 41 ++++++++++
+ ls2080abluebox/Makefile                       |  1 +
+ ls2080abluebox/README                         | 14 ++++
+ ls2080abluebox/a008972.rcw                    | 10 +++
+ ls2080abluebox/a009610.rcw                    | 13 +++
+ ls2080abluebox/bootlocptr_nor.rcw             |  8 ++
+ ls2080abluebox/ls2080a.rcwi                   | 81 +++++++++++++++++++
+ ls2080abluebox/tweaksata6gserdes.rcw          |  8 ++
+ ..._ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw | 43 ++++++++++
+ ..._ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw | 43 ++++++++++
+ ...hh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw | 16 ++++
+ ...pphh_0x2a_0x41_SDHC_1800_700_1867_1600.rcw | 46 +++++++++++
+ ...2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw | 16 ++++
+ ..._ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw | 43 ++++++++++
+ ...pphh_0x2a_0x43_SDHC_1800_700_1867_1600.rcw | 46 +++++++++++
+ ls2084abbmini/Makefile                        |  1 +
+ ls2084abbmini/README                          | 14 ++++
+ ls2084abbmini/a008851.rcw                     | 22 +++++
+ ls2084abbmini/a010477.rcw                     | 30 +++++++
+ ls2084abbmini/a010679.rcw                     |  7 ++
+ ls2084abbmini/ls2088a.rcwi                    | 18 +++++
+ ..._ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw | 43 ++++++++++
+ ..._ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw | 43 ++++++++++
+ ...hh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw | 16 ++++
+ ..._ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw | 43 ++++++++++
+ ls2084abluebox/Makefile                       |  1 +
+ ls2084abluebox/README                         | 14 ++++
+ ls2084abluebox/a008851.rcw                    | 22 +++++
+ ls2084abluebox/a010477.rcw                    | 30 +++++++
+ ls2084abluebox/a010679.rcw                    |  7 ++
+ ls2084abluebox/ls2088a.rcwi                   | 18 +++++
+ 32 files changed, 759 insertions(+)
+ create mode 100644 ls2080abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867ddr.rcw
+ create mode 100644 ls2080abluebox/Makefile
+ create mode 100644 ls2080abluebox/README
+ create mode 100644 ls2080abluebox/a008972.rcw
+ create mode 100644 ls2080abluebox/a009610.rcw
+ create mode 100644 ls2080abluebox/bootlocptr_nor.rcw
+ create mode 100644 ls2080abluebox/ls2080a.rcwi
+ create mode 100644 ls2080abluebox/tweaksata6gserdes.rcw
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_SDHC_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abbmini/Makefile
+ create mode 100644 ls2084abbmini/README
+ create mode 100644 ls2084abbmini/a008851.rcw
+ create mode 100644 ls2084abbmini/a010477.rcw
+ create mode 100644 ls2084abbmini/a010679.rcw
+ create mode 100644 ls2084abbmini/ls2088a.rcwi
+ create mode 100644 ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw
+ create mode 100644 ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abluebox/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw
+ create mode 100644 ls2084abluebox/Makefile
+ create mode 100644 ls2084abluebox/README
+ create mode 100644 ls2084abluebox/a008851.rcw
+ create mode 100644 ls2084abluebox/a010477.rcw
+ create mode 100644 ls2084abluebox/a010679.rcw
+ create mode 100644 ls2084abluebox/ls2088a.rcwi
+
+diff --git a/Makefile b/Makefile
+index c84a608..dc8388d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,6 @@
+ DESTDIR = .
+ BOARDS = b4420qds b4860qds \
++	 ls2080abluebox ls2084abluebox ls2084abbmini \
+ 	 ls1012ardb ls1012a2g5rdb ls1012afrdm ls1012afrwy ls1012aqds \
+ 	 ls1021aqds ls1021atwr ls1021atsn \
+ 	 ls1043aqds ls1043ardb \
+diff --git a/ls2080abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867ddr.rcw b/ls2080abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867ddr.rcw
+new file mode 100644
+index 0000000..8e343b0
+--- /dev/null
++++ b/ls2080abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867ddr.rcw
+@@ -0,0 +1,41 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + two lane PCIe + two SARA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A57	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 500 MHz
++ *
++ */
++
++#include <ls2080a.rcwi>
++
++SYS_PLL_RAT=10
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=24
++FLASH_MODE=0x25
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_BASE_BASE=2
++SPI_PCS_BASE=3
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=65
++/* Limit to Gen2 for SerDes 2 41h compatibility */
++SRDS_DIV_PEX_S2=1
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <bootlocptr_nor.rcw>
++#include <a008972.rcw>
++#include <a009610.rcw>
++#include <tweaksata6gserdes.rcw>
+diff --git a/ls2080abluebox/Makefile b/ls2080abluebox/Makefile
+new file mode 100644
+index 0000000..f77e46b
+--- /dev/null
++++ b/ls2080abluebox/Makefile
+@@ -0,0 +1 @@
++include ../Makefile.inc
+diff --git a/ls2080abluebox/README b/ls2080abluebox/README
+new file mode 100644
+index 0000000..4474c3e
+--- /dev/null
++++ b/ls2080abluebox/README
+@@ -0,0 +1,14 @@
++The RCW directories names for the S32VLS2 board conform to the following
++naming convention:
++
++abcdefgh_i_j (default FFFFPPHH_42_65) means:
++a   = 'F'  indicates XFI @ any four ports are supported
++b   = 'F'  indicates XFI @ any four ports are supported
++c   = 'F'  indicates XFI @ any four ports are supported
++d   = 'F'  indicates XFI @ any four ports are supported
++e   = 'P'  indicates PCIe x4 in the PCI slot
++f   = 'P'  indicates PCIe x2 in the PCI slot
++g   = 'H'  indicates SATA port is supported
++h   = 'H'  indicates SATA port is supported
++i   = '42' indicates SerDes1 protocol 0x2A
++j   = '65' indicates SerDes2 protocol 0x41
+diff --git a/ls2080abluebox/a008972.rcw b/ls2080abluebox/a008972.rcw
+new file mode 100644
+index 0000000..e9c41d0
+--- /dev/null
++++ b/ls2080abluebox/a008972.rcw
+@@ -0,0 +1,10 @@
++/*
++ * Errata workaround for A-008972 on LS2080A:
++ *      - CCN-504 performance
++ */
++
++.pbi
++write 0x03080000,0x00000000
++write 0x03080500,0x000004d7
++write 0x00e00620,0xa0000000
++.end
+diff --git a/ls2080abluebox/a009610.rcw b/ls2080abluebox/a009610.rcw
+new file mode 100644
+index 0000000..a7e59cb
+--- /dev/null
++++ b/ls2080abluebox/a009610.rcw
+@@ -0,0 +1,13 @@
++
++/*
++ * Errata workaround for A-00899610 on LS2080A:
++ *      - SVR
++ *      - AIOP power
++ */
++
++.pbi
++loadacwindow 0x01c0
++awrite 0x00117e60,0x00000001
++awrite 0x00117e70,0x00000000
++awrite 0x001244c0,0x00000001
++.end
+diff --git a/ls2080abluebox/bootlocptr_nor.rcw b/ls2080abluebox/bootlocptr_nor.rcw
+new file mode 100644
+index 0000000..3ac4c99
+--- /dev/null
++++ b/ls2080abluebox/bootlocptr_nor.rcw
+@@ -0,0 +1,8 @@
++/*
++ * Set the boot location pointer to the IFC NOR flash boot area.
++ */
++
++.pbi
++write 0x00e00404,0x00000000
++write 0x00e00400,0x30100000
++.end
+diff --git a/ls2080abluebox/ls2080a.rcwi b/ls2080abluebox/ls2080a.rcwi
+new file mode 100644
+index 0000000..4f3e662
+--- /dev/null
++++ b/ls2080abluebox/ls2080a.rcwi
+@@ -0,0 +1,81 @@
++%size=1024
++%pbiformat=2
++%classicbitnumbers=1
++%littleendian=1
++
++SYS_PLL_CFG[1:0]
++SYS_PLL_RAT[6:2]
++MEM_PLL_CFG[9:8]
++MEM_PLL_RAT[15:10]
++CGA_PLL1_CFG[25:24]
++CGA_PLL1_RAT[31:26]
++CGA_PLL2_CFG[33:32]
++CGA_PLL2_RAT[39:34]
++CGB_PLL1_CFG[49:48]
++CGB_PLL1_RAT[55:50]
++CGB_PLL2_CFG[57:56]
++CGB_PLL2_RAT[63:58]
++SYS_PLL_SPD[128]
++MEM1_PLL_SPD[129]
++CGA_PLL1_SPD[132]
++CGA_PLL2_SPD[133]
++CGB_PLL1_SPD[135]
++CGB_PLL2_SPD[136]
++C1_PLL_SEL[147:144]
++C2_PLL_SEL[151:148]
++C3_PLL_SEL[155:152]
++C4_PLL_SEL[159:156]
++DDR_REFCLK_SEL[212:211]
++DRAM_LAT[214:213]
++DDR_RATE[215]
++BOOT_LOC[264:260]
++BOOT_HD[265]
++SB_EN[266]
++FLASH_MODE[275:267]
++PBI_LENGTH[287:276]
++SDBGEN[288]
++SYSCLK_FREQ[301:292]
++GPIO_LED_NUM[310:304]
++GPIO_LED_EN[311]
++UART_BASE[385:384]
++IIC2_BASE[387:386]
++IIC3_BASE[389:388]
++IIC4_BASE[391:390]
++SPI_BASE_BASE[393:392]
++SPI_PCS_BASE[395:394]
++SDHC_BASE[396]
++IRQ11_BASE[397]
++IRQ10_BASE[398]
++IRQ09_BASE[399]
++IRQ08_BASE[400]
++IRQ07_BASE[401]
++IRQ06_BASE[402]
++IRQ05_BASE[403]
++IRQ04_BASE[404]
++IRQ03_BASE[405]
++EVT_9[406]
++RTC[407]
++ASLEEP[408]
++IFC_GRP_A_BASE[449:448]
++IFC_GRP_E_BASE[457:456]
++IFC_GRP_FGHI_BASE[459:458]
++IFC_A_8_6[460]
++QSPI_OCT_EN[461]
++HOST_AGT_PEX1[485]
++HOST_AGT_PEX2[486]
++HOST_AGT_PEX3[487]
++HOST_AGT_PEX4[488]
++GP_INFO[799:768]
++IEEE_1588_EXT[832]
++USB_EXT[833]
++USB3_CLK_FSEL[849:844]
++SRDS_PLL_PD_S1[896]
++SRDS_PLL_PD_S2[897]
++SRDS_PLL_PD_S3[898]
++SRDS_PLL_PD_S4[899]
++SRDS_PRTCL_S1[919:912]
++SRDS_PRTCL_S2[927:920]
++SRDS_PLL_REF_CLK_SEL_S1[929:928]
++SRDS_PLL_REF_CLK_SEL_S2[931:930]
++SRDS_DIV_PEX_S1[945:944]
++SRDS_DIV_PEX_S2[947:946]
+diff --git a/ls2080abluebox/tweaksata6gserdes.rcw b/ls2080abluebox/tweaksata6gserdes.rcw
+new file mode 100644
+index 0000000..4b75727
+--- /dev/null
++++ b/ls2080abluebox/tweaksata6gserdes.rcw
+@@ -0,0 +1,8 @@
++/*
++ * Override default SerDes settings for SATA6G
++ */
++
++.pbi
++write 0x00eb099c,0x00502880
++write 0x00eb09dc,0x00502880
++.end
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw
+new file mode 100644
+index 0000000..5382109
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw
+@@ -0,0 +1,43 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + two lane PCIe + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 500 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=10
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=24
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=1
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=65
++/* Limit to Gen2 for SerDes 2 41h compatibility */
++SRDS_DIV_PEX_S2=1
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++#include <../ls2088asi/bootlocptr_nor.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..fb3e4fe
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw
+@@ -0,0 +1,43 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + two lane PCIe + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=24
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=1
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=65
++/* Limit to Gen2 for SerDes 2 41h compatibility */
++SRDS_DIV_PEX_S2=1
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++#include <../ls2088asi/bootlocptr_nor.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..22d9910
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw
+@@ -0,0 +1,16 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe EP Gen2 + two lane PCIe RC Gen2 + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw>
++
++HOST_AGT_PEX3=1
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_1800_700_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..682d173
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_1800_700_1867_1600.rcw
+@@ -0,0 +1,46 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + two lane PCIe + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ * Boot from SDHC
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=21
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=1
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=65
++/* Limit to Gen2 for SerDes 2 41h compatibility */
++SRDS_DIV_PEX_S2=1
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++.pbi
++blockcopy 0x40,0x00100000,0x1800a000,0x00015000
++.end
++#include <../ls2088asi/bootlocptr_sdhc.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..a7d9b6c
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_EPGen2_1800_700_1867_1600.rcw
+@@ -0,0 +1,16 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe EP Gen2 + two lane PCIe RC Gen2 + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_SDHC_1800_700_1867_1600.rcw>
++
++HOST_AGT_PEX3=1
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..1dec382
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw
+@@ -0,0 +1,43 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + no link to S32V + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 43h (four lane PCIe @8/5/2.5G, no link to S32V, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=24
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=1
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=67
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++#include <../ls2088asi/bootlocptr_nor.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
++#include <a008851.rcw>
++#include <a010477.rcw>
+diff --git a/ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_SDHC_1800_700_1867_1600.rcw b/ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_SDHC_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..5c39cc4
+--- /dev/null
++++ b/ls2084abbmini/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_SDHC_1800_700_1867_1600.rcw
+@@ -0,0 +1,46 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + no link to S32V + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 43h (four lane PCIe @8/5/2.5G, no link to S32V, Two SATA)
++ * Boot from SDHC
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=21
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=1
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=67
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++.pbi
++blockcopy 0x40,0x00100000,0x1800a000,0x00015000
++.end
++#include <../ls2088asi/bootlocptr_sdhc.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
++#include <a008851.rcw>
++#include <a010477.rcw>
+diff --git a/ls2084abbmini/Makefile b/ls2084abbmini/Makefile
+new file mode 100644
+index 0000000..f77e46b
+--- /dev/null
++++ b/ls2084abbmini/Makefile
+@@ -0,0 +1 @@
++include ../Makefile.inc
+diff --git a/ls2084abbmini/README b/ls2084abbmini/README
+new file mode 100644
+index 0000000..00f462e
+--- /dev/null
++++ b/ls2084abbmini/README
+@@ -0,0 +1,14 @@
++The RCW directories names for the BlueBox with LS2084 board conform to the following
++naming convention:
++
++abcdefgh_i_j (default FFFFPPHH_42_65) means:
++a   = 'F'  indicates XFI @ any four ports are supported
++b   = 'F'  indicates XFI @ any four ports are supported
++c   = 'F'  indicates XFI @ any four ports are supported
++d   = 'F'  indicates XFI @ any four ports are supported
++e   = 'P'  indicates PCIe x4 in the PCI slot
++f   = 'P'  indicates PCIe x2 in the PCI slot
++g   = 'H'  indicates SATA port is supported
++h   = 'H'  indicates SATA port is supported
++i   = '42' indicates SerDes1 protocol 0x2A
++j   = '65' indicates SerDes2 protocol 0x41
+diff --git a/ls2084abbmini/a008851.rcw b/ls2084abbmini/a008851.rcw
+new file mode 100644
+index 0000000..6148024
+--- /dev/null
++++ b/ls2084abbmini/a008851.rcw
+@@ -0,0 +1,22 @@
++
++/*
++ * Errata workaround for A-008851 on LS2088A:
++ *      - PCIe Gen 3 training settings are not ok for RC
++ *
++ * NOTE: This only sets values for the PCIe controllers on the RDB
++ *       and would work for four lines each on PCIe3 and PCIe4.
++ *       Note also the different offsets between PCIe3 and PCIe4!
++ */
++
++.pbi
++write 0x036008bc,0x00000001
++write 0x03600164,0x47474747
++write 0x03600168,0x47474747
++
++write 0x037008bc,0x00000001
++write 0x03700154,0x47474747
++write 0x03700158,0x47474747
++
++write 0x036008bc,0x00000000
++write 0x037008bc,0x00000000
++.end
+diff --git a/ls2084abbmini/a010477.rcw b/ls2084abbmini/a010477.rcw
+new file mode 100644
+index 0000000..7a4f0c9
+--- /dev/null
++++ b/ls2084abbmini/a010477.rcw
+@@ -0,0 +1,30 @@
++
++/*
++ * Work-around for erratum A-010477
++ *
++ * Description:
++ * The PCI Express controller core implementation follows a newer version
++ * of the PIPE (PHY Interface for PCI Express) specification. With the
++ * controller's default configuration, the Gen3 equalization negotiation
++ * handshake signaling works slightly differently from what the device's
++ * PCI Express PHY expects. As such, the controller may fail the Gen3 link
++ * training with some Gen3-capable link partner and down-train to either
++ * Gen1 or Gen2.
++ *
++ * Impact:
++ * The PCI Express controller may not be able to establish the link at
++ * Gen3 speed successfully with some Gen3-capable link partner. The link
++ * will be down-trained to either Gen1 or Gen2 speed. However, the link
++ * width negotiation is not impacted.
++ *
++ * Workaround:
++ * Write the value of 0x0080_0401 to the GEN3 Control Register
++ * (GEN3_RELATED_OFF) located at each PCI Express controller’s
++ * configuration space offset 0x890 during the pre-boot initialization
++ * (PBI) stage.
++ */
++
++.pbi
++write 0x03600890,0x00800401
++write 0x03700890,0x00800401
++.end
+diff --git a/ls2084abbmini/a010679.rcw b/ls2084abbmini/a010679.rcw
+new file mode 100644
+index 0000000..2932173
+--- /dev/null
++++ b/ls2084abbmini/a010679.rcw
+@@ -0,0 +1,7 @@
++
++/*
++ * Errata workaround for A-010679 on LS2088A:
++ *      - RCW bit must be set to avoid data corruption
++ */
++
++RESERVED_7=1
+diff --git a/ls2084abbmini/ls2088a.rcwi b/ls2084abbmini/ls2088a.rcwi
+new file mode 100644
+index 0000000..aba65a6
+--- /dev/null
++++ b/ls2084abbmini/ls2088a.rcwi
+@@ -0,0 +1,18 @@
++#include <../ls2088asi/ls2088a.rcwi>
++
++/* Added a number of corrections per the RM nomenclature.
++ * Most can't be applied because there would be a name conflict.
++ */
++REQD_CUST_CONFIG[230:229]
++//IRQ11_BASE[397]
++//IRQ10_BASE[398]
++//IRQ09_BASE[399]
++//IRQ08_BASE[400]
++//IRQ06_BASE[402]
++//IRQ05_BASE[403]
++//IRQ04_BASE[404]
++//IRQ03_BASE[405]
++//SRDS_PLL_PD_PLL1[896]
++//SRDS_PLL_PD_PLL2[897]
++//SRDS_PLL_PD_PLL3[898]
++//SRDS_PLL_PD_PLL4[899]
+diff --git a/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw b/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw
+new file mode 100644
+index 0000000..9ccd9ad
+--- /dev/null
++++ b/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_500_1867_1600.rcw
+@@ -0,0 +1,43 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + two lane PCIe + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 500 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=10
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=24
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=3
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=65
++/* Limit to Gen2 for SerDes 2 41h compatibility */
++SRDS_DIV_PEX_S2=1
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++#include <../ls2088asi/bootlocptr_nor.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
+diff --git a/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw b/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..49bae63
+--- /dev/null
++++ b/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw
+@@ -0,0 +1,43 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe + two lane PCIe + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=24
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=3
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=65
++/* Limit to Gen2 for SerDes 2 41h compatibility */
++SRDS_DIV_PEX_S2=1
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++#include <../ls2088asi/bootlocptr_nor.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
+diff --git a/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw b/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..22d9910
+--- /dev/null
++++ b/ls2084abluebox/FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_EPGen2_1800_700_1867_1600.rcw
+@@ -0,0 +1,16 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe EP Gen2 + two lane PCIe RC Gen2 + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 41h (four lane PCIe @5/2.5G, two lane PCIe @5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <FFFFPPHH_0x2a_0x41/rcw_ffffpphh_0x2a_0x41_1800_700_1867_1600.rcw>
++
++HOST_AGT_PEX3=1
+diff --git a/ls2084abluebox/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw b/ls2084abluebox/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw
+new file mode 100644
+index 0000000..3fd46d0
+--- /dev/null
++++ b/ls2084abluebox/FFFFPPHH_0x2a_0x43/rcw_ffffpphh_0x2a_0x43_1800_700_1867_1600.rcw
+@@ -0,0 +1,43 @@
++/*
++ * RCW for 4x XFI + 4 lane PCIe Gen3 + two SATA
++ * SerDes 1 option 2ah (four XFI)
++ * SerDes 2 option 43h (four lane PCIe @8/5/2.5G, Two SATA)
++ *
++ *
++ * Frequencies :
++ * Core A72	: 1800 MHz
++ * DDR		: 1867 MHz
++ * Platform	: 700 MHz
++ *
++ */
++
++#include <ls2088a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_RAT=14
++CGA_PLL1_RAT=18
++CGA_PLL2_RAT=18
++CGB_PLL1_RAT=18
++CGB_PLL2_RAT=18
++DRAM_LAT=1
++BOOT_LOC=24
++FLASH_MODE=2
++SDBGEN=1
++SYSCLK_FREQ=600
++UART_BASE=3
++IIC2_BASE=2
++SPI_PCS_BASE=3
++USB3_CLK_FSEL=0x27
++SRDS_PRTCL_S1=42
++SRDS_PRTCL_S2=67
++#include <a010679.rcw>
++
++/* PBI LENGTH will be filled automagically if not set manually! */
++/* PBI_LENGTH=0 */
++#include <../ls2088asi/scratchrw1.rcw>
++#include <../ls2088asi/bootlocptr_nor.rcw>
++#include <../ls2088asi/a009531.rcw>
++#include <../ls2088asi/a000009.rcw>
++#include <../ls2088asi/a010554.rcw>
++#include <a008851.rcw>
++#include <a010477.rcw>
+diff --git a/ls2084abluebox/Makefile b/ls2084abluebox/Makefile
+new file mode 100644
+index 0000000..f77e46b
+--- /dev/null
++++ b/ls2084abluebox/Makefile
+@@ -0,0 +1 @@
++include ../Makefile.inc
+diff --git a/ls2084abluebox/README b/ls2084abluebox/README
+new file mode 100644
+index 0000000..00f462e
+--- /dev/null
++++ b/ls2084abluebox/README
+@@ -0,0 +1,14 @@
++The RCW directories names for the BlueBox with LS2084 board conform to the following
++naming convention:
++
++abcdefgh_i_j (default FFFFPPHH_42_65) means:
++a   = 'F'  indicates XFI @ any four ports are supported
++b   = 'F'  indicates XFI @ any four ports are supported
++c   = 'F'  indicates XFI @ any four ports are supported
++d   = 'F'  indicates XFI @ any four ports are supported
++e   = 'P'  indicates PCIe x4 in the PCI slot
++f   = 'P'  indicates PCIe x2 in the PCI slot
++g   = 'H'  indicates SATA port is supported
++h   = 'H'  indicates SATA port is supported
++i   = '42' indicates SerDes1 protocol 0x2A
++j   = '65' indicates SerDes2 protocol 0x41
+diff --git a/ls2084abluebox/a008851.rcw b/ls2084abluebox/a008851.rcw
+new file mode 100644
+index 0000000..6148024
+--- /dev/null
++++ b/ls2084abluebox/a008851.rcw
+@@ -0,0 +1,22 @@
++
++/*
++ * Errata workaround for A-008851 on LS2088A:
++ *      - PCIe Gen 3 training settings are not ok for RC
++ *
++ * NOTE: This only sets values for the PCIe controllers on the RDB
++ *       and would work for four lines each on PCIe3 and PCIe4.
++ *       Note also the different offsets between PCIe3 and PCIe4!
++ */
++
++.pbi
++write 0x036008bc,0x00000001
++write 0x03600164,0x47474747
++write 0x03600168,0x47474747
++
++write 0x037008bc,0x00000001
++write 0x03700154,0x47474747
++write 0x03700158,0x47474747
++
++write 0x036008bc,0x00000000
++write 0x037008bc,0x00000000
++.end
+diff --git a/ls2084abluebox/a010477.rcw b/ls2084abluebox/a010477.rcw
+new file mode 100644
+index 0000000..7a4f0c9
+--- /dev/null
++++ b/ls2084abluebox/a010477.rcw
+@@ -0,0 +1,30 @@
++
++/*
++ * Work-around for erratum A-010477
++ *
++ * Description:
++ * The PCI Express controller core implementation follows a newer version
++ * of the PIPE (PHY Interface for PCI Express) specification. With the
++ * controller's default configuration, the Gen3 equalization negotiation
++ * handshake signaling works slightly differently from what the device's
++ * PCI Express PHY expects. As such, the controller may fail the Gen3 link
++ * training with some Gen3-capable link partner and down-train to either
++ * Gen1 or Gen2.
++ *
++ * Impact:
++ * The PCI Express controller may not be able to establish the link at
++ * Gen3 speed successfully with some Gen3-capable link partner. The link
++ * will be down-trained to either Gen1 or Gen2 speed. However, the link
++ * width negotiation is not impacted.
++ *
++ * Workaround:
++ * Write the value of 0x0080_0401 to the GEN3 Control Register
++ * (GEN3_RELATED_OFF) located at each PCI Express controller’s
++ * configuration space offset 0x890 during the pre-boot initialization
++ * (PBI) stage.
++ */
++
++.pbi
++write 0x03600890,0x00800401
++write 0x03700890,0x00800401
++.end
+diff --git a/ls2084abluebox/a010679.rcw b/ls2084abluebox/a010679.rcw
+new file mode 100644
+index 0000000..2932173
+--- /dev/null
++++ b/ls2084abluebox/a010679.rcw
+@@ -0,0 +1,7 @@
++
++/*
++ * Errata workaround for A-010679 on LS2088A:
++ *      - RCW bit must be set to avoid data corruption
++ */
++
++RESERVED_7=1
+diff --git a/ls2084abluebox/ls2088a.rcwi b/ls2084abluebox/ls2088a.rcwi
+new file mode 100644
+index 0000000..aba65a6
+--- /dev/null
++++ b/ls2084abluebox/ls2088a.rcwi
+@@ -0,0 +1,18 @@
++#include <../ls2088asi/ls2088a.rcwi>
++
++/* Added a number of corrections per the RM nomenclature.
++ * Most can't be applied because there would be a name conflict.
++ */
++REQD_CUST_CONFIG[230:229]
++//IRQ11_BASE[397]
++//IRQ10_BASE[398]
++//IRQ09_BASE[399]
++//IRQ08_BASE[400]
++//IRQ06_BASE[402]
++//IRQ05_BASE[403]
++//IRQ04_BASE[404]
++//IRQ03_BASE[405]
++//SRDS_PLL_PD_PLL1[896]
++//SRDS_PLL_PD_PLL2[897]
++//SRDS_PLL_PD_PLL3[898]
++//SRDS_PLL_PD_PLL4[899]
+-- 
+2.17.1
+

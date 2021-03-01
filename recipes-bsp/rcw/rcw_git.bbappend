@@ -1,10 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-LEGACY_INCLUDE ??= ""
-LEGACY_INCLUDE_ls1046abluebox = "rcw_git_legacy.inc"
-LEGACY_INCLUDE_ls2 = "rcw_git_legacy.inc"
-
-# Not based on legacy RCW:
 BOARD_TARGETS_ls1043abluebox="ls1043ardb"
+BOARD_TARGETS_ls1046abluebox="ls1046ardb"
 
-include ${LEGACY_INCLUDE}
+SRC_URI_append += "\
+	file://0001-rcw-Configurations-for-LS2-based-BlueBox-variants.patch \
+"

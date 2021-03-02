@@ -19,9 +19,6 @@ PREMIRRORS_prepend = " git://github.com/qoriq-open-source/ git://source.codeauro
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"
 PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
 
-# Force using the legacy version of u-boot currently supported by the BSP, since
-# newer versions do not have LS2084 support updated
-PREFERRED_VERSION_u-boot-qoriq = "2017.12+fslgit"
 
 # Add and force using version 10.24.0, latest available with LS2084 support
 # 10.24.1 from meta-qoriq does not have LS2084 support

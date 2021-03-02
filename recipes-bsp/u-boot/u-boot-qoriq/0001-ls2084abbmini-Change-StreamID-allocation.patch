@@ -1,33 +1,38 @@
-From 3d1c58f0076c6072c840f4a7ca2faf2019a4140b Mon Sep 17 00:00:00 2001
-From: Jakub Sosnovec <jakub.sosnovec@nxp.com>
-Date: Mon, 2 Nov 2020 12:34:43 +0100
+From 2054ce267f617d27df9b02ab44634dba149a6534 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 25 Feb 2021 11:51:23 +0100
 Subject: [PATCH] ls2084abbmini Change StreamID allocation
 
----
- arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This is based on a patch submitted by
+Jakub Sosnovec <jakub.sosnovec@nxp.com> but implemented in a BB Mini
+specific file.
 
-diff --git a/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h b/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h
-index f464dda83f..d4e686dc85 100644
---- a/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h
-+++ b/arch/arm/include/asm/arch-fsl-layerscape/stream_id_lsch3.h
-@@ -84,14 +84,14 @@
- #define FSL_PEX_STREAM_ID_START		7
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ include/configs/ls2084abbmini.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/include/configs/ls2084abbmini.h b/include/configs/ls2084abbmini.h
+index 9228cfeb3d..a77101c81b 100644
+--- a/include/configs/ls2084abbmini.h
++++ b/include/configs/ls2084abbmini.h
+@@ -9,6 +9,16 @@
  
- #if defined(CONFIG_ARCH_LS2080A)
--#define FSL_PEX_STREAM_ID_END		22
-+#define FSL_PEX_STREAM_ID_END		42
- #elif defined(CONFIG_ARCH_LS1088A)
- #define FSL_PEX_STREAM_ID_END		18
- #endif
+ #include "ls2080a_common.h"
  
- 
- /* DPAA2 - set in MC DPC and alloced by MC */
--#define FSL_DPAA2_STREAM_ID_START	23
-+#define FSL_DPAA2_STREAM_ID_START	43
- #define FSL_DPAA2_STREAM_ID_END		63
- 
- #endif
++/* For complex PCIe scenarios we need more stream IDs there.
++ * This patch tweaks the stream ID allocation to have more on PCIe
++ * by reducing the IDs for DPAA2. BB Mini doesn't use all DPAA2
++ * features, so this seems like a reasonable compromise.
++ */
++#undef FSL_PEX_STREAM_ID_END
++#define FSL_PEX_STREAM_ID_END          42
++#undef FSL_DPAA2_STREAM_ID_START
++#define FSL_DPAA2_STREAM_ID_START      43
++
+ #if !defined(CONFIG_SPL_BUILD)
+ #define I2C_VOL_MONITOR_ADDR           0x63
+ #define CONFIG_VOL_MONITOR_LTC3882_READ
 -- 
 2.17.1
 

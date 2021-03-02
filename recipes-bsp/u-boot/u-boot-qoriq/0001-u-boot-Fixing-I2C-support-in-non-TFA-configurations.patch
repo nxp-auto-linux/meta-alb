@@ -1,0 +1,41 @@
+From f5e1130843cefab7851f394696f49e4b0c86889e Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 24 Feb 2021 17:03:31 +0100
+Subject: [PATCH 1/2] u-boot: Fixing I2C support in non-TFA configurations
+
+This is really using a fix from the 2021 U-Boot.
+
+Specifically, this is the equivalent of
+https://github.com/hsdenx/u-boot-i2c/commit/660606091f12320210cb7ced018788b8028aab5f
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ drivers/i2c/Makefile       | 2 +-
+ drivers/i2c/muxes/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/i2c/Makefile b/drivers/i2c/Makefile
+index f5a471f887..2179fd5cef 100644
+--- a/drivers/i2c/Makefile
++++ b/drivers/i2c/Makefile
+@@ -42,4 +42,4 @@ obj-$(CONFIG_SYS_I2C_VERSATILE) += i2c-versatile.o
+ obj-$(CONFIG_SYS_I2C_XILINX_XIIC) += xilinx_xiic.o
+ obj-$(CONFIG_TEGRA186_BPMP_I2C) += tegra186_bpmp_i2c.o
+ 
+-obj-$(CONFIG_I2C_MUX) += muxes/
++obj-$(CONFIG_$(SPL_)I2C_MUX) += muxes/
+diff --git a/drivers/i2c/muxes/Makefile b/drivers/i2c/muxes/Makefile
+index 68ed9b547d..b690821199 100644
+--- a/drivers/i2c/muxes/Makefile
++++ b/drivers/i2c/muxes/Makefile
+@@ -2,6 +2,6 @@
+ #
+ # Copyright (c) 2015 Google, Inc
+ obj-$(CONFIG_I2C_ARB_GPIO_CHALLENGE) += i2c-arb-gpio-challenge.o
+-obj-$(CONFIG_$(SPL_)I2C_MUX) += i2c-mux-uclass.o
++obj-$(CONFIG_I2C_MUX) += i2c-mux-uclass.o
+ obj-$(CONFIG_I2C_MUX_PCA954x) += pca954x.o
+ obj-$(CONFIG_I2C_MUX_GPIO) += i2c-mux-gpio.o
+-- 
+2.17.1
+

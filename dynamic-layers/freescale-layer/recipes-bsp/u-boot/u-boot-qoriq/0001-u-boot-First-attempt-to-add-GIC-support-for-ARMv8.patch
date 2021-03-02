@@ -1,32 +1,78 @@
-From 46c2b6d8ccdce0f05ee656d54c3be782fbc194aa Mon Sep 17 00:00:00 2001
+From 8aed14e0cd3dad8eb55abd0a1d6a7fdf49577c0f Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Thu, 17 Jan 2019 12:39:19 +0200
-Subject: [PATCH 11/15] u-boot: First attempt to add GIC support for ARMv8,
- needed for LS2 in EP mode
+Date: Fri, 19 Feb 2021 12:43:43 +0100
+Subject: [PATCH] u-boot: First attempt to add GIC support for ARMv8,
+
+We need to have the capability to use interrupt handlers in U-Boot
+to support PCIe in EP mode on Layerscape devices. Within careful limits
+this may be quite helpful also to ensure the proper state of other
+HW blocks. It is not meant to turn U-Boot into an interrupt driven
+code base.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Dan Nica <dan.nica@nxp.com>
----
- arch/arm/cpu/armv8/Kconfig        |  10 +
- arch/arm/cpu/armv8/Makefile       |   1 +
- arch/arm/cpu/armv8/gicsupport.c   | 385 ++++++++++++++++++++++++++++++++++++++
- arch/arm/include/asm/gicsupport.h |  11 ++
- arch/arm/lib/interrupts_64.c      |   8 +-
- 5 files changed, 411 insertions(+), 4 deletions(-)
- create mode 100644 arch/arm/cpu/armv8/gicsupport.c
- create mode 100644 arch/arm/include/asm/gicsupport.h
 
-diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index d9fe0d0..ec912c4 100644
---- a/arch/arm/cpu/armv8/Kconfig
-+++ b/arch/arm/cpu/armv8/Kconfig
-@@ -41,6 +41,16 @@ config ARMV8_SPIN_TABLE
- 	    - Reserve the code for the spin-table and the release address
- 	      via a /memreserve/ region in the Device Tree.
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ arch/arm/Kconfig                  |   2 +
+ arch/arm/include/asm/gicsupport.h |  11 +
+ arch/arm/lib/Kconfig              |  26 ++
+ arch/arm/lib/Makefile             |   1 +
+ arch/arm/lib/gicsupport.c         | 385 ++++++++++++++++++++++++++++++
+ arch/arm/lib/interrupts_64.c      |   8 +-
+ 6 files changed, 429 insertions(+), 4 deletions(-)
+ create mode 100644 arch/arm/include/asm/gicsupport.h
+ create mode 100644 arch/arm/lib/Kconfig
+ create mode 100644 arch/arm/lib/gicsupport.c
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 169a1f6278..b21e1fdc00 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1723,6 +1723,8 @@ config ISW_ENTRY_ADDR
+ 	  image headers.
+ endif
  
++source "arch/arm/lib/Kconfig"
++
+ source "arch/arm/mach-aspeed/Kconfig"
+ 
+ source "arch/arm/mach-at91/Kconfig"
+diff --git a/arch/arm/include/asm/gicsupport.h b/arch/arm/include/asm/gicsupport.h
+new file mode 100644
+index 0000000000..6ecc9978cd
+--- /dev/null
++++ b/arch/arm/include/asm/gicsupport.h
+@@ -0,0 +1,11 @@
++/*
++ * Copyright 2016, NXP
++ *
++ */
++ /* Functions defined in arch/arm/cpu/armv8/gicsupport.c */
++void gic_unmask_irq(unsigned int irq);
++void gic_mask_irq(unsigned int irq);
++void gic_clear_pending_irq(unsigned int irq);
++int gic_irq_status(unsigned int irq);
++static void gic_set_type(unsigned int irq, int type);
++int gic_register_handler(int irq, void (*handler)(struct pt_regs *pt_regs, unsigned int esr), int type, const char *name);
+diff --git a/arch/arm/lib/Kconfig b/arch/arm/lib/Kconfig
+new file mode 100644
+index 0000000000..15ea73cdca
+--- /dev/null
++++ b/arch/arm/lib/Kconfig
+@@ -0,0 +1,26 @@
++menu "Interrupt handler support"
++	depends on ARM64
++
 +config GICSUPPORT
 +	bool "Enable GIC support for interrupt handlers"
-+	depends on USE_IRQ
++	help
++	 This adds generic support functions for the Arm GIC V2 and V3.
++	 If unsure, say N.
++
++config SUPPORT_IRQHANDLERS
++	bool "Support interrupt handlers within U-Boot"
++	select GICSUPPORT
 +	help
 +	  Say Y here to support interrupt handlers within U-Boot.
 +	  If unsure, say N and see if U-Boot still builds properly.
@@ -34,26 +80,30 @@ index d9fe0d0..ec912c4 100644
 +	  mode need supporting interrupt handlers to function correctly.
 +	  This setting is required for configurations with such drivers.
 +
- menu "ARMv8 secure monitor firmware"
- config ARMV8_SEC_FIRMWARE_SUPPORT
- 	bool "Enable ARMv8 secure monitor firmware framework support"
-diff --git a/arch/arm/cpu/armv8/Makefile b/arch/arm/cpu/armv8/Makefile
-index 1249547..dfcbb8a 100644
---- a/arch/arm/cpu/armv8/Makefile
-+++ b/arch/arm/cpu/armv8/Makefile
-@@ -25,6 +25,7 @@ obj-$(CONFIG_ARMV8_SPIN_TABLE) += spin_table.o spin_table_v8.o
- endif
- obj-$(CONFIG_$(SPL_)ARMV8_SEC_FIRMWARE_SUPPORT) += sec_firmware.o sec_firmware_asm.o
- 
++config CMD_IRQINFO
++	bool "irqinfo"
++	select SUPPORT_IRQHANDLERS
++	help
++	  Print interrupt statistics for all registered handlers.
++
++endmenu
+diff --git a/arch/arm/lib/Makefile b/arch/arm/lib/Makefile
+index 8482f5446c..6860ce4687 100644
+--- a/arch/arm/lib/Makefile
++++ b/arch/arm/lib/Makefile
+@@ -51,6 +51,7 @@ else ifdef CONFIG_ARM64
+ obj-$(CONFIG_FSL_LAYERSCAPE) += ccn504.o
+ ifneq ($(CONFIG_GICV2)$(CONFIG_GICV3),)
+ obj-y	+= gic_64.o
 +obj-$(CONFIG_GICSUPPORT)	+= gicsupport.o
- obj-$(CONFIG_FSL_LAYERSCAPE) += fsl-layerscape/
- obj-$(CONFIG_S32V234) += s32v234/
- obj-$(CONFIG_ARCH_ZYNQMP) += zynqmp/
-diff --git a/arch/arm/cpu/armv8/gicsupport.c b/arch/arm/cpu/armv8/gicsupport.c
+ endif
+ obj-$(CONFIG_GIC_V3_ITS)	+= gic-v3-its.o
+ obj-y	+= interrupts_64.o
+diff --git a/arch/arm/lib/gicsupport.c b/arch/arm/lib/gicsupport.c
 new file mode 100644
-index 0000000..2b854ae
+index 0000000000..7c8c3377c1
 --- /dev/null
-+++ b/arch/arm/cpu/armv8/gicsupport.c
++++ b/arch/arm/lib/gicsupport.c
 @@ -0,0 +1,385 @@
 +/*
 + * (C) Copyright 2016
@@ -321,7 +371,7 @@ index 0000000..2b854ae
 +#endif
 +}
 +
-+#if defined(CONFIG_USE_IRQ)
++#if defined(CONFIG_SUPPORT_IRQHANDLERS)
 +int arch_interrupt_init(void)
 +{
 +	int i;
@@ -422,7 +472,7 @@ index 0000000..2b854ae
 +}
 +#endif
 +
-+#if defined(CONFIG_CMD_IRQ)
++#if defined(CONFIG_CMD_IRQINFO)
 +int do_irqinfo (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 +{
 +	int i;
@@ -440,25 +490,8 @@ index 0000000..2b854ae
 +	return 0;
 +}
 +#endif
-diff --git a/arch/arm/include/asm/gicsupport.h b/arch/arm/include/asm/gicsupport.h
-new file mode 100644
-index 0000000..6ecc997
---- /dev/null
-+++ b/arch/arm/include/asm/gicsupport.h
-@@ -0,0 +1,11 @@
-+/*
-+ * Copyright 2016, NXP
-+ *
-+ */
-+ /* Functions defined in arch/arm/cpu/armv8/gicsupport.c */
-+void gic_unmask_irq(unsigned int irq);
-+void gic_mask_irq(unsigned int irq);
-+void gic_clear_pending_irq(unsigned int irq);
-+int gic_irq_status(unsigned int irq);
-+static void gic_set_type(unsigned int irq, int type);
-+int gic_register_handler(int irq, void (*handler)(struct pt_regs *pt_regs, unsigned int esr), int type, const char *name);
 diff --git a/arch/arm/lib/interrupts_64.c b/arch/arm/lib/interrupts_64.c
-index cbcfeec..a568f47 100644
+index dffdf57aa2..9bb501e641 100644
 --- a/arch/arm/lib/interrupts_64.c
 +++ b/arch/arm/lib/interrupts_64.c
 @@ -11,17 +11,17 @@
@@ -482,7 +515,7 @@ index cbcfeec..a568f47 100644
  {
  	return 0;
  }
-@@ -101,7 +101,7 @@ void do_sync(struct pt_regs *pt_regs, unsigned int esr)
+@@ -122,7 +122,7 @@ void do_sync(struct pt_regs *pt_regs, unsigned int esr)
  /*
   * do_irq handles the Irq exception.
   */
@@ -492,5 +525,5 @@ index cbcfeec..a568f47 100644
  	efi_restore_gd();
  	printf("\"Irq\" handler, esr 0x%08x\n", esr);
 -- 
-2.7.4
+2.17.1
 

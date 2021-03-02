@@ -1,45 +1,45 @@
-From 95cbd8b4033a421b172ae781f98e1939c940e6be Mon Sep 17 00:00:00 2001
-From: r39252 <Heinz.Wrobel@freescale.com>
-Date: Sun, 23 Apr 2017 21:11:16 +0200
-Subject: [PATCH 01/17] u-boot: Enable Vitesse reset delay required per spec
+From 903630ecccc8c2137d8f89153e8febaf0c0886cd Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 18 Feb 2021 17:10:38 +0100
+Subject: [PATCH] u-boot: Enable Vitesse reset delay required per spec
 
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
- include/configs/B4860QDS.h   | 2 +-
+ include/configs/B4860QDS.h   | 1 +
  include/configs/T4240RDB.h   | 1 +
  include/configs/corenet_ds.h | 1 +
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ 3 files changed, 3 insertions(+)
 
 diff --git a/include/configs/B4860QDS.h b/include/configs/B4860QDS.h
-index b7dce72108..b43852ae32 100644
+index 1a34b95bec..4107d28792 100644
 --- a/include/configs/B4860QDS.h
 +++ b/include/configs/B4860QDS.h
-@@ -688,7 +688,7 @@ unsigned long get_board_ddr_clk(void);
- #define CONFIG_FMAN_ENET
+@@ -588,6 +588,7 @@ unsigned long get_board_ddr_clk(void);
+ #ifdef CONFIG_SYS_DPAA_FMAN
  #define CONFIG_PHYLIB_10G
  #define CONFIG_PHY_VITESSE
--#define CONFIG_PHY_TERANETICS
 +#define CONFIG_PHY_RESET_DELAY 4       /* Required by Vitesse Spec */
+ #define CONFIG_PHY_TERANETICS
  #define SGMII_CARD_PORT1_PHY_ADDR 0x1C
  #define SGMII_CARD_PORT2_PHY_ADDR 0x10
- #define SGMII_CARD_PORT3_PHY_ADDR 0x1E
 diff --git a/include/configs/T4240RDB.h b/include/configs/T4240RDB.h
-index e8a79ceb14..62622eff0c 100644
+index 4c0b9ada62..53e6ad2749 100644
 --- a/include/configs/T4240RDB.h
 +++ b/include/configs/T4240RDB.h
-@@ -664,6 +664,7 @@ unsigned long get_board_ddr_clk(void);
- #define CONFIG_FMAN_ENET
+@@ -555,6 +555,7 @@ unsigned long get_board_ddr_clk(void);
+ #ifdef CONFIG_SYS_DPAA_FMAN
  #define CONFIG_PHYLIB_10G
  #define CONFIG_PHY_VITESSE
 +#define CONFIG_PHY_RESET_DELAY 4       /* Required by Vitesse Spec */
- #define CONFIG_PHY_CORTINA
- #define CONFIG_SYS_CORTINA_FW_IN_NOR
  #define CONFIG_CORTINA_FW_ADDR		0xefe00000
+ #define CONFIG_CORTINA_FW_LENGTH	0x40000
+ #define CONFIG_PHY_TERANETICS
 diff --git a/include/configs/corenet_ds.h b/include/configs/corenet_ds.h
-index ba89fe601d..89f318857e 100644
+index d8402e493d..fa075a4b1e 100644
 --- a/include/configs/corenet_ds.h
 +++ b/include/configs/corenet_ds.h
-@@ -552,6 +552,7 @@
- #define CONFIG_FMAN_ENET
+@@ -440,6 +440,7 @@
+ #ifdef CONFIG_SYS_DPAA_FMAN
  #define CONFIG_PHYLIB_10G
  #define CONFIG_PHY_VITESSE
 +#define CONFIG_PHY_RESET_DELAY 4       /* Required by Vitesse Spec */
@@ -47,5 +47,5 @@ index ba89fe601d..89f318857e 100644
  #endif
  
 -- 
-2.12.2
+2.17.1
 

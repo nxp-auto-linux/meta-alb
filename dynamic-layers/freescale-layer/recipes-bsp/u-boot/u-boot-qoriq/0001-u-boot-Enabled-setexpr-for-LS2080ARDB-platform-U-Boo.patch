@@ -1,7 +1,10 @@
-From 1581e54a1aa099ea67c28840ed8f76ce5acc818b Mon Sep 17 00:00:00 2001
+From a42d1b1bdb0b7f34ad2cc3c59b1aebd27e045806 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Thu, 17 Jan 2019 12:44:55 +0200
-Subject: [PATCH 13/15] u-boot: Enabled setexpr for LS2080ARDB platform U-Boot
+Date: Thu, 18 Feb 2021 17:57:02 +0100
+Subject: [PATCH] u-boot: Enabled setexpr for LS2080ARDB platform U-Boot
+
+Specifically not having setexpr complicates use of the board
+unnecessarily when complex scripts are used.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Dan Nica <dan.nica@nxp.com>
@@ -12,41 +15,41 @@ Signed-off-by: Dan Nica <dan.nica@nxp.com>
  3 files changed, 3 deletions(-)
 
 diff --git a/configs/ls2080ardb_SECURE_BOOT_defconfig b/configs/ls2080ardb_SECURE_BOOT_defconfig
-index e4a985f..70f8847 100644
+index 4abfc64705..6aaf37f8b2 100644
 --- a/configs/ls2080ardb_SECURE_BOOT_defconfig
 +++ b/configs/ls2080ardb_SECURE_BOOT_defconfig
-@@ -21,7 +21,6 @@ CONFIG_CMD_NAND=y
- CONFIG_CMD_PCI=y
- CONFIG_CMD_SF=y
- CONFIG_CMD_USB=y
--# CONFIG_CMD_SETEXPR is not set
- CONFIG_CMD_CACHE=y
- CONFIG_CMD_DATE=y
- CONFIG_OF_CONTROL=y
-diff --git a/configs/ls2080ardb_defconfig b/configs/ls2080ardb_defconfig
-index 0fd3fee..b32d8f2 100644
---- a/configs/ls2080ardb_defconfig
-+++ b/configs/ls2080ardb_defconfig
-@@ -19,7 +19,6 @@ CONFIG_CMD_NAND=y
- CONFIG_CMD_PCI=y
- CONFIG_CMD_SF=y
- CONFIG_CMD_USB=y
--# CONFIG_CMD_SETEXPR is not set
- CONFIG_CMD_CACHE=y
- CONFIG_CMD_DATE=y
- CONFIG_OF_CONTROL=y
-diff --git a/configs/ls2080ardb_nand_defconfig b/configs/ls2080ardb_nand_defconfig
-index 0f248a7..10e54f5 100644
---- a/configs/ls2080ardb_nand_defconfig
-+++ b/configs/ls2080ardb_nand_defconfig
-@@ -27,7 +27,6 @@ CONFIG_CMD_MMC=y
+@@ -24,7 +24,6 @@ CONFIG_CMD_MMC=y
  CONFIG_CMD_NAND=y
  CONFIG_CMD_PCI=y
  CONFIG_CMD_USB=y
 -# CONFIG_CMD_SETEXPR is not set
  CONFIG_CMD_CACHE=y
  CONFIG_CMD_DATE=y
- CONFIG_OF_CONTROL=y
+ CONFIG_MP=y
+diff --git a/configs/ls2080ardb_defconfig b/configs/ls2080ardb_defconfig
+index 0102e14ecb..5cbe34ccee 100644
+--- a/configs/ls2080ardb_defconfig
++++ b/configs/ls2080ardb_defconfig
+@@ -24,7 +24,6 @@ CONFIG_CMD_MMC=y
+ CONFIG_CMD_NAND=y
+ CONFIG_CMD_PCI=y
+ CONFIG_CMD_USB=y
+-# CONFIG_CMD_SETEXPR is not set
+ CONFIG_CMD_CACHE=y
+ CONFIG_CMD_DATE=y
+ CONFIG_MP=y
+diff --git a/configs/ls2080ardb_nand_defconfig b/configs/ls2080ardb_nand_defconfig
+index 448e0fe58d..f684bd4f24 100644
+--- a/configs/ls2080ardb_nand_defconfig
++++ b/configs/ls2080ardb_nand_defconfig
+@@ -34,7 +34,6 @@ CONFIG_CMD_MMC=y
+ CONFIG_CMD_NAND=y
+ CONFIG_CMD_PCI=y
+ CONFIG_CMD_USB=y
+-# CONFIG_CMD_SETEXPR is not set
+ CONFIG_CMD_CACHE=y
+ CONFIG_CMD_DATE=y
+ CONFIG_MP=y
 -- 
-2.7.4
+2.17.1
 

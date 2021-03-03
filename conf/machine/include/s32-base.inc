@@ -61,3 +61,7 @@ MACHINE_SOCARCH_SUFFIX_s32 = "-s32"
 MACHINE_ARCH_FILTER = "virtual/kernel"
 
 INHERIT += "fsl-dynamic-packagearch"
+
+# Mask some recipes which address other architectures, and
+# which reside in layers that we may not use for S32
+BBMASK = "u-boot-qoriq linux-qoriq"

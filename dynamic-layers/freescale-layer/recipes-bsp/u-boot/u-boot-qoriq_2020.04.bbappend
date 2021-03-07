@@ -16,6 +16,6 @@ SRC_URI += "\
 	file://0001-u-boot-First-attempt-to-add-GIC-support-for-ARMv8.patch \
 \
 	file://0001-u-boot-SPL-NAND-support-should-only-be-active-if-NAN.patch \
+\
+	file://0001-lx2-uboot-Added-support-for-BlueBox3-PCIe-T6-Slot-6.patch \
 "
-
-

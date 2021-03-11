@@ -6,10 +6,10 @@ Ubuntu target: 18.04.5 20.04.1
 Yocto: 3.2 "gatesgarth"
 Gcc: 10.2.0
 Glibc: 2.32
-Binutils: 2.35.0
-Xen: 4.14.0
+Binutils: 2.35
+Xen: 4.14
 Lxc: 4.0.4
-Docker: 19.03.13
+Docker: 18.09.7 19.03.13
 Openssl: 1.1.1g
 ROS: melodic noetic
 GPU: 6.4.0

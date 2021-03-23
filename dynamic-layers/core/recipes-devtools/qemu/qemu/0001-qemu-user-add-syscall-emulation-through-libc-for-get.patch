@@ -1,0 +1,52 @@
+From 8f9ba7d63d52b10651e7333ca15e0427b2ba6b26 Mon Sep 17 00:00:00 2001
+From: Catalin Udma <catalin-dan.udma@nxp.com>
+Date: Mon, 22 Mar 2021 19:08:00 +0200
+Subject: [PATCH] qemu-user: add syscall emulation through libc for getcwd
+
+In QEMU 5.1, commit:
+https://github.com/qemu/qemu/commit/0f6bb1958f3aae0171996941df7fb7ea7536bb12
+
+updates getcwd to use the syscall directly instead of through libc using
+getcwd() call.
+When building in fakeroot environment this breaks the libc emulation and getcwd
+usage when QEMU_LIBCSYSCALL option is enabled.
+
+The fix updates getcwd usage to use getcwd() when QEMU_LIBCSYCALL is enabled,
+while otherwise using the default behavior to call the syscall directly.
+
+Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
+---
+ linux-user/syscall.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 18d189c..1db2270 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -254,6 +254,14 @@ static type name (type1 arg1)        \
+ 	return syscall(__NR_##name, arg1);    \
+ }
+ 
++#define _libc_syscall2(type,name,namelibc,type1,arg1,type2,arg2)	\
++static type name (type1 arg1,type2 arg2)				\
++{									\
++ if (do_libcsyscall)							\
++   return namelibc(arg1, arg2);						\
++ return syscall(__NR_##name, arg1, arg2);				\
++}
++
+ #define _libc_syscall3(type,name,namelibc,type1,arg1,type2,arg2,type3,arg3)  \
+ static type name (type1 arg1,type2 arg2,type3 arg3)        \
+ {                    \
+@@ -417,7 +425,7 @@ static bitmask_transtbl fcntl_flags_tbl[] = {
+   { 0, 0, 0, 0 }
+ };
+ 
+-_syscall2(int, sys_getcwd1, char *, buf, size_t, size)
++_libc_syscall2(int, sys_getcwd1, getcwd, char *, buf, size_t, size)
+ 
+ #ifdef TARGET_NR_utimensat
+ #if defined(__NR_utimensat)
+-- 
+2.7.4
+

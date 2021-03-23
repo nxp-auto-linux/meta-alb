@@ -10,4 +10,5 @@ SRC_URI += "\
 	file://0008-qemu-user-builtin-strace-much-more-comprehensive.patch \
 \
 	file://0001-qemu-user-strace-didn-t-print-faccessat-correctly.patch \
+	file://0001-qemu-user-add-syscall-emulation-through-libc-for-get.patch \
 "

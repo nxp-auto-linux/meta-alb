@@ -30,7 +30,7 @@ fakeroot do_aptget_user_update_append() {
 			aptget_install_oneshot_service "makemodules" "Build kernel modules_prepare" "/usr/bin/make -C ${KERNEL_SRC_PATH} modules_prepare"
 		else
 			PRECOMPILE_SCRIPTS_ERROR="0"
-			(/usr/bin/yes "" | ARCH=${DEBIAN_TARGET_ARCH} chroot "${KERNEL_CHROOT_DIR}" /usr/bin/make V=1 -C "${KERNEL_SRC_PATH}" scripts modules_prepare ${PARALLEL_MAKE}) || PRECOMPILE_SCRIPTS_ERROR="1"
+			(/usr/bin/yes "" | ARCH=${DEBIAN_TARGET_ARCH} chroot "${KERNEL_CHROOT_DIR}" /usr/bin/make -C "${KERNEL_SRC_PATH}" scripts modules_prepare ${PARALLEL_MAKE}) || PRECOMPILE_SCRIPTS_ERROR="1"
 			if [ "x$PRECOMPILE_SCRIPTS_ERROR" = "x1" ]; then
 				bbwarn "Scripts from kernel source tree failed to pre-compile. Please consider building them manually on target."
 			fi

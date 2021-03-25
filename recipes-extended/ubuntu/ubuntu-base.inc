@@ -62,7 +62,7 @@ APTGET_EXTRA_PACKAGES += "\
     libnss-db \
     libssl-dev \
     openssl \
-	python3.5 python bc db5.3 \
+	python${APTGET_PYTHON_VER} python bc db5.3 \
 	xz-utils bzip2 \
 "
 # Some packages are implicitly present in Ubuntu due to the kernel
@@ -204,11 +204,11 @@ fakeroot do_aptget_user_update_append() {
 		sed -i "s/^#*FSCKFIX\s*=.*/FSCKFIX=yes/g" "${APTGET_CHROOT_DIR}/lib/init/vars.sh"
 	fi
 
-	# Add /usr/bin/python3 symlink to /usr/bin/python3.5, as it is required
+	# Add /usr/bin/python3 symlink to /usr/bin/python3.x, as it is required
 	# by other packages depending on python3
 	if [ ! -f ${APTGET_CHROOT_DIR}/usr/bin/python3 ]; then
 		cd ${APTGET_CHROOT_DIR}/usr/bin/
-		ln -s python3.5 python3
+		ln -s python${APTGET_PYTHON_VER} python3
 		cd -
 	fi
 	set +x

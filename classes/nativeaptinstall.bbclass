@@ -93,6 +93,9 @@ APTGET_SKIP_CACHECLEAN ?= "0"
 # We can however speed up package installs to some extent
 APTGET_USE_NATIVE_DPKG ?= "1"
 
+# Python versions depend on Ubuntu version, but we need one default.
+APTGET_PYTHON_VER ?= "3.5"
+
 # Minimum package needs for apt to work right. Nothing else.
 APTGET_INIT_FAKETOOLS_PACKAGES ?= "dbus systemd"
 APTGET_INIT_PACKAGES ?= "dbus-user-session apt-transport-https ca-certificates software-properties-common apt-utils"
@@ -962,7 +965,7 @@ APTGET_YOCTO_TRANSLATION += "\
     libssl1.1:libssl1.1 \
     libssl-dev:openssl-dev,openssl-qoriq-dev \
     openssl:openssl-bin,openssl-qoriq-bin,openssl-conf,openssl-qoriq-conf,openssl-misc,openssl-qoriq-misc \
-    python3.5:python3 \
+    python${APTGET_PYTHON_VER}:python3 \
     xz-utils:xz \
     zlib1g:libz1 \
 "

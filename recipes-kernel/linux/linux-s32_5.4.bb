@@ -1,7 +1,5 @@
 require recipes-kernel/linux/linux-s32.inc
 
-BRANCH ?= "${RELEASE_BASE}-${PV}-rt"
-SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV = "88ca7a9fee7296f36891811b34f07bb65845b0c0"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"

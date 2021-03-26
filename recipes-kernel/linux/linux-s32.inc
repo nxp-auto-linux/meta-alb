@@ -1,7 +1,6 @@
 DESCRIPTION = "Linux kernel for S32 platforms"
 SECTION = "kernel"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM ?= "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 inherit kernel
 
@@ -12,6 +11,8 @@ LOCALVERSION = ""
 DELTA_KERNEL_DEFCONFIG ?= ""
 
 URL ?= "git://source.codeaurora.org/external/autobsps32/linux;protocol=https"
+BRANCH ??= "${RELEASE_BASE}-${PV}-rt"
+SRC_URI = "${URL};branch=${BRANCH}"
 
 DEPENDS_append = " libgcc dtc-native"
 

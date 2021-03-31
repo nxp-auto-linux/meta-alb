@@ -1,4 +1,4 @@
-# Copyright 2019-2020 NXP
+# Copyright 2019-2021 NXP
 
 DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause"
@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
 DEPENDS += "dtc-native xxd-native"
 DEPENDS += "openssl-native"
+DEPENDS += "u-boot-s32"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os', '', d)}"
 
 S = "${WORKDIR}/git"
@@ -48,17 +49,29 @@ EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS}" \
                  LIBPATH="${STAGING_LIBDIR_NATIVE}" \
                  HOSTSTRIP=true'
 
+BOOT_TYPE = "sdcard qspi"
+
 do_compile() {
 	unset LDFLAGS
 	unset CFLAGS
 	unset CPPFLAGS
 
-	oe_runmake -C ${S} BL33="${DEPLOY_DIR_IMAGE}/u-boot.bin" all
+	for suffix in ${BOOT_TYPE}
+	do
+		oe_runmake -C "${S}" \
+		    BL33="${DEPLOY_DIR_IMAGE}/u-boot.bin-${suffix}" \
+		    MKIMAGE="${DEPLOY_DIR_IMAGE}/tools/mkimage-${suffix}" all
+		cp -vf "${ATF_BINARIES}/fip.s32" "${ATF_BINARIES}/fip.s32-${suffix}"
+	done
 }
 
 do_deploy() {
 	install -d ${DEPLOY_DIR_IMAGE}
-	cp -v ${ATF_BINARIES}/fip.s32 ${DEPLOY_DIR_IMAGE}/${ATF_IMAGE_FILE}
+
+	for suffix in ${BOOT_TYPE}
+	do
+		cp -vf "${ATF_BINARIES}/fip.s32-${suffix}" "${DEPLOY_DIR_IMAGE}/"
+	done
 }
 
 addtask deploy after do_compile

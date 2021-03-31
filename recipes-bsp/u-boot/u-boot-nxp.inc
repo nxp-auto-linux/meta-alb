@@ -66,7 +66,7 @@ do_merge_delta_config() {
         for deltacfg in ${DELTA_UBOOT_DEFCONFIG}; do
             ${S}/scripts/kconfig/merge_config.sh -m .config ${deltacfg}
         done
-        cp .config ${S}/configs/${config}
+        cp -vf ${B}/.config ${S}/configs/${config}
     done
 }
 addtask merge_delta_config before do_configure after do_patch
@@ -88,15 +88,16 @@ do_install_append_s32() {
                 # install our environment file to usr/share to have it staged by yocto
                 install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv${type}.txt
             fi
+
+            if [ -n "${ATF_IMAGE}" ]; then
+                install -d ${DEPLOY_DIR_IMAGE}
+                cp ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin-${type}
+                install -d ${DEPLOY_DIR_IMAGE}/tools
+                cp -f ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage-${type}
+            fi
         done
     done
 
-    if [ -n "${ATF_IMAGE}" ]; then
-        install -d ${DEPLOY_DIR_IMAGE}
-        cp ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin
-        install -d ${DEPLOY_DIR_IMAGE}/tools
-        cp -f ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage
-    fi
 }
 
 python do_clean_append () {

@@ -97,5 +97,4 @@ stdin=serial_pl01x
 stdout=serial_pl01x
 usb_boot=usb start; if usb dev ${devnum}; then devtype=usb; run scan_dev_for_boot_part; fi
 vendor=freescale
-xspi_bootcmd=echo Trying load from flexspi..; sf probe 0:0 && sf read $load_addr $kernel_start $kernel_size ; env exists secureboot && sf read $kernelheader_addr_r $kernelheader_start $kernelheader_size && esbc_validate ${kernelheader_addr_r};  bootm $load_addr#$BOARD
-xspi_itblinux_bootcmd=echo Trying to load kernel.itb from flexspi..; devtype=xspi; run boot_xspiitblinux
+xspi_itblinux_bootcmd=echo Trying to load kernel.itb from flexspi..; devtype=xspi; target=xspi; run boot_xspiitblinux

@@ -42,11 +42,16 @@ distro_bootcmd=setenv scsi_need_init; scsi_need_init=true; setenv nvme_need_init
 efi_dtb_prefixes=/ /dtb/ /dtb/current/
 ethact=DPMAC5@usxgmii
 ethprime=DPMAC5@usxgmii
+factoryprep=devtype=mmc; devnum=0; run scan_dev_for_factory_part
 fdt_addr=0x64f00000
 fdt_addr_r=0x90000000
 fdt_high=0xa0000000
 fdtcontroladdr=fbb30f00
 fdtheader_addr_r=0x80100000
+flash_image_name=fsl-image-flash-lx2160abluebox3.flashimage
+flash_select_bank0=i2c mw 66 50 00
+flash_select_bank1=i2c mw 66 50 20
+flash_image=setenv flash_banks 1 0; for bank in ${flash_banks}; do run flash_select_bank${bank}; echo Flashing bank ${bank}... ; sf probe 0:0; sf erase 0x0 +$filesize; sf write ${load_addr} 0x0 $filesize; echo Flashing bank ${bank} completed; done
 hwconfig=fsl_ddr:bank_intlv=auto
 initrd_high=0xffffffffffffffff
 kernel_addr_r=0x81000000
@@ -81,6 +86,9 @@ scan_dev_for_boot=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for 
 scan_dev_for_boot_part=part list ${devtype} ${devnum} devplist; env exists devplist || setenv devplist 1; for distro_bootpart in ${devplist}; do if fstype ${devtype} ${devnum}:${distro_bootpart} bootfstype; then run scan_dev_for_boot; fi; done
 scan_dev_for_efi=setenv efi_fdtfile ${fdtfile}; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${efi_fdtfile}; then run load_efi_dtb; fi;done;if test -e ${devtype} ${devnum}:${distro_bootpart} efi/boot/bootaa64.efi; then echo Found EFI removable media binary efi/boot/bootaa64.efi; run boot_efi_binary; echo EFI LOAD FAILED: continuing...; fi; setenv efi_fdtfile
 scan_dev_for_extlinux=if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${boot_syslinux_conf}; then echo Found ${prefix}${boot_syslinux_conf}; run boot_extlinux; echo SCRIPT FAILED: continuing...; fi
+scan_dev_for_factory=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for prefix in ${boot_prefixes}; do run scan_dev_for_flash_image; done
+scan_dev_for_factory_part=part list ${devtype} ${devnum} devplist; env exists devplist || setenv devplist 1; for distro_bootpart in ${devplist}; do if fstype ${devtype} ${devnum}:${distro_bootpart} bootfstype; then run scan_dev_for_factory; fi; done
+scan_dev_for_flash_image=if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${flash_image_name}; then echo Found ${prefix}${flash_image_name}... ; ext4load ${devtype} ${devnum}:${distro_bootpart} ${load_addr} ${prefix}${flash_image_name}; run flash_image; fi
 scan_dev_for_itblinux=if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${boot_itbname}; then echo Found ${prefix}${boot_itbname}; run boot_itblinux; echo Booting ${boot_itbname} FAILED: continuing...; fi
 scan_dev_for_scripts=for script in ${boot_scripts}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${script}; then echo Found U-Boot script ${prefix}${script}; run boot_a_script; echo SCRIPT FAILED: continuing...; fi; done
 setbootargs=setenv bootargs console=$consoledev,$baudrate earlycon=pl011,mmio32,0x21c0000 default_hugepagesz=1024m hugepagesz=1024m hugepages=2 pci=pcie_bus_perf root=/dev/$rootdev ${bootargs_extra} ${bootargs_debug}

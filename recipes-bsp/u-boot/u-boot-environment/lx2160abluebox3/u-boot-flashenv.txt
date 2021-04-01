@@ -33,12 +33,11 @@ bootcmd_dhcp=run boot_net_usb_start; run boot_pci_enum; if dhcp ${scriptaddr} ${
 bootcmd_mmc0=devnum=0; run mmc_boot
 bootcmd_mmc1=devnum=1; run mmc_boot
 bootcmd_nvme0=devnum=0; run nvme_boot
-bootcmd_scsi0=devnum=0; run scsi_boot
 bootcmd_usb0=devnum=0; run usb_boot
 bootdelay=3
 consoledev=ttyAMA0
 cpu=armv8
-distro_bootcmd=setenv scsi_need_init; scsi_need_init=true; setenv nvme_need_init; nvme_need_init=true; for target in ${boot_targets}; do run bootcmd_${target}; done
+distro_bootcmd=setenv nvme_need_init; nvme_need_init=true; for target in ${boot_targets}; do run bootcmd_${target}; done
 efi_dtb_prefixes=/ /dtb/ /dtb/current/
 ethact=DPMAC5@usxgmii
 ethprime=DPMAC5@usxgmii
@@ -74,7 +73,6 @@ ramdisk_size=0x2000000
 rootdev_mmc0=setenv rootdev mmcblk0p${distro_bootpart} noinitrd
 rootdev_mmc1=setenv rootdev mmcblk1p${distro_bootpart} noinitrd
 rootdev_nvme0=setenv rootdev nvme0n1p${distro_bootpart} noinitrd
-rootdev_scsi0=setenv rootdev sda${distro_bootpart} noinitrd
 rootdev_usb0=setenv rootdev sdb${distro_bootpart} noinitrd
 rootdev_xspi=setenv rootdev ram0 ramdisk_size=0x2000000
 scan_dev_for_boot=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for prefix in ${boot_prefixes}; do run scan_dev_for_extlinux; run scan_dev_for_scripts; run scan_dev_for_itblinux; done;run scan_dev_for_efi;
@@ -87,10 +85,6 @@ setbootargs=setenv bootargs console=$consoledev,$baudrate earlycon=pl011,mmio32,
 setrcwdev=if itest.b *1e00003 -eq 0x07; then setenv rcwdev xspi; else setenv rcwdev mmc; fi
 scriptaddr=0x80000000
 scripthdraddr=0x80080000
-scsi_boot=run scsi_init; if scsi dev ${devnum}; then devtype=scsi; run scan_dev_for_boot_part; fi
-scsi_init=if ${scsi_need_init}; then scsi_need_init=false; scsi scan; fi
-sd2_bootcmd=echo Trying load from emmc card..;mmc dev 1; mmcinfo; mmc read $load_addr $kernel_addr_sd $kernel_size_sd ;env exists secureboot && mmc read $kernelheader_addr_r $kernelhdr_addr_sd $kernelhdr_size_sd  && esbc_validate ${kernelheader_addr_r};bootm $load_addr#$BOARD
-sd_bootcmd=echo Trying load from sd card..;mmcinfo; mmc read $load_addr $kernel_addr_sd $kernel_size_sd ;env exists secureboot && mmc read $kernelheader_addr_r $kernelhdr_addr_sd $kernelhdr_size_sd  && esbc_validate ${kernelheader_addr_r};bootm $load_addr#$BOARD
 soc=fsl-layerscape
 stderr=serial_pl01x
 stdin=serial_pl01x

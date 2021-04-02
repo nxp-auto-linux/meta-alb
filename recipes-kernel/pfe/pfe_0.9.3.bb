@@ -13,7 +13,6 @@ NXP_FIRMWARE_LOCAL_DIR ?= "."
 
 PFE_FW_CLASS_BIN ?= "s32g_pfe_class.fw"
 PFE_FW_UTIL_BIN ?= "s32g_pfe_util.fw"
-PFENF_SUPPORT_CUT11 ?= "0"
 
 SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
@@ -35,14 +34,50 @@ FW_INSTALL_DIR = "${D}/${base_libdir}/firmware"
 FW_INSTALL_CLASS_NAME ?= "s32g_pfe_class.fw"
 FW_INSTALL_UTIL_NAME ?= "s32g_pfe_util.fw"
 
-# Allow user to build Linux PFE driver (pfeng) for S32G2 silicon cut 1.1
-# by adding option to the local.conf:
-# PFENF_SUPPORT_CUT11 = "1"
-EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 ${@oe.utils.ifelse(d.getVar('PFENF_SUPPORT_CUT11') == '1', 'PFE_CFG_IP_VERSION=PFE_CFG_IP_VERSION_NPU_7_14', '')} all"
+EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 all"
+
+# Build PFE for both 1.x and 2.0 SoC revision
+# The user can choose to build specific version only by overwriting this variable
+# in this file or in conf/local.conf
+# For example, to build only for Rev 2.0, set PFE_SUPPORTED_REV = "2.0"
+PFE_SUPPORTED_REV ?= "1.x 2.0"
+
+module_do_compile() {
+	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+
+	for rev in ${PFE_SUPPORTED_REV}; do
+
+		# convert SoC revision to PFE revision
+		if [ "${rev}" = "1.x" ]; then
+			pfe_rev="PFE_CFG_IP_VERSION_NPU_7_14"
+		elif [ "${rev}" = "2.0" ]; then
+			pfe_rev="PFE_CFG_IP_VERSION_NPU_7_14a"
+		else
+			bberror "Cannont convert '${rev}' to a PFE revision"
+		fi
+
+		# standard module build, but setting PFE_CFG_IP_VERSION
+		oe_runmake PFE_CFG_IP_VERSION="${pfe_rev}" \
+		KERNEL_PATH=${STAGING_KERNEL_DIR}   \
+		KERNEL_VERSION=${KERNEL_VERSION}    \
+		CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
+		AR="${KERNEL_AR}" \
+		O=${STAGING_KERNEL_BUILDDIR} \
+		KBUILD_EXTRA_SYMBOLS="${KBUILD_EXTRA_SYMBOLS}" \
+		${MAKE_TARGETS}
+
+		# all revisions are installed, set them with revision suffix
+		mv "${MDIR}/pfeng.ko" "${MDIR}/pfeng-${rev}.ko"
+	done
+}
 
 module_do_install() {
-	install -D ${MDIR}/pfeng.ko ${INSTALL_DIR}/pfeng.ko
-	mkdir -p "${FW_INSTALL_DIR}"
+	# install all supported revisions
+	for rev in ${PFE_SUPPORTED_REV}; do
+		install -D "${MDIR}/pfeng-${rev}.ko" "${INSTALL_DIR}/pfeng-${rev}.ko"
+	done
+
+	install -d "${FW_INSTALL_DIR}"
 	install -D "${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN}" "${FW_INSTALL_DIR}/${FW_INSTALL_CLASS_NAME}"
 	install -D "${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN}" "${FW_INSTALL_DIR}/${FW_INSTALL_UTIL_NAME}"
 }
@@ -69,11 +104,23 @@ do_package_qa_setscene[noexec] = "1"
 FILES_${PN} += "${base_libdir}/*"
 FILES_${PN} += "${sysconfdir}/modules-load.d/*"
 
-PROVIDES = " \
-	kernel-module-pfeng${KERNEL_MODULE_PACKAGE_SUFFIX} \
-	"
-RPROVIDES_${PN} = " \
-	kernel-module-pfeng${KERNEL_MODULE_PACKAGE_SUFFIX} \
-	"
+
+python () {
+    # Allow providing one or more modules based on PFE_SUPPORTED_REV
+    # Set the needed variables depending on user defined PFE_SUPPORTED_REV
+
+    suffix = (d.getVar('KERNEL_MODULE_PACKAGE_SUFFIX', True) or "")
+    revs = d.getVar('PFE_SUPPORTED_REV', True).split()
+    pn = (d.getVar('PN', True) or "")
+
+    for rev in revs:
+        s = " kernel-module-pfeng-%s%s" % (rev, suffix)
+
+        provides = (d.getVar('PROVIDES', True) or "")
+        d.setVar('PROVIDES', provides + s)
+
+        rprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "")
+        d.setVar('RPROVIDES_%s' % pn, rprovides + s)
+}
 
 COMPATIBLE_MACHINE = "s32g2"

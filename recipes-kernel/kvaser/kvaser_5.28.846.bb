@@ -21,6 +21,7 @@ SRC_URI += "\
 S = "${WORKDIR}/linuxcan"
 
 EXTRA_OEMAKE += 'KDIR="${STAGING_KERNEL_DIR}" V=1'
+TARGET_CC_ARCH += "-Wno-error=maybe-uninitialized"
 
 MODULES = "leaf"
 # The following modules are untested, to be re-added in the future if needed

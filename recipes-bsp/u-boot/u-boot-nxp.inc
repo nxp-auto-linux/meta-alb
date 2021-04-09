@@ -82,18 +82,20 @@ do_install_append_s32() {
         unset j
         for type in ${UBOOT_CONFIG}; do
             j=`expr $j + 1`;
-            if [ $j -eq $i ]; then
-                # remove any empty lines which might break the environment
-                sed '/^[[:space:]]*$/d' -i ${B}/${config}/env-default.txt
-                # install our environment file to usr/share to have it staged by yocto
-                install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv${type}.txt
+            if [ $j -ne $i ]; then
+                continue
             fi
+
+            # remove any empty lines which might break the environment
+            sed '/^[[:space:]]*$/d' -i ${B}/${config}/env-default.txt
+            # install our environment file to usr/share to have it staged by yocto
+            install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv${type}.txt
 
             if [ -n "${ATF_IMAGE}" ]; then
                 install -d ${DEPLOY_DIR_IMAGE}
-                cp ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin-${type}
+                cp -vf ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin-${type}
                 install -d ${DEPLOY_DIR_IMAGE}/tools
-                cp -f ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage-${type}
+                cp -vf ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage-${type}
             fi
         done
     done

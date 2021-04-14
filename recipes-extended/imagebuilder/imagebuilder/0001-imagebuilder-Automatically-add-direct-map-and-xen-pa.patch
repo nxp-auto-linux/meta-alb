@@ -1,0 +1,47 @@
+From b02719b6ee8da4596488485ab5703879519a0411 Mon Sep 17 00:00:00 2001
+From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+Date: Tue, 23 Mar 2021 11:17:17 +0200
+Subject: [PATCH 1/4] imagebuilder: Automatically add "direct-map" and
+ "xen,passthrough"
+
+Changed the imagebuilder script to also add the "direct-map" field
+to a specified /chosen/domU* node, to be able to 1:1 map it. The
+property can be added to the specific chosen node of a domU by
+setting the "DOMU_DIRECT_MAP[i]" variable to value 1 in the config
+file that we pass to the imagebuilder script.
+
+Also added another property that can be used when we passthrough
+devices to a specific dom0less DomU, when we need to mark the
+device node by adding "xen,passthrough" field in it, in order
+for Xen not to automatically assign it to Dom0. By setting the
+"DOMU_PASSTHROUGH_DEVICE[i]" variable in the config file to the
+device node path string (e.g: "/ethernet/4033c000", for gmac),
+it is now done automatically.
+
+Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+---
+ scripts/uboot-script-gen | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
+index bc41d1f..38649ad 100755
+--- a/scripts/uboot-script-gen
++++ b/scripts/uboot-script-gen
+@@ -98,6 +98,14 @@ function device_tree_editing()
+         then
+             add_device_tree_passthrough "/chosen/domU$i" ${domU_passthrough_dtb_addr[$i]} ${domU_passthrough_dtb_size[$i]}
+         fi
++        if test "${DOMU_DIRECT_MAP[$i]}" = "1"
++        then
++            echo "fdt set /chosen/domU$i direct-map <0x1>" >> $UBOOT_SOURCE
++        fi
++        if test "${DOMU_PASSTHROUGH_DEVICE[$i]}"
++        then
++            echo "fdt set ${DOMU_PASSTHROUGH_DEVICE[$i]} xen,passthrough" >> $UBOOT_SOURCE
++        fi
+         i=$(( $i + 1 ))
+     done
+ }
+-- 
+2.7.4
+

@@ -1,0 +1,44 @@
+From 7994895c7b7f21493b526b6cdb22b8a815bc7ac3 Mon Sep 17 00:00:00 2001
+From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+Date: Mon, 26 Apr 2021 22:32:02 +0300
+Subject: [PATCH 4/4] imagebuilder: Disable autoboot
+
+Removed the `booti` command which was added at the end of the script,
+in order to permit the user to customize the u-boot environment or
+the device-tree after executing the script commands before booting.
+
+Also added commands to store the addresses where the Xen image and
+device-tree file are loaded, in 'xen_addr' and 'fdt_addr' variables.
+
+The `booti` command will be executed as part of the 'bootcmd' variable
+in u-boot, which will contain:
+	1. fetching the generated u-boot script
+	2. executing the script
+	3. running `booti` command
+
+Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+---
+ scripts/uboot-script-gen | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
+index 2ca481d..2dfd93d 100755
+--- a/scripts/uboot-script-gen
++++ b/scripts/uboot-script-gen
+@@ -408,9 +408,12 @@ device_tree_addr=$memaddr
+ load_file $DEVICE_TREE
+ device_tree_editing $device_tree_addr
+ 
++# store xen and device_tree load addresses
++echo "setenv xen_addr $xen_addr" >> $UBOOT_SOURCE
++echo "setenv fdt_addr $device_tree_addr" >> $UBOOT_SOURCE
++
+ # disable device tree reloation
+ echo "setenv fdt_high 0xffffffffffffffff" >> $UBOOT_SOURCE
+-echo "booti $xen_addr - $device_tree_addr" >> $UBOOT_SOURCE
+ mkimage -A arm64 -T script -C none -a $uboot_addr -e $uboot_addr -d $UBOOT_SOURCE "$UBOOT_SCRIPT" &> /dev/null
+ 
+ remove_tmp_files
+-- 
+2.7.4
+

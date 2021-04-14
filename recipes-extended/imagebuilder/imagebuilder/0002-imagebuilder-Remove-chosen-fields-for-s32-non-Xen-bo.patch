@@ -1,0 +1,29 @@
+From ce1533810eef5cdd4c32e9ab7e93aac8da05bf09 Mon Sep 17 00:00:00 2001
+From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+Date: Thu, 8 Apr 2021 21:44:24 +0300
+Subject: [PATCH 2/4] imagebuilder: Remove /chosen fields for s32 non-Xen boot
+ flow
+
+Removed fields under /chosen that are by default included for
+the non-Xen boot flow, which break the Xen boot flow.
+
+Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+---
+ scripts/uboot-script-gen | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
+index 38649ad..40dc69d 100755
+--- a/scripts/uboot-script-gen
++++ b/scripts/uboot-script-gen
+@@ -60,6 +60,7 @@ function device_tree_editing()
+ 
+     echo "fdt addr $device_tree_addr" >> $UBOOT_SOURCE
+     echo "fdt resize 1024" >> $UBOOT_SOURCE
++    echo "fdt rm /chosen stdout-path" >> $UBOOT_SOURCE
+     echo "fdt set /chosen \#address-cells <0x2>" >> $UBOOT_SOURCE
+     echo "fdt set /chosen \#size-cells <0x2>" >> $UBOOT_SOURCE
+     echo "fdt set /chosen xen,xen-bootargs \"$XEN_CMD\"" >> $UBOOT_SOURCE
+-- 
+2.7.4
+

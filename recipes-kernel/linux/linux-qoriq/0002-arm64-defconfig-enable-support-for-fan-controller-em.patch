@@ -1,0 +1,28 @@
+From c198ab31c76be96cd8c244eaf5d82bbf74b2c3a8 Mon Sep 17 00:00:00 2001
+From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+Date: Sat, 17 Apr 2021 01:42:19 +0300
+Subject: [PATCH 2/3] arm64: defconfig: enable support for fan controller
+ emc2305
+
+Enable support for fan controller emc2305
+
+Signed-off-by: Biwen Li <Biwen.Li@nxp.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 07925ce6700c..aa8f29fd5c40 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -505,6 +505,7 @@ CONFIG_SYSCON_REBOOT_MODE=y
+ CONFIG_BATTERY_SBS=m
+ CONFIG_BATTERY_BQ27XXX=y
+ CONFIG_SENSORS_ARM_SCPI=y
++CONFIG_SENSORS_EMC2305=y
+ CONFIG_SENSORS_LM90=m
+ CONFIG_SENSORS_PWM_FAN=m
+ CONFIG_SENSORS_RASPBERRYPI_HWMON=m
+-- 
+2.17.1
+

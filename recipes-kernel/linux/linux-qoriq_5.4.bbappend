@@ -48,6 +48,12 @@ SRC_URI_append_ls1043ardb += " \
     file://pci-vdev.cfg \
 "
 
+SRC_URI_append_lx2160abluebox3 += " \
+	file://0001-hwmon-add-support-for-SMSC-EMC2305-03-02-01-fan-cont.patch \
+	file://0002-arm64-defconfig-enable-support-for-fan-controller-em.patch \
+	file://0003-arm64-dts-lx2160abluebox3-add-fan-controller-emc2305.patch \
+"
+
 SRCREV_pci-vdev = "3646332fa76ef1623b36b6fe36e43391029c4603"
 
 # Note how our lxc.cfg comes *AFTER* containers.config to add to it

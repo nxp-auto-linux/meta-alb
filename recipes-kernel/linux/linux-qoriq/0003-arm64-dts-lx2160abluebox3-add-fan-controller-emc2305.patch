@@ -1,0 +1,37 @@
+From fa0f55d34c20924afcee91fa1642239d9ed4563e Mon Sep 17 00:00:00 2001
+From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+Date: Sat, 17 Apr 2021 01:42:51 +0300
+Subject: [PATCH 3/3] arm64: dts: lx2160abluebox3: add fan controller emc2305
+ node
+
+Add fan controller emc2305 node
+
+Signed-off-by: Biwen Li <Biwen.Li@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts b/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts
+index 3aa9bf527c8a..cee0638390f0 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts
+@@ -113,8 +113,14 @@
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0x1>;
+-			// TODO: Add entries for EMC2305
+-
++			emc2305@4c {
++				compatible = "smsc,emc2305";
++				reg = <0x4c>;
++			};
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++			};
+ 		};
+ 
+ 		i2c@2 {
+-- 
+2.17.1
+

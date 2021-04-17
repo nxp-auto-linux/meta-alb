@@ -13,11 +13,13 @@ require recipes-fsl/images/${FACTORY_SDCARD_ROOTFS_IMAGE}.bb
 # is that we use the exact image to enable flashing NOR.
 inherit fsl-rootfsimage
 FACTORY_FLASH_IMAGE_NAME ?= "fsl-image-flash"
+FACTORY_FLASH_IMAGE_NAME_ubuntu = "${FACTORY_SDCARD_ROOTFS_IMAGE}"
 FACTORY_FLASH_IMAGE ?= "${FACTORY_FLASH_IMAGE_NAME}-${MACHINE}.flashimage"
 # no flash image yet for ubuntu
 FACTORY_FLASH_IMAGE_NAME_ubuntu = "${FACTORY_SDCARD_ROOTFS_IMAGE}"
 FACTORY_FLASH_IMAGE_ubuntu = ""
 do_rootfs[depends] += "${FACTORY_FLASH_IMAGE_NAME}:do_image_complete ${FACTORY_SDCARD_ROOTFS_IMAGE}:do_image_complete"
-IMAGE_ROOTFS_IMAGELIST = "${FACTORY_FLASH_IMAGE}"
+
+IMAGE_ROOTFS_IMAGELIST = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz"
 
 COMPATIBLE_MACHINE = "lx2160abluebox3"

@@ -8,4 +8,4 @@ SRC_URI = "\
     file://0001-menuconfig-mconf-cfg-Allow-specification-of-ncurses-location.patch \
 "
 
-SRCREV = "7820dcc35f3cb1ba5284ea229a54658060190dcc"
+SRCREV = "daf8e7df62eaed5bbe2cf257ec5265747a6316a8"

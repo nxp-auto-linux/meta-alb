@@ -4,7 +4,8 @@
 
 SUMMARY = "u-boot environment setting tool"
 SECTION = "utils"
-DEPENDS = "bash"
+RDEPENDS_${PN}_class-native = "bash u-boot-tools-native"
+RDEPENDS_${PN}_class-target = "u-boot-tools"
 HOMEPAGE = "https://gitlab.com/ViryaOS/imagebuilder"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d2794c0df5b907fdace235a619d80314"
@@ -24,3 +25,11 @@ SRC_URI = "git://gitlab.com/ViryaOS/imagebuilder.git;protocol=https;branch=maste
 SRC_URI[sha256sum] = "b4c1d3d482965e9764485fa2eaef5a8e4d03e9fef2c9dcae4752a73309455cf3"
 
 S = "${WORKDIR}/git"
+
+IMAGEBUILDER_SCRIPT_FILE = "uboot-script-gen"
+FILES_${PN} = "${bindir}/${IMAGEBUILDER_SCRIPT_FILE}"
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/scripts/${IMAGEBUILDER_SCRIPT_FILE} ${D}${bindir}/
+}

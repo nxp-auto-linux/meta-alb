@@ -3,10 +3,6 @@ include recipes-extended/images/xen-image-minimal.bb
 
 IMAGE_INSTALL += "zlib-dev xen-tools-xenstat xen-tools-xenmon"
 
-# Enable deployment of Xen binary to fsl-image-auto.sdcard image
-SDCARDIMAGE_BOOT_EXTRA1 = "xen"
-SDCARDIMAGE_BOOT_EXTRA1_FILE = "xen"
-
 # Enable deployment of DomU rootfs to EXT partition
 inherit fsl-rootfsimage
 DOM0LESS_ROOTFS_IMAGE = "${DOM0LESS_ROOTFS}-${MACHINE}.cpio.gz"

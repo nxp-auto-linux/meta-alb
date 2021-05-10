@@ -1,6 +1,6 @@
-# Copyright 2019-2020 NXP
+# Copyright 2019-2021 NXP
 #
-# This is the PFE driver for Linux kernel 4.19 and 5.4
+# This is the PFE driver for Linux kernel 5.4 and 5.10
 
 SUMMARY = "Linux driver for the Packet Forwarding Engine hardware"
 LICENSE = "GPL-2.0"
@@ -14,11 +14,12 @@ NXP_FIRMWARE_LOCAL_DIR ?= "."
 PFE_FW_CLASS_BIN ?= "s32g_pfe_class.fw"
 PFE_FW_UTIL_BIN ?= "s32g_pfe_util.fw"
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
+URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
+SRC_URI = "${URL} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN} \
 	"
-SRCREV = "def922b2caf25f9f8a251d672d092c27244b3bcc"
+SRCREV ?= "def922b2caf25f9f8a251d672d092c27244b3bcc"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
 # since 'aarch64-fsl-linux-strip' fails with error code 1 when parsing the firmware
@@ -34,13 +35,13 @@ FW_INSTALL_DIR = "${D}/${base_libdir}/firmware"
 FW_INSTALL_CLASS_NAME ?= "s32g_pfe_class.fw"
 FW_INSTALL_UTIL_NAME ?= "s32g_pfe_util.fw"
 
-EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 all"
+EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 drv-build"
 
-# Build PFE for both 1.x and 2.0 SoC revision
+# Build PFE for both 1.1 and 2.0 SoC revision
 # The user can choose to build specific version only by overwriting this variable
 # in this file or in conf/local.conf
 # For example, to build only for Rev 2.0, set PFE_SUPPORTED_REV = "2.0"
-PFE_SUPPORTED_REV ?= "1.x 2.0"
+PFE_SUPPORTED_REV ?= "1.1 2.0"
 
 module_do_compile() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
@@ -48,7 +49,7 @@ module_do_compile() {
 	for rev in ${PFE_SUPPORTED_REV}; do
 
 		# convert SoC revision to PFE revision
-		if [ "${rev}" = "1.x" ]; then
+		if [ "${rev}" = "1.1" ]; then
 			pfe_rev="PFE_CFG_IP_VERSION_NPU_7_14"
 		elif [ "${rev}" = "2.0" ]; then
 			pfe_rev="PFE_CFG_IP_VERSION_NPU_7_14a"

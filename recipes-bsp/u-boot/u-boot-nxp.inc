@@ -20,16 +20,16 @@ PROVIDES = "virtual/bootloader u-boot"
 SCMVERSION = "y"
 LOCALVERSION = ""
 
+DELTA_UBOOT_DEFCONFIG ?= ""
+
 # Enable Xen default boot if Xen enabled
-DELTA_UBOOT_DEFCONFIG_append_s32 = " ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
+DELTA_UBOOT_DEFCONFIG_append_s32 += " ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
 SRC_URI_append_s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_config.cfg', '', d)} \
 "
 
-DELTA_UBOOT_DEFCONFIG ?= ""
-
 # Enable Arm Trusted Firmware
-DELTA_UBOOT_DEFCONFIG_append_s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
+DELTA_UBOOT_DEFCONFIG_append_s32 += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
 SRC_URI_append_s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'file://build/atf_config.cfg', '', d)} \
 "

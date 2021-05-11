@@ -35,6 +35,9 @@ IMAGE_INSTALL_append_s32g274ardb = " sja1105 "
 # Support for SJA1110 swich under Linux
 IMAGE_INSTALL_append_s32g274ardb2 = " sja1110 "
 
+# Support for STR (Suspend to RAM) -- rtcwake
+IMAGE_INSTALL_append_s32g2 = " util-linux-rtcwake "
+
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior
 IMAGE_INSTALL_append_fsl-lsch3 += " \

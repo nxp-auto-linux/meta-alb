@@ -19,7 +19,7 @@ SRC_URI = "${URL} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN} \
 	"
-SRCREV ?= "def922b2caf25f9f8a251d672d092c27244b3bcc"
+SRCREV ?= "8acb3a4a1c7b0ff88aa00881baf59e03043021d2"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
 # since 'aarch64-fsl-linux-strip' fails with error code 1 when parsing the firmware

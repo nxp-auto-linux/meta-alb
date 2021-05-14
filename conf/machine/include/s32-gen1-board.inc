@@ -3,7 +3,6 @@ require conf/machine/include/s32-gen1.inc
 EXTRA_IMAGECMD_ext3 = "-i 4096 -L ${IMAGE_NAME}"
 IMAGE_FSTYPES_remove = "jffs2 ubi ext2.gz ext2.gz.u-boot"
 
-BOOT_SPACE ?= "65536"
 UBOOT_BOOTSPACE_OFFSET = "0"
 UBOOT_BOOTSPACE_SEEK = "0"
 

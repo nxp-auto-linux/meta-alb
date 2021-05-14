@@ -13,9 +13,10 @@ SRCREV = "2083f642759d039f0e107bc856a29cc127aa67ca"
 
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"
 KERNEL_VER = '${@d.getVar("PREFERRED_VERSION_${KERNEL_NAME}",True)}'
+MAJ_VER = '${@oe.utils.trim_version("${KERNEL_VER}",1)}'
 
 # Customizations for some kernel versions
-OTHER_KERNEL_INCLUDE = "sja1105-append-${KERNEL_VER}.inc"
+OTHER_KERNEL_INCLUDE = "sja1105-append-${MAJ_VER}.x.inc"
 
 include ${OTHER_KERNEL_INCLUDE}
 

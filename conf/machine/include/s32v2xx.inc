@@ -4,11 +4,11 @@ SOC_FAMILY_append = ":s32v:s32v2xx"
 
 UBOOT_SUFFIX ?= "s32"
 
-IMAGE_FSTYPES += "ext3"
+IMAGE_FSTYPES += "ext4"
 
 # Specific definitions for .sdcard image generation
 IMAGE_FSTYPES += "sdcard"
-SDCARD_ROOTFS = "ext3"
+SDCARD_ROOTFS = "ext4"
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 IMAGE_CLASSES += "image_types_fsl_sdcard"
 

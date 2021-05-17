@@ -121,8 +121,8 @@ dd if=/dev/zero of=/dev/sda3 bs=512 count=1
 
 # Now we create the new and empty filesystems
 echo "Formatting SSD partitions ..."
-mkfs.ext3 /dev/sda1
-mkfs.ext3 /dev/sda2
+mkfs.ext4 /dev/sda1
+mkfs.ext4 /dev/sda2
 mkswap    /dev/sda3
 
 # We assume we are root and that we have only a rudimentary system

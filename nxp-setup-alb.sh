@@ -162,7 +162,7 @@ usage() {
 
     if [ $? -eq 0 ]; then
         echo -n -e "\n    Supported machines: "
-        for layer in $(eval echo $LAYER_LIST); do
+        for layer in $(eval echo $USAGE_LIST); do
             if [ -d ${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine ]; then
                 echo -n -e "`ls ${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine | grep "\.conf" \
                    | egrep -v "^${MACHINEEXCLUSION}" | sed s/\.conf//g | xargs echo` "
@@ -289,6 +289,12 @@ LSLAYERS=" \
 
 S32V234LAYERS=" \
     meta-adas \
+"
+
+USAGE_LIST="$LAYER_LIST \
+	$ALB_LAYER_LIST \
+	$LSLAYERS \
+	$S32V234LAYERS \
 "
 
 # Really, conf files should be checked and not the machine name ...

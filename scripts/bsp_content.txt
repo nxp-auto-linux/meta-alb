@@ -1,16 +1,16 @@
 Linux: 5.4.69
 Linux-rt: 5.4.69-rt39
-Linux versions: 5.4 4.19
+Linux versions: 5.4 4.19 5.10
 U-boot: 2020.04
 Ubuntu target: 18.04.5 20.04.1
-Yocto: 3.2 "gatesgarth"
+Yocto: 3.2.1 "gatesgarth"
 Gcc: 10.2.0
 Glibc: 2.32
-Binutils: 2.35
+Binutils: 2.35.1
 Xen: 4.14
 Lxc: 4.0.4
 Docker: 18.09.7 19.03.13
-Openssl: 1.1.1g
+Openssl: 1.1.1i
 ROS: melodic noetic
 GPU: 6.4.0
 IPCF: 1.0

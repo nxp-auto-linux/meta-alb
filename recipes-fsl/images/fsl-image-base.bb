@@ -7,6 +7,9 @@
 BASE_CORE_IMAGE ?= "recipes-core/images/core-image-minimal.bb"
 include ${BASE_CORE_IMAGE}
 
+DM_VERITY_IMG = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'fsl-dm-verity.inc', '', d)}"
+include ${DM_VERITY_IMG}
+
 IMAGE_INSTALL += " \
     kernel-image \
     kernel-modules \

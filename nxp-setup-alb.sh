@@ -278,6 +278,7 @@ LAYER_LIST=" \
     meta-openembedded/meta-xfce \
     meta-virtualization \
     meta-linaro/meta-optee \
+    meta-security \
     \
     meta-freescale \
 "

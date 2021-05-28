@@ -177,3 +177,7 @@ SRC_URI_append_s32g2 = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file:
 
 # make everything compatible for the time being
 COMPATIBLE_MACHINE_$MACHINE = "$MACHINE"
+
+# Enable dm-verity
+DELTA_KERNEL_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'dm-verity.cfg', '', d)}"
+SRC_URI_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://build/dm-verity.cfg', '', d)}"

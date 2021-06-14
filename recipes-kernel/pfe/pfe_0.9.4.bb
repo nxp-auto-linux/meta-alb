@@ -128,4 +128,12 @@ python () {
         d.setVar('RPROVIDES_%s' % pn, rprovides + s)
 }
 
+# Exclude (R)PROVIDES for the following tasks otherwise a hashbase mismatch is
+# reported between the hash before kernel build (which triggers an empty kernel
+# version in the (R)PROVIDES) and the hash after kernel build (using the updated
+# kernel version)
+do_populate_sysroot[vardepsexclude] += "PROVIDES"
+do_populate_sysroot_setscene[vardepsexclude] += "PROVIDES"
+do_package[vardepsexclude] += "PROVIDES RPROVIDES_${PN}"
+
 COMPATIBLE_MACHINE = "s32g2"

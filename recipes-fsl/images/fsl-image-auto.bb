@@ -53,6 +53,3 @@ IMAGE_INSTALL_append = " rsync irqbalance i2c-tools"
 PCIE_INSTALL_PACKAGES ?= " demo-pcie-shared-mem demo-virt-eth"
 IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' ${PCIE_INSTALL_PACKAGES}', '', d)}"
 
-# Add LLCE CAN if needed
-IMAGE_INSTALL_append_s32g2 = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
-

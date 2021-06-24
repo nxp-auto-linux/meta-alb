@@ -1,6 +1,6 @@
 require recipes-kernel/linux/linux-s32.inc
 
-SRCREV = "24acc1a072a5caeb25b583e51c700afb8c71cf99"
+SRCREV = "c807d5996d79e57f1781fa9e244b68d7a4123331"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 

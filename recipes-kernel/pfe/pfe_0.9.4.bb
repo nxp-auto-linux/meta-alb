@@ -21,6 +21,7 @@ SRC_URI = "${URL} \
 	file://0001-AAVB-3196-pfeng-Enable-pfe-eth-netdevs-to-be-selecte.patch \
 	file://0002-AAVB-3196-pfeng-Account-for-the-8021q-DSA-tag-length.patch \
 	file://0003-AAVB-3196-pfe_platform-Add-4B-margin-to-the-max-rx-p.patch \
+	file://0001-phylink-fix-build-with-backported-paches-on-5.4.patch \
 	"
 SRCREV ?= "3a548033d5126c9354a8529903d0842769718b1e"
 

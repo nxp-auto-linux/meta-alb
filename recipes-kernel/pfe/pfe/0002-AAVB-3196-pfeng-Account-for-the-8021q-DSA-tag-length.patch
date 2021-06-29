@@ -1,0 +1,38 @@
+From 72ba0483a8f0a4defffe7e3a01f7379c96054281 Mon Sep 17 00:00:00 2001
+From: Claudiu Manoil <claudiu.manoil@nxp.com>
+Date: Wed, 16 Jun 2021 13:08:58 +0300
+Subject: [PATCH 2/3] [AAVB-3196] pfeng: Account for the 8021q DSA tag length
+
+Fixes following DSA setup error :
+"000: pfeng 46000000.pfe pfe2: error -22 setting MTU to 1504 to include
+DSA overhead"
+
+Signed-off-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+---
+ sw/linux-pfeng/pfeng-netif.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sw/linux-pfeng/pfeng-netif.c b/sw/linux-pfeng/pfeng-netif.c
+index d65dacb38..e3be81bad 100644
+--- a/sw/linux-pfeng/pfeng-netif.c
++++ b/sw/linux-pfeng/pfeng-netif.c
+@@ -9,6 +9,7 @@
+ #include <linux/rtnetlink.h>
+ #include <linux/list.h>
+ #include <linux/clk.h>
++#include <linux/if_vlan.h>
+ 
+ #include "pfe_cfg.h"
+ #include "oal.h"
+@@ -1032,7 +1033,7 @@ static struct pfeng_netif *pfeng_netif_logif_create(struct pfeng_priv *priv, str
+ 
+ 	/* MTU ranges */
+ 	netdev->min_mtu = ETH_MIN_MTU;
+-	netdev->max_mtu = ETH_DATA_LEN;
++	netdev->max_mtu = ETH_DATA_LEN + VLAN_HLEN; /* account for 8021q DSA tag length, AAVB-3196 */
+ 
+ 	/* Each packet requires extra buffer for Tx header (metadata) */
+ 	netdev->needed_headroom = PFENG_TX_PKT_HEADER_SIZE;
+-- 
+2.32.0
+

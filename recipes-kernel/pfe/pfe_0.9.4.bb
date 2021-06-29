@@ -18,6 +18,9 @@ URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=htt
 SRC_URI = "${URL} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN} \
+	file://0001-AAVB-3196-pfeng-Enable-pfe-eth-netdevs-to-be-selecte.patch \
+	file://0002-AAVB-3196-pfeng-Account-for-the-8021q-DSA-tag-length.patch \
+	file://0003-AAVB-3196-pfe_platform-Add-4B-margin-to-the-max-rx-p.patch \
 	"
 SRCREV ?= "3a548033d5126c9354a8529903d0842769718b1e"
 

@@ -1,0 +1,32 @@
+From 68a575e22df92b73f35370b50e0e248449936f95 Mon Sep 17 00:00:00 2001
+From: Claudiu Manoil <claudiu.manoil@nxp.com>
+Date: Fri, 18 Jun 2021 11:45:14 +0300
+Subject: [PATCH 3/3] [AAVB-3196] pfe_platform: Add 4B margin to the max rx
+ packet size, for DSA
+
+The DSA 8021q tag is 4B long, and it is inserted in the eth header
+for the Linux host to extract and parse.
+Without this margin the traffic to host via the sja11xx DSA switch
+is broken (dropped on Rx) for l2 payloads from 1497B to 1500B.
+
+Signed-off-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+---
+ sw/pfe_platform/hw/s32g/pfe_emac_csr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sw/pfe_platform/hw/s32g/pfe_emac_csr.c b/sw/pfe_platform/hw/s32g/pfe_emac_csr.c
+index 4740d8f90..0072be1ca 100644
+--- a/sw/pfe_platform/hw/s32g/pfe_emac_csr.c
++++ b/sw/pfe_platform/hw/s32g/pfe_emac_csr.c
+@@ -179,7 +179,7 @@ errno_t pfe_emac_cfg_init(addr_t base_va, pfe_emac_mii_mode_t mode,  pfe_emac_sp
+ 			, base_va + MTL_RXQ0_OPERATION_MODE);
+ 
+ 	hal_write32(0U, base_va + MTL_TXQ0_OPERATION_MODE);
+-	hal_write32(GIANT_PACKET_SIZE_LIMIT(1518U), base_va + MAC_EXT_CONFIGURATION);
++	hal_write32(GIANT_PACKET_SIZE_LIMIT(1522U), base_va + MAC_EXT_CONFIGURATION);
+ 
+ 	hal_write32(0U, base_va + MAC_TIMESTAMP_CONTROL);
+ 	hal_write32(0U, base_va + MAC_SUB_SECOND_INCREMENT);
+-- 
+2.32.0
+

@@ -21,6 +21,7 @@ SRC_URI += " \
     file://0015-pseudo-We-need-to-treat-chroot-exceptions-properly-f.patch \
 \
     file://0001-pseudo-Added-missing-support-for-faccessat.patch \
+    file://0001-ports-linux-Add-fcntl64.patch \
 \
     file://0001-pseudo-pseudo_root_path-didn-t-work-properly-for-chr.patch \
     file://0001-pseudo-Fixing-an-incorrect-EAR-patch-port.patch \

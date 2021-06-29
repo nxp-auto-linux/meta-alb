@@ -1,0 +1,57 @@
+From f9e6997dfb96df60a596300ea54a70509125f2e0 Mon Sep 17 00:00:00 2001
+From: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+Date: Tue, 29 Jun 2021 12:29:17 +0300
+Subject: [PATCH] ports/linux: Add fcntl64
+
+Add wrapper for fcntl64 based on fcntl6. This call was added
+back in Linux 2.4.
+
+Issue: ALB-7386
+Signed-off-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+---
+ ports/linux/guts/fcntl64.c | 20 ++++++++++++++++++++
+ ports/linux/wrapfuncs.in   |  1 +
+ 2 files changed, 21 insertions(+)
+ create mode 100644 ports/linux/guts/fcntl64.c
+
+diff --git a/ports/linux/guts/fcntl64.c b/ports/linux/guts/fcntl64.c
+new file mode 100644
+index 0000000..aaa8035
+--- /dev/null
++++ b/ports/linux/guts/fcntl64.c
+@@ -0,0 +1,20 @@
++/*
++ * Copyright 2021 NXP
++ *
++ * SPDX-License-Identifier: LGPL-2.1-only
++ *
++ * static int
++ * wrap_fcntl64(int fd, int cmd, ...struct flock *lock) {
++ *	int rc = -1;
++ */
++	long arg;
++
++	va_start(ap, cmd);
++	arg = va_arg(ap, long);
++	va_end(ap);
++
++	rc = wrap_fcntl(fd, cmd, arg);
++
++/*	return rc;
++ * }
++ */
+diff --git a/ports/linux/wrapfuncs.in b/ports/linux/wrapfuncs.in
+index c5ea7c3..e9b2c62 100644
+--- a/ports/linux/wrapfuncs.in
++++ b/ports/linux/wrapfuncs.in
+@@ -12,6 +12,7 @@ int mknodat(int dirfd, const char *path, mode_t mode, dev_t dev); /* real_func=p
+ int __xmknod(int ver, const char *path, mode_t mode, dev_t *dev); /* flags=AT_SYMLINK_NOFOLLOW */
+ int __xmknodat(int ver, int dirfd, const char *path, mode_t mode, dev_t *dev); /* flags=AT_SYMLINK_NOFOLLOW */
+ int fcntl(int fd, int cmd, ...{struct flock *lock});
++int fcntl64(int fd, int cmd, ...{struct flock64 *lock});
+ # just so we know the inums of symlinks
+ char *canonicalize_file_name(const char *filename);
+ int eaccess(const char *path, int mode);
+-- 
+2.25.1
+

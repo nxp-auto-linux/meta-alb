@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2018 NXP
+# Copyright 2017-2021 NXP
 #
 
 require recipes-fsl/images/fsl-image-base.bb
@@ -21,10 +21,6 @@ IMAGE_INSTALL += " \
 IMAGE_INSTALL += "dhrystone fio"
 
 IMAGE_INSTALL_append_gen1 = " perf"
-
-# Add packages required for OpenMPI demo
-# TODO: add them to the RDEPENDS list in the OpenMPI demo recipe
-IMAGE_INSTALL += "imagemagick gnuplot mpich mpich-dev"
 
 # Userspace support for QSPI Flash under Linux for S32GEN1 platforms
 IMAGE_INSTALL_append_gen1 = " mtd-utils "

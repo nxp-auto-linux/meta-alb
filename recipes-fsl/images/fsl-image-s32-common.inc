@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2019 NXP
+# Copyright 2017-2021 NXP
 #
 
 # Support for native graphics. We enable this via DISTRO_FEATURES
@@ -16,6 +16,10 @@ IMAGE_INSTALL_append_s32v2xx += "\
     fbv \
     u-boot-s32 \
 "
+
+# Add packages required for OpenMPI demo
+# TODO: add them to the RDEPENDS list in the OpenMPI demo recipe
+IMAGE_INSTALL_append_s32v2xx += "imagemagick gnuplot mpich mpich-dev"
 
 # Support for Inter-Process(or) Communication over Shared Memory (ipc-shm) under Linux
 IPCSHM ?= "ipc-shm"

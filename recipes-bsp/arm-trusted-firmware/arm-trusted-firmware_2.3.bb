@@ -16,11 +16,11 @@ B = "${WORKDIR}/build"
 URL ?= "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "d3f735916e95834dd8934e4e4a191f5cf1706b4c"
+SRCREV ?= "cbfbec502a2da49de317c626a581863d4ee53358"
 
 SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 
-PLATFORM_s32g2 = "s32g"
+PLATFORM_s32g2 = "s32g2"
 BUILD_TYPE = "release"
 
 ATF_BINARIES = "${B}/${PLATFORM}/${BUILD_TYPE}"

@@ -124,8 +124,9 @@ def dnwp_fixuprdepends(d):
             # it is a reasonable solution to the QA problem.
             d.appendVar('INSANE_SKIP_' +  ppn, ' build-deps')
 
-# This is called once per package. It better be quick
-python () {
+addhandler distro_never_write_package_rdepends
+distro_never_write_package_rdepends[eventmask] = "bb.event.RecipeTaskPreProcess"
+python distro_never_write_package_rdepends () {
     dnwp_fixuprdepends(d)
     dnwp_nopackagewrites(d)
 }

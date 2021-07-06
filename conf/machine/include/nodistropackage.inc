@@ -46,7 +46,7 @@ def dnwp_prefrprov(d):
 
     dawp = (d.getVar('DISTRO_ALWAYS_WRITE_PACKAGE') or '').split()
     for pattern in (d.getVar('DISTRO_NEVER_WRITE_PACKAGE') or '').split():
-        pnpattern, packagelist, preferredrprovider = (pattern.split(':') + 3 * [None])[:3]
+        pnpattern, packagelist, preferredrprovider, virtruntime= (pattern.split(':') + 4 * [None])[:4]
         if not pnpattern:
             bb.error("Missing recipe name in nodistropackage")
         if not preferredrprovider:
@@ -69,6 +69,8 @@ def dnwp_prefrprov(d):
                 packagelist = packagelist.split(',')
                 for p in packagelist:
                     d.setVar('PREFERRED_RPROVIDER_' + p, preferredrprovider)
+                    if virtruntime == '1':
+                        d.setVar('VIRTUAL-RUNTIME_' + p, preferredrprovider)
 
 addhandler distro_never_write_package_pre
 distro_never_write_package_pre[eventmask] = "bb.event.ConfigParsed"

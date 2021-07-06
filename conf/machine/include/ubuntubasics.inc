@@ -96,7 +96,7 @@ require conf/machine/include/nodistropackage.inc
 DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
     alsa-conf \
     alsa-lib \
-    update-alternatives \
+    update-alternatives:::1 \
     bash \
     base-files \
     base-passwd \

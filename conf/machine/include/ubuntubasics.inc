@@ -79,6 +79,20 @@ INIT_MANAGER = "systemd"
 # The respective Ubuntu image must then install the Ubuntu version of
 # the recipe.
 require conf/machine/include/nodistropackage.inc
+
+# DISTRO_NEVER_WRITE_PACKAGE format:
+# <package name>[:[packagelist]:[preferred rprovider]:[virt-runtime]]
+# Where:
+#     package name: recipe name. Mandatory parameter
+# Optional parameters:
+#     packagelist:  list of comma-separated package names
+#     rprovider:    specify the preferred rprovider if different than default
+#                   (e.g. ubuntu-base)
+#     virt-runtime: 0/1:disable(0) or enable(1) overwritting VIRTUAL-RUNTIME
+#                   with preferred rprovider. Default is (if not specified)
+#                   disable. This is required for pkgs that are directly
+#                   referrenced with VIRTUAL-RUNTIME (e.g. update-alternatives)
+
 DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
     alsa-conf \
     alsa-lib \

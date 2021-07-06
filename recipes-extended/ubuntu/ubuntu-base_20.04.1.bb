@@ -76,7 +76,7 @@ libudev1 libunistring2 libuuid1 libwind0-heimdal libxml2 libxtables12 \
 libyaml-0-2 libzstd1 login logsave lsb-base lsb-release m4 mawk \
 mime-support mount ncurses-base ncurses-bin net-tools netbase \
 networkd-dispatcher openssl packagekit packagekit-tools passwd \
-perl-base pinentry-curses policykit-1 procps publicsuffix \
+perl perl-base pinentry-curses policykit-1 procps publicsuffix \
 python-apt-common python-is-python2 python2 python2-minimal python2.7 \
 python2.7-minimal python3 python3-apt python3-certifi python3-chardet \
 python3-dbus python3-distro-info python3-gi python3-idna \

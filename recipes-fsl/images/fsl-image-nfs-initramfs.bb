@@ -6,10 +6,13 @@ include recipes-core/images/core-image-minimal.bb
 
 inherit image_types
 
+require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
+
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234evb = " sja1105 "
 IMAGE_INSTALL_append_s32v234bbmini = " sja1105 "
 IMAGE_INSTALL_append_s32v234campp = " init-net-root"
+IMAGE_INSTALL_append_s32g274abluebox3 = " init-net-root"
 
 IMAGE_INSTALL_append += " \
 	init-nfs-boot     \
@@ -24,6 +27,6 @@ rootfs_delete_Image () {
 
 ROOTFS_POSTPROCESS_COMMAND += "rootfs_delete_Image; "
 
-IMAGE_FSTYPES_s32v2xx = "cpio.gz.u-boot"
+IMAGE_FSTYPES_s32 = "cpio.gz.u-boot"
 
-COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini|s32v234campp"
+COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini|s32v234campp|s32g274abluebox3"

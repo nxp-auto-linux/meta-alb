@@ -2,7 +2,7 @@
 #
 # Boot Linux from ramdisk, start networking services, insert kernel modules
 # Boot actual rootfs from NFS, as provided by command line parameters
-# Copyright 2018-2020 NXP
+# Copyright 2018-2021 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -58,6 +58,9 @@ if [ -z "$nfsroot" ]; then
         echo "Did not specify \"nfsroot=\" option."
 	exec /bin/bash
 fi
+
+echo "Starting udev"
+/etc/init.d/udev start
 
 # Setup network modules directly by insmod or by startup script
 # before enabling the networking service

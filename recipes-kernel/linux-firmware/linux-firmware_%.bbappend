@@ -16,15 +16,15 @@ SRC_URI_append_s32 = " \
 
 do_install_append () {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', 'true', 'false', d)}; then
-		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/dte.bin ${D}/lib/firmware/dte.bin
-		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/frpe.bin ${D}/lib/firmware/frpe.bin
-		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_tx.bin ${D}/lib/firmware/ppe_tx.bin
-		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_rx.bin ${D}/lib/firmware/ppe_rx.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/dte.bin ${D}/${base_libdir}/firmware/dte.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/frpe.bin ${D}/${base_libdir}/firmware/frpe.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_tx.bin ${D}/${base_libdir}/firmware/ppe_tx.bin
+		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_rx.bin ${D}/${base_libdir}/firmware/ppe_rx.bin
 	fi
 }
 
 PACKAGES =+ "${PN}-llce-can"
-FILES_${PN}-llce-can = "/lib/firmware/dte.bin \
-			/lib/firmware/frpe.bin \
-			/lib/firmware/ppe_tx.bin \
-			/lib/firmware/ppe_rx.bin"
+FILES_${PN}-llce-can = "${base_libdir}/firmware/dte.bin \
+			${base_libdir}/firmware/frpe.bin \
+			${base_libdir}/firmware/ppe_tx.bin \
+			${base_libdir}/firmware/ppe_rx.bin"

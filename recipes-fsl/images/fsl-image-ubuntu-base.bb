@@ -155,6 +155,7 @@ fakeroot do_systemd_service_fixup() {
 	# in the systemd config referencing nothing. This confuses the
 	# startup and leads to unnecessary waits
 	find ${APTGET_CHROOT_DIR}${sysconfdir}/systemd -name "*@.service" -execdir rm {} \;
+	ln -sf ../lib/systemd/systemd  ${APTGET_CHROOT_DIR}/sbin/init
 }
 
 fakeroot do_getty_fixup() {

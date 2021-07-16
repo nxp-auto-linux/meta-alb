@@ -2,9 +2,7 @@ require xen-nxp.inc
 
 do_deploy_append() {
 	# Create relative symbolic link for xen
-	if [ -f ${D}/boot/xen ]; then
-		cd ${DEPLOYDIR} && ln -sf xen-${MACHINE} ${DEPLOYDIR}/xen && cd -
-	fi
+	cd ${DEPLOYDIR} && ln -sf xen-${MACHINE} ${DEPLOYDIR}/xen && cd -
 }
 
 SRC_URI_append_gen1 += "file://xen_s32gen1.cfg"

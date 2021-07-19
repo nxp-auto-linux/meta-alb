@@ -1,15 +1,15 @@
-#
-# This is the default NOR flash environment shipped for the LS2 side of the BlueBox
-#
-#----------------------------------------------------------------------
-# The following macros with angle brackets will be automagically
-# replaced when building the binary environment:
-#       <fdt_name>      Basename of KERNEL_DEVICETREE
-#       <kernel_name>   UBOOT_KERNEL_IMAGETYPE if it has been set,
-#                       otherwise KERNEL_IMAGETYPE
-#       <machine>       MACHINE
-#----------------------------------------------------------------------
-#
+//
+// This is the default NOR flash environment shipped for the LS2 side of the BlueBox
+//
+//----------------------------------------------------------------------
+// The following macros will be automagically replaced when building
+// the binary environment:
+//       $KERNEL_DEVICETREE         Basename of KERNEL_DEVICETREE
+//       $UBOOT_KERNEL_IMAGETYPE    UBOOT_KERNEL_IMAGETYPE if it has been set,
+//                                  otherwise KERNEL_IMAGETYPE
+//       $MACHINE                   Current MACHINE variable
+//----------------------------------------------------------------------
+//
 baudrate=115200
 boot_from_flash=run loadcmd_flash && run mc_loadlinuxdpl && run bootcmd_flash
 bootcmd=run bootcmd_debug; \
@@ -54,10 +54,10 @@ loadcmd_nfs=echo Searching for NFS boot image via TFTP...; tftp $kernel_load $ma
 mcinitcmd=fsl_mc start mc $mc_addr $dpc_addr
 mc_loadlinuxdpl=fsl_mc apply dpl $dpl_addr
 
-machine=<machine>
+machine=$MACHINE
 mmcdev=0
 mmcpart=2
-#kernel_addr=0x100000
+//kernel_addr=0x100000
 kernel_load=0xa0000000
 kernel_name=boot/kernel.itb
 kernel_size=0x03000000
@@ -77,8 +77,8 @@ scsidevs=1
 scsipart=1
 serverip=192.168.2.1
 setbootargs=setenv bootargs console=$consoledev,$baudrate root=/dev/$bootdev earlycon=uart8250,mmio,0x21c0600 default_hugepagesz=2m hugepages=512 $bootargsextra $bootargs_debug
-# The address check is a bit of a hack. The shipped LS2 RDBs have broken pullup placement which leads to the I2C address 0x2c instead of the intended 0x2f.
-# If this was ever fixed on the PCB, the next line should hopefully pick the correct address automatically.
+// The address check is a bit of a hack. The shipped LS2 RDBs have broken pullup placement which leads to the I2C address 0x2c instead of the intended 0x2f.
+// If this was ever fixed on the PCB, the next line should hopefully pick the correct address automatically.
 silentfan_addr=i2c mw 75 0 d; if i2c probe 2f; then setenv w8 2f; else setenv w8 2c; fi; if test -z "$fanspeed"; then setenv fanspeed 10; fi;
 silentfan=run silentfan_addr; i2c mw $w8 0.1 80; i2c mw $w8 58.1 1; i2c mw $w8 5c.1 3; for i in b4 b5 b6 b7 b8; do i2c mw $w8 $i.1 $fanspeed; done; setenv w8; i2c mw 75 0 8;
 stderr=serial

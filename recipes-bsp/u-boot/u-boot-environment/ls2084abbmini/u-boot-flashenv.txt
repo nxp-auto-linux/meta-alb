@@ -1,15 +1,15 @@
-#
-# This is the default NOR flash environment shipped for the LS2 side of the BlueBox Mini
-#
-#----------------------------------------------------------------------
-# The following macros with angle brackets will be automagically
-# replaced when building the binary environment:
-#       <fdt_name>      Basename of KERNEL_DEVICETREE
-#       <kernel_name>   UBOOT_KERNEL_IMAGETYPE if it has been set,
-#                       otherwise KERNEL_IMAGETYPE
-#       <machine>       MACHINE
-#----------------------------------------------------------------------
-#
+//
+// This is the default NOR flash environment shipped for the LS2 side of the BlueBox Mini
+//
+//----------------------------------------------------------------------
+// The following macros will be automagically replaced when building
+// the binary environment:
+//       $KERNEL_DEVICETREE         Basename of KERNEL_DEVICETREE
+//       $UBOOT_KERNEL_IMAGETYPE    UBOOT_KERNEL_IMAGETYPE if it has been set,
+//                                  otherwise KERNEL_IMAGETYPE
+//       $MACHINE                   Current MACHINE variable
+//----------------------------------------------------------------------
+//
 baudrate=115200
 boot_from_flash=run loadcmd_flash && run mc_loadlinuxdpl && run bootcmd_flash
 bootcmd=run bootcmd_debug; \
@@ -53,16 +53,16 @@ loadcmd_ssd=echo Searching for boot image on SSD...; scsi scan && ext2load scsi 
 loadcmd_sdhc=echo Searching for boot image on SD-Card...; mmc rescan && mmc info && ext2load mmc ${mmcdev}:${mmcpart} $kernel_load $kernel_name
 loadcmd_nfs=echo Searching for NFS boot image via TFTP...; tftp $kernel_load $machine/$kernel_name;
 
-#mcinitcmd=fsl_mc start mc $mc_addr $dpc_addr
-#mc_loadlinuxdpl=fsl_mc apply dpl $dpl_addr
+//mcinitcmd=fsl_mc start mc $mc_addr $dpc_addr
+//mc_loadlinuxdpl=fsl_mc apply dpl $dpl_addr
 mcinitcmd=if itest.b *0x1e00003 -eq 0x20; then mmc read 90a00000 5000 1800; mmc read 90e00000 7000 800; fsl_mc start mc 90a00000 90e00000; else fsl_mc start mc $mc_addr $dpc_addr; fi
 mc_loadlinuxdpl=if itest.b *0x1e00003 -eq 0x20; then mmc read 90d00000 6800 800; fsl_mc apply dpl 90d00000; else fsl_mc apply dpl $dpl_addr; fi
 
-machine=<machine>
+machine=$MACHINE
 midfan=mw.b 5200000c0 28
 mmcdev=0
 mmcpart=2
-#kernel_addr=0x100000
+//kernel_addr=0x100000
 kernel_load=0xa0000000
 kernel_name=boot/kernel.itb
 kernel_size=0x03000000

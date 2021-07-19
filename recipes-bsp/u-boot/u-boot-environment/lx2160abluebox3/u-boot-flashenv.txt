@@ -1,22 +1,22 @@
-#
-# This is the default NOR flash environment shipped for the LX2 side of the BlueBox3
-#
-#----------------------------------------------------------------------
-# The following macros with angle brackets will be automagically
-# replaced when building the binary environment:
-#       <fdt_name>      Basename of KERNEL_DEVICETREE
-#       <kernel_name>   UBOOT_KERNEL_IMAGETYPE if it has been set,
-#                       otherwise KERNEL_IMAGETYPE
-#       <machine>       MACHINE
-#----------------------------------------------------------------------
-#
-BOARD=<machine>
+//
+// This is the default QSPI flash environment shipped for the LX2 side of the BlueBox3
+//
+//----------------------------------------------------------------------
+// The following macros will be automagically replaced when building
+// the binary environment:
+//       $KERNEL_DEVICETREE         Basename of KERNEL_DEVICETREE
+//       $UBOOT_KERNEL_IMAGETYPE    UBOOT_KERNEL_IMAGETYPE if it has been set,
+//                                  otherwise KERNEL_IMAGETYPE
+//       $MACHINE                   Current MACHINE variable
+//----------------------------------------------------------------------
+//
+BOARD=$MACHINE
 arch=arm
 baudrate=115200
 bd_part=1:2
 bd_type=mmc
-board=<machine>
-board_name=<machine>
+board=$MACHINE
+board_name=$MACHINE
 boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; env exists secureboot && load ${devtype} ${devnum}:${distro_bootpart} ${scripthdraddr} ${prefix}${boot_script_hdr} && esbc_validate ${scripthdraddr};source ${scriptaddr}
 boot_efi_binary=if fdt addr ${fdt_addr_r}; then bootefi bootmgr ${fdt_addr_r};else bootefi bootmgr ${fdtcontroladdr};fi;load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} efi/boot/bootaa64.efi; if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r};else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi
 boot_extlinux=sysboot ${devtype} ${devnum}:${distro_bootpart} any ${scriptaddr} ${prefix}${boot_syslinux_conf}

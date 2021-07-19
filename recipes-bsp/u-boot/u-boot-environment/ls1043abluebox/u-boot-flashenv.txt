@@ -1,15 +1,15 @@
-#
-# This is the default NOR flash environment for the LS1043A RDB
-#
-#----------------------------------------------------------------------
-# The following macros with angle brackets will be automagically
-# replaced when building the binary environment:
-#       <fdt_name>      Basename of KERNEL_DEVICETREE
-#       <kernel_name>   UBOOT_KERNEL_IMAGETYPE if it has been set,
-#                       otherwise KERNEL_IMAGETYPE
-#       <machine>       MACHINE
-#----------------------------------------------------------------------
-#
+//
+// This is the default NOR flash environment for the LS1043A RDB
+//
+//----------------------------------------------------------------------
+// The following macros will be automagically replaced when building
+// the binary environment:
+//       $KERNEL_DEVICETREE         Basename of KERNEL_DEVICETREE
+//       $UBOOT_KERNEL_IMAGETYPE    UBOOT_KERNEL_IMAGETYPE if it has been set,
+//                                  otherwise KERNEL_IMAGETYPE
+//       $MACHINE                   Current MACHINE variable
+//----------------------------------------------------------------------
+//
 baudrate=115200
 boot_from_flash=run loadcmd_flash && run bootcmd_flash
 bootcmd=run bootcmd_debug; \
@@ -37,7 +37,7 @@ consoledev=ttyS0
 ethact=FM1@DTSEC3
 ethprime=FM1@DTSEC3
 fdt_high=0xffffffffffffffff
-#fdt_load=0xa2000000
+//fdt_load=0xa2000000
 fman_ucode=0x60900000
 gatewayip=192.168.2.1
 hwconfig=fsl_ddr:bank_intlv=auto
@@ -47,7 +47,7 @@ loadcmd_flash=echo Loading from flash at $kernel_start...; cp.b $kernel_start $k
 loadcmd_ssd=echo Searching for boot image on SSD...; scsi scan && ext2load scsi ${scsidev}:${scsipart} $kernel_load $kernel_name
 loadcmd_sdhc=echo Searching for boot image on SD-Card...; mmc rescan && mmc info && ext2load mmc ${mmcdev}:${mmcpart} $kernel_load $kernel_name
 loadcmd_nfs=echo Searching for NFS boot image via TFTP...; tftp $kernel_load $machine/$kernel_name;
-machine=<machine>
+machine=$MACHINE
 mmcdev=0
 mmcpart=2
 kernel_load=0xa0000000
@@ -71,38 +71,38 @@ stderr=serial
 stdin=serial
 stdout=serial
 
-# Original environment as found shipped on the LS1043A RDB
-#baudrate=115200
-#bootargs=console=ttyS0,115200 root=/dev/ram0 earlycon=uart8250,0x21c0500,115200
-#bootcmd=cp.b $kernel_start $kernel_load $kernel_size && bootm $kernel_load
-#bootdelay=3
-#console=ttyAMA0,38400n8
-#eth1addr=00:04:9f:04:92:c8
-#eth2addr=00:04:9f:04:92:c9
-#eth3addr=00:04:9f:04:92:ca
-#eth4addr=00:04:9f:04:92:cb
-#eth5addr=00:04:9f:04:92:cc
-#eth6addr=00:04:9f:04:92:cd
-#ethact=FM1@DTSEC1
-#ethaddr=00:04:9f:04:92:c7
-#ethprime=e1000#0
-#fdt_high=0xffffffffffffffff
-#fdtcontroladdr=ffbc7738
-#fman_ucode=60300000
-#gatewayip=192.168.1.1
-#hwconfig=fsl_ddr:bank_intlv=auto
-#initrd_high=0xffffffffffffffff
-#ipaddr=192.168.1.100
-#kernel_addr=0x100000
-#kernel_load=0xa0000000
-#kernel_size=0x2800000
-#kernel_start=0x61100000
-#loadaddr=0x80100000
-#netmask=255.255.255.0
-#ramdisk_addr=0x800000
-#ramdisk_size=0x2000000
-#scsidevs=0
-#serverip=10.170.74.59
-#stderr=serial
-#stdin=serial
-#stdout=serial
+// Original environment as found shipped on the LS1043A RDB
+//baudrate=115200
+//bootargs=console=ttyS0,115200 root=/dev/ram0 earlycon=uart8250,0x21c0500,115200
+//bootcmd=cp.b $kernel_start $kernel_load $kernel_size && bootm $kernel_load
+//bootdelay=3
+//console=ttyAMA0,38400n8
+//eth1addr=00:04:9f:04:92:c8
+//eth2addr=00:04:9f:04:92:c9
+//eth3addr=00:04:9f:04:92:ca
+//eth4addr=00:04:9f:04:92:cb
+//eth5addr=00:04:9f:04:92:cc
+//eth6addr=00:04:9f:04:92:cd
+//ethact=FM1@DTSEC1
+//ethaddr=00:04:9f:04:92:c7
+//ethprime=e1000#0
+//fdt_high=0xffffffffffffffff
+//fdtcontroladdr=ffbc7738
+//fman_ucode=60300000
+//gatewayip=192.168.1.1
+//hwconfig=fsl_ddr:bank_intlv=auto
+//initrd_high=0xffffffffffffffff
+//ipaddr=192.168.1.100
+//kernel_addr=0x100000
+//kernel_load=0xa0000000
+//kernel_size=0x2800000
+//kernel_start=0x61100000
+//loadaddr=0x80100000
+//netmask=255.255.255.0
+//ramdisk_addr=0x800000
+//ramdisk_size=0x2000000
+//scsidevs=0
+//serverip=10.170.74.59
+//stderr=serial
+//stdin=serial
+//stdout=serial

@@ -1,14 +1,15 @@
-#
-# This is the default NOR flash environment as shipped in LS2080A-SDK-AARCH64-IMAGE-20151204-yocto.iso
-#
-#----------------------------------------------------------------------
-# The following macros with angle brackets will be automagically
-# replaced when building the binary environment:
-#       <fdt_name>      Basename of KERNEL_DEVICETREE
-#       <kernel_name>   UBOOT_KERNEL_IMAGETYPE if it has been set,
-#                       otherwise KERNEL_IMAGETYPE
-#----------------------------------------------------------------------
-#
+//
+// This is the default NOR flash environment as shipped in LS2080A-SDK-AARCH64-IMAGE-20151204-yocto.iso
+//
+//----------------------------------------------------------------------
+// The following macros will be automagically replaced when building
+// the binary environment:
+//       $KERNEL_DEVICETREE         Basename of KERNEL_DEVICETREE
+//       $UBOOT_KERNEL_IMAGETYPE    UBOOT_KERNEL_IMAGETYPE if it has been set,
+//                                  otherwise KERNEL_IMAGETYPE
+//       $MACHINE                   Current MACHINE variable
+//----------------------------------------------------------------------
+//
 baudrate=115200
 bootargs=console=ttyS1,115200 root=/dev/ram0 earlycon=uart8250,mmio,0x21c0600 ramdisk_size=0x2000000 default_hugepagesz=2m hugepagesz=2m hugepages=16
 bootcmd=run mc_boot && cp.b $kernel_start $kernel_load $kernel_size && bootm $kernel_load

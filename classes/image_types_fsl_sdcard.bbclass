@@ -147,23 +147,21 @@ add_extra_boot_img() {
 
 # Format rootfs partition
 create_rootfs_partition () {
-	PART_NO="$1"
+	SDCARD_ROOTFS_START="$1"
 	SDCARD_ROOTFS_SIZE="$2"
 	SDCARD_ROOTFS_NAME="$3"
 	if [ -n "${SDCARD_ROOTFS_NAME}" ]; then
-		parted -s ${SDCARD} unit KiB mkpart primary $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ ${SDCARD_ROOTFS_SIZE} \* $PART_NO \+ ${BASE_IMAGE_ROOTFS_ALIGNMENT} \* $PART_NO) \
-			$(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED} \+ ${SDCARD_ROOTFS_SIZE} \* $PART_NO \+ ${BASE_IMAGE_ROOTFS_ALIGNMENT} \* $PART_NO + ${SDCARD_ROOTFS_SIZE})
+		parted -s ${SDCARD} unit KiB mkpart primary ${SDCARD_ROOTFS_START} $(expr ${SDCARD_ROOTFS_START} + ${SDCARD_ROOTFS_SIZE})
 	fi
 }
 
 # Burn rootfs partition to .sdcard image
 write_rootfs_partition () {
-	PART_NO="$1"
+	SDCARD_ROOTFS_START="$1"
 	SDCARD_ROOTFS_SIZE="$2"
 	SDCARD_ROOTFS_NAME="$3"
 	if [ -n "${SDCARD_ROOTFS_NAME}" ]; then
-		dd if=${SDCARD_ROOTFS_NAME} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${BOOT_SPACE_ALIGNED} \* 1024 + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024 + \
-			$PART_NO \* ${BASE_IMAGE_ROOTFS_ALIGNMENT} \* 1024 + $PART_NO \* ${SDCARD_ROOTFS_SIZE} \* 1024)
+		dd if=${SDCARD_ROOTFS_NAME} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${SDCARD_ROOTFS_START} \* 1024)
 	fi
 }
 
@@ -309,12 +307,17 @@ _burn_bootloader() {
 #                                                                ROOTFS0                                                        ROOTFSn
 
 generate_nxp_sdcard () {
+	# Get partitions' start offsets passed as parameters
+	SDCARD_ROOTFS_REAL_START="$1"
+	SDCARD_ROOTFS_EXTRA1_START="$2"
+	SDCARD_ROOTFS_EXTRA2_START="$3"
+
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
 	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
-	create_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	create_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
-	create_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
+	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
+	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
+	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
 	parted ${SDCARD} print
 
 	# Fill optional Layerscape RCW into the boot block
@@ -328,9 +331,9 @@ generate_nxp_sdcard () {
 
 	# Burn Partitions
 	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
-	write_rootfs_partition 0 ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
-	write_rootfs_partition 1 ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
-	write_rootfs_partition 2 ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
+	write_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
+	write_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
+	write_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
 }
 
 generate_sdcardimage_entry() {
@@ -371,15 +374,25 @@ IMAGE_CMD_sdcard () {
 		fi
 	fi
 
+	# Compute final size of SDCard image and start offset of each rootfs partition
 	SDCARD_SIZE=$(expr ${IMAGE_ROOTFS_ALIGNMENT} + ${BOOT_SPACE_ALIGNED})
 	if [ -n "${SDCARD_ROOTFS_REAL}" ]; then
+		SDCARD_ROOTFS_REAL_START=${SDCARD_SIZE}
 		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${ROOTFS_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+	else
+		SDCARD_ROOTFS_REAL_START="0"
 	fi
 	if [ -n "${SDCARD_ROOTFS_EXTRA1_FILE}" ]; then
+		SDCARD_ROOTFS_EXTRA1_START=${SDCARD_SIZE}
 		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${SDCARD_ROOTFS_EXTRA1_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+	else
+		SDCARD_ROOTFS_EXTRA1_START="0"
 	fi
 	if [ -n "${SDCARD_ROOTFS_EXTRA2_FILE}" ]; then
+		SDCARD_ROOTFS_EXTRA2_START=${SDCARD_SIZE}
 		SDCARD_SIZE=$(expr ${SDCARD_SIZE} + ${SDCARD_ROOTFS_EXTRA2_SIZE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+	else
+		SDCARD_ROOTFS_EXTRA2_START="0"
 	fi
 
 	cd ${IMGDEPLOYDIR}
@@ -398,7 +411,7 @@ IMAGE_CMD_sdcard () {
 	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA8_FILE}" "SDCARDIMAGE_EXTRA8_OFFSET" "${SDCARDIMAGE_EXTRA8_OFFSET}" "${SDCARD}"
 	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA9_FILE}" "SDCARDIMAGE_EXTRA9_OFFSET" "${SDCARDIMAGE_EXTRA9_OFFSET}" "${SDCARD}"
 
-	${SDCARD_GENERATION_COMMAND}
+	${SDCARD_GENERATION_COMMAND} ${SDCARD_ROOTFS_REAL_START} ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA2_START}
 	cd -
 }
 

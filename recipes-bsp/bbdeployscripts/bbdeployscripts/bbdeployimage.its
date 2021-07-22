@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017, NXP
+ * Copyright (C) 2016-2017,2021 NXP
  * <Heinz.Wrobel@nxp.com>
  */
 
@@ -24,6 +24,30 @@
         ls2factoryprep@1 {
             description = "LS2 BB Mini factory deployment script";
             data = /incbin/("ls2factoryprep.txt");
+            type = "script";
+            compression = "none";
+        };
+        s32gqspideploy@1 {
+            description = "S32G Bluebox3 QSPI factory deployment script";
+            data = /incbin/("s32gqspideploy.txt");
+            type = "script";
+            compression = "none";
+        };
+        s32gemmcdeploy@1 {
+            description = "S32G Bluebox3 eMMC factory deployment script";
+            data = /incbin/("s32gemmcdeploy.txt");
+            type = "script";
+            compression = "none";
+        };
+        s32grcwdeploy@1 {
+            description = "S32G Bluebox3 RCW factory deployment script";
+            data = /incbin/("s32grcwdeploy.txt");
+            type = "script";
+            compression = "none";
+        };
+        s32gdeployall@1 {
+            description = "S32G Bluebox3 run all factory deployment scripts";
+            data = /incbin/("s32gdeployall.txt");
             type = "script";
             compression = "none";
         };

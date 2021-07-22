@@ -1,0 +1,6 @@
+# Copyright 2021 NXP
+
+source ${loadaddr}:s32grcwdeploy
+source ${loadaddr}:s32gqspideploy
+source ${loadaddr}:s32gemmcdeploy
+

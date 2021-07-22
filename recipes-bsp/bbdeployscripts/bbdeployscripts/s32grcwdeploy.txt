@@ -1,0 +1,58 @@
+# Copyright 2021 NXP
+
+setenv i2cdev 0
+setenv softdipsw 4d
+setenv eeprom_addr_j4 50
+setenv eeprom_addr_j14 56
+setenv sel_mmc_j4_wp 15
+setenv sel_mmc_j4_no_wp 11
+setenv sel_emmc_j4_wp 1d
+setenv sel_emmc_j4_no_wp 19
+
+i2c dev ${i2cdev}
+i2c probe ${softdipsw}
+if test $? == 0; 
+	then
+		echo "Found the software DIP switch at address ${softdipsw}.";
+		i2c mw ${softdipsw}.1 0 ${sel_mmc_j4_wp} 1;
+		i2c mw ${softdipsw}.1 1 ${sel_mmc_j4_no_wp} 1;
+		i2c mw ${softdipsw}.1 2 ${sel_emmc_j4_wp} 1;
+		i2c mw ${softdipsw}.1 3 ${sel_emmc_j4_no_wp} 1;
+		echo "INFO: Successfully configured the software DIP switch.";
+	else
+		echo "ERROR: Software DIP switch not found at address ${softdipsw}.";
+		echo "Please reset the board.";
+		while true; do sleep 1; done;
+fi;
+
+i2c probe ${eeprom_addr_j4}
+if test $? == 0; 
+	then
+		echo "INFO: Found the main RCW EEPROM at address ${eeprom_addr_j4}.";
+		# The below values are the RCW value 0x000f0140
+		i2c mw ${eeprom_addr_j4}.1 0 40 1;
+		i2c mw ${eeprom_addr_j4}.1 1 01 1;
+		i2c mw ${eeprom_addr_j4}.1 2 0f 1;
+		i2c mw ${eeprom_addr_j4}.1 3 00 1;
+		echo "INFO: Successfully configured the second RCW EEPROM.";
+	else
+		echo "ERROR: Main RCW EEPROM not found at address ${eeprom_addr_j4}.";
+		echo "Please reset the board.";
+		while true; do sleep 1; done;
+fi;
+
+i2c probe ${eeprom_addr_j14}
+if test $? == 0; 
+	then
+		echo "INFO: Found the secondary RCW EEPROM at address ${eeprom_addr_j14}.";
+		# The below values are the RCW value 0x0000010c
+		i2c mw ${eeprom_addr_j14}.1 0 0c 1;
+		i2c mw ${eeprom_addr_j14}.1 1 01 1;
+		i2c mw ${eeprom_addr_j14}.1 2 00 1;
+		i2c mw ${eeprom_addr_j14}.1 3 00 1;
+		echo "INFO: Successfully configured the second RCW EEPROM.";
+	else
+		echo "ERROR: Second RCW EEPROM not found at address ${eeprom_addr_j14}.";
+		echo "Please reset the board.";
+		while true; do sleep 1; done;
+fi;

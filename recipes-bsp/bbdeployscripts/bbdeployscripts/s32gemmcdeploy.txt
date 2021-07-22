@@ -1,0 +1,53 @@
+# Copyright 2021 NXP
+
+setenv i2cdev 0
+setenv softdipsw 4d
+setenv sel_byte_2 f8
+setenv sel_hardwired_byte f1
+setenv load_addr_r 84000000
+setenv emmc_image boot/fsl-image-auto-s32g274abluebox3.sdcard
+
+i2c dev ${i2cdev}
+i2c probe ${softdipsw}
+if test $? == 0; 
+	then
+		echo "Found the software DIP switch at address ${softdipsw}.";
+		i2c write ${load_addr_r} ${softdipsw} ${sel_hardwired_byte} 0 -s;
+	else
+		echo "ERROR: Software DIP switch not found at address ${softdipsw}.";
+		echo "Please reset the board.";
+		while true; do sleep 1; done;
+fi;
+
+mmc rescan
+load mmc 0:2 ${load_addr_r} ${emmc_image}
+if test $? -gt 0; 
+	then
+	echo "ERROR: Failed to load ${flash_image} from SD card.";
+	echo "Please reset the board.";
+	while true; do sleep 1; done;
+fi;
+
+setexpr nblks ${filesize} + 0x1ff
+setexpr nblks ${nblks} / 0x200
+
+i2c write ${load_addr_r} ${softdipsw} ${sel_byte_2} 0 -s;
+mmc rescan
+if test $? -gt 0; 
+	then
+	echo "ERROR: eMMC not found.";
+	echo "Please reset the board.";
+	while true; do sleep 1; done;
+fi;
+
+mmc write ${load_addr_r} 0 ${nblks}
+if test $? -gt 0; 
+	then
+	echo "ERROR: Failed to write the eMMC image.";
+	echo "Please reset the board.";
+	while true; do sleep 1; done;
+fi;
+
+i2c write ${load_addr_r} ${softdipsw} ${sel_hardwired_byte} 0 -s
+mmc rescan
+echo "INFO: eMMC successfully written."

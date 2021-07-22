@@ -20,6 +20,10 @@ UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2084abluebox ?= "ls2deployimage "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2084abbmini  ?= "ls2deployimage ls2factoryprep "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls1043abluebox ?= "ls1nordeployimage "
 UBOOT_DEPLOYSCRIPT_NAME_prepend_ls1046abluebox ?= "ls1nordeployimage "
+UBOOT_DEPLOYSCRIPT_NAME_prepend_s32g274abluebox3 ?= "s32gqspideploy \
+	s32gemmcdeploy \
+	s32grcwdeploy \
+	"
 
 SRC_URI = "file://${UBOOT_DEPLOYSCRIPT_NAME_ITS}.its \
            file://${LINUX_DEPLOYSCRIPT_NAME_SH}.sh \
@@ -27,6 +31,10 @@ SRC_URI = "file://${UBOOT_DEPLOYSCRIPT_NAME_ITS}.its \
            file://ls1nordeployimage.txt \
            file://ls2deployimage.txt \
            file://ls2factoryprep.txt \
+           file://s32gqspideploy.txt \
+           file://s32gemmcdeploy.txt \
+           file://s32grcwdeploy.txt \
+           file://s32gdeployall.txt \
 "
 
 S = "${WORKDIR}"

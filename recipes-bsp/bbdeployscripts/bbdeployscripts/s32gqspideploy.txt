@@ -1,0 +1,46 @@
+# Copyright 2021 NXP
+
+setenv flashsize 4000000
+setenv i2cdev 0
+setenv softdipsw 4d
+setenv sel_hardwired_byte f1
+setenv load_addr_r 84000000
+setenv flash_image boot/fsl-image-flash-s32g274abluebox3.flashimage
+
+i2c dev ${i2cdev}
+i2c probe ${softdipsw}
+if test $? == 0; 
+	then
+		echo "Found the software DIP switch at address ${softdipsw}.";
+		i2c write ${load_addr_r} ${softdipsw} ${sel_hardwired_byte} 0 -s;
+	else
+		echo "ERROR: Software DIP switch not found at address ${softdipsw}.";
+		echo "Please reset the board.";
+		while true; do sleep 1; done;
+fi;
+
+sf probe 6:0
+if test $? -gt 0; 
+	then
+	echo "ERROR: QSPI memory probe failed.";
+	echo "Please reset the board.";
+	while true; do sleep 1; done;
+fi;
+
+mmc rescan
+load mmc 0:2 ${load_addr_r} ${flash_image}
+if test $? -gt 0; 
+	then
+	echo "ERROR: Failed to load ${flash_image} from SD card.";
+	echo "Please reset the board.";
+	while true; do sleep 1; done;
+fi;
+
+sf update ${load_addr_r} 0 ${filesize}
+if test $? -gt 0; 
+	then
+	echo "ERROR: Failed to write the QSPI memory.";
+	echo "Please reset the board.";
+	while true; do sleep 1; done;
+fi;
+echo "INFO: QSPI memory successfully written."

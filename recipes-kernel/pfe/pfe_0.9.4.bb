@@ -22,11 +22,11 @@ SRC_URI = "${URL} \
 SRCREV ?= "3a548033d5126c9354a8529903d0842769718b1e"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
-# since 'aarch64-fsl-linux-strip' fails with error code 1 when parsing the firmware
-# ("Unable to recognise the format of the input file")
-INHIBIT_PACKAGE_STRIP = "1"
-INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
-INHIBIT_SYSROOT_STRIP = "1"
+INHIBIT_PACKAGE_STRIP_FILES = "\
+    ${PKGD}${base_libdir}/firmware/s32g_pfe_class.fw \
+    ${PKGD}${base_libdir}/firmware/s32g_pfe_util.fw \
+"
+
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"
@@ -97,39 +97,10 @@ do_deploy() {
 
 addtask do_deploy after do_install
 
-# do_package_qa throws error "QA Issue: Architecture did not match"
-# when checking the firmware
-do_package_qa[noexec] = "1"
-do_package_qa_setscene[noexec] = "1"
+# avoid "QA Issue: Architecture did not match" caused by firmware
+INSANE_SKIP_${PN} += "arch already-stripped"
 
-FILES_${PN} += "${base_libdir}/*"
+FILES_${PN} += "${base_libdir}/firmware"
 FILES_${PN} += "${sysconfdir}/modules-load.d/*"
-
-
-python () {
-    # Allow providing one or more modules based on PFE_SUPPORTED_REV
-    # Set the needed variables depending on user defined PFE_SUPPORTED_REV
-
-    suffix = (d.getVar('KERNEL_MODULE_PACKAGE_SUFFIX', True) or "")
-    revs = d.getVar('PFE_SUPPORTED_REV', True).split()
-    pn = (d.getVar('PN', True) or "")
-
-    for rev in revs:
-        s = " kernel-module-pfeng-%s%s" % (rev, suffix)
-
-        provides = (d.getVar('PROVIDES', True) or "")
-        d.setVar('PROVIDES', provides + s)
-
-        rprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "")
-        d.setVar('RPROVIDES_%s' % pn, rprovides + s)
-}
-
-# Exclude (R)PROVIDES for the following tasks otherwise a hashbase mismatch is
-# reported between the hash before kernel build (which triggers an empty kernel
-# version in the (R)PROVIDES) and the hash after kernel build (using the updated
-# kernel version)
-do_populate_sysroot[vardepsexclude] += "PROVIDES"
-do_populate_sysroot_setscene[vardepsexclude] += "PROVIDES"
-do_package[vardepsexclude] += "PROVIDES RPROVIDES_${PN}"
 
 COMPATIBLE_MACHINE = "s32g2"

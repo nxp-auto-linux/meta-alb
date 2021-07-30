@@ -122,8 +122,24 @@ DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu',
 DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "tmu.config"
 DELTA_KERNEL_DEFCONFIG_append_s32v234evb += "tmu.config"
 
+LLCE_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', '+can', '', d)}"
+LLCE_FEATURES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', '+logger', '', d)}"
+
 # LLCE CAN Drivers
 DELTA_KERNEL_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', 'llce_can.config', '', d)}"
+# LLCE logger
+DELTA_KERNEL_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', 'llce_logger.config', '', d)}"
+
+# Logging only
+KERNEL_MODULE_AUTOLOAD_append_s32g2 += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox llce_logger', '', d)}"
+KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox', '', d)}"
+module_conf_llce-core = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-core load_fw=0', '', d)}"
+module_conf_llce-mailbox = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-mailbox config_platform=0', '', d)}"
+
+# CAN + Logging
+KERNEL_MODULE_AUTOLOAD_append_s32g2 += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce-core llce-mailbox llce_can llce_logger', '', d)}"
+KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce_can', '', d)}"
+module_conf_llce_can = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'options llce_can logging=1', '', d)}"
 
 SRC_URI += "\
     file://build/blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
@@ -133,6 +149,7 @@ SRC_URI += "\
     file://build/gpu.config \
     file://build/tmu.config \
     file://build/llce_can.config \
+    file://build/llce_logger.config \
 "
 
 # Following patch disables the AVB TX queues (1 and 2) in order to prevent

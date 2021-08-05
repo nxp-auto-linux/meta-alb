@@ -129,5 +129,5 @@ INSANE_SKIP_${PN}-dev += "ldflags"
 INSANE_SKIP_${PN}-samples += "ldflags"
 INSANE_SKIP_${PN} += "already-stripped"
 
-COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)"
+COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)|(s32v234hpcsom)"
 

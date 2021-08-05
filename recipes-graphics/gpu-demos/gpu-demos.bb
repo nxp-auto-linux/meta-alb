@@ -65,4 +65,4 @@ FILES_${PN} += "/usr/include"
 INSANE_SKIP_${PN} += "staticdev"
 INSANE_SKIP_${PN} += "already-stripped"
 
-COMPATIBLE_MACHINE-samples = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)"
+COMPATIBLE_MACHINE-samples = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)|(s32v234hpcsom)"

@@ -4,7 +4,7 @@ URL ?= "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI_prepend = "${URL};branch=${BRANCH}"
 
-SRCREV = "67e5121dd27475e384c81fa6dd884e81d43bcb11"
+SRCREV = "9d49df7690cb93ae72c046f5bcad45bd2bb92ae6"
 
 # Support for generating default environment
 SRC_URI += " \

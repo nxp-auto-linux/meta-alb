@@ -1,0 +1,32 @@
+# Copyright 2021 NXP
+#
+# Recipe for tool which takes a specified node from Linux DT, modifies
+# it and adds it to a separate partial DT, along with its references
+
+SUMMARY = "Recipe for partial-dtb-gen tool, used for generating partial DTS \
+    for device passthrough in Dom0less-VMs use-cases"
+SECTION = "utils"
+DEPENDS = "python3 python-fdt"
+RDEPENDS_${PN} = "python3 python-fdt"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+BBCLASSEXTEND = "native"
+
+XEN_PV = "${PREFERRED_VERSION_xen}"
+URL ?= "git://source.codeaurora.org/external/autobsps32/partial_dtb_gen;protocol=https"
+BRANCH ?= "${RELEASE_BASE}-${XEN_PV}"
+SRC_URI = "\
+    ${URL};branch=${BRANCH} \
+"
+SRCREV = "50adfa692ebb846e67adf02e6d0a1d16a9fee402"
+
+S = "${WORKDIR}/git"
+
+PARTIAL_DTB_GEN_DIR = "partial_dtb_gen"
+FILES_${PN} = "${bindir}/${PARTIAL_DTB_GEN_DIR}/*.py"
+
+do_install() {
+    install -d ${D}${bindir}/${PARTIAL_DTB_GEN_DIR}
+    install -m 0755 "${S}/partial_dtb_gen.py" ${D}${bindir}/${PARTIAL_DTB_GEN_DIR}/
+}

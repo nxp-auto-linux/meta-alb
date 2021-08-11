@@ -1,0 +1,22 @@
+/* 
+ * Copyright 2021 NXP
+ */
+/dts-v1/;
+
+/ {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+
+	gic {
+		#interrupt-cells = <0x3>;
+		interrupt-controller;
+		phandle = <0x1>;
+	};
+
+	passthrough {
+		compatible = "simple-bus";
+		ranges;
+		#address-cells = <0x2>;
+		#size-cells = <0x2>;
+	};
+};

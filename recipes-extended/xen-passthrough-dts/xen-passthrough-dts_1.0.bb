@@ -8,28 +8,46 @@ SECTION = "utils"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-DEPENDS = "dtc-native"
+DEPENDS = "dtc-native partial-dtb-gen-native"
 FILESEXTRAPATHS_prepend = "${THISDIR}/${BPN}:"
-COMPATIBLE_MACHINE = "s32g2evb"
 
 SRC_URI += " \
-    file://passthrough_gmac_s32g274aevb.dts \
+    file://template.dts \
 "
 
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"
 
 FILES_${PN} += "/boot/*.dtb"
+PARTIAL_DTB_GEN = "partial_dtb_gen.py"
+PARTIAL_DTB_GEN_DIR = "partial_dtb_gen"
+
+TEMPLATE_FILE_BASENAME = "template"
+TEMPLATE_DTS = "${TEMPLATE_FILE_BASENAME}.dts"
+TEMPLATE_DTB = "${TEMPLATE_FILE_BASENAME}.dtb"
+
+PASSTHROUGH_FILE_BASENAME = "passthrough"
+PASSTHROUGH_DTS = "${PASSTHROUGH_FILE_BASENAME}.dts"
+PASSTHROUGH_DTB = "${PASSTHROUGH_FILE_BASENAME}.dtb"
 
 do_compile() {
     cd ${S}
-    # Compile partial .dts files
-    for dts_name in *.dts; do
-        if [ -f ${dts_name} ]; then
-            output_dtb_name=${dts_name%.*}
-            dtc -O dtb -o ${B}/${output_dtb_name}.dtb ${dts_name}
-        fi
-    done
+
+    # Compile template dts
+    dtc -O dtb -o ${B}/${TEMPLATE_DTB} ${TEMPLATE_DTS}
+
+    # Generate passthrough dts file
+    LINUX_DTB_NAME="$(basename ${KERNEL_DEVICETREE})"
+    python3 ${STAGING_BINDIR_NATIVE}/${PARTIAL_DTB_GEN_DIR}/${PARTIAL_DTB_GEN} \
+        -i "${DEPLOY_DIR_IMAGE}/${LINUX_DTB_NAME}" \
+        -t "${B}/${TEMPLATE_DTB}" \
+        -n "${PASSTHROUGH_NODE}"
+
+    mv -vf ${PASSTHROUGH_DTS} ${B}/
+    rm -vf ${B}/${TEMPLATE_DTB}
+
+    # Compile partial dts
+    dtc -O dtb -o ${B}/${PASSTHROUGH_DTB} ${B}/${PASSTHROUGH_DTS}
     cd -
 }
 
@@ -50,3 +68,6 @@ do_deploy() {
 }
 
 addtask do_deploy after do_compile before do_build
+do_compile[depends] += " \
+    virtual/kernel:do_deploy \
+"

@@ -6,16 +6,15 @@
 SUMMARY = "Recipe for partial-dtb-gen tool, used for generating partial DTS \
     for device passthrough in Dom0less-VMs use-cases"
 SECTION = "utils"
-DEPENDS = "python3 python-fdt"
-RDEPENDS_${PN} = "python3 python-fdt"
+DEPENDS = "python3 python3-pip python-fdt"
+RDEPENDS_${PN} = "python3 python3-pip python-fdt"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 BBCLASSEXTEND = "native"
 
-XEN_PV = "${PREFERRED_VERSION_xen}"
 URL ?= "git://source.codeaurora.org/external/autobsps32/partial_dtb_gen;protocol=https"
-BRANCH ?= "${RELEASE_BASE}-${XEN_PV}"
+BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "\
     ${URL};branch=${BRANCH} \
 "

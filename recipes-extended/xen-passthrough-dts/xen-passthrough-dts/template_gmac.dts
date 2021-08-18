@@ -1,0 +1,41 @@
+/*
+ * Copyright 2021 NXP
+ */
+/dts-v1/;
+
+/ {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+
+	gic {
+		#interrupt-cells = <0x3>;
+		interrupt-controller;
+		phandle = <0x1>;
+	};
+
+	passthrough {
+		compatible = "simple-bus";
+		ranges;
+		#address-cells = <0x2>;
+		#size-cells = <0x2>;
+
+		gmac0_axi: gmac0_axi {
+			#clock-cells = <0>;
+			clock-frequency = <400000000>;
+			compatible = "fixed-clock";
+		};
+		gmac0_tx: gmac0_tx {
+			#clock-cells = <0>;
+			clock-frequency = <125000000>;
+			compatible = "fixed-clock";
+		};
+		gmac0_rx: gmac0_rx {
+			#clock-cells = <0>;
+			clock-frequency = <125000000>;
+			compatible = "fixed-clock";
+		};
+		ethernet@4033c000 {
+			clocks = <&gmac0_axi &gmac0_axi &gmac0_tx &gmac0_tx &gmac0_tx &gmac0_tx &gmac0_rx &gmac0_rx &gmac0_rx &gmac0_rx>;
+		};
+	};
+};

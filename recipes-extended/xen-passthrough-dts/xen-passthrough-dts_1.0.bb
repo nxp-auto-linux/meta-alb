@@ -13,6 +13,7 @@ FILESEXTRAPATHS_prepend = "${THISDIR}/${BPN}:"
 
 SRC_URI += " \
     file://template.dts \
+    file://template_gmac.dts \
 "
 
 S = "${WORKDIR}"
@@ -23,15 +24,23 @@ PARTIAL_DTB_GEN = "partial_dtb_gen.py"
 PARTIAL_DTB_GEN_DIR = "partial_dtb_gen"
 
 TEMPLATE_FILE_BASENAME = "template"
-TEMPLATE_DTS = "${TEMPLATE_FILE_BASENAME}.dts"
-TEMPLATE_DTB = "${TEMPLATE_FILE_BASENAME}.dtb"
+TEMPLATE_DTS ?= "${TEMPLATE_FILE_BASENAME}.dts"
+TEMPLATE_DTB ?= "${TEMPLATE_FILE_BASENAME}.dtb"
 
 PASSTHROUGH_FILE_BASENAME = "passthrough"
 PASSTHROUGH_DTS = "${PASSTHROUGH_FILE_BASENAME}.dts"
 PASSTHROUGH_DTB = "${PASSTHROUGH_FILE_BASENAME}.dtb"
 
+# Override with xen-example specific variables
+include ${XEN_EXAMPLE}.inc
+
 do_compile() {
     cd ${S}
+
+    # PASSTHROUGH_NODE variable is mandatory
+    if [ -z "${PASSTHROUGH_NODE}" ]; then
+        bberror "PASSTHROUGH_NODE variable should not be empty! Please set it in conf/local.conf."
+    fi
 
     # Compile template dts
     dtc -O dtb -o ${B}/${TEMPLATE_DTB} ${TEMPLATE_DTS}

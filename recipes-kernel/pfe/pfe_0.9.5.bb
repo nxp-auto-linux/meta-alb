@@ -19,7 +19,7 @@ SRC_URI = "${URL} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN} \
 	"
-SRCREV ?= "e7247d2e10b39fa4aab9a131500749c098daff43"
+SRCREV ?= "e5747c79469580515871006c79719f506d828ebc"
 
 # Tell yocto not to bother stripping our binaries, especially the firmware
 INHIBIT_PACKAGE_STRIP_FILES = "\

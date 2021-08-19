@@ -21,3 +21,6 @@ fix_inittab() {
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "fix_inittab; "
+
+# Fix do_package warning when depending on this recipe
+deltask do_packagedata

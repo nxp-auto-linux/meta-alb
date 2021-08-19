@@ -1,0 +1,52 @@
+From 1a154e2a848e41d1eee041789f728bd78b92c278 Mon Sep 17 00:00:00 2001
+From: Le Quan <quan.le.hong@nxp.com>
+Date: Fri, 20 Aug 2021 12:31:46 +0700
+Subject: [PATCH] lmbench: update getsummary search pattern to be more specific
+
+Currently, search pattern "if (/size=0/)", "if (/size=16/)", "(/size=64/)" are too broad,
+which may cause the script match unpexected string. According to the script's expected behavior,
+ the partent should match string starts at begining of line.
+
+ex.
+... (rw,relatime,size=815876k,nr_inodes=403969,mode=755)] -> fail matched
+"size=8k ovr=7.56  -> correct matched
+
+Signed-off-by: Le Quan <quan.le.hong@nxp.com>
+---
+ scripts/getsummary | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/getsummary b/scripts/getsummary
+index 4d54fea..5de456a 100755
+--- a/scripts/getsummary
++++ b/scripts/getsummary
+@@ -315,7 +315,7 @@ foreach $file (@ARGV) {
+ 				}
+ 			}
+ 		}
+-		if (/size=0/) {
++		if (/^"size=0/) {
+ 			while (<FD>) {
+ 				if (/^2 /) {
+ 					@_ = split; push(@lat_ctx0_2, $_[1]);
+@@ -327,7 +327,7 @@ foreach $file (@ARGV) {
+ 			    	last if /^\s*$/ || /^Memory/;
+ 			}
+ 		}
+-		if (/size=16/) {
++		if (/^"size=16/) {
+ 			while (<FD>) {
+ 				if (/^2 /) {
+ 					@_ = split; push(@lat_ctx16_2, $_[1]);
+@@ -339,7 +339,7 @@ foreach $file (@ARGV) {
+ 			    	last if /^\s*$/;
+ 			}
+ 		}
+-		if (/size=64/) {
++		if (/^"size=64/) {
+ 			while (<FD>) {
+ 				if (/^2 /) {
+ 					@_ = split; push(@lat_ctx64_2, $_[1]);
+-- 
+2.17.1
+

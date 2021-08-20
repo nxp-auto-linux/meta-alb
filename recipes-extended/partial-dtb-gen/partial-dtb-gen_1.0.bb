@@ -18,7 +18,7 @@ BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "\
     ${URL};branch=${BRANCH} \
 "
-SRCREV = "50adfa692ebb846e67adf02e6d0a1d16a9fee402"
+SRCREV = "bc66ad3429c5850bb8b5e631306fa4f4e0f2fbeb"
 
 S = "${WORKDIR}/git"
 

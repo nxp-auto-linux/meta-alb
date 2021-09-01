@@ -284,7 +284,6 @@ LAYER_LIST=" \
 
 LSLAYERS=" \
     meta-qoriq \
-    meta-security \
 "
 
 S32V234LAYERS=" \

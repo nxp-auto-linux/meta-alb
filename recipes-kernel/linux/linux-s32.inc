@@ -148,9 +148,6 @@ require gcc75compat.inc
 # at build time of the Linux Kernel version 5.4, we add this dependency.
 do_merge_delta_config[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
 
-# TODO: pcie-demos not ported to 5.4
-SRC_URI_append_s32v2xx = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' file://0001-pcie-s32v-kernel-support-for-pcie-demos-icc-and-user-sp.patch', '', d)}"
-
 SRC_URI_append_s32v2xx = " ${@oe.utils.conditional('KERNEL_FEC_LIMIT_TX', '0', '', ' file://0001-fec-limit-TX-queues-to-prevent-TX-starvation-crash.patch', d)}"
 
 # Enable PCIe support for the EVBs and SBC also

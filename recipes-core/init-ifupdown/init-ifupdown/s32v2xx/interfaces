@@ -6,4 +6,4 @@ iface lo inet loopback
 
 auto eth0
 iface eth0 inet dhcp
-dhcpcd_opts -b
+dhcpcd_opts -Gb

@@ -13,6 +13,9 @@ IMAGE_INSTALL += " \
     setserial \
     iputils \
     dhcpcd \
+    packagegroup-core-ssh-openssh \
+    inetutils \
+    net-tools \
 "
 # Add getty spawn on ttyAMA0 in Dom0less DomUs' rootfs
 fix_inittab() {

@@ -105,6 +105,9 @@ DELTA_KERNEL_DEFCONFIG_append_s32v234pciebcm += " \
 DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += " \
     blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
 "
+DELTA_KERNEL_DEFCONFIG_append_s32v234hpcsom += " \
+    blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
+"
 
 # LXC configuration
 DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' containers.config', '', d)}"

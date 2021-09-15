@@ -20,6 +20,7 @@ SRC_URI = "git://gitlab.com/ViryaOS/imagebuilder.git;protocol=https;branch=maste
     file://0002-imagebuilder-Remove-chosen-fields-for-s32-non-Xen-bo.patch \
     file://0003-imagebuilder-Add-support-for-prepending-path-to-file.patch \
     file://0004-imagebuilder-Disable-autoboot.patch \
+    file://0005-imagebuilder-Use-dynamic-sizes-for-loaded-binaries.patch \
 "
 
 SRC_URI[sha256sum] = "b4c1d3d482965e9764485fa2eaef5a8e4d03e9fef2c9dcae4752a73309455cf3"

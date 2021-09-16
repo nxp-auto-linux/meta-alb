@@ -32,7 +32,7 @@ KERNEL_MODULE_AUTOLOAD += "galcore"
 KERNEL_MODULE_PROBECONF += "galcore"
 module_conf_galcore = "options galcore contiguousSize=0x200000"
 
-FILES_${PN} += "/lib/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv/galcore.ko"
+FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv/galcore.ko"
 FILES_${PN} += "/etc/modules-load.d/galcore.conf"
 FILES_${PN} += "/etc/modprobe.d/galcore.conf"
 
@@ -41,8 +41,8 @@ do_install_append(){
 	install -d ${D}/etc/modules-load.d/
 	install -m 0644 ${S}/galcore.conf ${D}/etc/modules-load.d/
 
-	install -d ${D}/lib/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv
-	install -m 0644 ${S}/build/sdk/drivers/galcore.ko ${D}/lib/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv/
+	install -d ${D}/${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv
+	install -m 0644 ${S}/build/sdk/drivers/galcore.ko ${D}/${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/mxc/gpu-viv/
 }
 
 COMPATIBLE_MACHINE = "(s32v234evb)|(s32v234pcie)|(s32v234bbmini)|(s32v234evb28899)|(s32v234sbc)|(s32v234hpcsom)"

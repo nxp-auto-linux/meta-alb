@@ -113,6 +113,7 @@ DEVLIBS = " \
 FILES_SOLIBSDEV="${base_libdir}/lib*.so"
 FILES_${PN} += "${STRANGELIBS}"
 FILES_${PN} += "${DEVLIBS}"
+FILES_${PN}-dev = "/usr/include/"
 # **** HACK END ****
 
 PACKAGES += "${PN}-samples"

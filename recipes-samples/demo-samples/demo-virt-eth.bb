@@ -6,7 +6,7 @@ BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
 
 S = "${WORKDIR}/git"
-SRCREV = "264a88d49aff18a2739351c8f53fc279ae5c9577"
+SRCREV = "dcfeb2ff989bf073012fa4b980bfb463b3012d85"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 
@@ -21,7 +21,7 @@ FILES_${PN}-dbg += "${SAMPLESDIR}/.debug"
 DEMO_PCIE_APPS ?= "net_ep net_rc"
 
 DEMO_PCIE_APPS_ls2 = "net_rc"
-DEMO_PCIE_APPS_lx2 = "net_rc"
+DEMO_PCIE_APPS_lx2160a = "net_rc"
 DEMO_PCIE_APPS_s32v234pcie = "net_ep"
 DEMO_PCIE_APPS_s32v234bbmini = "net_ep"
 DEMO_PCIE_APPS_s32v234campp = "net_ep"

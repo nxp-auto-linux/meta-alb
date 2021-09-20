@@ -7,6 +7,7 @@ BOOTDD_VOLUME_ID ?= "boot_${MACHINE}"
 
 UBOOT_REALSUFFIX_SDCARD ?= ".${UBOOT_SUFFIX_SDCARD}"
 IMAGE_BOOTLOADER ?= "${@d.getVar('PREFERRED_PROVIDER_virtual/bootloader', True) or 'u-boot'}"
+IMAGE_BOOTLOADER_RECIPE ?= "${IMAGE_BOOTLOADER}"
 
 UBOOT_TYPE_SDCARD ?= "sdcard"
 UBOOT_BASENAME_SDCARD ?= "u-boot"
@@ -112,7 +113,7 @@ IMAGE_ROOTFS_ALIGNMENT = "${SDCARD_BINARY_SPACE}"
 
 do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARD_RCW', True) and d.getVar('SDCARD_RCW', True) + ':do_deploy' or ''} \
-	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER', True) + ':do_deploy' or ''} \
+	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER_RECIPE', True) + ':do_deploy' or ''} \
 	${@d.getVar('INITRAMFS_IMAGE', True) and d.getVar('INITRAMFS_IMAGE', True) + ':do_image_complete' or ''} \
 	${@d.getVar('SDCARD_ROOTFS_EXT', True) and d.getVar('SDCARD_ROOTFS_PKG', True) + ':do_image_${SDCARD_ROOTFS_EXT}' or ''} \
 	${@d.getVar('UBOOT_ENV_SDCARD_OFFSET', True) and d.getVar('UBOOT_ENV_SDCARD', True) + ':do_deploy' or ''} \

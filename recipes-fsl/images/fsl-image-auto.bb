@@ -25,6 +25,9 @@ IMAGE_INSTALL_append_gen1 = " perf"
 # PCIe testing
 IMAGE_INSTALL += "kernel-pcitest"
 
+# PCIe testing
+IMAGE_INSTALL += "kernel-pcitest"
+
 # Userspace support for QSPI Flash under Linux for S32GEN1 platforms
 IMAGE_INSTALL_append_gen1 = " mtd-utils "
 

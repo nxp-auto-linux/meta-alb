@@ -26,6 +26,9 @@ IMAGE_INSTALL_append_gen1 = " perf"
 # TODO: add them to the RDEPENDS list in the OpenMPI demo recipe
 IMAGE_INSTALL += "imagemagick gnuplot mpich mpich-dev"
 
+# PCIe testing
+IMAGE_INSTALL += "kernel-pcitest"
+
 # Userspace support for QSPI Flash under Linux for S32GEN1 platforms
 IMAGE_INSTALL_append_gen1 = " mtd-utils "
 

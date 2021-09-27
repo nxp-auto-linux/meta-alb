@@ -11,6 +11,8 @@ UBOOT_CONFIG[sdcard] = "${UBOOT_DEFCONFIG},,u-boot.${UBOOT_SUFFIX}"
 UBOOT_CONFIG_prepend = "qspi "
 UBOOT_CONFIG[qspi] = "${UBOOT_FLASH_DEFCONFIG},,u-boot.${UBOOT_SUFFIX}"
 
-# Enable ATF
-require ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'conf/machine/include/atf.inc', '', d)}
+# Enable ATF if m7boot is not enabled.
+# When m7boot is enabled, the needed ATF settings are included from m7-boot.inc
+INC_FILE="${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', '', 'conf/machine/include/atf.inc', d)}"
+require ${@bb.utils.contains('DISTRO_FEATURES', 'atf', '${INC_FILE}', '', d)}
 

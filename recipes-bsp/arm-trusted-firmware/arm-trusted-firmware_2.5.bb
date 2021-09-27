@@ -35,6 +35,11 @@ XEN_ARGS = " \
                 S32G_HAS_HV=1 \
                 "
 
+M7BOOT_ARGS = " \
+                FIP_MMC_OFFSET=0x5400 \
+                FIP_QSPI_OFFSET=0x5400 \
+                "
+
 EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
                 ARCH=${TARGET_ARCH} \
@@ -43,6 +48,7 @@ EXTRA_OEMAKE += " \
                 "
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '${OPTEE_ARGS}', '', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${XEN_ARGS}', '', d)}"
+EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', '${M7BOOT_ARGS}', '', d)}"
 
 # FIXME: Allow linking of 'tools' binaries with native libraries
 #        used for generating the boot logo and other tools used

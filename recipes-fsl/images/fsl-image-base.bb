@@ -32,7 +32,6 @@ IMAGE_INSTALL_append_fsl-lsch3 += " \
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234evb = " sja1105 "
 IMAGE_INSTALL_append_s32v234bbmini = " sja1105 "
-IMAGE_INSTALL_append_s32g2evb = " sja1105 "
 IMAGE_INSTALL_append_s32g274ardb = " sja1105 "
 
 # Support for SJA1110 swich under Linux

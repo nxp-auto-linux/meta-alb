@@ -36,7 +36,7 @@ FILES_${PN} += "${sysconfdir}/modules-load.d/*"
 PROVIDES = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 RPROVIDES_${PN} = "kernel-module-sja1105pqrs${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
-COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini|s32g2evb|s32g274ardb"
+COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini|s32g274ardb"
 INHIBIT_PACKAGE_STRIP = "1"
 
 DEPENDS_append = " coreutils-native"

@@ -15,11 +15,32 @@ pre-up [ -L /sys/class/net/pfe1 ]
 dhcpcd_opts -Gb
 
 auto pfe2
-iface pfe2 inet dhcp
+iface pfe2 inet manual
 pre-up [ -L /sys/class/net/pfe2 ]
-dhcpcd_opts -Gb
+up /bin/ifconfig pfe2 up
 
 auto eth0
 iface eth0 inet dhcp
 pre-up [ -L /sys/class/net/eth0 ]
 dhcpcd_opts -Gb
+
+auto enet_p1
+iface enet_p1 inet dhcp
+pre-up [ -L /sys/class/net/enet_p1 ]
+dhcpcd_opts -Gb
+
+auto enet_p2
+iface enet_p2 inet dhcp
+pre-up [ -L /sys/class/net/enet_p2 ]
+dhcpcd_opts -Gb
+
+auto enet_p3
+iface enet_p3 inet dhcp
+pre-up [ -L /sys/class/net/enet_p3 ]
+dhcpcd_opts -Gb
+
+auto enet_p4
+iface enet_p4 inet dhcp
+pre-up [ -L /sys/class/net/enet_p4 ]
+dhcpcd_opts -Gb
+

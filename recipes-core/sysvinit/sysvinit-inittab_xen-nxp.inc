@@ -1,5 +1,5 @@
-# Copyright 2020 NXP
-# Comment lines in inittab with getty spawn on default serial consoles if Xen enabled
+# Copyright 2021 NXP
+# Comment lines in inittab with getty spawn on default serial consoles if Xen Dom0less enabled
 
 do_install_append() {
 	tmp="${SERIAL_CONSOLES}"

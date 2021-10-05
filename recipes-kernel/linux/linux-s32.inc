@@ -92,10 +92,6 @@ KERNEL_MODULE_AUTOLOAD_s32g274aevb += "\
     nxp \
 "
 
-KERNEL_MODULE_AUTOLOAD_s32g274ardb += "\
-    nxp \
-"
-
 DELTA_KERNEL_DEFCONFIG_append_s32v234pcie += " \
     blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
 "

@@ -37,11 +37,8 @@ FW_INSTALL_UTIL_NAME ?= "s32g_pfe_util.fw"
 
 EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 drv-build"
 
-# Build PFE for both 1.1 and 2.0 SoC revision
-# The user can choose to build specific version only by overwriting this variable
-# in this file or in conf/local.conf
-# For example, to build only for Rev 2.0, set PFE_SUPPORTED_REV = "2.0"
-PFE_SUPPORTED_REV ?= "1.1 2.0"
+# Build PFE for 2.0 SoC revision
+PFE_SUPPORTED_REV ?= "2.0"
 
 module_do_compile() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS

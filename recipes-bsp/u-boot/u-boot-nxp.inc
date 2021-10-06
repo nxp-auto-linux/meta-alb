@@ -29,14 +29,14 @@ SRC_URI_append_s32 = " \
 "
 
 # Enable Arm Trusted Firmware
-DELTA_UBOOT_DEFCONFIG_append_s32 += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
+DELTA_UBOOT_DEFCONFIG_append_s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
 SRC_URI_append_s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'file://build/atf_config.cfg', '', d)} \
 "
 
 # Enable OP-TEE
-DELTA_UBOOT_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
-SRC_URI_append_s32g2 = " \
+DELTA_UBOOT_DEFCONFIG_append_s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
+SRC_URI_append_s32g = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
 "
 

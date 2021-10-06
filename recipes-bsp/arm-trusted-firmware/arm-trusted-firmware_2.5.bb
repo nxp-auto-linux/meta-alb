@@ -21,6 +21,8 @@ SRCREV ?= "eddee9089c851d24e21d55e78ebbe68b61742336"
 SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 
 PLATFORM_s32g2 = "s32g2"
+PLATFORM_s32g3 = "s32g3"
+
 BUILD_TYPE = "release"
 
 ATF_BINARIES = "${B}/${PLATFORM}/${BUILD_TYPE}"
@@ -89,4 +91,4 @@ addtask deploy after do_compile
 
 do_compile[depends] = "virtual/bootloader:do_install"
 
-COMPATIBLE_MACHINE = "s32g2"
+COMPATIBLE_MACHINE = "s32g"

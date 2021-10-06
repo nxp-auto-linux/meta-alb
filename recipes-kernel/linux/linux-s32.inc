@@ -185,8 +185,8 @@ SRC_URI_append_gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', \
 DELTA_KERNEL_DEFCONFIG_append_gen1 += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie', 'pcie_s32gen1.cfg', '', d)}"
 
 # Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
-DELTA_KERNEL_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"
-SRC_URI_append_s32g2 = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append_s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"
+SRC_URI_append_s32g = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee.cfg', '', d)}"
 
 # make everything compatible for the time being
 COMPATIBLE_MACHINE_$MACHINE = "$MACHINE"

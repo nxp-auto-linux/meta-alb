@@ -29,38 +29,49 @@ DESKTOP_IMAGE="fsl-image-blueboxdt"
 DEFAULT_IMAGE="fsl-image-auto"
 
 # Select the image file depending on the SoC we run on
-IMAGETYPE=unknown
 SOCTYPE=unknown
 BLUEBOXNAME=unknown
-ppccheck=`cat /proc/cpuinfo |grep e6500`
+ppccheck=$(grep e6500 /proc/cpuinfo)
 if [ "$ppccheck" != "" ]; then
         SOCTYPE=t4
         BLUEBOXNAME=bluebox
 else
-        corecheck=`cat /proc/cpuinfo |grep 0xd08$`
+        corecheck=$(grep 0xd08$ /proc/cpuinfo)
         if [ "$corecheck" != "" ]; then
                 # Cortex-A72
-                SOCTYPE=ls2084a
-                if [ "`devmem2 $((0x520000000)) b|grep :.0x|sed s/.*:.//`" != "0x41" ]; then
-                        BLUEBOXNAME=bluebox
+                corecount=$(grep -c processor /proc/cpuinfo)
+                if [ "$corecount" == "16" ]; then
+                        SOCTYPE=lx2160a
+                        BLUEBOXNAME=bluebox3
                 else
-                        BLUEBOXNAME=bbmini
+                        SOCTYPE=ls2084a
+                        if [ "$(devmem2 $((0x520000000)) b|grep :.0x|sed s/.*:.//)" != "0x41" ]; then
+                                BLUEBOXNAME=bluebox
+                        else
+                                BLUEBOXNAME=bbmini
+                        fi
+                fi
+        else
+                corecheck=$(grep 0xd07$ /proc/cpuinfo)
+                if [ "$corecheck" != "" ]; then
+                        # Cortex-A57
+                        SOCTYPE=ls2080a
+                        BLUEBOXNAME=bluebox
                 fi
         fi
-        corecheck=`cat /proc/cpuinfo |grep 0xd07$`
-        if [ "$corecheck" != "" ]; then
-                # Cortex-A57
-                SOCTYPE=ls2080a
-                BLUEBOXNAME=bluebox
-        fi
+fi
+
+MACHINE=${SOCTYPE}${BLUEBOXNAME}
+if [ "$MACHINE" == "lx2160abluebox3" ]; then
+	ROOTFS="/run/media/nvme0n1"
 fi
 
 # We prefer the desktop enabled rootfs over the standard one
 if [ -z "$1" ]; then
-        if [ -f "${DESKTOP_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz" ]; then
-                ROOTFS_IMAGE=${DESKTOP_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz
+        if [ -f "${DESKTOP_IMAGE}-${MACHINE}.tar.gz" ]; then
+                ROOTFS_IMAGE=${DESKTOP_IMAGE}-${MACHINE}.tar.gz
         else
-                ROOTFS_IMAGE=${DEFAULT_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz
+                ROOTFS_IMAGE=${DEFAULT_IMAGE}-${MACHINE}.tar.gz
         fi
 else
         ROOTFS_IMAGE="$1"

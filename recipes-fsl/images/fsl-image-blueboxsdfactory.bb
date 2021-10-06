@@ -32,6 +32,7 @@ FACTORY_FLASH_IMAGE_NAME_ubuntu = "${FACTORY_SDCARD_ROOTFS_IMAGE}"
 FACTORY_FLASH_IMAGE_ubuntu = ""
 do_rootfs[depends] += "${FACTORY_FLASH_IMAGE_NAME}:do_image_complete ${FACTORY_SDCARD_ROOTFS_IMAGE}:do_image_complete bbdeployscripts:do_deploy"
 IMAGE_ROOTFS_IMAGELIST_ls2084abbmini = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.itb bbdeployimage.sh bbreplacerootfs.sh"
+IMAGE_ROOTFS_IMAGELIST_lx2160abluebox3 = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.sh bbreplacerootfs.sh"
 IMAGE_ROOTFS_IMAGELIST_s32g274abluebox3 = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.sdcard bbdeployimage.itb"
 
 # For factory imaging, we use a custom U-Boot environment
@@ -46,4 +47,4 @@ SDCARDIMAGE_EXTRA9_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr
 SDCARDIMAGE_EXTRA9_FILE_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aq_programming.bin', '', d)}"
 SDCARDIMAGE_EXTRA9_OFFSET_ls2084abbmini = "0x00980000"
 
-COMPATIBLE_MACHINE = "ls2084abbmini|s32g274abluebox3"
+COMPATIBLE_MACHINE = "ls2084abbmini|lx2160abluebox3|s32g274abluebox3"

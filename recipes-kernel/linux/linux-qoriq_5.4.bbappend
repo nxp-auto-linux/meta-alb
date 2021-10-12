@@ -62,6 +62,9 @@ DELTA_KERNEL_DEFCONFIG_append_ls1043ardb += " pci-vdev.cfg"
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.cfg', '', d)}"
 
 SRC_URI_append_ls2084abbmini += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'file://0001-pcie-ls2-kernel-support-for-pcie-demos.patch', '', d)}"
-SRC_URI_append_lx2160a += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'file://0001-pcie-lx2-kernel-support-for-pcie-demos.patch', '', d)}"
+
+PCIE_DEMOS_LX2_PATCH ?= "0001-pcie-lx2-kernel-support-for-pcie-demos.patch"
+PCIE_DEMOS_LX2_PATCH_lx2160ahpcsom = "0001-pcie-lx2-hpcsom-kernel-support-for-pcie-demos.patch"
+SRC_URI_append_lx2160a += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'file://${PCIE_DEMOS_LX2_PATCH}', '', d)}"
 
 require gcc75compat.inc

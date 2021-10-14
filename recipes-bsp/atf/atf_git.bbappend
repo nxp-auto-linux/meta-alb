@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += "\
 	file://0001-atf-Support-for-ls2084abbmini.patch \
+	file://0001-ddr-phy-gen2-Add-workaround-for-Errata-A050958.patch \
 "
 
 # What's in a name? That which we call a rose,

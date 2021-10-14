@@ -1,0 +1,78 @@
+From 17cd61f79a37ff8de75eee391f29607399e7273c Mon Sep 17 00:00:00 2001
+From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Date: Thu, 14 Oct 2021 16:44:25 +0300
+Subject: [PATCH] ddr: phy-gen2: Add workaround for Errata A050958
+
+Set the receiver gain to max value to recover cold temp marginality issue.
+
+Signed-off-by: Pankit Garg <pankit.garg@nxp.com>
+Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+---
+ drivers/nxp/ddr/nxp-ddr/ddr.mk | 5 ++++-
+ drivers/nxp/ddr/phy-gen2/phy.c | 6 +++++-
+ plat/nxp/soc-lx2160/soc.def    | 3 ++-
+ 3 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/nxp/ddr/nxp-ddr/ddr.mk b/drivers/nxp/ddr/nxp-ddr/ddr.mk
+index 38ff952e3..0ac567184 100644
+--- a/drivers/nxp/ddr/nxp-ddr/ddr.mk
++++ b/drivers/nxp/ddr/nxp-ddr/ddr.mk
+@@ -1,5 +1,5 @@
+ #
+-# Copyright 2018-2020 NXP
++# Copyright 2018-2021 NXP
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -39,3 +39,6 @@ ifeq ($(DEBUG_DDR_INPUT_CONFIG), yes)
+ $(eval $(call add_define, DEBUG_DDR_INPUT_CONFIG))
+ endif
+ 
++ifeq (${ERRATA_DDR_A050958}, 1)
++$(eval $(call add_define,ERRATA_DDR_A050958))
++endif
+diff --git a/drivers/nxp/ddr/phy-gen2/phy.c b/drivers/nxp/ddr/phy-gen2/phy.c
+index 7fce2fecf..c9dcfb934 100644
+--- a/drivers/nxp/ddr/phy-gen2/phy.c
++++ b/drivers/nxp/ddr/phy-gen2/phy.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright 2018-2020 NXP
++ * Copyright 2018-2021 NXP
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+  */
+@@ -1619,6 +1619,10 @@ static void prog_dq_dqs_rcv_cntrl(uint16_t *phy,
+ 	int sel_analog_vref = 1;
+ 	uint32_t addr;
+ 
++#ifdef ERRATA_DDR_A050958
++	gain_curr_adj_defval = 0x1f;
++#endif
++
+ 	dq_dqs_rcv_cntrl = gain_curr_adj_defval << csr_gain_curr_adj_lsb |
+ 			major_mode_dbyte << csr_major_mode_dbyte_lsb	|
+ 			dfe_ctrl_defval << csr_dfe_ctrl_lsb		|
+diff --git a/plat/nxp/soc-lx2160/soc.def b/plat/nxp/soc-lx2160/soc.def
+index 30bbb9ed4..d0ee91bad 100644
+--- a/plat/nxp/soc-lx2160/soc.def
++++ b/plat/nxp/soc-lx2160/soc.def
+@@ -1,6 +1,6 @@
+ #
+ # Copyright (c) 2015, 2016 Freescale Semiconductor, Inc.
+-# Copyright 2017-2020 NXP Semiconductors
++# Copyright 2017-2021 NXP Semiconductors
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -35,6 +35,7 @@ CONSOLE=PL011
+ ERRATA_A72_859971 := 1
+ ERRATA_PLAT_A050426 := 1
+ ERRATA_DDR_A050450 := 1
++ERRATA_DDR_A050958 := 1
+ 
+  # Select the DDR PHY generation to be used
+ PLAT_DDR_PHY=PHY_GEN2
+-- 
+2.33.0
+

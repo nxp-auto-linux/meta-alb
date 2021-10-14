@@ -8,9 +8,10 @@ UBOOT_NAME_SDCARD = "${@bb.utils.contains('DISTRO_FEATURES', 'atf', \
 	    'u-boot-${MACHINE}.s32-sdcard.m7',\
 	    d)}"
 
+M7BOOT_UBOOT_FILE = '${FLASHIMAGE_UBOOT_BASENAME}-${MACHINE}${FLASHIMAGE_UBOOT_REALSUFFIX}${@oe.utils.conditional("FLASHIMAGE_UBOOT_TYPE", "", "", "-${FLASHIMAGE_UBOOT_TYPE}", d)}'
 FLASHIMAGE_UBOOT_FILE = "${@bb.utils.contains('DISTRO_FEATURES', 'atf', \
 	    'fip.s32-qspi.m7',\
-	    '${FLASHIMAGE_UBOOT_BASENAME}-${MACHINE}${FLASHIMAGE_UBOOT_REALSUFFIX}${@oe.utils.conditional("FLASHIMAGE_UBOOT_TYPE", "", "", "-${FLASHIMAGE_UBOOT_TYPE}", d)}.m7',\
+	    '${M7BOOT_UBOOT_FILE}.m7',\
 	    d)}"
 
 ATF_IMAGE = "${@bb.utils.contains('DISTRO_FEATURES', 'atf', \

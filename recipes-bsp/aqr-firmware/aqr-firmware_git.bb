@@ -1,29 +1,25 @@
 DESCRIPTION = "Firmware images for PHYs used on NXP boards"
 LICENSE = "Freescale-EULA"
-LIC_FILES_CHKSUM = "file://EULA;md5=ab61cab9599935bfe9f700405ef00f28"
+LIC_FILES_CHKSUM = "file://EULA;md5=c9ae442cf1f9dd6c13dfad64b0ffe73f"
 
 inherit deploy
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}"
 
-AQR107FIRMWARE = "AQR-G2_v3.3.A-AQR_Freescale_AQR107_ID16066_VER554.cld"
+AQR_BIN ??= "aquantia/apps/aq_programming.bin"
+AQR_FIRMWARE ??= "aquantia/AQR-G2_v3.3.A-AQR_Freescale_AQR107_ID16066_VER554.cld"
 
 SRC_URI = "\
-    file://git/readme \
-    file://git/EULA \
-    file://git/aquantia/apps/aq_programming.bin \
-    file://git/aquantia/${AQR107FIRMWARE} \
+    file://readme \
+    file://EULA \
+    file://${AQR_BIN} \
+    file://${AQR_FIRMWARE} \
 "
 
-UCODE_ls2084abbmini = "\
-    aquantia/apps/aq_programming.bin \
-    aquantia/${AQR107FIRMWARE} \
+UCODE = "\
+    ${AQR_BIN} \
+    ${AQR_FIRMWARE} \
 "
-UCODE_ls1046abluebox = "\
-    aquantia/apps/aq_programming.bin \
-    aquantia/${AQR107FIRMWARE} \
-"
-
 do_install () {
     install -d ${D}/boot
     for name in ${UCODE};do

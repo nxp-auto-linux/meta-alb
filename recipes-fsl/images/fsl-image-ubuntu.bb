@@ -58,9 +58,10 @@ APTGET_EXTRA_PACKAGES += " \
     libgstreamer-plugins-base1.0-dev \
 \
     indicator-multiload \
-    iperf nginx \
+    iperf nginx iperf3 \
     nmap \
     openssh-server \
+    tftp \
 \
     sqlitebrowser \
     libsqlite3-dev \
@@ -84,6 +85,8 @@ APTGET_EXTRA_PACKAGES += " \
     python-mode \
 \
     qgit \
+\
+    pciutils \
 "
 
 # The following packages are apparently not mainstream enough to be

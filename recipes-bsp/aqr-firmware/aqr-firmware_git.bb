@@ -39,4 +39,4 @@ PACKAGES += "${PN}-image"
 FILES_${PN}-image += "/boot"
 
 
-COMPATIBLE_MACHINE_append = "ls1046abluebox|ls2084abbmini"
+COMPATIBLE_MACHINE_append = "ls1046abluebox|ls2084abbmini|lx2160abluebox3"

@@ -58,6 +58,39 @@ python __anonymous () {
         depends = "%s bc-native" % depends
         d.setVar("DEPENDS", depends)
 }
+
+
+add_flash_region () {
+        # Add a new flash region for writing an image
+        # Check if there is an overlap with an existing region
+
+        start="$1"
+        size="$2"
+        name="$3"
+
+        end=$(printf "%d + %d\n" ${start} ${size} | bc)
+
+        restore_ifs=$IFS
+        IN="${flash_regions}"
+
+        set -- "$IN"
+        IFS=';'
+        for entry in ${IN}; do
+                start0=$(echo ${entry} | cut -d '-' -f1)
+                end0=$(echo ${entry} | cut -d '-' -f2)
+                if ((start <= end0 && end >= start0)); then
+                        error_str=$(printf "%s (0x%x - 0x%x) overlaps with (0x%x - 0x%x)" "${name}" "${start}" "${end}" "${start0}" "${end0}")
+                        bberror "Flash regions overlap: ${error_str}"
+                        exit 1
+                fi
+        done
+
+        # Save regions in string using format:
+        #     start0-end0;start1-end1; ...
+        flash_regions="${flash_regions}${start}-${end};"
+        IFS=${restore_ifs}
+}
+
 #
 # Create an image that can by written to flash directly
 # The input files are to be found in ${DEPLOY_DIR_IMAGE}.
@@ -88,6 +121,9 @@ generate_flashimage_entry() {
                         fi
                 fi
 
+                # add region for checking overlap with existing ones
+                add_flash_region "${FLASHIMAGE_FILE_OFFSET}" "${FLASHIMAGE_FILE_SIZE}" "${FLASHIMAGE_FILE_OFFSET_NAME}"
+
                 bbnote "Generating flashimage entry at ${FLASHIMAGE_FILE_OFFSET} for ${FLASHIMAGE_FILE}"
                 dd if=${FLASHIMAGE_FILE} of=${FLASHIMAGE} conv=notrunc,fsync bs=32K oflag=seek_bytes seek=${FLASHIMAGE_FILE_OFFSET}
                 if [ "${FLASHIMAGE_BANK4}" = "yes" ]; then
@@ -102,6 +138,8 @@ generate_flashimage_entry() {
 }
 
 generate_flashimage() {
+        flash_regions=""
+
         FLASHIMAGE_SIZE_D=$(printf "%d * 1024 * 1024\n" ${FLASHIMAGE_SIZE} | bc)
         FLASHIMAGE_BANK4_XOR=$(expr ${FLASHIMAGE_SIZE_D} / 2)
 

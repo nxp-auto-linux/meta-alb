@@ -50,6 +50,7 @@ APTGET_EXTRA_PACKAGES += "\
 	apt git vim \
 	ethtool wget ftp iputils-ping lrzsz \
 	net-tools \
+	rsync irqbalance i2c-tools gpiod \
 "
 APTGET_EXTRA_SOURCE_PACKAGES += "\
 	iproute2 \

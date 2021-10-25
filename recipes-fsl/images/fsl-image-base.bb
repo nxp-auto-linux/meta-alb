@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017-2020 NXP
+# Copyright 2017-2021 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -49,7 +49,11 @@ IMAGE_FSTYPES ?= "tar.gz"
 
 IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"
 
+# Populate PFE and PFE FW
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
+
+# Populate PFE slave driver
+IMAGE_INSTALL_append_s32g2 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
 
 # Enable Xen and add Xen Packages
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-xen.inc', '', d)}

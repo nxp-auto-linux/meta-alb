@@ -1,0 +1,44 @@
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+ 
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+# RGMII ports
+#auto eth0
+#iface eth0 inet dhcp
+#dhcpcd_opts -Gb
+
+#auto eth1
+#iface eth1 inet dhcp
+#dhcpcd_opts -Gb
+
+# RJ45 switch ports
+auto 1ge_p1
+iface 1ge_p1 inet dhcp
+pre-up ip link set eth1 up
+dhcpcd_opts -Gb
+
+auto 1ge_p2
+iface 1ge_p2 inet dhcp
+pre-up ip link set eth0 up
+dhcpcd_opts -Gb
+
+
+# 10GbE ports
+auto eth2
+iface eth2 inet dhcp
+dhcpcd_opts -Gb
+
+auto eth3
+iface eth3 inet dhcp
+dhcpcd_opts -Gb
+
+auto eth4
+iface eth4 inet dhcp
+dhcpcd_opts -Gb
+
+auto eth5
+iface eth5 inet dhcp
+dhcpcd_opts -Gb
+

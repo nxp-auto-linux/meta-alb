@@ -1,0 +1,15 @@
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+auto 1ge_p3
+iface 1ge_p3 inet dhcp
+pre-up [ -L /sys/class/net/pfe0 ] && ip link set pfe0 up
+dhcpcd_opts -Gb
+
+auto 1ge_p4
+iface 1ge_p4 inet dhcp
+pre-up [ -L /sys/class/net/pfe0 ] && ip link set pfe0 up
+dhcpcd_opts -Gb

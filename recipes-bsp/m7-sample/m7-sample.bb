@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=0f00d99239d922ffd13cabef83b33444"
 URL ?= "git://source.codeaurora.org/external/autobsps32/m7-sample;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "99599340a7436cce821bdadec9e281741d88d6f3"
+SRCREV ?= "35dd488b107efce318a0a41733b88345d6d7001d"
 
 S = "${WORKDIR}/git"
 BUILD = "${WORKDIR}/build"

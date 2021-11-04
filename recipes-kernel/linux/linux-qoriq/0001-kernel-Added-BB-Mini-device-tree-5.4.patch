@@ -1,6 +1,6 @@
-From 25d43dc4b8c3f1a578c34faec7db67191d8eca0f Mon Sep 17 00:00:00 2001
+From ef705c13d50250def83d32bd1b872ab200142136 Mon Sep 17 00:00:00 2001
 From: Priyanka Jain <priyanka.jain@nxp.com>
-Date: Mon, 6 Jul 2020 14:18:45 +0530
+Date: Thu, 4 Nov 2021 11:35:26 +0200
 Subject: [PATCH] kernel: Added BB Mini device tree
 
 Signed-off-by: Heinz Wrobel <heinz.wrobel@nxp.com>
@@ -13,17 +13,17 @@ Signed-off-by: Priyanka Jain <priyanka.jain@nxp.com>
  create mode 100644 arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
 
 diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
-index 5e05e0be3aeb..030a226bfec8 100644
+index 7a8e3472cef4..b8b512aa7307 100644
 --- a/arch/arm64/boot/dts/freescale/Makefile
 +++ b/arch/arm64/boot/dts/freescale/Makefile
-@@ -45,6 +45,7 @@ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2081a-rdb.dtb
+@@ -43,6 +43,7 @@ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2080a-qds.dtb
+ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2080a-rdb.dtb
+ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2081a-rdb.dtb
  dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2080a-simu.dtb
++dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2084a-bbmini.dtb
  dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2088a-qds.dtb
  dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2088a-rdb.dtb
-+dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls2084a-bbmini.dtb
  dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-lx2160a-qds.dtb
- dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-lx2160a-rdb.dtb
-
 diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
 new file mode 100644
 index 000000000000..5df9e634fad6
@@ -188,4 +188,5 @@ index 000000000000..5df9e634fad6
 +	phy-handle = <&mdio2_phy3>;
 +};
 --
-2.7.4
+2.25.1
+

@@ -8,7 +8,7 @@ inherit image_types
 
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 
-IMAGE_INSTALL_append_s32g2 = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
+IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
 
 # Support for SJA1105 swich under Linux
 IMAGE_INSTALL_append_s32v234evb = " sja1105 "

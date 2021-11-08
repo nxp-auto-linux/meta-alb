@@ -125,18 +125,18 @@ LLCE_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', '+can', '',
 LLCE_FEATURES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', '+logger', '', d)}"
 
 # LLCE CAN Drivers
-DELTA_KERNEL_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', 'llce_can.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append_s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', 'llce_can.config', '', d)}"
 # LLCE logger
-DELTA_KERNEL_DEFCONFIG_append_s32g2 += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', 'llce_logger.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append_s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', 'llce_logger.config', '', d)}"
 
 # Logging only
-KERNEL_MODULE_AUTOLOAD_append_s32g2 += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox llce_logger', '', d)}"
+KERNEL_MODULE_AUTOLOAD_append_s32g += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox llce_logger', '', d)}"
 KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox', '', d)}"
 module_conf_llce-core = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-core load_fw=0', '', d)}"
 module_conf_llce-mailbox = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-mailbox config_platform=0', '', d)}"
 
 # CAN + Logging
-KERNEL_MODULE_AUTOLOAD_append_s32g2 += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce-core llce-mailbox llce_can llce_logger', '', d)}"
+KERNEL_MODULE_AUTOLOAD_append_s32g += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce-core llce-mailbox llce_can llce_logger', '', d)}"
 KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce_can', '', d)}"
 module_conf_llce_can = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'options llce_can logging=1', '', d)}"
 

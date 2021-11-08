@@ -21,6 +21,9 @@ if [ "x$STATUS" = "xokay" ]; then
 	ip link set dev sw1-p1 up
 	ip link set dev sw1-p2 up
 	ip link set dev sw1-p3 up
+	# In initramfs vlan filtering is not enabled by ip tool even if that
+	# is explicitly specified. So we have to enable it from sysfs.
+	echo 1 > /sys/devices/virtual/net/br0/bridge/vlan_filtering
 
 else
 	echo "Not initializing bridge/switch interfaces"

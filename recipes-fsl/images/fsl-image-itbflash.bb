@@ -56,3 +56,5 @@ IMAGE_INSTALL_append_lx2160a = " \
     restool \
 "
 
+# Fix do_package warning when depending on this recipe
+deltask do_packagedata

@@ -15,5 +15,12 @@ SRCREV = "9ab5f81ca5670fa47acab2cb10157630207d1f7a"
 
 DEPENDS += "python3-pycryptodomex-native"
 
+PLATFORM_FLAVOR_s32g2 = "s32g2"
+PLATFORM_FLAVOR_s32g3 = "s32g3"
+
+EXTRA_OEMAKE += " \
+                PLATFORM_FLAVOR=${PLATFORM_FLAVOR} \
+                "
+
 OPTEEMACHINE_s32g = "s32g"
 OPTEEOUTPUTMACHINE_s32g = "s32g"

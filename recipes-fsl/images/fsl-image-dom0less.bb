@@ -17,6 +17,10 @@ IMAGE_INSTALL += " \
     inetutils \
     net-tools \
 "
+
+# Install PFE Slave module
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', 'pfe-slave', '', d)}"
+
 # Add getty spawn on ttyAMA0 in Dom0less DomUs' rootfs
 fix_inittab() {
     INITTAB_AMA0="A0:12345:respawn:/bin/start_getty 115200 ttyAMA0"

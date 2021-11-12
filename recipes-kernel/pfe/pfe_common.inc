@@ -13,7 +13,7 @@ PFE_SUPPORTED_REV ?= "PFE_CFG_IP_VERSION_NPU_7_14a"
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
 
-SRCREV ?= "e5747c79469580515871006c79719f506d828ebc"
+SRCREV ?= "ee7bdbab28bae030793b404405c61546c66b7d5b"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"
@@ -21,4 +21,4 @@ INSTALL_DIR = "${D}/${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/
 
 EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} PFE_CFG_IP_VERSION=${PFE_SUPPORTED_REV} MDIR=${MDIR} -C ${MDIR} V=1 drv-build"
 
-COMPATIBLE_MACHINE = "s32g2"
+COMPATIBLE_MACHINE = "s32g"

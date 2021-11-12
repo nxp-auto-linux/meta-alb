@@ -7,7 +7,7 @@ PR = "r0"
 
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
-SRCREV = "e5747c79469580515871006c79719f506d828ebc"
+SRCREV = "ee7bdbab28bae030793b404405c61546c66b7d5b"
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/xfci/libfci"
 LIBBUILDDIR = "${S}/sw/xfci/libfci/build/${TARGET_SYS}-release"
@@ -28,4 +28,4 @@ do_install() {
 	install -m 0644 ${LIBBUILDDIR}/libfci.a ${D}${libdir}
 }
 
-COMPATIBLE_MACHINE = "s32g2"
+COMPATIBLE_MACHINE = "s32g"

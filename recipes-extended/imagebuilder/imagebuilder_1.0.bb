@@ -21,6 +21,7 @@ SRC_URI = "git://gitlab.com/ViryaOS/imagebuilder.git;protocol=https;branch=maste
     file://0003-imagebuilder-Add-support-for-prepending-path-to-file.patch \
     file://0004-imagebuilder-Disable-autoboot.patch \
     file://0005-imagebuilder-Use-dynamic-sizes-for-loaded-binaries.patch \
+    file://0006-imagebuilder-Allow-pasthrough-of-multiple-devices.patch \
 "
 
 SRC_URI[sha256sum] = "b4c1d3d482965e9764485fa2eaef5a8e4d03e9fef2c9dcae4752a73309455cf3"
@@ -31,6 +32,6 @@ IMAGEBUILDER_SCRIPT_FILE = "uboot-script-gen"
 FILES_${PN} = "${bindir}/${IMAGEBUILDER_SCRIPT_FILE}"
 
 do_install() {
-    install -d ${D}${bindir}
+    install -d ${D}/${bindir}
     install -m 0755 ${S}/scripts/${IMAGEBUILDER_SCRIPT_FILE} ${D}${bindir}/
 }

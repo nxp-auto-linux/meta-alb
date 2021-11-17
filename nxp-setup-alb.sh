@@ -44,10 +44,6 @@ COMPANY="NXP"
 # Any bluebox or LS machine type
 BBLSMACHINE=".+bbmini|.+bluebox.+|ls.+|lx.+"
 
-
-# Any s32v234* machine type
-S32V234MACHINE="s32v234.+"
-
 # Any Ubuntu machine type
 UBUNTUMACHINE=".+ubuntu"
 
@@ -192,7 +188,7 @@ usage() {
     You are using dash which does not pass args when being sourced.
     To workaround this limitation, use \"set -- args\" prior to
     sourcing this script. For exmaple:
-        \$ set -- -m s32v234evb -j 3 -t 2
+        \$ set -- -m s32g274ardb2 -j 3 -t 2
         \$ . $ROOTDIR/$PROGNAME
 "
     fi
@@ -288,14 +284,9 @@ LSLAYERS=" \
     meta-qoriq \
 "
 
-S32V234LAYERS=" \
-    meta-adas \
-"
-
 USAGE_LIST="$LAYER_LIST \
 	$ALB_LAYER_LIST \
 	$LSLAYERS \
-	$S32V234LAYERS \
 "
 
 # Really, conf files should be checked and not the machine name ...
@@ -311,9 +302,6 @@ if [ $? -eq 0 ]; then
     LAYER_LIST="$LAYER_LIST \
     $ALB_LAYER_LIST \
     "
-
-    add_layers_for_machines "${S32V234LAYERS}" "${S32V234MACHINE}"
-
 fi
  
 

@@ -10,10 +10,6 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-i
 
 IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
 
-# Support for SJA1105 swich under Linux
-IMAGE_INSTALL_append_s32v234evb = " sja1105 "
-IMAGE_INSTALL_append_s32v234bbmini = " sja1105 "
-IMAGE_INSTALL_append_s32v234campp = " init-net-root"
 IMAGE_INSTALL_append_s32g274abluebox3 = " init-net-root"
 
 IMAGE_INSTALL_append += " \
@@ -31,4 +27,4 @@ ROOTFS_POSTPROCESS_COMMAND += "rootfs_delete_Image; "
 
 IMAGE_FSTYPES_s32 = "cpio.gz.u-boot"
 
-COMPATIBLE_MACHINE = "s32v234evb|s32v234bbmini|s32v234campp|s32g274abluebox3"
+COMPATIBLE_MACHINE = "s32g274abluebox3"

@@ -22,10 +22,6 @@ DEMO_PCIE_APPS ?= "pcie_ep pcie_rc"
 
 DEMO_PCIE_APPS_ls2 = "pcie_rc"
 DEMO_PCIE_APPS_lx2160a = "pcie_rc"
-DEMO_PCIE_APPS_s32v234pcie = "pcie_ep"
-DEMO_PCIE_APPS_s32v234bbmini = "pcie_ep"
-DEMO_PCIE_APPS_s32v234campp = "pcie_ep"
-DEMO_PCIE_APPS_s32v234hpcsom = "pcie_ep"
 
 EXTRA_OEMAKE = "samples=pcie_shared_mem apps="${DEMO_PCIE_APPS}""
 

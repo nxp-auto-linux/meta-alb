@@ -15,7 +15,7 @@ You can create a build directory in the BSP root with command:
 $ . nxp-setup-alb.sh -m <machine>
 
 where <machine> can be any of the following NXP targets:
-s32v234evb, s32v234bbmini, etc.
+s32g274ardb2, s32g274aevb, etc.
 
 When this is done, run command:
 $ bitbake <image-name>

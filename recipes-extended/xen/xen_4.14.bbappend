@@ -6,4 +6,3 @@ do_deploy_append() {
 }
 
 SRC_URI_append_gen1 += "file://xen_s32gen1.cfg"
-SRC_URI_append_s32v2xx += "file://xen_s32v2xx.cfg"

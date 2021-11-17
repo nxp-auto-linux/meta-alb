@@ -79,30 +79,8 @@ do_shared_workdir_append () {
 
 FILES_${KERNEL_PACKAGE_NAME}-image += "/boot/zImage*"
 
-# Support for TJA1100 and TJA1102 under Linux
-KERNEL_MODULE_AUTOLOAD_s32v234bbmini += "\
-    nxp \
-"
-
-KERNEL_MODULE_AUTOLOAD_s32v234evb += "\
-    nxp \
-"
-
 KERNEL_MODULE_AUTOLOAD_s32g274aevb += "\
     nxp \
-"
-
-DELTA_KERNEL_DEFCONFIG_append_s32v234pcie += " \
-    blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
-"
-DELTA_KERNEL_DEFCONFIG_append_s32v234pciebcm += " \
-    blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
-"
-DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += " \
-    blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
-"
-DELTA_KERNEL_DEFCONFIG_append_s32v234hpcsom += " \
-    blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
 "
 
 # LXC configuration
@@ -116,10 +94,6 @@ DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docke
 
 # GPU configuration
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 'gpu.config', '', d)}"
-
-# Temperature Monitoring Unit
-DELTA_KERNEL_DEFCONFIG_append_s32v234bbmini += "tmu.config"
-DELTA_KERNEL_DEFCONFIG_append_s32v234evb += "tmu.config"
 
 LLCE_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', '+can', '', d)}"
 LLCE_FEATURES_append = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', '+logger', '', d)}"
@@ -141,20 +115,13 @@ KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger',
 module_conf_llce_can = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'options llce_can logging=1', '', d)}"
 
 SRC_URI += "\
-    file://build/blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg \
     file://build/containers.config \
     file://build/docker.config \
     file://build/virtio \
     file://build/gpu.config \
-    file://build/tmu.config \
     file://build/llce_can.config \
     file://build/llce_logger.config \
 "
-
-# Following patch disables the AVB TX queues (1 and 2) in order to prevent
-# a FEC TX queue timeout that occurs when using NFS root filesystem.
-# This issue occurs on S32V234.
-KERNEL_FEC_LIMIT_TX ??= "0"
 
 require vnet-s32.inc
 require gcc75compat.inc
@@ -163,13 +130,6 @@ require gcc75compat.inc
 # compiler is available in recipe's sysroot. In order to avoid any erros/warnings
 # at build time of the Linux Kernel version 5.4, we add this dependency.
 do_merge_delta_config[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
-
-SRC_URI_append_s32v2xx = " ${@oe.utils.conditional('KERNEL_FEC_LIMIT_TX', '0', '', ' file://0001-fec-limit-TX-queues-to-prevent-TX-starvation-crash.patch', d)}"
-
-# Enable PCIe support for the EVBs and SBC also
-DELTA_KERNEL_DEFCONFIG_append_s32v234evb += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg', '', d)}"
-DELTA_KERNEL_DEFCONFIG_append_s32v234evb28899 += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg', '', d)}"
-DELTA_KERNEL_DEFCONFIG_append_s32v234sbc += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'blueboxconfig_s32v234pcie_${MAJ_VER}.x.cfg', '', d)}"
 
 DEPENDS = "flex-native bison-native bc-native"
 

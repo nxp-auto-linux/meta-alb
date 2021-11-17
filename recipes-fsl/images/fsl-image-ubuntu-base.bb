@@ -70,7 +70,7 @@ HOST_NAME = "ubuntu-${MACHINE_ARCH}"
 # to the final image that we build.
 ##############################################################################
 
-# Minimum support for LS2 and S32V specific elements.
+# Minimum support for LS2 specific elements.
 IMAGE_INSTALL_append_fsl-lsch3 += "\
     mc-utils-image \
     restool \
@@ -82,14 +82,6 @@ DEPLOYSCRIPTS ?= "bbdeployscripts"
 DEPLOYSCRIPTS_lx2160a = ""
 DEPENDS_append_fsl-lsch3 = " \
     ${DEPLOYSCRIPTS} \
-"
-
-# Support for SJA1105 swich under Linux
-IMAGE_INSTALL_append_s32v234bbmini += "\
-    sja1105 \
-"
-IMAGE_INSTALL_append_s32v234evb += "\
-    sja1105 \
 "
 
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}

@@ -35,4 +35,4 @@ do_install() {
 RDEPENDS_${PN} += "bash"
 RDEPENDS_${PN}-root += "bash"
 
-COMPATIBLE_MACHINE = "s32v234campp|s32g274abluebox3"
+COMPATIBLE_MACHINE = "s32g274abluebox3"

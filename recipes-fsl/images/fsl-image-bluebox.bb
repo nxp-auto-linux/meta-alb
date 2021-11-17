@@ -4,10 +4,7 @@ EXTRA_REQUIRE ?= ""
 require ${EXTRA_REQUIRE}
 
 require fsl-image-blueboxadditions.inc
-# Do not include virtualization user space libraries for s32v
-# Note: since we are including lxc and meta-virtualization for s32v also,
-# we may consider adding the user space libraries also for s32v in the future.
-require ${@ "fsl-image-blueboxadditionsvirt.inc" if "s32v" not in (d.getVar("MACHINEOVERRIDES") or "").split(":") else "" }
+require fsl-image-blueboxadditionsvirt.inc
 
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior

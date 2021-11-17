@@ -22,11 +22,5 @@ DEMO_PCIE_APPS ?= "net_ep net_rc"
 
 DEMO_PCIE_APPS_ls2 = "net_rc"
 DEMO_PCIE_APPS_lx2160a = "net_rc"
-DEMO_PCIE_APPS_s32v234pcie = "net_ep"
-DEMO_PCIE_APPS_s32v234bbmini = "net_ep"
-DEMO_PCIE_APPS_s32v234campp = "net_ep"
-DEMO_PCIE_APPS_s32v234hpcsom = "net_ep"
 
 EXTRA_OEMAKE = "samples=pcie_virt_eth apps="${DEMO_PCIE_APPS}""
-
-require demo-pcie.inc

@@ -29,10 +29,6 @@ IMAGE_INSTALL_append_fsl-lsch3 += " \
     restool \
 "
 
-# Support for SJA1105 swich under Linux
-IMAGE_INSTALL_append_s32v234evb = " sja1105 "
-IMAGE_INSTALL_append_s32v234bbmini = " sja1105 "
-
 # Support for SJA1110 swich under Linux
 IMAGE_INSTALL_append_s32g274ardb2 = " sja1110 "
 
@@ -58,7 +54,4 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-i
 
 # Add LLCE CAN if needed
 IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
-
-# S32V234 camera card support
-IMAGE_INSTALL_append_s32v234campp = " init-net"
 

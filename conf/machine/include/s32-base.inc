@@ -7,7 +7,7 @@ SOC_FAMILY = "s32"
 # Machines may include this file directly, if little to no changes are
 # required for their definitions.
 # Otherwise, intermediate include files should be
-# created for various families (e.g. s32v-base.inc, s32g-base.inc etc)
+# created for various families (e.g. s32g-base.inc etc)
 
 KERNEL_IMAGETYPE ?= "Image"
 

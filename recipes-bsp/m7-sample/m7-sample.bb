@@ -24,6 +24,9 @@ do_compile() {
 
 		BDIR="${BUILD}-${suffix}"
 
+		oe_runmake CROSS_COMPILE="arm-none-eabi-" \
+			BUILD="${BDIR}" clean
+
 		mkdir -p "${BDIR}"
 		cp -vf "${DEPLOY_DIR_IMAGE}/${ivt_file}" "${BDIR}/"
 

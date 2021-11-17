@@ -69,6 +69,8 @@ do_compile() {
 	unset CFLAGS
 	unset CPPFLAGS
 
+	oe_runmake -C "${S}" clean
+
 	for suffix in ${BOOT_TYPE}
 	do
 		oe_runmake -C "${S}" \

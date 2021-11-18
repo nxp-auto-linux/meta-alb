@@ -128,15 +128,16 @@ For more information about OpenEmbedded see their website:
 You can now run 'bitbake <target>'
 "
     echo "Targets specific to ${COMPANY}:"
-    for layer in $(eval echo $LAYER_LIST); do
-        for i in `ls ${ROOTDIR}/${SOURCESDIR}/$layer/recipes-*/images/fsl*.bb 2>/dev/null`;do
-            i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
+    for layer in $(echo $LAYER_LIST | xargs); do
+        fsl_recipes=$(find ${ROOTDIR}/${SOURCESDIR}/$layer -path "*recipes-*/images/fsl*.bb" -or -path "images/fsl*.bb" 2> /dev/null)
+        if [ -n "$fsl_recipes" ]
+        then
+            for i in $(echo $fsl_recipes | xargs);do
+                i=$(basename $i);
+                i=$(echo $i | sed -e 's,^\(.*\)\.bb,\1,' 2> /dev/null)
                 echo "    $i";
-        done
-        for i in `ls ${ROOTDIR}/${SOURCESDIR}/$layer/images/fsl*.bb 2>/dev/null`;do
-            i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
-                echo "    $i";
-        done
+            done
+        fi
     done
 
     echo "To return to this build environment later please run:"
@@ -448,7 +449,7 @@ for layer in $(eval echo $LAYER_LIST); do
     fi
     if [ -n "${append_layer}" ]; then
         append_layer=`readlink -f $append_layer`
-        awk '/  \"/ && !x {print "'"  ${append_layer}"' \\"; x=1} 1' \
+        awk '/  "/ && !x {print "'"  ${append_layer}"' \\"; x=1} 1' \
             conf/bblayers.conf > conf/bblayers.conf~
         mv conf/bblayers.conf~ conf/bblayers.conf
 

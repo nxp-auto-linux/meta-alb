@@ -13,7 +13,7 @@ PFE_SUPPORTED_REV ?= "PFE_CFG_IP_VERSION_NPU_7_14a"
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
 
-SRCREV ?= "ee7bdbab28bae030793b404405c61546c66b7d5b"
+SRCREV ?= "e24933f1b4ed3e9e312f2a3c5f4ee081394aa813"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"

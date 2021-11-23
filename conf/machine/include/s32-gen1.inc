@@ -1,5 +1,4 @@
 require conf/machine/include/s32-base.inc
-require conf/machine/include/s32-gmac.inc
 
 SOC_FAMILY_append = ":gen1"
 

@@ -28,8 +28,6 @@ IMAGE_INSTALL_append_s32v234sbc += " ${IPCSHM} "
 IMAGE_INSTALL_append_s32g += " ${IPCSHM} "
 IMAGE_INSTALL_append_s32r45evb += " ${IPCSHM} "
 
-IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'gmac', ' ${GMAC_IMAGE_INSTALL} ', '', d)}"
-
 # Support CAN interfaces under Linux
 IMAGE_INSTALL_append += "\
     can-utils \

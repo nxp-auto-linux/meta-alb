@@ -15,7 +15,7 @@ DDS_SRC_BRANCH ?= "master"
 SRC_URI = "git://github.com/objectcomputing/OpenDDS.git;protocol=https;branch=${DDS_SRC_BRANCH} \
 		http://download.ociweb.com/TAO-2.2a/${ACE_TAO_ARCHIVE} \
 		"
-SRC_URI[sha256sum] = "9f114cd43811290341becb79ffcdf4badede2a92917be1f1189fd991a4c816b2"
+SRC_URI[sha256sum] = "e5f04b13bc0571f3523e9101bed193b1a6edf7dec109ad24999728383b7792a9"
 
 DEPENDS += "perl"
 RDEPENDS_${PN}-dev += "perl"

@@ -13,7 +13,7 @@ inherit module
 URL ?= "git://source.codeaurora.org/external/autobsps32/ipcf/ipc-shm;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV = "51141ef027305c2548f587816a5d8491013e5fae"
+SRCREV = "81c99a4ae24603843bd23c690d9aa0ba66cfe015"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"

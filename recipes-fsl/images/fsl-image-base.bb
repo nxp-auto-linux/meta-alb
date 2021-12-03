@@ -15,6 +15,7 @@ IMAGE_INSTALL += " \
     kernel-modules \
     setserial \
     dhcpcd \
+    rng-tools \
 "
 
 # Add pciutils package

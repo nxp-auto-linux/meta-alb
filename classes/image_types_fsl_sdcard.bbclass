@@ -178,11 +178,49 @@ create_rootfs_partition () {
 	fi
 }
 
+# ROOTFS name contains the DATETIME string (timestamp). If both rootfs and
+# sdcard are built, the file name used in sdcard is consistent with the real
+# filename. However if only sdcard should be updated without re-building
+# rootfs, there is timestamp inconsistency: timestamp at sdcard build time is
+# different than rootfs build time.
+# This can be easily reproduced when u-boot/atf/kernel are needed with no
+# rootfs change.
+# To fix this problem, this function excludes the timestamp from the rootfs
+# file name and get the existing rootfs.
+# If there is no match or more than 1, an error is thrown.
+#
+# Nothing is needed for dependency, this is already handled using:
+# [vardepsexclude] += "DATETIME"
+#
+update_rootfs_name () {
+	local img="$1"
+
+	img=$(echo "${img}" | sed  "s#-[0-9]*${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}#-\*${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}#g")
+
+	local base=$(basename "${img}")
+	local dir=$(dirname "${img}")
+
+	img=$(find "${dir}" -name "${base}")
+	local num=$(echo "${img}" | wc -l)
+
+	if [ "${num}" -eq "1" ]; then
+		printf "%s" "${img}"
+	else
+		bberror "Can not match a unique rootfs file. Matches are: [ ${img} ]."
+	fi
+}
+
+
 # Burn rootfs partition to .sdcard image
 write_rootfs_partition () {
 	SDCARD_ROOTFS_START="$1"
 	SDCARD_ROOTFS_SIZE="$2"
 	SDCARD_ROOTFS_NAME="$3"
+
+	if [ ! -f "${SDCARD_ROOTFS_NAME}" ]; then
+		SDCARD_ROOTFS_NAME=$(update_rootfs_name ${SDCARD_ROOTFS_NAME})
+	fi
+
 	if [ -n "${SDCARD_ROOTFS_NAME}" ]; then
 		dd if=${SDCARD_ROOTFS_NAME} of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${SDCARD_ROOTFS_START} \* 1024)
 	fi

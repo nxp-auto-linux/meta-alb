@@ -48,6 +48,8 @@ ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'kinetic', '${ROS_PACKAGES_
 ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'kinetic', 'ros-${ROS_VERSION}-web-video-server', '', d)}"
 ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'noetic', '${ROS_PACKAGES_NOETIC}', '', d)}"
 
+PYTHON_ROSDEP_PACKAGE = "${@bb.utils.contains('ROS_VERSION', 'kinetic', 'python-rosdep', 'python3-rosdep', d)}"
+
 ADD_ROS_PACKAGES ?= "${ROS_PACKAGES}"
 APTGET_EXTRA_PACKAGES_LAST += " \
     ${ADD_ROS_PACKAGES} \
@@ -60,7 +62,7 @@ fakeroot do_aptget_user_update_append() {
     set -x
 
     # ROS initialization
-    chroot "${IMAGE_ROOTFS}" /usr/bin/apt-get -q -y install python-rosdep
+    chroot "${IMAGE_ROOTFS}" /usr/bin/apt-get -q -y install "${PYTHON_ROSDEP_PACKAGE}"
     ROS_DEP_BIN=""
     if [ -e "${IMAGE_ROOTFS}/usr/bin/rosdep" ]; then
         ROS_DEP_BIN="/usr/bin/rosdep"

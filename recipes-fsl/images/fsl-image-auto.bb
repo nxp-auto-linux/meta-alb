@@ -15,6 +15,7 @@ IMAGE_INSTALL += " \
     packagegroup-core-buildessential \
     packagegroup-core-nfs-server \
     packagegroup-core-tools-debug \
+    vim \
 "
 
 # Benchmark tools

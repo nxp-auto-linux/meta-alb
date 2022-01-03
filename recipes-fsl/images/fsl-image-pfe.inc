@@ -1,7 +1,6 @@
 
 # Enable deployment of PFE firmware to 'sdcard' image
-SDCARDIMAGE_BOOT_EXTRA2 = "pfe"
-SDCARDIMAGE_BOOT_EXTRA2_FILE = "s32g_pfe_class.fw"
+SDCARDIMAGE_BOOT_EXTRA_FILES_append += "pfe:s32g_pfe_class.fw"
 
 # Enable deployment of PFE firmware to 'fsl-image-flash.flashimage'
 FLASHIMAGE_EXTRA2 = "pfe"

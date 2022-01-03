@@ -91,10 +91,9 @@ SDCARDIMAGE_EXTRA9 ?= "${FLASHIMAGE_EXTRA9}"
 SDCARDIMAGE_EXTRA9_FILE ?= "${FLASHIMAGE_EXTRA9_FILE}"
 SDCARDIMAGE_EXTRA9_OFFSET ?= "${FLASHIMAGE_EXTRA9_OFFSET}"
 
-SDCARDIMAGE_BOOT_EXTRA1 ?= ""
-SDCARDIMAGE_BOOT_EXTRA1_FILE ?= ""
-SDCARDIMAGE_BOOT_EXTRA2 ?= ""
-SDCARDIMAGE_BOOT_EXTRA2_FILE ?= ""
+# This should be a list of : <package>:<file> and the file
+# should be deployed in ${DEPLOY_DIR_IMAGE}
+SDCARDIMAGE_BOOT_EXTRA_FILES ?= ""
 
 SDCARD_ROOTFS_EXTRA1_FILE ?= ""
 SDCARD_ROOTFS_EXTRA1_SIZE ?= "0"
@@ -111,6 +110,30 @@ BASE_IMAGE_ROOTFS_ALIGNMENT ?= "4096"
 SDCARD_BINARY_SPACE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
 IMAGE_ROOTFS_ALIGNMENT = "${SDCARD_BINARY_SPACE}"
 
+def get_extra_files_fields(d, findex):
+    pkgs = []
+    extra_files = d.getVar('SDCARDIMAGE_BOOT_EXTRA_FILES', True)
+    if not extra_files:
+        return pkgs
+    for f in extra_files.split():
+        pair = f.split(":")
+        if len(pair) == 2:
+            pkgs.append(pair[findex])
+    return pkgs
+
+def get_pkgs_from_extra_files(d):
+    return get_extra_files_fields(d, 0)
+
+def get_files_from_extra_files(d):
+    return get_extra_files_fields(d, 1)
+
+def get_extra_pkgs_deploy(d):
+    pkgs = get_pkgs_from_extra_files(d)
+    print(pkgs)
+    if pkgs:
+        return ":do_deploy ".join(get_pkgs_from_extra_files(d)) + ":do_deploy"
+    return ""
+
 do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARD_RCW', True) and d.getVar('SDCARD_RCW', True) + ':do_deploy' or ''} \
 	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER_RECIPE', True) + ':do_deploy' or ''} \
@@ -126,8 +149,7 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA7_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA7', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA8_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA8', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
-	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA1', True) + ':do_deploy' or ''} \
-	${@d.getVar('SDCARDIMAGE_BOOT_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_BOOT_EXTRA2', True) + ':do_deploy' or ''} \
+	${@get_extra_pkgs_deploy(d)} \
 	${@d.getVar('ATF_IMAGE_FILE', True) and d.getVar('ATF_IMAGE', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2', True) + ':do_deploy' or ''} \
@@ -229,8 +251,10 @@ _generate_boot_image() {
 	fi
 
 	# Add extra boot images in the SDCARD boot partition
-	add_extra_boot_img "${SDCARDIMAGE_BOOT_EXTRA1_FILE}" "${WORKDIR}/boot.img"
-	add_extra_boot_img "${SDCARDIMAGE_BOOT_EXTRA2_FILE}" "${WORKDIR}/boot.img"
+	for file in ${@" ".join(get_files_from_extra_files(d))}
+	do
+		add_extra_boot_img "${file}" "${WORKDIR}/boot.img"
+	done
 }
 
 #

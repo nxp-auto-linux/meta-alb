@@ -75,7 +75,9 @@ do_compile() {
 	do
 		oe_runmake -C "${S}" \
 		    BL33="${DEPLOY_DIR_IMAGE}/u-boot.bin-${suffix}" \
-		    MKIMAGE="${DEPLOY_DIR_IMAGE}/tools/mkimage-${suffix}" all
+		    MKIMAGE="${DEPLOY_DIR_IMAGE}/tools/mkimage" \
+		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
+		    MKIMAGE_CFG="${DEPLOY_DIR_IMAGE}/tools/u-boot.cfgout-${suffix}" all
 		cp -vf "${ATF_BINARIES}/fip.s32" "${ATF_BINARIES}/fip.s32-${suffix}"
 	done
 }

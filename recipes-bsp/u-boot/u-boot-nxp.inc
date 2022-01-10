@@ -95,7 +95,9 @@ do_install_append_s32() {
                 install -d ${DEPLOY_DIR_IMAGE}
                 cp -vf ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin-${type}
                 install -d ${DEPLOY_DIR_IMAGE}/tools
-                cp -vf ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage-${type}
+                cp -vf ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage
+                cp -vf ${B}/${config}/u-boot.cfgout ${DEPLOY_DIR_IMAGE}/tools/u-boot.cfgout-${type}
+                find ${B}/${config}/ -name "qspi_params_*" -exec cp -vf {} ${DEPLOY_DIR_IMAGE}/tools/ \;
             fi
         done
     done

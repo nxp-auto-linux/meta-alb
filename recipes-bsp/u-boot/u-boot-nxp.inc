@@ -35,8 +35,8 @@ SRC_URI_append_gen1 = " \
 "
 
 # Enable OP-TEE
-DELTA_UBOOT_DEFCONFIG_append_s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
-SRC_URI_append_s32g = " \
+DELTA_UBOOT_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
+SRC_URI_append_gen1 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
 "
 

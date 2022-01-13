@@ -14,4 +14,4 @@ IMAGE_INSTALL_append += "\
 "
 
 # Add OP-TEE user-space components
-IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
+IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"

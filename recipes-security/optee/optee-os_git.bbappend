@@ -17,6 +17,7 @@ DEPENDS += "python3-pycryptodomex-native"
 
 PLATFORM_FLAVOR_s32g2 = "s32g2"
 PLATFORM_FLAVOR_s32g3 = "s32g3"
+PLATFORM_FLAVOR_s32r45evb = "s32r"
 
 EXTRA_OEMAKE += " \
                 PLATFORM_FLAVOR=${PLATFORM_FLAVOR} \

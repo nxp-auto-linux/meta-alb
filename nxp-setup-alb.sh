@@ -461,7 +461,7 @@ DL_DIR = "$DOWNLOADS"
 SSTATE_DIR = "$CACHES"
 INHERIT += "own-mirrors"
 SOURCE_MIRROR_URL ?= "http://git.freescale.com/source/"
-SSTATE_MIRRORS = "file://.*/(.*)/(.*) file://\${SSTATE_DIR}/native/\\1/\\2 \\n"
+SSTATE_MIRRORS ?= "file://.*/(.*)/(.*) file://\${SSTATE_DIR}/native/\\1/\\2 \\n"
 # use xz to compress sstate
 SSTATE_PKG_SUFFIX = "txz"
 SSTATE_PKG_TARZIPPROG = "xz"

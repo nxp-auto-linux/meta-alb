@@ -1,4 +1,4 @@
-# Copyright 2019-2021 NXP
+# Copyright 2019-2022 NXP
 
 DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause"
@@ -22,6 +22,7 @@ SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 
 PLATFORM_s32g2 = "s32g2"
 PLATFORM_s32g3 = "s32g3"
+PLATFORM_s32r45evb = "s32r"
 
 BUILD_TYPE = "release"
 
@@ -34,7 +35,7 @@ OPTEE_ARGS = " \
                 "
 
 XEN_ARGS = " \
-                S32G_HAS_HV=1 \
+                S32_HAS_HV=1 \
                 "
 
 M7BOOT_ARGS = " \
@@ -95,4 +96,4 @@ addtask deploy after do_compile
 
 do_compile[depends] = "virtual/bootloader:do_install"
 
-COMPATIBLE_MACHINE = "s32g"
+COMPATIBLE_MACHINE = "s32"

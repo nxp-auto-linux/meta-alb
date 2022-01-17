@@ -29,8 +29,8 @@ SRC_URI_append_s32 = " \
 "
 
 # Enable Arm Trusted Firmware
-DELTA_UBOOT_DEFCONFIG_append_s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
-SRC_URI_append_s32 = " \
+DELTA_UBOOT_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
+SRC_URI_append_gen1 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'file://build/atf_config.cfg', '', d)} \
 "
 

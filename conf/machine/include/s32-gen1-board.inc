@@ -28,3 +28,8 @@ IMAGE_FSTYPES += "${FLASHIMAGE_ROOTFS_SUFFIX}"
 # Add extra sdcard partition with rootfs image if Xen enabled
 SDCARD_ROOTFS_EXTRA1_FILE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}', '', d)}"
 SDCARD_ROOTFS_EXTRA1_SIZE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${ROOTFS_SIZE}', '0', d)}"
+
+# Enable ATF if m7boot is not enabled.
+# When m7boot is enabled, the needed ATF settings are included from m7-boot.inc
+INC_FILE="${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', '', 'conf/machine/include/atf.inc', d)}"
+require ${@bb.utils.contains('DISTRO_FEATURES', 'atf', '${INC_FILE}', '', d)}

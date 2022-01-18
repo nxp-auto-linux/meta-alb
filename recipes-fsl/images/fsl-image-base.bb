@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017-2021 NXP
+# Copyright 2017-2022 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -32,6 +32,7 @@ IMAGE_INSTALL_append_fsl-lsch3 += " \
 
 # Support for SJA1110 swich under Linux
 IMAGE_INSTALL_append_s32g274ardb2 = " sja1110 "
+IMAGE_INSTALL_append_s32g399ardb3 = " sja1110 "
 
 # Support for STR (Suspend to RAM) -- rtcwake
 IMAGE_INSTALL_append_s32g = " util-linux-rtcwake "

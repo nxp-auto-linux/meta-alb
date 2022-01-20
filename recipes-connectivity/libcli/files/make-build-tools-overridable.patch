@@ -1,0 +1,40 @@
+From 6ea34a60add4b60e1f03e59aee440f3d0882cdd5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
+Date: Fri, 29 May 2020 11:58:18 -0500
+Subject: [PATCH] Make build tools overridable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e90e144..597d2c7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,7 +7,7 @@ TESTS ?= 1
+ 
+ UNAME = $(shell sh -c 'uname -s 2>/dev/null || echo not')
+ DESTDIR =
+-PREFIX = /usr/local
++PREFIX ?= /usr/local
+ 
+ MAJOR = 1
+ MINOR = 10
+@@ -15,8 +15,8 @@ REVISION = 4
+ LIB = libcli.so
+ LIB_STATIC = libcli.a
+ 
+-CC = gcc
+-AR = ar
++CC ?= gcc
++AR ?= ar
+ ARFLAGS = rcs
+ DEBUG = -g
+ OPTIM = -O3
+-- 
+2.20.1
+

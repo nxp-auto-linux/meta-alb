@@ -12,10 +12,7 @@ SRCREV ?= "805b159a50fa12c3a5993db425ce1ac9a2fcb3f7"
 S = "${WORKDIR}/git"
 BUILD = "${WORKDIR}/build"
 BOOT_TYPE = "sdcard qspi"
-IVT_FILE_BASE = "${@bb.utils.contains('DISTRO_FEATURES', 'atf', \
-	    'fip.s32',\
-	    'u-boot-${MACHINE}.s32',\
-	    d)}"
+IVT_FILE_BASE = "fip.s32"
 
 do_compile() {
 	for suffix in ${BOOT_TYPE}
@@ -51,8 +48,7 @@ do_deploy() {
 
 addtask deploy after do_compile
 
-do_compile[depends] += "virtual/bootloader:do_deploy"
-do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'arm-trusted-firmware:do_deploy', '', d)}"
+do_compile[depends] += "arm-trusted-firmware:do_deploy"
 DEPENDS += "cortex-m-toolchain-native"
 # hexdump native (used by append_m7.sh) dependency
 DEPENDS += "util-linux-native"

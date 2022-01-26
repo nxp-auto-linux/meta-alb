@@ -28,12 +28,6 @@ SRC_URI_append_s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_config.cfg', '', d)} \
 "
 
-# Enable Arm Trusted Firmware
-DELTA_UBOOT_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'atf_config.cfg', '', d)}"
-SRC_URI_append_gen1 = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'atf', 'file://build/atf_config.cfg', '', d)} \
-"
-
 # Enable OP-TEE
 DELTA_UBOOT_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
 SRC_URI_append_gen1 = " \
@@ -90,16 +84,13 @@ do_install_append_s32() {
             sed '/^[[:space:]]*$/d' -i ${B}/${config}/env-default.txt
             # install our environment file to usr/share to have it staged by yocto
             install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv${type}.txt
-
-            if [ -n "${ATF_IMAGE}" ]; then
-                install -d ${DEPLOY_DIR_IMAGE}
-                cp -vf ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin-${type}
-                install -d ${DEPLOY_DIR_IMAGE}/tools
-                cp -vf ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage
-                cp -vf ${B}/${config}/u-boot.cfgout ${DEPLOY_DIR_IMAGE}/tools/u-boot.cfgout-${type}
-                find ${B}/${config}/ -name "qspi_params_*" -exec cp -vf {} ${DEPLOY_DIR_IMAGE}/tools/ \;
-            fi
-        done
+			install -d ${DEPLOY_DIR_IMAGE}
+			cp -vf ${B}/${config}/u-boot.bin ${DEPLOY_DIR_IMAGE}/u-boot.bin-${type}
+			install -d ${DEPLOY_DIR_IMAGE}/tools
+			cp -vf ${B}/${config}/tools/mkimage ${DEPLOY_DIR_IMAGE}/tools/mkimage
+			cp -vf ${B}/${config}/u-boot.cfgout ${DEPLOY_DIR_IMAGE}/tools/u-boot.cfgout-${type}
+			find ${B}/${config}/ -name "qspi_params_*" -exec cp -vf {} ${DEPLOY_DIR_IMAGE}/tools/ \;
+		done
     done
 
 }

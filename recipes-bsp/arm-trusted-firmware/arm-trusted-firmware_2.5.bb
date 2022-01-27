@@ -39,8 +39,8 @@ XEN_ARGS = " \
                 "
 
 M7BOOT_ARGS = " \
-                FIP_MMC_OFFSET=0x5240 \
-                FIP_QSPI_OFFSET=0x4240 \
+                FIP_MMC_OFFSET=0x3240 \
+                FIP_QSPI_OFFSET=0x2440 \
                 "
 
 EXTRA_OEMAKE += " \

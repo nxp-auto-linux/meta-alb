@@ -90,7 +90,9 @@ DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc',
 DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtio', 'virtio', '', d)}"
 
 # Docker configuration
-DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker_${MAJ_VER}.config', '', d)}"
+SRC_URI += "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'file://build/docker_${MAJ_VER}.config', '', d)} "
 
 # GPU configuration
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 'gpu.config', '', d)}"
@@ -116,7 +118,6 @@ module_conf_llce_can = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'op
 
 SRC_URI += "\
     file://build/containers.config \
-    file://build/docker.config \
     file://build/virtio \
     file://build/gpu.config \
     file://build/llce_can.config \

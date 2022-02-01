@@ -4,6 +4,9 @@ DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
+DEPENDS += "bc-native"
+DEPENDS += "coreutils-native"
+DEPENDS += "binutils-native"
 DEPENDS += "dtc-native xxd-native"
 DEPENDS += "openssl-native"
 DEPENDS += "u-boot-s32"
@@ -39,8 +42,7 @@ XEN_ARGS = " \
                 "
 
 M7BOOT_ARGS = " \
-                FIP_MMC_OFFSET=0x3240 \
-                FIP_QSPI_OFFSET=0x2440 \
+                FIP_OFFSET_DELTA=0x2000 \
                 "
 
 EXTRA_OEMAKE += " \

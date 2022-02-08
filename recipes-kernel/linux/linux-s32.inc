@@ -20,7 +20,7 @@ KERNEL_CC_append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append = " ${TOOLCHAIN_OPTIONS}"
 
 S = "${WORKDIR}/git"
-MAJ_VER =  "${@oe.utils.trim_version("${PV}", 1)}"
+MAJ_VER =  "${@oe.utils.trim_version("${PV}", 2)}"
 
 do_merge_delta_config[dirs] = "${B}"
 do_merge_delta_config() {

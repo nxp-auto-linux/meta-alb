@@ -23,13 +23,9 @@ SRCREV ?= "7802b89fe48ca0508c63c9f5b17e3fd3f2b3fba6"
 
 SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 
-PLATFORM_s32g2 = "s32g2"
-PLATFORM_s32g3 = "s32g3"
-PLATFORM_s32r45evb = "s32r"
-
 BUILD_TYPE = "release"
 
-ATF_BINARIES = "${B}/${PLATFORM}/${BUILD_TYPE}"
+ATF_BINARIES = "${B}/${ATF_PLAT}/${BUILD_TYPE}"
 
 OPTEE_ARGS = " \
                 BL32=${DEPLOY_DIR_IMAGE}/optee/tee-header_v2.bin \
@@ -49,7 +45,7 @@ EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
                 ARCH=${TARGET_ARCH} \
                 BUILD_BASE=${B} \
-                PLAT=${PLATFORM} \
+                PLAT=${ATF_PLAT} \
                 "
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '${OPTEE_ARGS}', '', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${XEN_ARGS}', '', d)}"

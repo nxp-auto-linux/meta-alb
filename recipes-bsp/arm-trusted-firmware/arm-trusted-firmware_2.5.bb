@@ -10,6 +10,7 @@ DEPENDS += "binutils-native"
 DEPENDS += "dtc-native xxd-native"
 DEPENDS += "openssl-native"
 DEPENDS += "u-boot-s32"
+DEPENDS += "u-boot-tools-native"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os', '', d)}"
 
 S = "${WORKDIR}/git"
@@ -73,10 +74,10 @@ do_compile() {
 	for suffix in ${BOOT_TYPE}
 	do
 		oe_runmake -C "${S}" \
-		    BL33="${DEPLOY_DIR_IMAGE}/u-boot.bin-${suffix}" \
-		    MKIMAGE="${DEPLOY_DIR_IMAGE}/tools/mkimage" \
+		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-s32.bin-${suffix}" \
+		    MKIMAGE="mkimage" \
 		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
-		    MKIMAGE_CFG="${DEPLOY_DIR_IMAGE}/tools/u-boot.cfgout-${suffix}" all
+		    MKIMAGE_CFG="${DEPLOY_DIR_IMAGE}/tools/u-boot-s32.cfgout-${suffix}" all
 		cp -vf "${ATF_BINARIES}/fip.s32" "${ATF_BINARIES}/fip.s32-${suffix}"
 	done
 }

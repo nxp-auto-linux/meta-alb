@@ -6,7 +6,6 @@ IMAGE_FSTYPES_remove = "flashimage"
 KERNEL_DEFCONFIG ?= "s32gen1_defconfig"
 
 UBOOT_CONFIG = "cpio"
-UBOOT_SUFFIX ?= "bin"
 
 VIRTUAL-RUNTIME_dev_manager = "busybox-mdev"
 VIRTUAL-RUNTIME_login_manager = "busybox"

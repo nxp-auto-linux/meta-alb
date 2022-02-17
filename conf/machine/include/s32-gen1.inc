@@ -2,8 +2,6 @@ require conf/machine/include/s32-base.inc
 
 SOC_FAMILY_append = ":gen1"
 
-UBOOT_SUFFIX ?= "s32"
-
 IMAGE_FSTYPES += "ext4"
 
 # Specific definitions for .sdcard image generation

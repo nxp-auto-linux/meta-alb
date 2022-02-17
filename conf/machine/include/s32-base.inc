@@ -26,6 +26,7 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-s32"
 
 PREFERRED_VERSION_linux-s32 ?= "5.10.90"
 PREFERRED_VERSION_u-boot-s32 ?= "2020.04"
+PREFERRED_VERSION_u-boot-tools ?= "2020.04"
 PREFERRED_VERSION_xen ?= "4.14"
 
 PREFERRED_VERSION_rng-tools ?= "5"

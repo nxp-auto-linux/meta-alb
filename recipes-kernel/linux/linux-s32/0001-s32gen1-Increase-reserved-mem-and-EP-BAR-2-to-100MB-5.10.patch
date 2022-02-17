@@ -1,20 +1,19 @@
-From 3ce2a88e3f2d950a8c318350439600294d1d76e9 Mon Sep 17 00:00:00 2001
+From ca7d8680b56c347c9fd1ba23f3ead6d6991ea635 Mon Sep 17 00:00:00 2001
 From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-Date: Tue, 2 Mar 2021 12:55:31 +0200
-Subject: [PATCH] s32gen1: Increase reserved mem and EP BAR 2 to 100MB
+Date: Thu, 17 Feb 2022 10:21:09 +0200
+Subject: [PATCH] Increase reserved mem to 100MB
 
-Issue: ALB-5740
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
 ---
  arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi | 4 ++--
- drivers/pci/controller/dwc/pci-s32gen1.c        | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi b/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
-index a06fbff3477f..7ccb12d1c1e5 100644
+index 6aeac9d9f8e8..25f7803fa06d 100644
 --- a/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
 +++ b/arch/arm64/boot/dts/freescale/fsl-s32-gen1.dtsi
-@@ -36,10 +36,10 @@
+@@ -51,10 +51,10 @@
  		#size-cells = <2>;
  		ranges;
  
@@ -27,19 +26,6 @@ index a06fbff3477f..7ccb12d1c1e5 100644
  			no-map;
  		};
  
-diff --git a/drivers/pci/controller/dwc/pci-s32gen1.c b/drivers/pci/controller/dwc/pci-s32gen1.c
-index c9e7c1ecd4bc..40cb930b1107 100644
---- a/drivers/pci/controller/dwc/pci-s32gen1.c
-+++ b/drivers/pci/controller/dwc/pci-s32gen1.c
-@@ -118,7 +118,7 @@
- #define PCIE_EP_BAR1_ADDR		(PCIE_EP_BAR0_ADDR + PCIE_EP_BAR0_SIZE)
- #define PCIE_EP_BAR1_SIZE		0
- #define PCIE_EP_BAR2_ADDR		(PCIE_EP_BAR1_ADDR + PCIE_EP_BAR1_SIZE)
--#define PCIE_EP_BAR2_SIZE		SZ_1M
-+#define PCIE_EP_BAR2_SIZE		(SZ_1M * 100)
- #define PCIE_EP_BAR3_ADDR		(PCIE_EP_BAR2_ADDR + PCIE_EP_BAR2_SIZE)
- #define PCIE_EP_BAR3_SIZE		0
- #define PCIE_EP_BAR4_ADDR		(PCIE_EP_BAR3_ADDR + PCIE_EP_BAR3_SIZE)
 -- 
 2.17.1
 

@@ -14,10 +14,6 @@ SRC_URI = "git://github.com/dparrish/libcli.git;protocol=https;branch=stable \
 
 S = "${WORKDIR}/git"
 
-do_compile() {
-    oe_runmake #'CC=${CC}' 'LD=${LD}' 'LDFLAGS=${LDFLAGS}'
-}
-
 do_install() {
     oe_runmake PREFIX=${D}/${prefix} install
 }

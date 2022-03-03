@@ -35,6 +35,9 @@ IMAGE_INSTALL_append_gen1 = " mtd-utils "
 # Support for accessing MDIO bus for GMAC phys
 IMAGE_INSTALL_append_gen1 = " mdio-proxy "
 
+# Tool for flashing the AQR107 firmware using mdio-proxy
+IMAGE_INSTALL_append_gen1 = " aquantia-firmware-utility "
+
 # Supporting complex evaluation scenarios
 IMAGE_INSTALL += "openssl-misc"
 IMAGE_INSTALL_append_s32 += "openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"

@@ -1,4 +1,4 @@
-# Copyright 2019-2021 NXP
+# Copyright 2019-2022 NXP
 #
 # PFE common recipe for Master/Slave
 
@@ -8,17 +8,15 @@ SUMMARY = "Linux driver for the Packet Forwarding Engine hardware"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE-GPL2.txt;md5=5dcdfe25f21119aa5435eab9d0256af7"
 
-PFE_SUPPORTED_REV ?= "PFE_CFG_IP_VERSION_NPU_7_14a"
-
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
 
-SRCREV ?= "dff0148647c4bb06518e376f2d0a78aa69420972"
+SRCREV ?= "eed7a81efdbd2e6d05a0c9edfbe21780c163cd8f"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"
 INSTALL_DIR = "${D}/${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/ethernet/nxp/pfe"
 
-EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} PFE_CFG_IP_VERSION=${PFE_SUPPORTED_REV} MDIR=${MDIR} -C ${MDIR} V=1 drv-build"
+EXTRA_OEMAKE_append = " KERNELDIR=${STAGING_KERNEL_DIR} MDIR=${MDIR} -C ${MDIR} V=1 drv-build"
 
 COMPATIBLE_MACHINE = "s32g"

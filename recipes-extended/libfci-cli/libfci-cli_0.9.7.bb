@@ -1,13 +1,13 @@
 DESCRIPTION = "LibFCI Example: Command line tool for configuration of PFE"
 HOMEPAGE = "https://source.codeaurora.org/external/autobsps32/extra/pfeng"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://LICENSE-BSD3.txt;md5=45871c7f71d09ac15568b10e8c013600"
+LIC_FILES_CHKSUM = "file://LICENSE-BSD3.txt;md5=6b674f4e7c2e72a1907ad7a7f03b800c"
 
 PR = "r0"
 
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
-SRCREV = "dff0148647c4bb06518e376f2d0a78aa69420972"
+SRCREV = "eed7a81efdbd2e6d05a0c9edfbe21780c163cd8f"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/libfci_cli"

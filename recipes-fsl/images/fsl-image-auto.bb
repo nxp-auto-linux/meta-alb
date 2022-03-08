@@ -13,6 +13,7 @@ COPY_LIC_DIRS = "1"
 IMAGE_INSTALL += " \
     kernel-devicetree \
     packagegroup-core-buildessential \
+    packagegroup-core-full-cmdline \
     packagegroup-core-nfs-server \
     packagegroup-core-tools-debug \
     vim \

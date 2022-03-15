@@ -87,6 +87,10 @@ do_configure () {
         fi
         merge_config.sh -m .config ${@" ".join(find_cfgs(d))}
         cml1_do_configure
+    elif [ -n "${UBOOT_MACHINE}" ]; then
+        for config in ${UBOOT_MACHINE}; do
+            oe_runmake -C ${S} O=${B}/${config} ${config}
+        done
     fi
 }
 
@@ -114,7 +118,6 @@ do_compile () {
                 j=$(expr $j + 1);
                 if [ $j -eq $i ]
                 then
-                    oe_runmake -C ${S} O=${B}/${config} ${config}
                     oe_runmake -C ${S} O=${B}/${config} ${UBOOT_MAKE_TARGET}
                     for binary in ${UBOOT_BINARIES}; do
                         k=$(expr $k + 1);

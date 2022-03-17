@@ -7,7 +7,7 @@ PR = "r0"
 
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
-SRCREV = "eed7a81efdbd2e6d05a0c9edfbe21780c163cd8f"
+SRCREV = "91400317323ba22e1fdc0ac9ddc0923975e85b70"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/libfci_cli"

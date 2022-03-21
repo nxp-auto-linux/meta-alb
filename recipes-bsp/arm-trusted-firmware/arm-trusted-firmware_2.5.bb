@@ -20,7 +20,7 @@ B = "${WORKDIR}/build"
 URL ?= "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "6d6ed26da016932db79cb99542d26aa2db93698e"
+SRCREV ?= "b6b0419ec2d8cf84d1bf17cb3cd13d16558d639f"
 
 SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 

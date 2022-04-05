@@ -15,7 +15,8 @@ if [ "Fedora" = "$distro" ]; then
     PKGS="$PKGS ccache perl-bignum python3-pexpect findutils file cpio"
 fi
 # pkgs required for fsl use
-PKGS="vim-common redhat-lsb xz perl-String-CRC32 dos2unix screen $PKGS"
+PKGS="$PKGS vim-common redhat-lsb xz perl-String-CRC32 dos2unix screen parted \
+     dosfstools mtools udev"
 
 # Extra Packages for Enterprise Linux (i.e. epel-release) is a collection
 # of packages from Fedora built on RHEL/CentOS for easy installation of

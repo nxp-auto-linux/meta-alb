@@ -17,19 +17,19 @@ SRCREV = "79052243a9a0366cf31768a3c931a7cc0fd59a24"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"
-EXTRA_OEMAKE_append = " -C ./sample INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} "
 MODULES_MODULE_SYMVERS_LOCATION = "."
 
-PROVIDES += "kernel-module-ipc-shm-sample${KERNEL_MODULE_PACKAGE_SUFFIX}"
-RPROVIDES_${PN} += "kernel-module-ipc-shm-sample${KERNEL_MODULE_PACKAGE_SUFFIX}"
-PROVIDES += "kernel-module-ipc-shm-dev${KERNEL_MODULE_PACKAGE_SUFFIX}"
-RPROVIDES_${PN} += "kernel-module-ipc-shm-dev${KERNEL_MODULE_PACKAGE_SUFFIX}"
-PROVIDES += "kernel-module-ipc-shm-uio${KERNEL_MODULE_PACKAGE_SUFFIX}"
-RPROVIDES_${PN} += "kernel-module-ipc-shm-uio${KERNEL_MODULE_PACKAGE_SUFFIX}"
+DEMO_IPCF_APPS ?= "sample sample_multi_instance"
+EXTRA_OEMAKE_append = " --file ./makefile_samples apps="${DEMO_IPCF_APPS}" INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} "
+
+PLATFORM_FLAVOR_s32g2 = "s32g2"
+PLATFORM_FLAVOR_s32g3 = "s32g3"
+PLATFORM_FLAVOR_s32r45evb = "s32r45"
+EXTRA_OEMAKE_append = " PLATFORM_FLAVOR=${PLATFORM_FLAVOR} "
 
 # Prevent to load ipc-shm-uio at boot time
 KERNEL_MODULE_PROBECONF += "ipc-shm-uio"
 module_conf_ipc-shm-uio = "blacklist ipc-shm-uio"
-
-FILES_${PN} += "${base_libdir}/*"
+KERNEL_MODULE_PROBECONF += "ipc-sample-multi-instance"
+module_conf_ipc-sample-multi-instance = "blacklist ipc-sample-multi-instance"
 FILES_${PN} += "${sysconfdir}/modprobe.d/*"

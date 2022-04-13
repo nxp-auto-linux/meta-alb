@@ -5,18 +5,21 @@ auto lo
 iface lo inet loopback
 
 auto pfe0
-iface pfe0 inet dhcp
+iface pfe0 inet manual
 pre-up [ -L /sys/class/net/pfe0 ]
 dhcpcd_opts -Gb
+up /bin/ifconfig pfe0 up
 
 auto pfe1
-iface pfe1 inet dhcp
+iface pfe1 inet manual
 pre-up [ -L /sys/class/net/pfe1 ]
 dhcpcd_opts -Gb
+up /bin/ifconfig pfe1 up
 
 auto pfe2
 iface pfe2 inet manual
 pre-up [ -L /sys/class/net/pfe2 ]
+dhcpcd_opts -Gb
 up /bin/ifconfig pfe2 up
 
 auto eth0

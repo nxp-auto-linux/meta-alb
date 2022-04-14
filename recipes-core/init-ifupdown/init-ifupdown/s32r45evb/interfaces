@@ -7,4 +7,4 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 pre-up [ -L /sys/class/net/eth0 ]
-dhcpcd_opts -Gb
+dhcpcd_opts -LGb

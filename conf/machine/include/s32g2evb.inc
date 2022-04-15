@@ -1,6 +1,7 @@
 require conf/machine/include/s32g2.inc
 
 MACHINEOVERRIDES =. "s32g2evb:"
+MACHINEOVERRIDES =. "s32gevbx:"
 
 ATF_PLAT = "s32g2xxaevb"
 

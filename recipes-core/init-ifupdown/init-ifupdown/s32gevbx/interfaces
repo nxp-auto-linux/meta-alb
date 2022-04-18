@@ -4,6 +4,7 @@
 auto lo
 iface lo inet loopback
 
+# To enable DHCP for an interface, replace "manual" with "dhcp" in iface command
 auto pfe0
 iface pfe0 inet manual
 pre-up [ -L /sys/class/net/pfe0 ]

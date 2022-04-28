@@ -22,6 +22,15 @@ POKY_DEFAULT_EXTRA_RDEPENDS_remove = "packagegroup-core-boot"
 INITRAMFS_IMAGE = ""
 POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 
+# Removal of flash image filesystem support
+# for Ubuntu images due to an issue regarding 'cpio'
+# utility when seeking on large files (> 2 GB).
+# As a Ubuntu based rootfs can easily go beyond 2GB and are even in
+# the smallest form larger than what is good for a boot flash, we
+# do not generate a .flashimage with Ubuntu.
+IMAGE_FSTYPES_remove = "flashimage"
+IMAGE_TYPES_MASKED += "cpio cpio.gz cpio.gz.u-boot"
+
 # The Yocto glibc version must not exceed the Ubuntu glibc version
 # or Yocto-created executables will fail on the Ubuntu image.
 # We want to be as close as possible to the respective Ubuntu glibc

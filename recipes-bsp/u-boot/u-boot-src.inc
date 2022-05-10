@@ -2,4 +2,4 @@ URL ?= "git://source.codeaurora.org/external/autobsps32/u-boot;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
 
-SRCREV = "6f4a3794f5ff52204a764c93eca5289842cd7f37"
+SRCREV = "fda3b36958e6cdc5e79caa9c97b4631547751e22"

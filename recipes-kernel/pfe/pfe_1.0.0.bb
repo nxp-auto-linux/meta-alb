@@ -1,4 +1,4 @@
-# Copyright 2019-2021 NXP
+# Copyright 2019-2022 NXP
 #
 # This is the PFE driver for Linux kernel 5.4 and 5.10
 # This driver can be used in PFE Master/Slave configuration as Master.

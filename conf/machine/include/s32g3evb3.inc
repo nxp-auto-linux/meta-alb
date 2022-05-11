@@ -8,6 +8,6 @@ ATF_PLAT = "s32g3xxaevb"
 UBOOT_DEFCONFIG = "s32g3xxaevb3_defconfig"
 UBOOT_FLASH_DEFCONFIG = "s32g3xxaevb3_qspi_defconfig"
 
-KERNEL_DEVICETREE ?= "freescale/fsl-s32g3xxa-evb3.dtb"
+KERNEL_DEVICETREE ?= "freescale/s32g3xxa-evb3.dtb"
 
-FLASHIMAGE_EXTRA1_FILE = "fsl-s32g3xxa-evb3.${FLASHIMAGE_DTB_SUFFIX}"
+FLASHIMAGE_EXTRA1_FILE = "s32g3xxa-evb3.${FLASHIMAGE_DTB_SUFFIX}"

@@ -10,4 +10,4 @@ SRC_URI = "\
     file://0001-xen-build-temporarily-inhibit-Werror-4.14.patch \
 "
 
-SRCREV = "17a628c44b48986a2be3a7a52730e13068e58391"
+SRCREV = "62ef3d7af15c39935672e069bd2be18e0ba50a21"

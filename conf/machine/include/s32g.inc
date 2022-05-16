@@ -5,8 +5,8 @@ KERNEL_DEFCONFIG ?= "s32gen1_defconfig"
 MACHINEOVERRIDES =. "s32g:"
 
 UBOOT_CONFIG ?= "sdcard"
-UBOOT_CONFIG[sdcard] = "${UBOOT_DEFCONFIG},,u-boot-s32.${UBOOT_SUFFIX}"
+UBOOT_CONFIG[sdcard] = "${UBOOT_DEFCONFIG},,u-boot-nodtb.${UBOOT_SUFFIX}"
 
 # prepend 'qspi' to keep the default deploy/u-boot-<MACHINE>.s32 to point to sdcard
 UBOOT_CONFIG_prepend = "qspi "
-UBOOT_CONFIG[qspi] = "${UBOOT_FLASH_DEFCONFIG},,u-boot-s32.${UBOOT_SUFFIX}"
+UBOOT_CONFIG[qspi] = "${UBOOT_FLASH_DEFCONFIG},,u-boot-nodtb.${UBOOT_SUFFIX}"

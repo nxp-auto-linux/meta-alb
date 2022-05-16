@@ -74,7 +74,7 @@ do_compile() {
 	for suffix in ${BOOT_TYPE}
 	do
 		oe_runmake -C "${S}" \
-		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-s32.bin-${suffix}" \
+		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}" \
 		    MKIMAGE="mkimage" \
 		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
 		    MKIMAGE_CFG="${DEPLOY_DIR_IMAGE}/tools/u-boot-s32.cfgout-${suffix}" all

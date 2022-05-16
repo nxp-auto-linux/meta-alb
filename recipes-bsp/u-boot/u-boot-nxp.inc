@@ -85,7 +85,7 @@ do_install_append_s32() {
             # install our environment file to usr/share to have it staged by yocto
             install ${B}/${config}/env-default.txt ${D}${ENV_STAGE_DIR}/u-boot-default-flashenv${type}.txt
             install -d ${DEPLOY_DIR_IMAGE}
-            install -v ${B}/${config}/u-boot-s32.bin ${DEPLOY_DIR_IMAGE}/u-boot-s32.bin-${type}
+            install -v ${B}/${config}/u-boot-nodtb.bin ${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${type}
             install -d ${DEPLOY_DIR_IMAGE}/tools
             install -v ${B}/${config}/u-boot-s32.cfgout ${DEPLOY_DIR_IMAGE}/tools/u-boot-s32.cfgout-${type}
             find ${B}/${config}/ -name "qspi_params_*" -exec install -v {} ${DEPLOY_DIR_IMAGE}/tools/ \;

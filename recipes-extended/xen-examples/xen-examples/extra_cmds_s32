@@ -1,1 +1,3 @@
 fdt rm /chosen stdout-path
+fdt get value msi_parent0 pcie0 msi-parent && fdt rm pcie0 msi-parent;
+fdt get value msi_parent1 pcie1 msi-parent && fdt rm pcie1 msi-parent;

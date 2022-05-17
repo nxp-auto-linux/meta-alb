@@ -17,11 +17,15 @@ B = "${WORKDIR}/build"
 
 FILES_${PN} = "/boot/boot.scr /boot/boot.source"
 
+EXTRA_CMDS_FILE = "extra_cmds_s32"
+SRC_URI = "file://${EXTRA_CMDS_FILE}"
+
 do_configure() {
     DTB_NAME="$(basename ${KERNEL_DEVICETREE})"
     CFG_FILE="${B}/${CFG_NAME}"
 
     cp -vf "${S}/${CFG_NAME}" "${CFG_FILE}"
+    cp -vf "${S}/${EXTRA_CMDS_FILE}" "${B}/${EXTRA_CMDS_FILE}"
 
     # Append machine-specific linux .dtb file name
     echo "DEVICE_TREE=\"${DTB_NAME}\"" >> "${CFG_FILE}"
@@ -44,9 +48,15 @@ do_compile() {
     UBOOT_DIR="${DEPLOY_DIR_IMAGE}"
     IMAGEBUILDER_CONFIG="${CFG_NAME}"
     PREPEND_PATH="/boot"
+    EXTRA_CMDS="${B}/${EXTRA_CMDS_FILE}"
 
     # Run Imagebuilder script
-    uboot-script-gen -c ${IMAGEBUILDER_CONFIG} -d "${UBOOT_DIR}" -t "${LOAD_CMD}" -p "${PREPEND_PATH}"
+    uboot-script-gen -c ${IMAGEBUILDER_CONFIG} \
+        -d "${UBOOT_DIR}" \
+        -t "${LOAD_CMD}" \
+        -p "${PREPEND_PATH}" \
+        -a "${EXTRA_CMDS}"
+
     mv ${UBOOT_DIR}/boot.scr ${UBOOT_DIR}/boot.source ${B}/
 }
 

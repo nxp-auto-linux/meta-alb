@@ -1,0 +1,1 @@
+fdt rm /chosen stdout-path

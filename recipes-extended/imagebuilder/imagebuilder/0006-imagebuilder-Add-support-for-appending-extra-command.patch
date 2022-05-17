@@ -1,0 +1,87 @@
+From c5a1b6a0558743763d3502809a4fe3184511fe0e Mon Sep 17 00:00:00 2001
+From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+Date: Tue, 17 May 2022 19:01:25 +0300
+Subject: [PATCH 6/6] imagebuilder: Add support for appending extra commands to
+ script
+
+Added the "-a" parameter which stands for APPEND_EXTRA_CMDS option,
+which enables the user to specify the path to a text file that contains,
+on each line, u-boot commands that will be added to the generated script as
+"fixups", before the boot command.
+
+The file specified via the "-a" parameter will be copied as-is in the
+generated script.
+
+Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+---
+ scripts/uboot-script-gen | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
+index e2b9cd1..755e96a 100755
+--- a/scripts/uboot-script-gen
++++ b/scripts/uboot-script-gen
+@@ -167,6 +167,10 @@ function check_file_type()
+     elif [ "$type" = "Device Tree Blob" ]
+     then
+         type="Device Tree Blob\|data"
++
++    elif [ "$type" = "text" ]
++    then
++        type="ASCII text"
+     fi
+ 
+     file -L $filename | grep "$type" &> /dev/null
+@@ -215,7 +219,7 @@ function print_help
+ {
+     script=`basename "$0"`
+     echo "usage:"
+-    echo "	$script -c CONFIG_FILE -t UBOOT_TYPE -d DIRECTORY [-o FILE] [-p PREPEND_PATH]"
++    echo "	$script -c CONFIG_FILE -t UBOOT_TYPE -d DIRECTORY [-o FILE] [-p PREPEND_PATH] [-a APPEND_EXTRA_CMDS]"
+     echo "	$script -h"
+     echo "where:"
+     echo "	CONFIG_FILE - configuration file"
+@@ -227,6 +231,7 @@ function print_help
+     echo "	DIRECTORY - root directory where the files of CONFIG_FILE are located"
+     echo "	FILE - output filename for the uboot script and its source, overrides option in CONFIG_FILE"
+     echo "	PREPEND_PATH - path to be appended before file names to match deploy location within rootfs"
++    echo "	APPEND_EXTRA_CMDS - absolute path to file containing extra u-boot cmds (fixups) to be run before booting"
+     echo "	-h - prints out the help message and exits "
+     echo "Defaults:"
+     echo "	CONFIG_FILE=$cfg_file, UBOOT_TYPE=\"LOAD_CMD\" env var, DIRECTORY=$uboot_dir"
+@@ -234,7 +239,7 @@ function print_help
+     echo "	$script -c ../config -d ./build42 -t \"scsi load 1:1\""
+ }
+ 
+-while getopts ":c:t:d:ho:p:" opt; do
++while getopts ":c:t:d:ho:p:a:" opt; do
+     case ${opt} in
+     t )
+         case $OPTARG in
+@@ -264,6 +269,9 @@ while getopts ":c:t:d:ho:p:" opt; do
+     p )
+         PREPEND_PATH="$OPTARG"
+         ;;
++    a )
++        extra_cmds_file=$OPTARG
++        ;;
+     h )
+         print_help
+         exit 0
+@@ -418,6 +426,13 @@ device_tree_editing $device_tree_addr
+ echo "setenv xen_addr $xen_addr" >> $UBOOT_SOURCE
+ echo "setenv fdt_addr $device_tree_addr" >> $UBOOT_SOURCE
+ 
++# append extra u-boot commands (fixups) to script before boot command
++if test "$extra_cmds_file"
++then
++    check_file_type "$extra_cmds_file" "text"
++    cat $extra_cmds_file >> $UBOOT_SOURCE
++fi
++
+ # disable device tree reloation
+ echo "setenv fdt_high 0xffffffffffffffff" >> $UBOOT_SOURCE
+ mkimage -A arm64 -T script -C none -a $uboot_addr -e $uboot_addr -d $UBOOT_SOURCE "$UBOOT_SCRIPT" &> /dev/null
+-- 
+2.35.1
+

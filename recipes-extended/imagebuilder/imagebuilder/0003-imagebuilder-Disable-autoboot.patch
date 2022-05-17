@@ -1,7 +1,7 @@
-From 7994895c7b7f21493b526b6cdb22b8a815bc7ac3 Mon Sep 17 00:00:00 2001
+From eed2bb47cb36e354949df96719a82d30680be3eb Mon Sep 17 00:00:00 2001
 From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
 Date: Mon, 26 Apr 2021 22:32:02 +0300
-Subject: [PATCH 4/4] imagebuilder: Disable autoboot
+Subject: [PATCH 3/6] imagebuilder: Disable autoboot
 
 Removed the `booti` command which was added at the end of the script,
 in order to permit the user to customize the u-boot environment or
@@ -22,10 +22,10 @@ Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
-index 2ca481d..2dfd93d 100755
+index 38ac9c9..9de4dc2 100755
 --- a/scripts/uboot-script-gen
 +++ b/scripts/uboot-script-gen
-@@ -408,9 +408,12 @@ device_tree_addr=$memaddr
+@@ -407,9 +407,12 @@ device_tree_addr=$memaddr
  load_file $DEVICE_TREE
  device_tree_editing $device_tree_addr
  
@@ -40,5 +40,5 @@ index 2ca481d..2dfd93d 100755
  
  remove_tmp_files
 -- 
-2.7.4
+2.35.1
 

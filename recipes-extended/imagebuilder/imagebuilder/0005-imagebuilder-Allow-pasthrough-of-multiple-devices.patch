@@ -1,7 +1,7 @@
-From 020c17d0985c3c19d87dcd14c85e47c46252d9c5 Mon Sep 17 00:00:00 2001
+From b0bf234865ef9a61a0fe3657aac959e27d1c2499 Mon Sep 17 00:00:00 2001
 From: Ondrej Spacek <ondrej.spacek@nxp.com>
 Date: Tue, 2 Nov 2021 14:35:47 +0100
-Subject: [PATCH 6/6] imagebuilder - Allow pasthrough of multiple devices.
+Subject: [PATCH 5/6] imagebuilder - Allow pasthrough of multiple devices.
 
 Currently it is possible to pass single device via
 "DOMU_PASSTHROUGH_DEVICE[i]".With this commit changes
@@ -20,10 +20,10 @@ Signed-off-by: Ondrej Spacek <ondrej.spacek@nxp.com>
  1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
-index 472b4c6..f34b3d8 100755
+index 0ee2210..e2b9cd1 100755
 --- a/scripts/uboot-script-gen
 +++ b/scripts/uboot-script-gen
-@@ -103,10 +103,17 @@ function device_tree_editing()
+@@ -102,10 +102,17 @@ function device_tree_editing()
          then
              echo "fdt set /chosen/domU$i direct-map <0x1>" >> $UBOOT_SOURCE
          fi
@@ -46,5 +46,5 @@ index 472b4c6..f34b3d8 100755
      done
  }
 -- 
-2.17.1
+2.35.1
 

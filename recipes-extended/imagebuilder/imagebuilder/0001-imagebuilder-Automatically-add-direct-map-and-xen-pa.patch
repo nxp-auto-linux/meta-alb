@@ -1,7 +1,7 @@
-From b02719b6ee8da4596488485ab5703879519a0411 Mon Sep 17 00:00:00 2001
+From 415991f5a0391062670f769d720242b2994cf5b4 Mon Sep 17 00:00:00 2001
 From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
 Date: Tue, 23 Mar 2021 11:17:17 +0200
-Subject: [PATCH 1/4] imagebuilder: Automatically add "direct-map" and
+Subject: [PATCH 1/6] imagebuilder: Automatically add "direct-map" and
  "xen,passthrough"
 
 Changed the imagebuilder script to also add the "direct-map" field
@@ -43,5 +43,5 @@ index bc41d1f..38649ad 100755
      done
  }
 -- 
-2.7.4
+2.35.1
 

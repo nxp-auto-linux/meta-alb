@@ -1,7 +1,7 @@
-From 57852f46fc18412a1bef3c21a6c250b3666a0e20 Mon Sep 17 00:00:00 2001
+From aa9fa077f3a4a8274e37e0e88fd9ed769c3b3bfd Mon Sep 17 00:00:00 2001
 From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
 Date: Wed, 21 Apr 2021 21:53:19 +0300
-Subject: [PATCH 3/4] imagebuilder: Add support for prepending path to file
+Subject: [PATCH 2/6] imagebuilder: Add support for prepending path to file
  names
 
 Added support for prepending path to file names in the final generated
@@ -26,10 +26,10 @@ Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
  1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
-index 40dc69d..2ca481d 100755
+index 38649ad..38ac9c9 100755
 --- a/scripts/uboot-script-gen
 +++ b/scripts/uboot-script-gen
-@@ -125,9 +125,13 @@ function load_file()
+@@ -124,9 +124,13 @@ function load_file()
  {
      local filename=$1
  
@@ -45,7 +45,7 @@ index 40dc69d..2ca481d 100755
      add_size $filename
  }
  
-@@ -200,7 +204,7 @@ function print_help
+@@ -199,7 +203,7 @@ function print_help
  {
      script=`basename "$0"`
      echo "usage:"
@@ -54,7 +54,7 @@ index 40dc69d..2ca481d 100755
      echo "	$script -h"
      echo "where:"
      echo "	CONFIG_FILE - configuration file"
-@@ -211,6 +215,7 @@ function print_help
+@@ -210,6 +214,7 @@ function print_help
      echo "		< > - used for uboot load commands"
      echo "	DIRECTORY - root directory where the files of CONFIG_FILE are located"
      echo "	FILE - output filename for the uboot script and its source, overrides option in CONFIG_FILE"
@@ -62,7 +62,7 @@ index 40dc69d..2ca481d 100755
      echo "	-h - prints out the help message and exits "
      echo "Defaults:"
      echo "	CONFIG_FILE=$cfg_file, UBOOT_TYPE=\"LOAD_CMD\" env var, DIRECTORY=$uboot_dir"
-@@ -218,7 +223,7 @@ function print_help
+@@ -217,7 +222,7 @@ function print_help
      echo "	$script -c ../config -d ./build42 -t \"scsi load 1:1\""
  }
  
@@ -71,7 +71,7 @@ index 40dc69d..2ca481d 100755
      case ${opt} in
      t )
          case $OPTARG in
-@@ -245,6 +250,9 @@ while getopts ":c:t:d:ho:" opt; do
+@@ -244,6 +249,9 @@ while getopts ":c:t:d:ho:" opt; do
      o )
          UBOOT_SCRIPT_ARG=$OPTARG
          ;;
@@ -82,5 +82,5 @@ index 40dc69d..2ca481d 100755
          print_help
          exit 0
 -- 
-2.7.4
+2.35.1
 

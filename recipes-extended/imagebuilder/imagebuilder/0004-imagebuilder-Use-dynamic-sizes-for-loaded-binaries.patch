@@ -1,7 +1,7 @@
-From 97a302752b67e7431eb95896ac2b5c56d733c7c0 Mon Sep 17 00:00:00 2001
+From 448ad46f71067d8231e12970f91757ab16c7b9ab Mon Sep 17 00:00:00 2001
 From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
 Date: Thu, 16 Sep 2021 01:30:18 +0300
-Subject: [PATCH 5/5] imagebuilder: Use dynamic sizes for loaded binaries
+Subject: [PATCH 4/6] imagebuilder: Use dynamic sizes for loaded binaries
 
 Imagebuilder would precompute the sizes of the loaded binaries
 before generating the script, and the sizes that needed to be
@@ -16,11 +16,11 @@ of the hardcoded values.
 
 Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
 ---
- scripts/uboot-script-gen | 42 +++++++++++++++++++++---------------------
+ scripts/uboot-script-gen | 42 ++++++++++++++++++++--------------------
  1 file changed, 21 insertions(+), 21 deletions(-)
 
 diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
-index 2dfd93d..472b4c6 100755
+index 9de4dc2..0ee2210 100755
 --- a/scripts/uboot-script-gen
 +++ b/scripts/uboot-script-gen
 @@ -24,11 +24,11 @@ function add_device_tree_kernel()
@@ -64,7 +64,7 @@ index 2dfd93d..472b4c6 100755
  }
  
  function device_tree_editing()
-@@ -66,7 +66,7 @@ function device_tree_editing()
+@@ -65,7 +65,7 @@ function device_tree_editing()
      echo "fdt set /chosen xen,xen-bootargs \"$XEN_CMD\"" >> $UBOOT_SOURCE
      echo "fdt mknod /chosen dom0" >> $UBOOT_SOURCE
      echo "fdt set /chosen/dom0 compatible \"xen,linux-zimage\" \"xen,multiboot-module\"" >> $UBOOT_SOURCE
@@ -73,7 +73,7 @@ index 2dfd93d..472b4c6 100755
      if test "$LOAD_CMD" = "tftpb"
      then
          echo "fdt set /chosen xen,dom0-bootargs \"$DOM0_CMD\"" >> $UBOOT_SOURCE
-@@ -74,7 +74,7 @@ function device_tree_editing()
+@@ -73,7 +73,7 @@ function device_tree_editing()
          then
              echo "fdt mknod /chosen dom0-ramdisk" >> $UBOOT_SOURCE
              echo "fdt set /chosen/dom0-ramdisk compatible \"xen,linux-initrd\" \"xen,multiboot-module\"" >> $UBOOT_SOURCE
@@ -82,7 +82,7 @@ index 2dfd93d..472b4c6 100755
          fi
      else
          echo "fdt set /chosen xen,dom0-bootargs \"$DOM0_CMD\"" >> $UBOOT_SOURCE
-@@ -90,14 +90,14 @@ function device_tree_editing()
+@@ -89,14 +89,14 @@ function device_tree_editing()
          echo "fdt set /chosen/domU$i memory <0x0 "${DOMU_MEM[$i]}">" >> $UBOOT_SOURCE
          echo "fdt set /chosen/domU$i cpus <"${DOMU_VCPUS[$i]}">" >> $UBOOT_SOURCE
          echo "fdt set /chosen/domU$i vpl011 <0x1>" >> $UBOOT_SOURCE
@@ -100,7 +100,7 @@ index 2dfd93d..472b4c6 100755
          fi
          if test "${DOMU_DIRECT_MAP[$i]}" = "1"
          then
-@@ -124,6 +124,7 @@ function add_size()
+@@ -123,6 +123,7 @@ function add_size()
  function load_file()
  {
      local filename=$1
@@ -108,7 +108,7 @@ index 2dfd93d..472b4c6 100755
  
      local relative_path="$(realpath --no-symlinks --relative-to=$PWD $filename)"
  
-@@ -133,6 +134,10 @@ function load_file()
+@@ -132,6 +133,10 @@ function load_file()
          echo "$LOAD_CMD $memaddr $PREPEND_PATH/$relative_path" >> $UBOOT_SOURCE
      fi
      add_size $filename
@@ -119,7 +119,7 @@ index 2dfd93d..472b4c6 100755
  }
  
  function check_file_type()
-@@ -366,15 +371,13 @@ load_file "$XEN"
+@@ -365,15 +370,13 @@ load_file "$XEN"
  
  check_compressed_file_type $DOM0_KERNEL "executable"
  dom0_kernel_addr=$memaddr
@@ -137,7 +137,7 @@ index 2dfd93d..472b4c6 100755
  else
      dom0_ramdisk_addr="-"
  fi
-@@ -384,21 +387,18 @@ while test $i -lt $NUM_DOMUS
+@@ -383,21 +386,18 @@ while test $i -lt $NUM_DOMUS
  do
      check_compressed_file_type ${DOMU_KERNEL[$i]} "executable"
      domU_kernel_addr[$i]=$memaddr
@@ -163,5 +163,5 @@ index 2dfd93d..472b4c6 100755
      i=$(( $i + 1 ))
  done
 -- 
-2.7.4
+2.35.1
 

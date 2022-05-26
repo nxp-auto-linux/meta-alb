@@ -1,7 +1,7 @@
-From e4c874f32cc9f9d8a3c67b3b1d015422eb170c79 Mon Sep 17 00:00:00 2001
+From 62e12bfe0295e2b621252c3271b98ba94e9d1fe8 Mon Sep 17 00:00:00 2001
 From: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
-Date: Wed, 11 May 2022 08:06:46 +0300
-Subject: [PATCH] s32gen1: Increase reserved mem and EP BAR 2 to 100MB
+Date: Thu, 26 May 2022 10:05:20 +0300
+Subject: [PATCH] s32cc: Increase reserved mem and EP BAR 2 to 100MB
 
 Issue: ALB-5740
 
@@ -13,22 +13,22 @@ Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/freescale/s32cc.dtsi b/arch/arm64/boot/dts/freescale/s32cc.dtsi
-index d84c57ef9a8e..9eb2d40110ea 100644
+index fdea5162e26d..40a1762045e6 100644
 --- a/arch/arm64/boot/dts/freescale/s32cc.dtsi
 +++ b/arch/arm64/boot/dts/freescale/s32cc.dtsi
-@@ -55,10 +55,10 @@ reserved-memory {
+@@ -55,10 +55,10 @@ reserved-memory  {
  		#size-cells = <2>;
  		ranges;
  
 -		/* 4Mb shared memory for PCIe shared mem transfers, EP mode */
 +		/* 100Mb shared memory for PCIe shared mem transfers, EP mode */
  		pci_shared_memory0: shm@c0000000 {
- 			compatible = "fsl,s32gen1-shm";
+ 			compatible = "nxp,s32cc-shm";
 -			reg = <0x0 0xc0000000 0x0 0x400000>;    /* 4 MB */
 +			reg = <0x0 0xc0000000 0x0 0x6400000>;    /* 100 MB */
  			no-map;
  		};
- 		pci_shared_memory1: shm@c0400000 {
+ 
 diff --git a/drivers/pci/controller/dwc/pci-s32gen1.c b/drivers/pci/controller/dwc/pci-s32gen1.c
 index 1ff774d61d6e..70304072ff2f 100644
 --- a/drivers/pci/controller/dwc/pci-s32gen1.c

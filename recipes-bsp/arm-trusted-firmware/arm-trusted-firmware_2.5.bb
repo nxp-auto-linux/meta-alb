@@ -13,6 +13,10 @@ DEPENDS += "u-boot-s32"
 DEPENDS += "u-boot-tools-native"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os', '', d)}"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+inherit deploy
+
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
@@ -83,11 +87,9 @@ do_compile() {
 }
 
 do_deploy() {
-	install -d ${DEPLOY_DIR_IMAGE}
-
-	for suffix in ${BOOT_TYPE}
-	do
-		cp -vf "${ATF_BINARIES}/fip.s32-${suffix}" "${DEPLOY_DIR_IMAGE}/"
+	install -d ${DEPLOYDIR}
+	for suffix in ${BOOT_TYPE}; do
+		cp -vf "${ATF_BINARIES}/fip.s32-${suffix}" ${DEPLOYDIR}
 	done
 }
 

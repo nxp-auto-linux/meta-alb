@@ -13,7 +13,7 @@ SRC_URI = "\
 
 SRCREV = "bf46a767d38c6d13c5e5a5fabc88e640872e6a8e"
 
-DEPENDS += "python3-pycryptodomex-native"
+DEPENDS += "python3-pycryptodomex-native dtc-native"
 
 PLATFORM_FLAVOR_s32g2 = "s32g2"
 PLATFORM_FLAVOR_s32g3 = "s32g3"

@@ -144,7 +144,7 @@ generate_flashimage() {
         FLASHIMAGE_BANK4_XOR=$(expr ${FLASHIMAGE_SIZE_D} / 2)
 
         generate_flashimage_entry "${FLASHIMAGE_RESET_FILE}"  "FLASHIMAGE_RESET_OFFSET"  "${FLASHIMAGE_RESET_OFFSET}"
-        generate_flashimage_entry "${FLASHIMAGE_UBOOT_FILE}"  "FLASHIMAGE_UBOOT_OFFSET"  "${FLASHIMAGE_UBOOT_OFFSET}"
+        generate_flashimage_entry "${FLASHIMAGE_UBOOT_FILE}"  "FLASHIMAGE_FIP_OFFSET"  "${FLASHIMAGE_FIP_OFFSET}"
         generate_flashimage_entry "${FLASHIMAGE_KERNEL_FILE}" "FLASHIMAGE_KERNEL_OFFSET" "${FLASHIMAGE_KERNEL_OFFSET}"
         generate_flashimage_entry "${FLASHIMAGE_DTB_FILE}"    "FLASHIMAGE_DTB_OFFSET"    "${FLASHIMAGE_DTB_OFFSET}"
         generate_flashimage_entry "${FLASHIMAGE_ROOTFS_FILE}" "FLASHIMAGE_ROOTFS_OFFSET" "${FLASHIMAGE_ROOTFS_OFFSET}"

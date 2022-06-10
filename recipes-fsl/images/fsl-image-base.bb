@@ -37,6 +37,9 @@ IMAGE_INSTALL_append_s32g399ardb3 = " sja1110 "
 # Support for STR (Suspend to RAM) -- rtcwake
 IMAGE_INSTALL_append_s32g = " util-linux-rtcwake "
 
+# Export QSPI FLash Offsets environment variables
+IMAGE_INSTALL_append_s32 = " linux-qspi-env "
+
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior
 IMAGE_INSTALL_append_fsl-lsch3 += " \

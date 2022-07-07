@@ -12,7 +12,6 @@ UBOOT_BOOTSPACE_SEEK = "0"
 FLASHIMAGE_UBOOT_TYPE = "qspi"
 # Normally only FLASHIMAGE_UBOOT_TYPE should be enough, but we also define
 # the *_SUFFIX and *_FILE for safety
-require conf/machine/include/s32gen1flashmap.inc
 FLASHIMAGE_SIZE="64"
 FLASHIMAGE_UBOOT_SUFFIX = "${UBOOT_SUFFIX}"
 FLASHIMAGE_KERNEL_FILE = "${KERNEL_IMAGETYPE}"

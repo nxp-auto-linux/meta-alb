@@ -9,6 +9,7 @@
 # Heinz Wrobel <Heinz.Wrobel@nxp.com>
 #
 inherit image_types
+inherit ${@bb.utils.contains('FLASHIMAGE_DYNAMIC_OFFSETS', '1', 's32cc-flash-offsets', '', d)}
 IMAGE_TYPES += "flashimage"
 
 # We assume U-Boot always has to be there, so we provide reasonable
@@ -50,6 +51,8 @@ do_image_flashimage[depends] += " \
         ${@d.getVar('FLASHIMAGE_EXTRA8_FILE', True) and d.getVar('FLASHIMAGE_EXTRA8', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA9_FILE', True) and d.getVar('FLASHIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
 "
+
+do_image_flashimage[prefuncs] += "${@bb.utils.contains('FLASHIMAGE_DYNAMIC_OFFSETS', '1' , 'update_flash_offsets', '', d)}"
 
 python __anonymous () {
     types = d.getVar('IMAGE_FSTYPES') or ""

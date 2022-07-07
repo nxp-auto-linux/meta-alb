@@ -12,6 +12,9 @@ UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 
 UBOOT_ENV_SDCARD_OFFSET ?= "0x001e0000"
 
+# The following variable enables dynamic retrieval of FLASHIMAGE offsets from the Linux's device tree
+FLASHIMAGE_DYNAMIC_OFFSETS ?= "1"
+
 # Enable DM-Verity
 require ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'conf/machine/include/s32-gen1-dm-verity.inc', '', d)}
 

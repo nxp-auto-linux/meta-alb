@@ -98,8 +98,15 @@ add_flash_region () {
 generate_flashimage_entry() {
         FLASHIMAGE_FILE="$1"
         FLASHIMAGE_FILE_OFFSET_NAME="$2"
+        FLASHIMAGE_FILE_OFFSET_VARIABLE="$3"
         FLASHIMAGE_FILE_OFFSET=$(printf "%d" "$3")
+
         if [ -n "${FLASHIMAGE_FILE}" ]; then
+                if [ -z "${FLASHIMAGE_FILE_OFFSET_VARIABLE}" ]; then
+                    bberror "${FLASHIMAGE_FILE} is set but offset for this file inside the flashimage is undefined"
+                    exit 1
+                fi
+
                 if [ -z "${FLASHIMAGE_FILE_OFFSET}" ]; then
                         bberror "${FLASHIMAGE_FILE_OFFSET_NAME} is undefined. To use the 'flashimage' image it needs to be defined as byte offset."
                         exit 1

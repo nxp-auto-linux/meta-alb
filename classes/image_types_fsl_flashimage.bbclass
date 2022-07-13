@@ -40,6 +40,7 @@ do_image_flashimage[depends] += " \
         ${@d.getVar('FLASHIMAGE_RESET_FILE', True) and d.getVar('FLASHIMAGE_RESET', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_UBOOT_FILE', True) and d.getVar('FLASHIMAGE_UBOOT', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_KERNEL_FILE', True) and d.getVar('FLASHIMAGE_KERNEL', True) + ':do_deploy' or ''} \
+        ${@d.getVar('FLASHIMAGE_DTB_FILE', True) and d.getVar('FLASHIMAGE_DTB', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_ROOTFS_FILE', True) and d.getVar('FLASHIMAGE_ROOTFS', True) and d.getVar('FLASHIMAGE_ROOTFS', True) + ':do_image_complete' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA1_FILE', True) and d.getVar('FLASHIMAGE_EXTRA1', True) + ':do_deploy' or ''} \
         ${@d.getVar('FLASHIMAGE_EXTRA2_FILE', True) and d.getVar('FLASHIMAGE_EXTRA2', True) + ':do_deploy' or ''} \

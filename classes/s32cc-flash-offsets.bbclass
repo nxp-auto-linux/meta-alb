@@ -28,7 +28,7 @@ python update_flash_offsets () {
     add_fdt_library_path(d)
     import fdt
 
-    kernel_fdt = d.getVar('FLASHIMAGE_EXTRA1_FILE') or ""
+    kernel_fdt = d.getVar('FLASHIMAGE_DTB_FILE') or ""
     fdt_path = d.getVar('DEPLOY_DIR_IMAGE') or ""
     fdt_path = os.path.join(fdt_path, kernel_fdt)
 

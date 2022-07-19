@@ -1,4 +1,5 @@
 require conf/machine/include/s32-base.inc
+require conf/machine/include/systemd.inc
 
 SOC_FAMILY_append = ":gen1"
 

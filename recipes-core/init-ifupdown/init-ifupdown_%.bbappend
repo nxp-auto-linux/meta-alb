@@ -4,7 +4,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 # so that the primary Eth connector comes up for dhcp
 # by default.
 #
-SRC_URI += "file://interfaces"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'file://interfaces', '', d)}"
 
 do_install_ubuntu () {
        install -d ${D}${sysconfdir}/network/interfaces.d

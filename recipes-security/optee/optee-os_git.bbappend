@@ -19,8 +19,13 @@ PLATFORM_FLAVOR_s32g2 = "s32g2"
 PLATFORM_FLAVOR_s32g3 = "s32g3"
 PLATFORM_FLAVOR_s32r45evb = "s32r"
 
+XEN_ARGS = " \
+                CFG_VIRTUALIZATION=y \
+                "
+
 EXTRA_OEMAKE += " \
                 PLATFORM_FLAVOR=${PLATFORM_FLAVOR} \
+                ${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${XEN_ARGS}', '', d)} \
                 "
 
 OPTEEMACHINE_gen1 = "s32"

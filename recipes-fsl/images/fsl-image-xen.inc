@@ -1,6 +1,9 @@
 # Enable Xen and add Xen Packages
 include recipes-extended/images/xen-image-minimal.bb
 
+# SystemD needs CONFIG_XEN_GNTDEV as built-in instead of module
+IMAGE_INSTALL_remove = "kernel-module-xen-gntdev"
+
 IMAGE_INSTALL += "zlib-dev xen-tools-xenstat xen-tools-xenmon"
 
 # Enable deployment of DomU rootfs to EXT partition

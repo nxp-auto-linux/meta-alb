@@ -136,9 +136,14 @@ DEPENDS = "flex-native bison-native bc-native"
 
 # Enable Xen booting
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-kernel/linux/linux-yocto_virtualization.inc', '', d)}
-DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen.cfg', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_s32.cfg', '', d)} \
+    "
 SRC_URI += "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://xen.cfg', '', d)} "
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://xen.cfg', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_s32.cfg', '', d)} \
+    "
 
 # Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
 DELTA_KERNEL_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"

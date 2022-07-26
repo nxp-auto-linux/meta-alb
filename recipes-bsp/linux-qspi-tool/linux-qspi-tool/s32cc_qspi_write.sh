@@ -7,7 +7,7 @@ if [ $# -ne 2 ]; then
 	echo "Usage: $0 <qspi_partition> <file_to_write>"
 	printf "\nExamples:\n"
 	echo "$(whoami)@$(hostname):/# $0 FIP fip.s32-qspi"
-	echo "$(whoami)@$(hostname):/# $0 kernel Image"
+	echo "$(whoami)@$(hostname):/# $0 Kernel Image"
 	printf "\n"
 	exit 1
 fi

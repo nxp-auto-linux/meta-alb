@@ -24,4 +24,4 @@ DEPENDS += "libgpiod"
 
 # This recipe applies to all non-pcie demos.
 # Clustering demo has not been added.
-EXTRA_OEMAKE += "samples="multicore gpio_sysfs gpio_libgpiod networking""
+EXTRA_OEMAKE += "samples="multicore gpio_libgpiod networking""

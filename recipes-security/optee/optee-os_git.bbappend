@@ -11,7 +11,7 @@ SRC_URI = "\
     file://0001-allow-setting-sysroot-for-libgcc-lookup.patch \
 "
 
-SRCREV = "4fd00210e73801e518e751891feceaa5b325280e"
+SRCREV = "a4239ac5869645516d63fc27045154acfc8acf3f"
 
 DEPENDS += "python3-pycryptodomex-native dtc-native"
 

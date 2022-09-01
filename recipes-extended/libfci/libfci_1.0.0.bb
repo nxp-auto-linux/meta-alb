@@ -7,7 +7,7 @@ PR = "r0"
 
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
-SRCREV = "c9eea81d5026387c8f712a3565f3e41083e2f18f"
+SRCREV = "5468601da1bd9ce9213a71029e5b7d2252d00dc4"
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/xfci/libfci"
 LIBBUILDDIR = "${S}/sw/xfci/libfci/build/${TARGET_SYS}-release"

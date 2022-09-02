@@ -1,5 +1,5 @@
 #
-# Copyright 2018 NXP.
+# Copyright 2018, 2022 NXP.
 #
 
 PACKAGES-CORE = "\
@@ -10,7 +10,7 @@ PACKAGES-CORE = "\
     sysstat \
     util-linux \
     gdbserver \
-    nfs-utils \
+    nfs-utils-client \
     lrzsz \
     glibc-utils \
 "

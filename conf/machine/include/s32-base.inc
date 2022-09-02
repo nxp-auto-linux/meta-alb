@@ -73,3 +73,7 @@ BBMASK = "u-boot-qoriq linux-qoriq"
 DOM0LESS_ROOTFS ?= "fsl-image-dom0less"
 XEN_EXAMPLE ?= "xen-examples-default"
 DEFAULTTUNE_s32 ?= "cortexa53-crypto"
+
+# Disable NFS server service
+DISTRO_FEATURES_remove = " nfs"
+IMAGE_INSTALL_remove = " packagegroup-core-nfs-server"

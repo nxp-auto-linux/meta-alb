@@ -1,4 +1,4 @@
-# Copyright 2017-2018 NXP
+# Copyright 2017-2018, 2022 NXP
 
 SUMMARY = "Generate a minimal rootfs with a custom init script"
 
@@ -15,7 +15,7 @@ IMAGE_INSTALL_append_s32g274abluebox3 = " init-net-root"
 IMAGE_INSTALL_append += " \
 	init-nfs-boot     \
 	kernel-modules    \
-	nfs-utils         \
+	nfs-utils-client  \
 "
 
 # Remove unwanted images

@@ -26,7 +26,6 @@ BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV ?= "4523ee73e91cd3ad7d3f8861cc30dc002e134578"
 
-SRC_URI += "file://0001-Fix-fiptool-build-error.patch"
 
 BUILD_TYPE = "release"
 
@@ -56,14 +55,7 @@ EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '${OPTEE_ARGS}
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${XEN_ARGS}', '', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', '${M7BOOT_ARGS}', '', d)}"
 
-# FIXME: Allow linking of 'tools' binaries with native libraries
-#        used for generating the boot logo and other tools used
-#        during the build process.
-EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS}" \
-                 HOSTLD="${BUILD_LD} -L${STAGING_BASE_LIBDIR_NATIVE} \
-                 -Wl,-rpath,${STAGING_LIBDIR_NATIVE} \
-                 -Wl,-rpath,${STAGING_BASE_LIBDIR_NATIVE}" \
-                 LIBPATH="${STAGING_LIBDIR_NATIVE}" \
+EXTRA_OEMAKE += 'OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/../" \
                  HOSTSTRIP=true'
 
 BOOT_TYPE = "sdcard qspi"

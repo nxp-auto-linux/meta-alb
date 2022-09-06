@@ -179,4 +179,8 @@ IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 # Add LLCE CAN if needed
 IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
 
+# Add sja1110 driver for RDB boards
+IMAGE_INSTALL_append_s32g274ardb2 = " sja1110"
+IMAGE_INSTALL_append_s32g399ardb3 = " sja1110"
+
 COMPATIBLE_MACHINE ="(.*ubuntu)"

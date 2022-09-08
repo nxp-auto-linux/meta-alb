@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE-GPL2.txt;md5=5dcdfe25f21119aa5435eab9d0256af7
 URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
 SRC_URI = "${URL}"
 
-SRCREV ?= "5468601da1bd9ce9213a71029e5b7d2252d00dc4"
+SRCREV ?= "0034cc7d4b369a426fce88bc5a23b648ddb42110"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"

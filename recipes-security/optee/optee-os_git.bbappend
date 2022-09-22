@@ -1,4 +1,4 @@
-PV = "3.11.0"
+PV = "3.18.0"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 
@@ -13,7 +13,7 @@ SRC_URI = "\
 
 SRCREV = "86cb213aff502aed180acf421fb5e3936ee52d71"
 
-DEPENDS += "python3-pycryptodomex-native dtc-native"
+DEPENDS += "python3-cryptography-native dtc-native"
 
 PLATFORM_FLAVOR_s32g2 = "s32g2"
 PLATFORM_FLAVOR_s32g3 = "s32g3"

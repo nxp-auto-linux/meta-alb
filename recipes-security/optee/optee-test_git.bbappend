@@ -1,8 +1,8 @@
-PV = "3.11.0"
+PV = "3.18.0"
 
-SRCREV = "159e295d5cc3ad2275ab15fe544620f6604d4ba4"
+SRCREV = "da5282a011b40621a2cf7a296c11a35c833ed91b"
 
-DEPENDS += "python3-pycryptodomex-native"
+DEPENDS += "python3-cryptography-native"
 
 EXTRA_OEMAKE += " \
                 WITH_OPENSSL=n \

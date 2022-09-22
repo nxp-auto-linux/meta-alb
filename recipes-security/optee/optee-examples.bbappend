@@ -1,6 +1,6 @@
-PV = "3.11.0"
+PV = "3.18.0"
 
-SRCREV = "9a7dc598591990349d88b4dba3a37aadd6851295"
+SRCREV = "f301ee9df2129c0db683e726c91dc2cefe4cdb65"
 
 EXTRA_OEMAKE += " \
                 LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
@@ -8,4 +8,4 @@ EXTRA_OEMAKE += " \
 
 INSANE_SKIP_${PN} += "ldflags"
 
-DEPENDS += "python3-pycryptodomex-native"
+DEPENDS += "python3-cryptography-native"

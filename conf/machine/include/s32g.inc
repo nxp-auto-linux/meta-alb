@@ -1,6 +1,6 @@
 require conf/machine/include/s32-gen1-board.inc
 
-KERNEL_DEFCONFIG ?= "s32gen1_defconfig"
+KERNEL_DEFCONFIG ?= "s32cc_defconfig"
 
 MACHINEOVERRIDES =. "s32g:"
 

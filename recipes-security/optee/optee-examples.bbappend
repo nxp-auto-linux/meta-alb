@@ -9,3 +9,12 @@ EXTRA_OEMAKE += " \
 INSANE_SKIP_${PN} += "ldflags"
 
 DEPENDS += "python3-cryptography-native"
+
+do_install_append () {
+        mkdir -p ${D}${libdir}/tee-supplicant/plugins
+        install -D -p -m0444 ${S}/out/plugins/* ${D}${libdir}/tee-supplicant/plugins
+}
+
+FILES_${PN} += "\
+                ${libdir}/tee-supplicant/plugins/ \
+               "

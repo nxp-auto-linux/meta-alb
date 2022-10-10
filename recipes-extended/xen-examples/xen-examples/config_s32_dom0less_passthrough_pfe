@@ -6,7 +6,7 @@ MEMORY_END="0xFFFFFFFF"
 XEN="xen"
 XEN_CMD="console=dtuart dtuart=serial0 dom0_mem=512M dom0_max_vcpus=2 bootscrub=0 vwfi=native sched=null"
 DOM0_KERNEL="Image"
-DOM0_CMD="console=hvc0 earlycon=xen earlyprintk=xen root=/dev/mmcblk0p2 rw clk_ignore_unused"
+DOM0_CMD="console=hvc0 earlycon=xen earlyprintk=xen root=/dev/mmcblk0p2 rootwait rw clk_ignore_unused"
 
 NUM_DOMUS=1
 DOMU_KERNEL[0]="Image"

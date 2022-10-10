@@ -20,7 +20,6 @@ KERNEL_CC_append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append = " ${TOOLCHAIN_OPTIONS}"
 
 S = "${WORKDIR}/git"
-MAJ_VER =  "${@oe.utils.trim_version("${PV}", 2)}"
 
 do_merge_delta_config[dirs] = "${B}"
 do_merge_delta_config() {
@@ -90,9 +89,9 @@ DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc',
 DELTA_KERNEL_DEFCONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtio', 'virtio', '', d)}"
 
 # Docker configuration
-DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker_${MAJ_VER}.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
 SRC_URI += "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'file://build/docker_${MAJ_VER}.config', '', d)} "
+    ${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'file://build/docker.config', '', d)} "
 
 # GPU configuration
 DELTA_KERNEL_DEFCONFIG_append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 'gpu.config', '', d)}"

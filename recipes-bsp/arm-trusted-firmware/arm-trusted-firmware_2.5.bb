@@ -21,7 +21,7 @@ S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 # ATF repository
-URL ?= "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/arm-trusted-firmware.git;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV ?= "669ed1bd7928f1f5ac7b45e09a949d0ec2582592"

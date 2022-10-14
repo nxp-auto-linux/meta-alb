@@ -4,7 +4,7 @@ MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-URL ?= "git://source.codeaurora.org/external/autobsps32/optee_os;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/optee_os;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${MAJ_VER}"
 SRC_URI = "\
     ${URL};branch=${BRANCH} \

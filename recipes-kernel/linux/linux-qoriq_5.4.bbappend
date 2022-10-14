@@ -24,7 +24,7 @@ SRC_URI_append_ls2 += " \
 "
 
 # add sources for virtual ethernet over PCIe
-VNET_URL ?= "git://source.codeaurora.org/external/autobsps32/vnet;protocol=https"
+VNET_URL ?= "git://github.com/nxp-auto-linux/vnet;protocol=https"
 VNET_BRANCH ?= "${RELEASE_BASE}"
 SRC_URI_append_ls2084abbmini += " \
     ${VNET_URL};branch=${VNET_BRANCH};name=vnet;destsuffix=git/drivers/net/vnet \
@@ -42,7 +42,7 @@ SRCREV_vnet = "7d3c52dc3c6564e92bbbc0d0b6aa11e73174fed0"
 
 # pci vdev sources
 SRC_URI_append_ls1043ardb += " \
-    git://source.codeaurora.org/external/autobsps32/vnet;protocol=https;branch=pci-vdev;name=pci-vdev;destsuffix=git/drivers/pci/pci-vdev \
+    git://github.com/nxp-auto-linux/vnet;protocol=https;branch=pci-vdev;name=pci-vdev;destsuffix=git/drivers/pci/pci-vdev \
     file://0001-Add-support-for-building-NXP-VETH-module.patch \
     file://0001-LS1043A-Adjust-device-tree-ranges-for-PCIe.patch \
     file://pci-vdev.cfg \

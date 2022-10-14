@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 BBCLASSEXTEND = "native"
 
-URL ?= "git://source.codeaurora.org/external/autobsps32/partial_dtb_gen;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/partial_dtb_gen;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "\
     ${URL};branch=${BRANCH} \

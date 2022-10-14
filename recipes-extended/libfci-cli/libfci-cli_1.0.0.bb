@@ -1,11 +1,11 @@
 DESCRIPTION = "LibFCI Example: Command line tool for configuration of PFE"
-HOMEPAGE = "https://source.codeaurora.org/external/autobsps32/extra/pfeng"
+HOMEPAGE = "https://github.com/nxp-auto-linux/pfeng"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE-BSD3.txt;md5=6b674f4e7c2e72a1907ad7a7f03b800c"
 
 PR = "r0"
 
-URL ?= "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https"
 SRC_URI = "${URL}"
 SRCREV = "277a0973a27108822b4d68b231476c8ecbdab047"
 

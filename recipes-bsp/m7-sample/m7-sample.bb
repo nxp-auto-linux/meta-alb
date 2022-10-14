@@ -4,7 +4,7 @@ SUMMARY = "Sample M7 Bootloader"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=0f00d99239d922ffd13cabef83b33444"
 
-URL ?= "git://source.codeaurora.org/external/autobsps32/m7-sample;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/m7-sample;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV ?= "39104f1b57cc40cb1e21042cfab01d25fde638ee"

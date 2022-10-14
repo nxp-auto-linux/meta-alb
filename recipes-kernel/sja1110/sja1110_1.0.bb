@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 inherit module
 
-SRC_URI = "git://source.codeaurora.org/external/autoivnsw/sja1110_linux;branch=master;protocol=https"
+SRC_URI = "git://github.com/nxp-archive/autoivnsw_sja1110_linux;branch=master;protocol=https"
 SRC_URI += "file://0001-s32g274a-rdb2-Add-support-for-S32G-VNP-RDB2.patch"
 SRCREV = "ac06f130d512e75edcf98d1a8304edd90055e525"
 

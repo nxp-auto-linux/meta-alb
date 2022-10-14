@@ -13,7 +13,7 @@ EXTRA_IMAGECMD_ext4 = "-i 4096 -L ${IMAGE_NAME}"
 
 EXTRA_IMAGEDEPENDS += "mc-utils management-complex ppa"
 
-PREMIRRORS_prepend = " git://github.com/qoriq-open-source/ git://source.codeaurora.org/external/qoriq/qoriq-components/ \n "
+PREMIRRORS_prepend = " git://github.com/qoriq-open-source/ git://github.com/nxp-qoriq/ \n "
 
 # No better place for this if it should stay in the layer
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"

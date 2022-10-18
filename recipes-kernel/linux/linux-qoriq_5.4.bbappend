@@ -23,17 +23,9 @@ SRC_URI_append_ls2 += " \
     file://dpaa2qdma.cfg \
 "
 
-# add sources for virtual ethernet over PCIe
-VNET_URL ?= "git://github.com/nxp-auto-linux/vnet;protocol=https"
-VNET_BRANCH ?= "${RELEASE_BASE}"
 SRC_URI_append_ls2084abbmini += " \
-    ${VNET_URL};branch=${VNET_BRANCH};name=vnet;destsuffix=git/drivers/net/vnet \
-    file://0001-vnet-Add-initial-support-to-build-driver-in-kernel-4.19.patch \
-    file://vnet_ls2.cfg \
-    file://0001-vnet-remove-iommu-map-for-pcie-in-dts-5.4.patch \
     file://gpio.cfg \
 "
-SRCREV_vnet = "7d3c52dc3c6564e92bbbc0d0b6aa11e73174fed0"
 
 # Optional to simplify Ethernet debug
 #SRC_URI_append_ls2 += " \
@@ -53,7 +45,7 @@ SRCREV_pci-vdev = "3646332fa76ef1623b36b6fe36e43391029c4603"
 # Note how our lxc.cfg comes *AFTER* containers.config to add to it
 COMMONDELTA_KERNEL_DEFCONFIG = "enablepktgen.cfg iptables_5.4.cfg iso9660.cfg enableusbcan.cfg containers.config lxc.cfg"
 DELTA_KERNEL_DEFCONFIG_append_ls2 = " ls2blueboxconfig dpaa2qdma.cfg dpaa2debugfs.cfg ${COMMONDELTA_KERNEL_DEFCONFIG}"
-DELTA_KERNEL_DEFCONFIG_append_ls2084abbmini = " vnet_ls2.cfg gpio.cfg"
+DELTA_KERNEL_DEFCONFIG_append_ls2084abbmini = " gpio.cfg"
 
 #DELTA_KERNEL_DEFCONFIG_append_ls2 = " enablegfxhwls2.cfg"
 

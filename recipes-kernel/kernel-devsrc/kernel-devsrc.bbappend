@@ -35,7 +35,9 @@ do_install_append() {
 		sed -i -e "s,#!.*awk.*,#!${USRBINPATH}/env awk," $kerneldir/build/arch/arm64/tools/gen-cpucaps.awk
 	fi
 
-	chown -R root:root $kerneldir/build/arch/arm64/tools
+	if [ -d "$kerneldir/build/arch/arm64/tools" ]; then
+		chown -R root:root $kerneldir/build/arch/arm64/tools
+	fi
 
 	cd -
 }

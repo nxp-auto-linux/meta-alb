@@ -24,7 +24,7 @@ B = "${WORKDIR}/build"
 URL ?= "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "565892894fb42125f56f8cd91b5bdc3dbdb2399c"
+SRCREV ?= "d5993ecea2692076ac741d2d27e843ae828fbf7d"
 
 
 BUILD_TYPE = "release"

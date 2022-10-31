@@ -8,7 +8,7 @@ SUMMARY = "Linux driver for the Packet Forwarding Engine hardware"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE-GPL2.txt;md5=5dcdfe25f21119aa5435eab9d0256af7"
 
-URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https"
+URL ?= "https://github.com/nxp-auto-linux/pfeng;protocol=https"
 SRC_URI = "${URL}"
 
 SRCREV ?= "0387b32f5919459d176e4887b2869e0261e34c11"

@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 
 inherit module
 
-URL ?= "git://github.com/nxp-auto-linux/ipc-shm;protocol=https"
+URL ?= "https://github.com/nxp-auto-linux/ipc-shm;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
 SRCREV = "57b05a6293d7e02f6ad6a0fa4651fe208f87e395"

@@ -1,7 +1,7 @@
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://pcie_virt_eth/COPYING;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
 
-URL ?= "git://github.com/nxp-auto-linux/alb-demos;protocol=https"
+URL ?= "https://github.com/nxp-auto-linux/alb-demos;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
 

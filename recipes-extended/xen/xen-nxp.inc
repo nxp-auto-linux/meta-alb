@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/xen:"
 
 PV = "4.14"
-URL ?= "git://github.com/nxp-auto-linux/xen;protocol=https"
+URL ?= "https://github.com/nxp-auto-linux/xen;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "\
     ${URL};branch=${BRANCH} \

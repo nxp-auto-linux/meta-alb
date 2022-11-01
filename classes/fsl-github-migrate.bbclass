@@ -8,5 +8,5 @@ python __anonymous () {
         # Set the new SRC_URI
         d.setVar("SRC_URI", src_uri_new)
 
-        bb.note("new SRC_URI: '%s'" % src_uri_new)
+        bb.debug(1, "new SRC_URI: '%s'" % src_uri_new)
 }

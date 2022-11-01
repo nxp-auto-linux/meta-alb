@@ -13,8 +13,8 @@ EXTRA_IMAGECMD:ext4 = "-i 4096 -L ${IMAGE_NAME}"
 
 EXTRA_IMAGEDEPENDS += "mc-utils management-complex ppa"
 
-URL_CODEAURORA = "source.codeaurora.org/external/qoriq/qoriq-components"
-URL_GITHUB = "github.com/nxp-qoriq"
+URL_MIGRATEFROM = "source.codeaurora.org/external/qoriq/qoriq-components"
+URL_MIGRATETO = "github.com/nxp-qoriq"
 INHERIT += "fsl-github-migrate"
 BB_DANGLINGAPPENDS_WARNONLY = "1"
 

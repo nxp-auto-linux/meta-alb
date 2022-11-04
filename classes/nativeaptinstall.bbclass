@@ -960,7 +960,7 @@ APTGET_ALL_PACKAGES = "\
 # complain if needed!
 python() {
         lc = d.getVar("LAYERSERIES_CORENAMES")
-        if ("zeus" not in lc) and ("dunfell" not in lc) and ("gatesgarth" not in lc):
+        if ("kirkstone" not in lc):
                 bb.error("nativeaptinstall.bbclass is incompatible to the current layer set")
                 bb.error("You must check APTGET_YOCTO_TRANSLATION and update the anonymous python() function!")
 }

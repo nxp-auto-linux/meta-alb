@@ -21,27 +21,6 @@ BINAWK_FILES = "\
     tools/perf/util/intel-pt-decoder/gen-insn-attr-x86.awk \
 "
 
-# This is needed in order to compile Linux Kernel
-# version 5.15 on Yocto Gatesgarth version.
-# This patch already exists in Yocto Hardknott version.
-do_install_append() {
-	cd ${S}
-
-	# 5.13+ needs these tools
-	cp -a --parents arch/arm64/tools/gen-cpucaps.awk $kerneldir/build/ 2>/dev/null || :
-	cp -a --parents arch/arm64/tools/cpucaps $kerneldir/build/ 2>/dev/null || :
-
-	if [ -e $kerneldir/build/arch/arm64/tools/gen-cpucaps.awk ]; then
-		sed -i -e "s,#!.*awk.*,#!${USRBINPATH}/env awk," $kerneldir/build/arch/arm64/tools/gen-cpucaps.awk
-	fi
-
-	if [ -d "$kerneldir/build/arch/arm64/tools" ]; then
-		chown -R root:root $kerneldir/build/arch/arm64/tools
-	fi
-
-	cd -
-}
-
 do_install_append_ubuntu() {
 
     cd "$kerneldir/.."

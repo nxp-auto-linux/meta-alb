@@ -3,7 +3,7 @@ require recipes-core/images/core-image-minimal.bb
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 CORE_IMAGE_EXTRA_INSTALL += "udev-extraconf lsb-release"
-CORE_IMAGE_EXTRA_INSTALL_append_qoriq = " udev-rules-qoriq"
+CORE_IMAGE_EXTRA_INSTALL:append:qoriq = " udev-rules-qoriq"
 
 IMAGE_FSTYPES = "tar.gz cpio.gz"
 
@@ -14,7 +14,7 @@ than fsl-image-networking-full to evaluate the Freescale socs."
 
 LICENSE = "MIT"
 
-IMAGE_INSTALL_append = " \
+IMAGE_INSTALL:append = " \
     packagegroup-core-ssh-openssh \
     packagegroup-fsl-mfgtools \
     packagegroup-fsl-tools-core \
@@ -25,4 +25,4 @@ IMAGE_INSTALL_append = " \
 
 IMAGE_ROOTFS_DEP_EXT ??= "ext2.gz"
 
-IMAGE_FSTYPES_append = " ${IMAGE_ROOTFS_DEP_EXT}"
+IMAGE_FSTYPES:append = " ${IMAGE_ROOTFS_DEP_EXT}"

@@ -15,4 +15,4 @@ BBCLASSEXTEND = "native"
 S = "${WORKDIR}/git"
 
 inherit setuptools3
-RDEPENDS_${PN} += "python3-core python3-stringold"
+RDEPENDS:${PN} += "python3-core python3-stringold"

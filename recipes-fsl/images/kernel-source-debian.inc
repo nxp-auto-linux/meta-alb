@@ -22,7 +22,7 @@ APTGET_EXTRA_PACKAGES += "coreutils make gcc bison flex mawk libssl-dev"
 # build them in deferred systemd service at first boot (set it to "1")
 KERNEL_DEVSRC_DEFER_TO_SYSTEMD ?= ""
 
-fakeroot do_aptget_user_update_append() {
+fakeroot do_aptget_user_update:append() {
 
 	if [ -e "${KERNEL_CHROOT_DIR}/${KERNEL_SRC_PATH}" ]; then
 		if [ -e "${KERNEL_CHROOT_DIR}${root_prefix}/lib/systemd/system" -a "${KERNEL_DEVSRC_DEFER_TO_SYSTEMD}" = "1" ]; then

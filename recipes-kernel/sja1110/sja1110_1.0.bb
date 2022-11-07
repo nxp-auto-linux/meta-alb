@@ -12,7 +12,7 @@ SRCREV = "ac06f130d512e75edcf98d1a8304edd90055e525"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE_append = " KERNELDIR=${KBUILD_OUTPUT} TARGET_ARCH=${ARCH} LOCAL_TOOLCHAIN=${CROSS_COMPILE} LOCAL_COMPILER=${CROSS_COMPILE}gcc"
+EXTRA_OEMAKE:append = " KERNELDIR=${KBUILD_OUTPUT} TARGET_ARCH=${ARCH} LOCAL_TOOLCHAIN=${CROSS_COMPILE} LOCAL_COMPILER=${CROSS_COMPILE}gcc"
 
 SJA_LIBDIR = "${base_libdir}"
 SJA_MODDIR = "${sysconfdir}/modules-load.d"
@@ -20,7 +20,7 @@ SJA_MODDIR = "${sysconfdir}/modules-load.d"
 SJA1110_UC_FW ?= ""
 SJA1110_SWITCH_FW ?= ""
 
-module_do_install_append() {
+module_do_install:append() {
 	install -d ${D}/${SJA_LIBDIR}/firmware
 	if [ -f "${SJA1110_UC_FW}" ]; then
 		cp -f ${SJA1110_UC_FW} ${D}/${SJA_LIBDIR}/firmware/sja1110_uc.bin
@@ -32,10 +32,10 @@ module_do_install_append() {
 
 KERNEL_MODULE_AUTOLOAD += "sja1110"
 
-FILES_${PN} += "${SJA_LIBDIR}/*"
-FILES_${PN} += "${SJA_MODDIR}/*"
+FILES:${PN} += "${SJA_LIBDIR}/*"
+FILES:${PN} += "${SJA_MODDIR}/*"
 
 PROVIDES = "kernel-module-sja1110${KERNEL_MODULE_PACKAGE_SUFFIX}"
-RPROVIDES_${PN} = "kernel-module-sja1110${KERNEL_MODULE_PACKAGE_SUFFIX}"
+RPROVIDES:${PN} = "kernel-module-sja1110${KERNEL_MODULE_PACKAGE_SUFFIX}"
 
 COMPATIBLE_MACHINE = "(s32g274ardb2|s32g399ardb3)"

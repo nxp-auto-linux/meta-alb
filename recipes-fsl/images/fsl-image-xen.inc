@@ -2,7 +2,7 @@
 include recipes-extended/images/xen-image-minimal.bb
 
 # SystemD needs CONFIG_XEN_GNTDEV as built-in instead of module
-IMAGE_INSTALL_remove = "kernel-module-xen-gntdev"
+IMAGE_INSTALL:remove = "kernel-module-xen-gntdev"
 
 IMAGE_INSTALL += "zlib-dev xen-tools-xenstat xen-tools-xenmon"
 

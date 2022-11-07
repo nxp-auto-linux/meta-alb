@@ -11,7 +11,7 @@ inherit packagegroup
 PACKAGES = "${PN}"
 
 FSL_WEBSERVER ?= ""
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     bind \
     curl \
     dhcpcd \

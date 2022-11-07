@@ -16,13 +16,13 @@ APTGET_EXTRA_PACKAGES += ""
 # We still need to ship the symlinks.
 # We also need to remove the udev reference as apparently bitbake.conf
 # isn't quite adapted to usrmerge there.
-FILES_${PN}_remove = "/lib/udev"
-FILES_${PN} += "/bin"
-FILES_${PN} += "/sbin"
+FILES:${PN}:remove = "/lib/udev"
+FILES:${PN} += "/bin"
+FILES:${PN} += "/sbin"
 
 # The downside of not having the symlink destination content is that we
 # are missing a few basic files that are must have for dependencies.
-RPROVIDES_${PN}_ubuntu += " \
+RPROVIDES:${PN}_ubuntu += " \
     /bin/bash \
     /bin/dash \
 "

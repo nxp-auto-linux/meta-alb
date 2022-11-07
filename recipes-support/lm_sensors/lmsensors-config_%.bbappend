@@ -1,31 +1,31 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 #-----------------------------------------------------------------------
-SRC_URI_append_ls2080abluebox += " \
+SRC_URI:append:ls2080abluebox += " \
     file://bluebox.conf \
 "
 
-do_install_append_ls2080abluebox() {
+do_install:append:ls2080abluebox() {
     # Install sensors configuration file
     install -m 0644 ${WORKDIR}/bluebox.conf ${D}${sysconfdir}/sensors.d
 }
 
 #-----------------------------------------------------------------------
-SRC_URI_append_ls2084abluebox += " \
+SRC_URI:append:ls2084abluebox += " \
     file://bluebox.conf \
 "
 
-do_install_append_ls2084abluebox() {
+do_install:append:ls2084abluebox() {
     # Install sensors configuration file
     install -m 0644 ${WORKDIR}/bluebox.conf ${D}${sysconfdir}/sensors.d
 }
 
 #-----------------------------------------------------------------------
-SRC_URI_append_ls2084abbmini += " \
+SRC_URI:append:ls2084abbmini += " \
     file://ls2084abbmini.conf \
 "
 
-do_install_append_ls2084abbmini() {
+do_install:append:ls2084abbmini() {
     # Install sensors configuration file
     install -m 0644 ${WORKDIR}/ls2084abbmini.conf ${D}${sysconfdir}/sensors.d
 }

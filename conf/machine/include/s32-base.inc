@@ -34,7 +34,7 @@ PREFERRED_VERSION_tcpreplay ?= "4.3.3"
 
 # ensure bison is not removed from sysroot, otherwise
 # some build tasks e.g. kernel 'do_merge_delta_config' will fail
-SSTATE_EXCLUDEDEPS_SYSROOT_remove = ".*->bison-native"
+SSTATE_EXCLUDEDEPS_SYSROOT:remove = ".*->bison-native"
 
 UBOOT_BOOTSPACE_SEEK ?= "8"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"
@@ -59,7 +59,7 @@ EXTRA_IMAGEDEPENDS += "u-boot-s32 "
 
 # Sub-architecture support
 MACHINE_SOCARCH_SUFFIX ?= ""
-MACHINE_SOCARCH_SUFFIX_s32 = "-s32"
+MACHINE_SOCARCH_SUFFIX:s32 = "-s32"
 
 MACHINE_ARCH_FILTER = "virtual/kernel"
 
@@ -72,8 +72,8 @@ BBMASK = "u-boot-qoriq linux-qoriq"
 # Xen Examples support variables
 DOM0LESS_ROOTFS ?= "fsl-image-dom0less"
 XEN_EXAMPLE ?= "xen-examples-default"
-DEFAULTTUNE_s32 ?= "cortexa53-crypto"
+DEFAULTTUNE:s32 ?= "cortexa53-crypto"
 
 # Disable NFS server service
-DISTRO_FEATURES_remove = " nfs"
-IMAGE_INSTALL_remove = " packagegroup-core-nfs-server"
+DISTRO_FEATURES:remove = " nfs"
+IMAGE_INSTALL:remove = " packagegroup-core-nfs-server"

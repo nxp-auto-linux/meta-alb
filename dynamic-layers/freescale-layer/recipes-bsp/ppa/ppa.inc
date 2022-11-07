@@ -17,8 +17,8 @@ python () {
         sys_multilib = d.getVar('TARGET_VENDOR') + 'mllib64-linux'
         sys_original = d.getVar('TARGET_VENDOR') + '-' + d.getVar('TARGET_OS')
         workdir = d.getVar('WORKDIR').replace(sys_original,sys_multilib)
-        d.setVar('DEPENDS_append', ' lib64-gcc-cross-aarch64 lib64-libgcc')
-        d.setVar('PATH_append', ':' + d.getVar('STAGING_BINDIR_NATIVE') + '/aarch64' + sys_multilib)
+        d.setVar('DEPENDS:append', ' lib64-gcc-cross-aarch64 lib64-libgcc')
+        d.setVar('PATH:append', ':' + d.getVar('STAGING_BINDIR_NATIVE') + '/aarch64' + sys_multilib)
         d.setVar('TOOLCHAIN_OPTIONS', '--sysroot=' + workdir + '/lib64-recipe-sysroot')
         d.setVar("WRAP_TARGET_PREFIX", 'aarch64' + sys_multilib + '-')
 }
@@ -43,7 +43,7 @@ do_deploy(){
 addtask deploy before do_build after do_install
 
 PACKAGES += "${PN}-image"
-FILES_${PN}-image += "/boot"   
+FILES:${PN}-image += "/boot"
 
 CLEANBROKEN = "1"
 PARALLEL_MAKE = ""

@@ -16,7 +16,7 @@ PACKAGES = "\
     packagegroup-fsl-extend-misc \
 "
 
-RDEPENDS_packagegroup-fsl-extend = "\
+RDEPENDS:packagegroup-fsl-extend = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'packagegroup-fsl-extend-alsa', '',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'perl', 'packagegroup-fsl-extend-perl', '',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ppp', 'packagegroup-fsl-extend-ppp', '',d)} \
@@ -28,11 +28,11 @@ RDEPENDS_packagegroup-fsl-extend = "\
     packagegroup-fsl-extend-misc \
 "
 
-RDEPENDS_packagegroup-fsl-extend-alsa = "\
+RDEPENDS:packagegroup-fsl-extend-alsa = "\
     alsa-utils \
 "
 
-RDEPENDS_packagegroup-fsl-extend-perl = "\
+RDEPENDS:packagegroup-fsl-extend-perl = "\
     perl \
     perl-misc \
     perl-modules \
@@ -40,31 +40,31 @@ RDEPENDS_packagegroup-fsl-extend-perl = "\
     perl-pod \
 "
 
-RDEPENDS_packagegroup-fsl-extend-ppp = "\
+RDEPENDS:packagegroup-fsl-extend-ppp = "\
     ppp \
     ppp-dialin \
 "
 
-RDEPENDS_packagegroup-fsl-extend-python = "\
+RDEPENDS:packagegroup-fsl-extend-python = "\
     python \
     python-misc \
     python-modules \
 "
 
-RDEPENDS_packagegroup-fsl-extend-usbhost = "\
+RDEPENDS:packagegroup-fsl-extend-usbhost = "\
     usbutils \
 "
 
-RDEPENDS_packagegroup-fsl-extend-virtualization += "\
+RDEPENDS:packagegroup-fsl-extend-virtualization += "\
     qemu \
 "
 
-RDEPENDS_packagegroup-fsl-extend-db = "\
+RDEPENDS:packagegroup-fsl-extend-db = "\
     db \
     sqlite3 \
 "
 
-RDEPENDS_packagegroup-fsl-extend-misc = "\
+RDEPENDS:packagegroup-fsl-extend-misc = "\
     bind \
     bison \
     ccache \
@@ -103,7 +103,7 @@ RDEPENDS_packagegroup-fsl-extend-misc = "\
     texinfo \
 "
 
-RRECOMMENDS_packagegroup-fsl-extend-misc = "\
+RRECOMMENDS:packagegroup-fsl-extend-misc = "\
     debianutils \
     libnfnetlink \
     ptpd \
@@ -113,10 +113,10 @@ RRECOMMENDS_packagegroup-fsl-extend-misc = "\
     wget \
 "
 
-RDEPENDS_packagegroup-fsl-extend-benchmark = "\
+RDEPENDS:packagegroup-fsl-extend-benchmark = "\
 "
 
-RRECOMMENDS_packagegroup-fsl-extend-benchmark = "\
+RRECOMMENDS:packagegroup-fsl-extend-benchmark = "\
     bonnie++ \
     dbench \
     tiobench \

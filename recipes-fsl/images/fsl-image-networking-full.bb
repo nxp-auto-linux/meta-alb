@@ -10,7 +10,7 @@ LICENSE = "MIT"
 # copy the manifest and the license text for each package to image
 COPY_LIC_MANIFEST = "1"
 
-IMAGE_INSTALL_append = " \
+IMAGE_INSTALL:append = " \
     packagegroup-core-buildessential \
     packagegroup-core-tools-profile \
     packagegroup-core-eclipse-debug \

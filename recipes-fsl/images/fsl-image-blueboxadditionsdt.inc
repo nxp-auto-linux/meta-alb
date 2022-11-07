@@ -67,7 +67,7 @@ IMAGE_INSTALL += " \
 "
 
 # Ease of use for the desktop
-RDEPENDS_qt4-x11-free_remove = "qmmp"
+RDEPENDS:qt4-x11-free:remove = "qmmp"
 QT4_PACKAGES = " \
     qt4-x11-free\
     qt4-x11-free-dev\
@@ -79,7 +79,7 @@ IMAGE_INSTALL += "${@bb.utils.contains("BBFILE_COLLECTIONS", "qt4-layer", "${QT4
 # have initialization issues
 
 ROOTFS_AUTOSTART_CLEANUP_LIST ?= "xscreensaver.desktop"
-ROOTFS_POSTPROCESS_COMMAND_append = "do_rootfs_startup_cleanup; "
+ROOTFS_POSTPROCESS_COMMAND:append = "do_rootfs_startup_cleanup; "
 
 do_rootfs_startup_cleanup() {
     if [ -e "${IMAGE_ROOTFS}/etc/xdg/autostart" ]; then

@@ -17,8 +17,8 @@ do_install() {
         oe_runmake install INSTALLDIR=${DESTDIR}
 }
 
-FILES_${PN} = "${SAMPLESDIR}"
-FILES_${PN}-dbg += "${SAMPLESDIR}/.debug"
+FILES:${PN} = "${SAMPLESDIR}"
+FILES:${PN}-dbg += "${SAMPLESDIR}/.debug"
 
 DEPENDS += "libgpiod"
 

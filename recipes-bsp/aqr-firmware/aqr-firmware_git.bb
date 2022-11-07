@@ -15,11 +15,11 @@ SRC_URI = "\
     file://git/aquantia/${AQR107FIRMWARE} \
 "
 
-UCODE_ls2084abbmini = "\
+UCODE:ls2084abbmini = "\
     aquantia/apps/aq_programming.bin \
     aquantia/${AQR107FIRMWARE} \
 "
-UCODE_ls1046abluebox = "\
+UCODE:ls1046abluebox = "\
     aquantia/apps/aq_programming.bin \
     aquantia/${AQR107FIRMWARE} \
 "
@@ -40,7 +40,7 @@ do_deploy () {
 addtask deploy before do_build after do_install
 
 PACKAGES += "${PN}-image"
-FILES_${PN}-image += "/boot"
+FILES:${PN}-image += "/boot"
 
 
-COMPATIBLE_MACHINE_append = "ls1046abluebox|ls2084abbmini"
+COMPATIBLE_MACHINE:append = "ls1046abluebox|ls2084abbmini"

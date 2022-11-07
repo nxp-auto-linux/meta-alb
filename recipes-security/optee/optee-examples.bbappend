@@ -6,15 +6,15 @@ EXTRA_OEMAKE += " \
                 LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
                 "
 
-INSANE_SKIP_${PN} += "ldflags"
+INSANE_SKIP:${PN} += "ldflags"
 
 DEPENDS += "python3-cryptography-native"
 
-do_install_append () {
+do_install:append () {
         mkdir -p ${D}${libdir}/tee-supplicant/plugins
         install -D -p -m0444 ${S}/out/plugins/* ${D}${libdir}/tee-supplicant/plugins
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
                 ${libdir}/tee-supplicant/plugins/ \
                "

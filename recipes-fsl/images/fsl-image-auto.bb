@@ -22,7 +22,7 @@ IMAGE_INSTALL += " \
 # Benchmark tools
 IMAGE_INSTALL += "dhrystone fio"
 
-IMAGE_INSTALL_append_gen1 = " perf"
+IMAGE_INSTALL:append:gen1 = " perf"
 
 # PCIe testing
 IMAGE_INSTALL += "kernel-pcitest"
@@ -31,18 +31,18 @@ IMAGE_INSTALL += "kernel-pcitest"
 IMAGE_INSTALL += "kernel-pcitest"
 
 # Userspace support for QSPI Flash under Linux for S32GEN1 platforms
-IMAGE_INSTALL_append_gen1 = " mtd-utils "
+IMAGE_INSTALL:append:gen1 = " mtd-utils "
 
 # Support for accessing MDIO bus for GMAC phys
-IMAGE_INSTALL_append_gen1 = " mdio-proxy "
+IMAGE_INSTALL:append:gen1 = " mdio-proxy "
 
 # Tool for flashing the AQR107 firmware using mdio-proxy
-IMAGE_INSTALL_append_gen1 = " aquantia-firmware-utility "
+IMAGE_INSTALL:append:gen1 = " aquantia-firmware-utility "
 
 # Supporting complex evaluation scenarios
 IMAGE_INSTALL += "openssl-misc"
-IMAGE_INSTALL_append_s32 += "openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"
-IMAGE_INSTALL_remove_s32 += "ipsec-tools"
+IMAGE_INSTALL:append:s32 += "openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"
+IMAGE_INSTALL:remove:s32 += "ipsec-tools"
 
 # Increase the freespace
 IMAGE_ROOTFS_EXTRA_SPACE ?= "54000"
@@ -50,18 +50,18 @@ IMAGE_ROOTFS_EXTRA_SPACE ?= "54000"
 # Enable LXC features.
 # On LS2 enable it by default. On s32, only by DISTRO_FEATURE
 LXC_INSTALL_PACKAGES = "lxc debootstrap"
-IMAGE_INSTALL_append_s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' ${LXC_INSTALL_PACKAGES}', '', d)}"
-IMAGE_INSTALL_append_ls2 = " ${LXC_INSTALL_PACKAGES}"
+IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' ${LXC_INSTALL_PACKAGES}', '', d)}"
+IMAGE_INSTALL:append:ls2 = " ${LXC_INSTALL_PACKAGES}"
 
 # SFTP server
-IMAGE_INSTALL_append = " openssh openssh-sftp openssh-sftp-server "
+IMAGE_INSTALL:append = " openssh openssh-sftp openssh-sftp-server "
 
 # Other useful tools
-IMAGE_INSTALL_append = " rsync irqbalance i2c-tools linuxptp"
+IMAGE_INSTALL:append = " rsync irqbalance i2c-tools linuxptp"
 
 # PCIe demos and test apps
 PCIE_INSTALL_PACKAGES ?= " demo-pcie-shared-mem demo-virt-eth"
-IMAGE_INSTALL_append = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' ${PCIE_INSTALL_PACKAGES}', '', d)}"
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' ${PCIE_INSTALL_PACKAGES}', '', d)}"
 
 # sysfs gpio interface is deprecated, include gpiod tools, lib and headers
-IMAGE_INSTALL_append = " libgpiod libgpiod-tools libgpiod-dev"
+IMAGE_INSTALL:append = " libgpiod libgpiod-tools libgpiod-dev"

@@ -11,7 +11,7 @@ require recipes-fsl/images/${FACTORY_SDCARD_ROOTFS_IMAGE}.bb
 # and we want phytool to be able to debug boards on bring up
 # The Aquantia binaries (bin and cld) must be downloaded
 # separately.
-IMAGE_INSTALL_append_ls2084abbmini += "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware-image', '', d)}"
+IMAGE_INSTALL:append:ls2084abbmini += "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware-image', '', d)}"
 
 FACTORY_EXTRA_IMAGE_INSTALL = "\
     phytool \
@@ -31,19 +31,19 @@ FACTORY_FLASH_IMAGE ?= "${FACTORY_FLASH_IMAGE_NAME}-${MACHINE}.flashimage"
 FACTORY_FLASH_IMAGE_NAME_ubuntu = "${FACTORY_SDCARD_ROOTFS_IMAGE}"
 FACTORY_FLASH_IMAGE_ubuntu = ""
 do_rootfs[depends] += "${FACTORY_FLASH_IMAGE_NAME}:do_image_complete ${FACTORY_SDCARD_ROOTFS_IMAGE}:do_image_complete bbdeployscripts:do_deploy"
-IMAGE_ROOTFS_IMAGELIST_ls2084abbmini = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.itb bbdeployimage.sh bbreplacerootfs.sh"
-IMAGE_ROOTFS_IMAGELIST_s32g274abluebox3 = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.sdcard bbdeployimage.itb"
+IMAGE_ROOTFS_IMAGELIST:ls2084abbmini = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.itb bbdeployimage.sh bbreplacerootfs.sh"
+IMAGE_ROOTFS_IMAGELIST:s32g274abluebox3 = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.sdcard bbdeployimage.itb"
 
 # For factory imaging, we use a custom U-Boot environment
-SDCARDIMAGE_EXTRA4_FILE_ls2084abbmini = "u-boot-flashenv-factory-${MACHINE}.bin"
+SDCARDIMAGE_EXTRA4_FILE:ls2084abbmini = "u-boot-flashenv-factory-${MACHINE}.bin"
 
 # For the factory reimaging SD card, we also add the AQR firmware
 # setup into the flash area for BlueBox Mini
-SDCARDIMAGE_EXTRA8_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware', '', d)}"
-SDCARDIMAGE_EXTRA8_FILE_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'AQR-G2_v3.3.A-AQR_Freescale_AQR107_ID16066_VER554.cld', '', d)}"
-SDCARDIMAGE_EXTRA8_OFFSET_ls2084abbmini = "0x00900000"
-SDCARDIMAGE_EXTRA9_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware', '', d)}"
-SDCARDIMAGE_EXTRA9_FILE_ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aq_programming.bin', '', d)}"
-SDCARDIMAGE_EXTRA9_OFFSET_ls2084abbmini = "0x00980000"
+SDCARDIMAGE_EXTRA8:ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware', '', d)}"
+SDCARDIMAGE_EXTRA8_FILE:ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'AQR-G2_v3.3.A-AQR_Freescale_AQR107_ID16066_VER554.cld', '', d)}"
+SDCARDIMAGE_EXTRA8_OFFSET:ls2084abbmini = "0x00900000"
+SDCARDIMAGE_EXTRA9:ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware', '', d)}"
+SDCARDIMAGE_EXTRA9_FILE:ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aq_programming.bin', '', d)}"
+SDCARDIMAGE_EXTRA9_OFFSET:ls2084abbmini = "0x00980000"
 
 COMPATIBLE_MACHINE = "ls2084abbmini|s32g274abluebox3"

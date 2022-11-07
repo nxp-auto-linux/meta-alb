@@ -38,6 +38,6 @@ SRC_URI = "\
 "
 S  = "${WORKDIR}/git"
 
-do_configure_prepend () {
+do_configure:prepend () {
         rm -rf ${S}/gdb ${S}/libdecnumber ${S}/readline ${S}/sim
 }

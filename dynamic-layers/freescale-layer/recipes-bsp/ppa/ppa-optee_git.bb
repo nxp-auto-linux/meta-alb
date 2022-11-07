@@ -2,9 +2,9 @@ require ppa.inc
 
 DEPENDS += "optee-os-qoriq"
 
-PPA_PATH_ls1046a = "ls1046"
-PPA_PATH_ls1043a = "ls2088"
-PPA_PATH_ls1012a = "ls1012"
+PPA_PATH:ls1046a = "ls1046"
+PPA_PATH:ls1043a = "ls2088"
+PPA_PATH:ls1012a = "ls1012"
 
 do_compile() {
     export ARMV8_TOOLS_DIR="${STAGING_BINDIR_TOOLCHAIN}"

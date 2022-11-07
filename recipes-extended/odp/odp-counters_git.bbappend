@@ -1,1 +1,1 @@
-COMPATIBLE_MACHINE_append = "|(ls2084a)"
+COMPATIBLE_MACHINE:append = "|(ls2084a)"

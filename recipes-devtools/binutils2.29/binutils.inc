@@ -16,20 +16,20 @@ DEPENDS = "flex-native bison-native zlib-native gnu-config-native autoconf-nativ
 #
 # we need chrpath > 0.14 and some distros like centos 7 still have older chrpath
 #
-DEPENDS_append_class-target = " chrpath-replacement-native"
-EXTRANATIVEPATH_append_class-target = " chrpath-native"
+DEPENDS:append:class-target = " chrpath-replacement-native"
+EXTRANATIVEPATH:append:class-target = " chrpath-native"
 
 inherit autotools gettext multilib_header texinfo
 
-FILES_${PN} = " \
+FILES:${PN} = " \
 	${bindir}/${TARGET_PREFIX}* \
 	${libdir}/lib*-*.so \
 	${prefix}/${TARGET_SYS}/bin/* \
         ${bindir}/embedspu"
 
-RPROVIDES_${PN} += "${PN}-symlinks"
+RPROVIDES:${PN} += "${PN}-symlinks"
 
-FILES_${PN}-dev = " \
+FILES:${PN}-dev = " \
 	${includedir} \
 	${libdir}/*.la \
 	${libdir}/libbfd.so \
@@ -58,7 +58,7 @@ USE_ALTERNATIVES_FOR = " \
 	strip \
 "
 
-python do_package_prepend() {
+python do_package:prepend() {
     make_alts = d.getVar("USE_ALTERNATIVES_FOR") or ""
     prefix = d.getVar("TARGET_PREFIX")
     bindir = d.getVar("bindir")
@@ -76,8 +76,8 @@ EXTRA_OECONF = "--program-prefix=${TARGET_PREFIX} \
                 ${LDGOLD} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'multiarch', '--enable-64-bit-bfd', '', d)}"
 
-LDGOLD_class-native = ""
-LDGOLD_class-crosssdk = ""
+LDGOLD:class-native = ""
+LDGOLD:class-crosssdk = ""
 LDGOLD ?= "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', '--enable-gold=default --enable-threads', '--enable-gold --enable-ld=default --enable-threads', d)}"
 
 # This is necessary due to a bug in the binutils Makefiles
@@ -118,7 +118,7 @@ do_configure () {
 	done
 }
 
-do_compile_append_class-target() {
+do_compile:append:class-target() {
 	chrpath -d ${B}/binutils/elfedit
 	chrpath -d ${B}/binutils/readelf
 }
@@ -159,4 +159,4 @@ inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN}_class-target = "${USE_ALTERNATIVES_FOR}"
+ALTERNATIVE:${PN}:class-target = "${USE_ALTERNATIVES_FOR}"

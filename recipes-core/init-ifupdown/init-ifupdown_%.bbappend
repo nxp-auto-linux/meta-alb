@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 #
 # We really should have board specific interfaces files,
 # so that the primary Eth connector comes up for dhcp
@@ -15,4 +15,4 @@ do_install_ubuntu () {
 # generates an error, as package version cannot be seen,
 # thus we need to overwrite this.
 
-RCONFLICTS_${PN}_ubuntu = ""
+RCONFLICTS:${PN}_ubuntu = ""

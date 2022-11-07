@@ -18,4 +18,4 @@ do_install() {
     oe_runmake PREFIX=${D}/${prefix} install
 }
 
-FILES_${PN} = "${libdir}"
+FILES:${PN} = "${libdir}"

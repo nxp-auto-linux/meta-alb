@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "\
 
 PROVIDES += "virtual/libc-locale virtual/crypt"
 
-do_install_prepend() {
+do_install:prepend() {
 	# create dummy files/folder needed in the other recipes
 
 	if ! [ -f ${D}/usr/include/bits/long-double.h ]; then
@@ -28,7 +28,7 @@ do_install_prepend() {
 }
 
 
-do_install_append() {
+do_install:append() {
 	# Standard external linaro toolchains have no symbolic link for libraries
 	# To free-up some space, linaro do_install will remove unused files
 
@@ -41,4 +41,4 @@ do_install_append() {
 	cp -a ${EXTERNAL_TOOLCHAIN}/${ELT_TARGET_SYS}/libc/usr/lib/libthread_db.so  ${D}${base_libdir}/
 }
 
-INSANE_SKIP_${PN}_ubuntu = "installed-vs-shipped build-deps"
+INSANE_SKIP:${PN}_ubuntu = "installed-vs-shipped build-deps"

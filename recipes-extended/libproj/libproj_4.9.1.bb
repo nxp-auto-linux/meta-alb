@@ -3,7 +3,7 @@ AUTHOR = "Gerald Evenden and Frank Warmerdam"
 HOMEPAGE = "http://proj4.org/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=74d9aaec5fa0cd734341e8c4dc91b608"
-FILES_${PN} += "/usr/share/*"
+FILES:${PN} += "/usr/share/*"
 
 SRC_URI = "http://download.osgeo.org/proj/proj-${PV}.tar.gz"
 SRC_URI[md5sum] = "3cbb2a964fd19a496f5f4265a717d31c"

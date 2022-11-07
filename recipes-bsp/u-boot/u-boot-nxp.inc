@@ -12,8 +12,8 @@ LIC_FILES_CHKSUM = " \
     file://Licenses/lgpl-2.1.txt;md5=4fbd65380cdd255951079008b364516c \
 "
 
-DEPENDS_append = " libgcc dtc-native bison-native bc-native"
-DEPENDS_append_qoriq-ppc = " boot-format-native"
+DEPENDS:append = " libgcc dtc-native bison-native bc-native"
+DEPENDS:append:qoriq-ppc = " boot-format-native"
 
 PROVIDES = "virtual/bootloader u-boot"
 
@@ -23,14 +23,14 @@ LOCALVERSION = ""
 DELTA_UBOOT_DEFCONFIG ?= ""
 
 # Enable Xen default boot if Xen enabled
-DELTA_UBOOT_DEFCONFIG_append_s32 += " ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
-SRC_URI_append_s32 = " \
+DELTA_UBOOT_DEFCONFIG:append:s32 += " ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
+SRC_URI:append:s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_config.cfg', '', d)} \
 "
 
 # Enable OP-TEE
-DELTA_UBOOT_DEFCONFIG_append_gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
-SRC_URI_append_gen1 = " \
+DELTA_UBOOT_DEFCONFIG:append:gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
+SRC_URI:append:gen1 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
 "
 
@@ -67,7 +67,7 @@ addtask merge_delta_config before do_configure after do_patch
 
 ENV_STAGE_DIR = "${datadir}/env"
 
-do_install_append_s32() {
+do_install:append:s32() {
     unset i j
     mkdir -p ${D}${ENV_STAGE_DIR}
     # we should have one config
@@ -94,13 +94,13 @@ do_install_append_s32() {
 
 }
 
-python do_clean_append () {
+python do_clean:append () {
     """clear the custom added files"""
 
     mkimage = os.path.join(d.getVar("DEPLOY_DIR_IMAGE"), "/tools/mkimage")
     oe.path.remove(mkimage)
 }
 
-FILES_${PN} += "${ENV_STAGE_DIR}"
+FILES:${PN} += "${ENV_STAGE_DIR}"
 
 COMPATIBLE_MACHINE = "s32|qoriq"

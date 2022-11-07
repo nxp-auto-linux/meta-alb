@@ -1,4 +1,4 @@
-do_install_append () {
+do_install:append () {
 	# workarond sshd to start in background so that login prompt is not
 	# delayed until proper entropy is retrieved and /sbin/sshd continue
 

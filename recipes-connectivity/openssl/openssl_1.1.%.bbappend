@@ -1,5 +1,5 @@
 EXTRA_OECONF += '-DDEVRANDOM="\\\"\"/dev/urandom\\\"\"" --with-rand-seed=devrandom'
-do_install_append () {
+do_install:append () {
 	# fix af alg name
 	mv ${D}${libdir}/engines-1.1/afalg.so ${D}${libdir}/engines-1.1/af_alg.so
 

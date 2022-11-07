@@ -8,7 +8,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=175792518e4ac015ab6696d16c4f607e"
 
 OECMAKE_SOURCEPATH = "${S}/src"
-OECMAKE_FIND_ROOT_PATH_MODE_PROGRAM_class-native = "ONLY"
+OECMAKE_FIND_ROOT_PATH_MODE_PROGRAM:class-native = "ONLY"
 
 SRCREV = "ea4f900311027e4c50f101e08c12920f6e2ddf8d"
 
@@ -19,7 +19,7 @@ SRC_URI = "git://github.com/nxp-qoriq/vpp;nobranch=1 \
 "
 DEPENDS = "dpdkvpp openssl python-ply util-linux vpp-core-native"
 
-DEPENDS_class-native = "openssl-native  python-ply-native util-linux-native"
+DEPENDS:class-native = "openssl-native  python-ply-native util-linux-native"
 
 inherit cmake
 inherit pkgconfig
@@ -43,7 +43,7 @@ CFLAGS += " -mtls-dialect=trad -DCLIB_LOG2_CACHE_LINE_BYTES=6 -I${OPENSSL_PATH}/
 # due to gcc 10 setting -fno-common by default
 CFLAGS += " -fcommon"
 
-do_install_append() {
+do_install:append() {
         mkdir -p ${D}/etc/vpp
         cp ${S}/src/vpp/conf/startup.conf ${D}/etc/vpp/startup.conf
 }
@@ -52,4 +52,4 @@ include vpp-pkgs.inc
 
 BBCLASSEXTEND = "native nativesdk"
 
-COMPATIBLE_MACHINE_class-target = "(qoriq)"
+COMPATIBLE_MACHINE:class-target = "(qoriq)"

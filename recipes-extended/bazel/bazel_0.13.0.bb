@@ -11,10 +11,10 @@ SRC_URI[sha256sum] = "82e9035084660b9c683187618a29aa896f8b05b5f16ae4be42a80b5e5b
 
 S = "${WORKDIR}"
 BAZEL_DEPLOY_DIR = "/opt/bazel"
-FILES_${PN} = "${BAZEL_DEPLOY_DIR}"
+FILES:${PN} = "${BAZEL_DEPLOY_DIR}"
 COMPATIBLE_MACHINE = ".*ubuntu"
 
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 do_install() {
 	OUTPUT_DIR="${D}${BAZEL_DEPLOY_DIR}"

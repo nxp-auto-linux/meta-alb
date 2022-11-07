@@ -39,6 +39,6 @@ do_install () {
 	ln -s alternatives.8 ${D}${mandir}/man8/update-alternatives.8
 }
 
-do_install_append_linuxstdbase() {
+do_install:append:linuxstdbase() {
 	rm -rf ${D}${libdir}/lsb
 }

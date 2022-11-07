@@ -2,7 +2,7 @@ PV = "3.18.0"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 URL ?= "git://github.com/nxp-auto-linux/optee_os;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${MAJ_VER}"
@@ -15,9 +15,9 @@ SRCREV = "cf2edab455ca2c9896d037dd248d391ba2ea62ec"
 
 DEPENDS += "python3-cryptography-native dtc-native"
 
-PLATFORM_FLAVOR_s32g2 = "s32g2"
-PLATFORM_FLAVOR_s32g3 = "s32g3"
-PLATFORM_FLAVOR_s32r45evb = "s32r"
+PLATFORM_FLAVOR:s32g2 = "s32g2"
+PLATFORM_FLAVOR:s32g3 = "s32g3"
+PLATFORM_FLAVOR:s32r45evb = "s32r"
 
 EXTRA_OEMAKE += " \
                 PLATFORM_FLAVOR=${PLATFORM_FLAVOR} \

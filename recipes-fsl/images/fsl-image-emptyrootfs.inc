@@ -4,7 +4,7 @@
 IMAGE_LINGUAS = ""
 IMAGE_INSTALL = ""
 PACKAGE_INSTALL = ""
-fakeroot python do_rootfs_prepend () {
+fakeroot python do_rootfs:prepend () {
     d.setVar("IMAGE_PREPROCESS_COMMAND", "")
     d.setVar("IMAGE_POSTPROCESS_COMMAND", "")
 }

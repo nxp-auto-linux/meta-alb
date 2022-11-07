@@ -57,6 +57,6 @@ do_install() {
     oe_runmake -C tools/pci install
 }
 
-FILES_${PN} += "${bindir}"
+FILES:${PN} += "${bindir}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

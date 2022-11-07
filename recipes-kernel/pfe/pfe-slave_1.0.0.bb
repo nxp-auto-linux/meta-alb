@@ -6,10 +6,10 @@
 
 require pfe_common.inc
 
-EXTRA_OEMAKE_append = " PFE_CFG_MULTI_INSTANCE_SUPPORT=1 PFE_CFG_PFE_MASTER=0"
+EXTRA_OEMAKE:append = " PFE_CFG_MULTI_INSTANCE_SUPPORT=1 PFE_CFG_PFE_MASTER=0"
 
 module_do_install() {
 	install -D "${MDIR}/pfeng-slave.ko" "${INSTALL_DIR}/pfeng-slave.ko"
 }
 
-FILES_${PN} += "${sysconfdir}/modules-load.d/*"
+FILES:${PN} += "${sysconfdir}/modules-load.d/*"

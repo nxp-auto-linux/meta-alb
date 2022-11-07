@@ -29,13 +29,13 @@ MODULES = "leaf"
 
 LIBS = "canlib linlib"
 
-RPROVIDES_${PN} = " \
+RPROVIDES:${PN} = " \
 	kernel-module-kvcommon${KERNEL_MODULE_PACKAGE_SUFFIX} \
 	kernel-module-leaf${KERNEL_MODULE_PACKAGE_SUFFIX} \
 "
 
 # Following modules are untested, to be re-added in the future if needed
-#RPROVIDES_${PN} += " \
+#RPROVIDES:${PN} += " \
 #	kernel-module-mhydra \
 #	kernel-module-pcican \
 #	kernel-module-pcican2 \
@@ -103,13 +103,13 @@ do_package_qa() {
 	:
 }
 
-FILES_${PN} += "${MODULES_DIR}"
-FILES_${PN} += "${KVASER_DIR}"
-FILES_${PN} += "${EXAMPLES_BASE}"
-FILES_${PN} += "${LIB_DIR}"
+FILES:${PN} += "${MODULES_DIR}"
+FILES:${PN} += "${KVASER_DIR}"
+FILES:${PN} += "${EXAMPLES_BASE}"
+FILES:${PN} += "${LIB_DIR}"
 
-FILES_${PN}-dev = ""
-FILES_${PN}-dbg = ""
+FILES:${PN}-dev = ""
+FILES:${PN}-dbg = ""
 
-ALLOW_EMPTY_${PN}-dev = "1"
-ALLOW_EMPTY_${PN}-dbg = "1"
+ALLOW_EMPTY:${PN}-dev = "1"
+ALLOW_EMPTY:${PN}-dbg = "1"

@@ -12,7 +12,7 @@ PFE_FW_UTIL_BIN ?= "s32g_pfe_util.fw"
 FW_INSTALL_CLASS_NAME ?= "s32g_pfe_class.fw"
 FW_INSTALL_UTIL_NAME ?= "s32g_pfe_util.fw"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_CLASS_BIN} \
 	file://${NXP_FIRMWARE_LOCAL_DIR}/${PFE_FW_UTIL_BIN} \
 "
@@ -30,7 +30,7 @@ INHIBIT_PACKAGE_STRIP_FILES = "\
 
 # In case the pfe-slave is built, change to multi instance driver(allow override)
 PFE_MASTER_OPTIONS ?= "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' PFE_CFG_MULTI_INSTANCE_SUPPORT=1 PFE_CFG_PFE_MASTER=1', '', d)}"
-EXTRA_OEMAKE_append = " ${PFE_MASTER_OPTIONS}"
+EXTRA_OEMAKE:append = " ${PFE_MASTER_OPTIONS}"
 
 module_do_install() {
 	install -D "${MDIR}/pfeng.ko" "${INSTALL_DIR}/pfeng.ko"
@@ -51,8 +51,8 @@ do_deploy() {
 
 addtask do_deploy after do_install
 
-FILES_${PN} += "${sysconfdir}/modules-load.d/*"
-FILES_${PN} += "${base_libdir}/firmware"
+FILES:${PN} += "${sysconfdir}/modules-load.d/*"
+FILES:${PN} += "${base_libdir}/firmware"
 
 # avoid "QA Issue: Architecture did not match" caused by firmware
-INSANE_SKIP_${PN} += "arch already-stripped"
+INSANE_SKIP:${PN} += "arch already-stripped"

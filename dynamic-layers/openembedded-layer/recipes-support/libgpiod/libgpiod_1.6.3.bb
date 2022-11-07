@@ -27,16 +27,16 @@ EXTRA_OECONF = "--enable-tools"
 DEPENDS += "autoconf-archive-native"
 
 PACKAGES =+ "${PN}-tools libgpiodcxx"
-FILES_${PN}-tools = "${bindir}/*"
-FILES_libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
+FILES:${PN}-tools = "${bindir}/*"
+FILES:libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
 
 PACKAGES =+ "${PN}-python"
-FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
-FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
 RRECOMMENDS_PYTHON = "${@bb.utils.contains('PACKAGECONFIG', 'python3', '${PN}-python', '',d)}"
-RRECOMMENDS_${PN}-python += "${RRECOMMENDS_PYTHON}"
+RRECOMMENDS:${PN}-python += "${RRECOMMENDS_PYTHON}"
 
-PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'tests', '', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'tests', '', d)}"
 
 do_install_ptest() {
 	install -d ${D}${PTEST_PATH}/tests

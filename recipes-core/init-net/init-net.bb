@@ -13,8 +13,8 @@ SRC_URI += " \
 "
 
 PACKAGES += "${PN}-root"
-FILES_${PN} += "/etc"
-FILES_${PN}-root += "/init-ip-link.sh"
+FILES:${PN} += "/etc"
+FILES:${PN}-root += "/init-ip-link.sh"
 
 do_install() {
 	install -m 755 ${WORKDIR}/${INIT_IP_LINK} ${D}/${base_prefix}/init-ip-link.sh
@@ -32,7 +32,7 @@ do_install() {
 	ln -s ../init.d/init-ip-link.sh ./rc5.d/S98net-init.sh
 }
 
-RDEPENDS_${PN} += "bash"
-RDEPENDS_${PN}-root += "bash"
+RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN}-root += "bash"
 
 COMPATIBLE_MACHINE = "s32g274abluebox3"

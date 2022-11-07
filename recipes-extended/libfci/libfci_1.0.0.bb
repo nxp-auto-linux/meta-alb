@@ -12,11 +12,11 @@ S = "${WORKDIR}/git"
 MDIR = "${S}/sw/xfci/libfci"
 LIBBUILDDIR = "${S}/sw/xfci/libfci/build/${TARGET_SYS}-release"
 
-CFLAGS_prepend = "-I${S} "
+CFLAGS:prepend = "-I${S} "
 
 PACKAGES = "${PN}-staticdev"
 
-RDEPENDS_${PN}-staticdev = "pfe"
+RDEPENDS:${PN}-staticdev = "pfe"
 
 do_compile() {
 	cd ${MDIR}

@@ -4,7 +4,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 #CORE_IMAGE_EXTRA_INSTALL += "udev-extraconf lsb"
 CORE_IMAGE_EXTRA_INSTALL += "udev-extraconf"
-CORE_IMAGE_EXTRA_INSTALL_append_qoriq = " udev-rules-qoriq"
+CORE_IMAGE_EXTRA_INSTALL:append:qoriq = " udev-rules-qoriq"
 
 IMAGE_FSTYPES = "tar.gz ext2.gz ext2.gz.u-boot"
 
@@ -19,11 +19,11 @@ include recipes-fsl/images/fsl-image-core-common.inc
 # Our recovery image should have the smallest possible size.
 # So we remove several things.
 PACKAGES-CORE-benchmark = ""
-PACKAGES-CORE_remove = "\
+PACKAGES-CORE:remove = "\
     gdbserver \
     lrzsz \
 "
-PACKAGES-CORE-MISC_remove = "\
+PACKAGES-CORE-MISC:remove = "\
     elfutils \
     pkgconfig \
     strongswan \
@@ -44,15 +44,15 @@ PACKAGES-CORE-MISC_remove = "\
 
 # Given that it is a recover image, we may want to have some
 # special tools.
-IMAGE_INSTALL_append = " \
+IMAGE_INSTALL:append = " \
     memtester \
 "
 
-IMAGE_INSTALL_append_ls2 = " \
+IMAGE_INSTALL:append:ls2 = " \
     restool \
 "
 
-IMAGE_INSTALL_append_lx2160a = " \
+IMAGE_INSTALL:append:lx2160a = " \
     restool \
 "
 

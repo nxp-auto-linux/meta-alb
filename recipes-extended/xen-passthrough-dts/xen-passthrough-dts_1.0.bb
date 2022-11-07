@@ -9,7 +9,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 DEPENDS = "dtc-native partial-dtb-gen-native"
-FILESEXTRAPATHS_prepend = "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend = "${THISDIR}/${BPN}:"
 
 SRC_URI += " \
     file://template.dts \
@@ -19,7 +19,7 @@ SRC_URI += " \
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"
 
-FILES_${PN} += "/boot/*.dtb"
+FILES:${PN} += "/boot/*.dtb"
 PARTIAL_DTB_GEN = "partial_dtb_gen.py"
 PARTIAL_DTB_GEN_DIR = "partial_dtb_gen"
 

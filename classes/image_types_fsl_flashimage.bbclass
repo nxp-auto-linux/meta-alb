@@ -34,7 +34,7 @@ FLASHIMAGE_ROOTFS_SUFFIX ?= ""
 FLASHIMAGE ?= "${IMAGE_NAME}.flashimage"
 FLASHIMAGE_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
 
-IMAGE_TYPEDEP_flashimage_append = " ${FLASHIMAGE_ROOTFS_SUFFIX}"
+IMAGE_TYPEDEP:flashimage:append = " ${FLASHIMAGE_ROOTFS_SUFFIX}"
 
 do_image_flashimage[depends] += " \
         ${@d.getVar('FLASHIMAGE_RESET_FILE', True) and d.getVar('FLASHIMAGE_RESET', True) + ':do_deploy' or ''} \
@@ -170,7 +170,7 @@ generate_flashimage() {
         generate_flashimage_entry "${FLASHIMAGE_EXTRA9_FILE}" "FLASHIMAGE_EXTRA9_OFFSET" "${FLASHIMAGE_EXTRA9_OFFSET}"
 }
 
-IMAGE_CMD_flashimage () {
+IMAGE_CMD:flashimage () {
         # we expect image size in Mb
         FLASH_IBS="1M"
         if [ -z "${FLASHIMAGE_SIZE}" ]; then

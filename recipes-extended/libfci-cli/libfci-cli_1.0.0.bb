@@ -20,13 +20,13 @@ CCFLAGS_all = "--sysroot=\"${STAGING_DIR_HOST}\""
 LDFLAGS_all = "--sysroot=\"${STAGING_DIR_HOST}\""
 SYSROOT_WORKAROUND = "CCFLAGS_all=${CCFLAGS_all} LDFLAGS_all=${LDFLAGS_all}"
 
-CFLAGS_prepend = "-I${S} "
+CFLAGS:prepend = "-I${S} "
 
 PACKAGES = "${PN} ${PN}-dbg"
-FILES_${PN} += "${bindir}/libfci_cli"
+FILES:${PN} += "${bindir}/libfci_cli"
 
-RDEPENDS_${PN} = "pfe"
-RDEPENDS_${PN}-dbg = "pfe"
+RDEPENDS:${PN} = "pfe"
+RDEPENDS:${PN}-dbg = "pfe"
 
 do_compile() {
 	cd ${MDIR}

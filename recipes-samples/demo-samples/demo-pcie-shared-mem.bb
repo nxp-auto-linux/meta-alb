@@ -15,13 +15,13 @@ do_install() {
         oe_runmake install INSTALLDIR=${DESTDIR}
 }
 
-FILES_${PN} = "${SAMPLESDIR}"
-FILES_${PN}-dbg += "${SAMPLESDIR}/.debug"
+FILES:${PN} = "${SAMPLESDIR}"
+FILES:${PN}-dbg += "${SAMPLESDIR}/.debug"
 
 DEMO_PCIE_APPS ?= "pcie_ep pcie_rc"
 
-DEMO_PCIE_APPS_ls2 = "pcie_rc"
-DEMO_PCIE_APPS_lx2160a = "pcie_rc"
+DEMO_PCIE_APPS:ls2 = "pcie_rc"
+DEMO_PCIE_APPS:lx2160a = "pcie_rc"
 
 EXTRA_OEMAKE = "samples=pcie_shared_mem apps="${DEMO_PCIE_APPS}""
 

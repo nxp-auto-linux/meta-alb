@@ -9,7 +9,7 @@ IMAGE_FSTYPES = "tar.gz ext4"
 # required for sdcard deploy
 HOSTTOOLS += "parted mkfs.vfat mcopy udevadm"
 
-EXTRA_IMAGECMD_ext4 = "-i 4096 -L ${IMAGE_NAME}"
+EXTRA_IMAGECMD:ext4 = "-i 4096 -L ${IMAGE_NAME}"
 
 EXTRA_IMAGEDEPENDS += "mc-utils management-complex ppa"
 

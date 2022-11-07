@@ -7,7 +7,7 @@ SUMMARY = "Recipe for partial-dtb-gen tool, used for generating partial DTS \
     for device passthrough in Dom0less-VMs use-cases"
 SECTION = "utils"
 DEPENDS = "python3 python3-pip python-fdt"
-RDEPENDS_${PN} = "python3 python3-pip python-fdt"
+RDEPENDS:${PN} = "python3 python3-pip python-fdt"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
@@ -23,7 +23,7 @@ SRCREV = "9643e82eba5bc69b7881193e84ee91e93c77ee75"
 S = "${WORKDIR}/git"
 
 PARTIAL_DTB_GEN_DIR = "partial_dtb_gen"
-FILES_${PN} = "${bindir}/${PARTIAL_DTB_GEN_DIR}/*.py"
+FILES:${PN} = "${bindir}/${PARTIAL_DTB_GEN_DIR}/*.py"
 
 do_install() {
     install -d ${D}${bindir}/${PARTIAL_DTB_GEN_DIR}

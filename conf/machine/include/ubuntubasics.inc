@@ -18,7 +18,7 @@ UBUNTU_TARGET_ARCH="${@d.getVar('TRANSLATED_TARGET_ARCH', True).replace("aarch64
 # We do not want any default post intercepts or special default
 # packages added.
 IMAGE_LINGUAS = ""
-POKY_DEFAULT_EXTRA_RDEPENDS_remove = "packagegroup-core-boot"
+POKY_DEFAULT_EXTRA_RDEPENDS:remove = "packagegroup-core-boot"
 INITRAMFS_IMAGE = ""
 POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 
@@ -28,7 +28,7 @@ POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 # As a Ubuntu based rootfs can easily go beyond 2GB and are even in
 # the smallest form larger than what is good for a boot flash, we
 # do not generate a .flashimage with Ubuntu.
-IMAGE_FSTYPES_remove = "flashimage"
+IMAGE_FSTYPES:remove = "flashimage"
 IMAGE_TYPES_MASKED += "cpio cpio.gz cpio.gz.u-boot"
 
 # The Yocto glibc version must not exceed the Ubuntu glibc version
@@ -53,7 +53,7 @@ BINUVERSION="2.34"
 
 # More recent Ubuntu versions work with symlinks for the base
 # directories. We can't refer to symlink based files
-DISTRO_FEATURES_append = '${@ \
+DISTRO_FEATURES:append = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", " usrmerge", \
    "unsupportedubuntuversion" \
@@ -102,7 +102,7 @@ require conf/machine/include/nodistropackage.inc
 #                   disable. This is required for pkgs that are directly
 #                   referrenced with VIRTUAL-RUNTIME (e.g. update-alternatives)
 
-DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
+DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     alsa-conf \
     alsa-lib \
     update-alternatives:::1 \
@@ -164,7 +164,7 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 # image because they are available as Ubuntu-native packages.
 # Given that we can't set a PREFERRED_RPROVIDER in an image recipe
 # we need to isolate those packages globally.
-DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
+DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     openssl \
     openssl-bin \
     openssl-conf \
@@ -181,6 +181,6 @@ DISTRO_NEVER_WRITE_PACKAGE_class-target += "\
 # at configuration time we cannot predict algorithmically which derived
 # images would add the final apt packages. Any "missing" dependencies
 # would only show up then at image build time.
-DISTRO_DEFAULT_RPROVIDER_class-target = "ubuntu-base (= ${UBUNTU_TARGET_VERSION})"
+DISTRO_DEFAULT_RPROVIDER:class-target = "ubuntu-base (= ${UBUNTU_TARGET_VERSION})"
 
 #require conf/machine/include/ubuntutcconf.inc

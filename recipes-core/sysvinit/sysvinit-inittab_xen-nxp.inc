@@ -1,7 +1,7 @@
 # Copyright 2021 NXP
 # Comment lines in inittab with getty spawn on default serial consoles if Xen Dom0less enabled
 
-do_install_append() {
+do_install:append() {
 	tmp="${SERIAL_CONSOLES}"
 	for i in $tmp; do
 		# Parse each item in SERIAL_CONSOLES to obtain the inittab entry ID

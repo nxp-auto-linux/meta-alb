@@ -15,7 +15,7 @@ PACKAGES-CORE = "\
     glibc-utils \
 "
 
-PACKAGES-CORE_append_s32 = "\
+PACKAGES-CORE:append:s32 = "\
     fbset-modes \
 "
 
@@ -47,7 +47,7 @@ PACKAGES-CORE-MISC = "\
     i2c-tools \
 "
 
-PACKAGES-CORE-MISC_append_fsl-lsch3 += "\
+PACKAGES-CORE-MISC:append:fsl-lsch3 += "\
     merge-files \
 "
 
@@ -86,7 +86,7 @@ PACKAGES-CORE-MISC += "\
     tcpreplay \
 "
 
-PACKAGES-CORE-MISC_append_fsl-lsch3 = "\
+PACKAGES-CORE-MISC:append:fsl-lsch3 = "\
     iproute2 \
     iproute2-tc \
     iptables \
@@ -104,7 +104,7 @@ PACKAGES-CORE-DBG = "\
 	memtester \
 "
 
-PACKAGES-CORE-MISC_append_lx2160a = " ${PACKAGES-CORE-DPAA2} ${PACKAGES-CORE-DBG}"
+PACKAGES-CORE-MISC:append:lx2160a = " ${PACKAGES-CORE-DPAA2} ${PACKAGES-CORE-DBG}"
 
 IMAGE_INSTALL += "\
     ${PACKAGES-CORE} \

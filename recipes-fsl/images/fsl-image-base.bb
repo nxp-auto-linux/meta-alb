@@ -26,23 +26,23 @@ IMAGE_INSTALL += "iputils"
 
 # For LS2/LX2, dpl-examples, management-complex, restool is a machine dependency.
 # rcw is dependency for image_types_fsl_flashimage.
-IMAGE_INSTALL_append_fsl-lsch3 += " \
+IMAGE_INSTALL:append:fsl-lsch3 += " \
     restool \
 "
 
 # Support for SJA1110 swich under Linux
-IMAGE_INSTALL_append_s32g274ardb2 = " sja1110 "
-IMAGE_INSTALL_append_s32g399ardb3 = " sja1110 "
+IMAGE_INSTALL:append:s32g274ardb2 = " sja1110 "
+IMAGE_INSTALL:append:s32g399ardb3 = " sja1110 "
 
 # Support for STR (Suspend to RAM) -- rtcwake
-IMAGE_INSTALL_append_s32g = " util-linux-rtcwake "
+IMAGE_INSTALL:append:s32g = " util-linux-rtcwake "
 
 # Export QSPI FLash script
-IMAGE_INSTALL_append_s32 = " linux-qspi-tool "
+IMAGE_INSTALL:append:s32 = " linux-qspi-tool "
 
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior
-IMAGE_INSTALL_append_fsl-lsch3 += " \
+IMAGE_INSTALL:append:fsl-lsch3 += " \
     linux-kernelitb-norootfs-image \
 "
 
@@ -52,13 +52,13 @@ IMAGE_FSTYPES ?= "tar.gz"
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 
 # Populate PFE slave driver
-IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
+IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
 
 # Enable Xen and add Xen Packages
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-xen.inc', '', d)}
 
 # Add LLCE CAN if needed
-IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
+IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
 
 # Add OP-TEE user-space components
-IMAGE_INSTALL_append_gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
+IMAGE_INSTALL:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"

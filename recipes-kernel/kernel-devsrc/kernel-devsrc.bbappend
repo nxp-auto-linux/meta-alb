@@ -21,7 +21,7 @@ BINAWK_FILES = "\
     tools/perf/util/intel-pt-decoder/gen-insn-attr-x86.awk \
 "
 
-do_install_append_ubuntu() {
+do_install:append:ubuntu() {
 
     cd "$kerneldir/.."
     ln -s "${KERNEL_SOURCE_DIR}" "${KERNEL_HEADERS_DIR}"
@@ -34,10 +34,10 @@ do_install_append_ubuntu() {
     done
 }
 
-FILES_${PN}_append_ubuntu = " /usr/src/${KERNEL_HEADERS_DIR}"
+FILES:${PN}:append:ubuntu = " /usr/src/${KERNEL_HEADERS_DIR}"
 
 # Yocto 3 recipe creates a symlink but apparently does not consider that
 # in the FILES statement.
-FILES_${PN}_append = " /usr/src/kernel"
+FILES:${PN}:append = " /usr/src/kernel"
 
-INSANE_SKIP_${PN} = "arch"
+INSANE_SKIP:${PN} = "arch"

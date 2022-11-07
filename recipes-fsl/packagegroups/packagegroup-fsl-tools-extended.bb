@@ -14,7 +14,7 @@ X11_TOOLS = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', \
     ' lsb-release ', '', d)} \
 "
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     bc \
     chkconfig \
     crconf \
@@ -44,14 +44,14 @@ RDEPENDS_${PN} = "\
     ${X11_TOOLS} \
 "
 
-RDEPENDS_${PN}_append_ls1088a = " \
+RDEPENDS:${PN}:append:ls1088a = " \
     aiopsl \
 "
-RDEPENDS_${PN}_append_ls2088a = " \
+RDEPENDS:${PN}:append:ls2088a = " \
     aiopsl \
 "
 
-RDEPENDS_${PN}_imx = " \
+RDEPENDS:${PN}_imx = " \
     imx-kobs \
     ${SOC_TOOLS_TEST} \
 "
@@ -69,7 +69,7 @@ EXTRA_TOOLS ?= ""
 EXTRA_TOOLS_p1022ds = " packagegroup-fsl-graphics-minimal"
 EXTRA_TOOLS_t4240 = " cairo-dev"
 
-RDEPENDS_${PN}_append_qoriq = "\
+RDEPENDS:${PN}:append:qoriq = "\
     kernel-image \
     ${@multilib_pkg_extend(d, "binutils")} \
     ${@multilib_pkg_extend(d, "cpp")} \
@@ -99,16 +99,16 @@ SECURE_TOOLS = "\
     secure-obj \
     secure-obj-module \
 "
-SECURE_TOOLS_ls1043ardb-be = ""
-SECURE_TOOLS_ls1046ardb-be = ""
-SECURE_TOOLS_ls1088ardb-be = ""
-SECURE_TOOLS_ls2088ardb-be = ""
+SECURE_TOOLS:ls1043ardb-be = ""
+SECURE_TOOLS:ls1046ardb-be = ""
+SECURE_TOOLS:ls1088ardb-be = ""
+SECURE_TOOLS:ls2088ardb-be = ""
 
-RDEPENDS_${PN}_append_qoriq-arm64 = "\ 
+RDEPENDS:${PN}:append:qoriq-arm64 = "\
     ${LSDK_TOOLS} \
     ${SECURE_TOOLS} \
 "
-RDEPENDS_${PN}_append_qoriq-ppc = "\
+RDEPENDS:${PN}:append:qoriq-ppc = "\
     ${@multilib_pkg_extend(d, "valgrind")} \
 "
 

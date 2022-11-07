@@ -1,7 +1,7 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 PV = "5.4"
-SRC_URI_append_ls2 += "\
+SRC_URI:append:ls2 += "\
 	file://0001-kernel-LS2-RDB-device-tree-was-not-quite-correct.patch \
 	file://0001-kernel-Added-phy-ioctl-support-to-the-DPAA2-dpmac-dr.patch \
 	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-wh-5.4.patch \
@@ -24,5 +24,5 @@ DUMMYTBD += "\
     file://0002-pci-layerscape.c-LUT-endianess-and-presence-was-not-.patch \
 "
 
-SRC_URI_append_ls1043ardb = " file://build/enableds1307.cfg"
-DELTA_KERNEL_DEFCONFIG_append_ls1043ardb = " enableds1307.cfg"
+SRC_URI:append:ls1043ardb = " file://build/enableds1307.cfg"
+DELTA_KERNEL_DEFCONFIG:append:ls1043ardb = " enableds1307.cfg"

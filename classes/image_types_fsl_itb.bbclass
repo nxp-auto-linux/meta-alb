@@ -26,7 +26,7 @@ ITB_ROOTFS_REALSUFFIX ?= '${@oe.utils.conditional("ITB_ROOTFS_SUFFIX", "", "", "
 ITB_ROOTFS_DIR ?= "${DEPLOY_DIR_IMAGE}"
 ITB_ROOTFS_DIR_SLASH ?= "${ITB_ROOTFS_DIR}/"
 ITB_ROOTFS_BASENAME_MACHINE ?= "${ITB_ROOTFS_BASENAME}-${MACHINE}"
-IMAGE_TYPEDEP_itb ?= "${ITB_ROOTFS_SUFFIX}"
+IMAGE_TYPEDEP:itb ?= "${ITB_ROOTFS_SUFFIX}"
 
 #do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${@oe.utils.conditional("ITB_ROOTFS_TYPE", "", "", "${ITB_ROOTFS_BASENAME}:do_image_${ITB_ROOTFS_TYPE}", d)}'
 do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${ITB_ROOTFS_BASENAME}:do_image_complete'

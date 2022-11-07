@@ -20,16 +20,16 @@ DESTDIR="${D}"
 MODULES_MODULE_SYMVERS_LOCATION = "."
 
 DEMO_IPCF_APPS ?= "sample sample_multi_instance"
-EXTRA_OEMAKE_append = " --file ./makefile_samples apps="${DEMO_IPCF_APPS}" INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} "
+EXTRA_OEMAKE:append = " --file ./makefile_samples apps="${DEMO_IPCF_APPS}" INSTALL_DIR=${DESTDIR} KERNELDIR=${KBUILD_OUTPUT} "
 
-PLATFORM_FLAVOR_s32g2 = "s32g2"
-PLATFORM_FLAVOR_s32g3 = "s32g3"
-PLATFORM_FLAVOR_s32r45evb = "s32r45"
-EXTRA_OEMAKE_append = " PLATFORM_FLAVOR=${PLATFORM_FLAVOR} "
+PLATFORM_FLAVOR:s32g2 = "s32g2"
+PLATFORM_FLAVOR:s32g3 = "s32g3"
+PLATFORM_FLAVOR:s32r45evb = "s32r45"
+EXTRA_OEMAKE:append = " PLATFORM_FLAVOR=${PLATFORM_FLAVOR} "
 
 # Prevent to load ipc-shm-uio at boot time
 KERNEL_MODULE_PROBECONF += "ipc-shm-uio"
 module_conf_ipc-shm-uio = "blacklist ipc-shm-uio"
 KERNEL_MODULE_PROBECONF += "ipc-sample-multi-instance"
 module_conf_ipc-sample-multi-instance = "blacklist ipc-sample-multi-instance"
-FILES_${PN} += "${sysconfdir}/modprobe.d/*"
+FILES:${PN} += "${sysconfdir}/modprobe.d/*"

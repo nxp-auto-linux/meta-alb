@@ -2,7 +2,7 @@ require ppa.inc
 
 DEPENDS += "cst-native"
 
-PPA_PATH_ls1046a = "ls1046"
+PPA_PATH:ls1046a = "ls1046"
 
 do_compile() {
     export ARMV8_TOOLS_DIR="${STAGING_BINDIR_TOOLCHAIN}"

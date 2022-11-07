@@ -16,8 +16,8 @@ inherit fsl-eula-unpack
 # url.localpath which is None for rocko and python 3.x.
 # Workaround is to use url.path instead of url.localpath.
 
-LIC_FILES_CHKSUM_remove = " file://${FSL_EULA_FILE};md5=d4f548f93b5fe0ee2bc86758c344412d"
-LIC_FILES_CHKSUM_append = " file://${FSL_EULA_FILE};md5=ab61cab9599935bfe9f700405ef00f28"
+LIC_FILES_CHKSUM:remove = " file://${FSL_EULA_FILE};md5=d4f548f93b5fe0ee2bc86758c344412d"
+LIC_FILES_CHKSUM:append = " file://${FSL_EULA_FILE};md5=ab61cab9599935bfe9f700405ef00f28"
 
 python fsl_bin_do_unpack() {
     src_uri = (d.getVar('SRC_URI', True) or "").split()

@@ -14,7 +14,7 @@ inherit allarch update-rc.d systemd
 
 INITSCRIPT_NAME = "lxdm"
 INITSCRIPT_PARAMS = "start 80 5 . stop 80 0 1 2 3 6 ."
-INITSCRIPT_PARAMS_shr = "start 90 5 . stop 90 0 1 2 3 6 ."
+INITSCRIPT_PARAMS:shr = "start 90 5 . stop 90 0 1 2 3 6 ."
 
 do_install() {
     install -d ${D}${sysconfdir}/init.d
@@ -28,12 +28,12 @@ do_install() {
     fi
 }
 
-RDEPENDS_${PN} = "lxdm"
+RDEPENDS:${PN} = "lxdm"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "lxdm.service"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "lxdm.service"
 
-FILES_${PN} += "${sysconfdir}/default/lxdm"
+FILES:${PN} += "${sysconfdir}/default/lxdm"
 

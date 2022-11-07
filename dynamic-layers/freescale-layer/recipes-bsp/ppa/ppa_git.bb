@@ -8,11 +8,11 @@ SRC_URI += "file://0001-build-disable-parallel-make-to-avoid-compile-time-ra.pat
 
 SRCREV = "e5641434f00d75634a285341d810df4261daf5de"
 
-PPA_PATH_ls1012a = "ls1012"
-PPA_PATH_ls1043a = "ls1043"
-PPA_PATH_ls1046a = "ls1046"
-PPA_PATH_ls2088a = "ls2088"
-PPA_PATH_ls1088a = "ls1088"
+PPA_PATH:ls1012a = "ls1012"
+PPA_PATH:ls1043a = "ls1043"
+PPA_PATH:ls1046a = "ls1046"
+PPA_PATH:ls2088a = "ls2088"
+PPA_PATH:ls1088a = "ls1088"
 
 do_compile () {
     export ARMV8_TOOLS_DIR="${STAGING_BINDIR_TOOLCHAIN}"

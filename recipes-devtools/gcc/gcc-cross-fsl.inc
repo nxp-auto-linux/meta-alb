@@ -1,3 +1,3 @@
 
-EXTRA_OECONF_append = " --with-isl=${STAGING_DIR_NATIVE}${prefix_native} \
+EXTRA_OECONF:append = " --with-isl=${STAGING_DIR_NATIVE}${prefix_native} \
 "

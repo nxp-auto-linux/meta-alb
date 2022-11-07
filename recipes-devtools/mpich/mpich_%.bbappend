@@ -1,2 +1,2 @@
 # Enable building C++ compiler
-EXTRA_OECONF_remove = "--disable-cxx"
+EXTRA_OECONF:remove = "--disable-cxx"

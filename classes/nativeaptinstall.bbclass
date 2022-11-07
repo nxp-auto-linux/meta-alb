@@ -814,7 +814,7 @@ END_PPA
 
 # Must have to preset all variables properly. It also means that
 # the user of this class should not prepend to avoid ordering issues.
-fakeroot do_aptget_user_update_prepend() {
+fakeroot do_aptget_user_update:prepend() {
 
 	aptget_update_presetvars;
 }
@@ -827,7 +827,7 @@ fakeroot do_aptget_user_update() {
 
 # Must have to preset all variables properly. It also means that
 # the user of this class should not prepend to avoid ordering issues.
-fakeroot do_aptget_user_finalupdate_prepend() {
+fakeroot do_aptget_user_finalupdate:prepend() {
 
 	aptget_update_presetvars;
 }
@@ -901,8 +901,8 @@ python do_aptget_update() {
 # but in the Ubuntu rootfs chroot context with the proper variable setup.
 # We still provide the fallback to have classic behavior in the unlikely
 # case of a weird target rootfs without systemctl.
-IMAGE_FEATURES_append = " stateless-rootfs"
-fakeroot do_aptget_user_finalupdate_append() {
+IMAGE_FEATURES:append = " stateless-rootfs"
+fakeroot do_aptget_user_finalupdate:append() {
 	# This code is only executed when an image is built so that it
 	# does not affect non-image package generation.
 	if [ -n "${IMGDEPLOYDIR}" ]; then
@@ -942,7 +942,7 @@ EOF
 }
 
 # The various apt packages need to be translated properly into Yocto
-# RPROVIDES_${PN}
+# RPROVIDES:${PN}
 APTGET_ALL_PACKAGES = "\
         ${APTGET_INIT_PACKAGES} \
         ${APTGET_EXTRA_PACKAGES} \
@@ -1099,7 +1099,7 @@ python () {
     packagelist = (d.getVar('APTGET_ALL_PACKAGES', True) or "").split()
     translations = (d.getVar('APTGET_YOCTO_TRANSLATION', True) or "").split()
 
-    origrprovides = (d.getVar('RPROVIDES_%s' % pn, True) or "").split()
+    origrprovides = (d.getVar('RPROVIDES:%s' % pn, True) or "").split()
     allrprovides = []
     for p in packagelist:
         appendp = True
@@ -1116,6 +1116,6 @@ python () {
 
     if allrprovides:
         s = ' '.join(origrprovides + allrprovides)
-        bb.debug(1, 'Setting RPROVIDES_%s = "%s"' % (pn, s))
-        d.setVar('RPROVIDES_%s' % pn, s)
+        bb.debug(1, 'Setting RPROVIDES:%s = "%s"' % (pn, s))
+        d.setVar('RPROVIDES:%s' % pn, s)
 }

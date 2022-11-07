@@ -57,7 +57,7 @@ APTGET_EXTRA_PACKAGES_LAST += " \
 
 APTGET_EXTRA_PPA += "${ROS_PPA}"
 
-fakeroot do_aptget_user_update_append() {
+fakeroot do_aptget_user_update:append() {
 
     set -x
 

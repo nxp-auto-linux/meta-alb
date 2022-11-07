@@ -44,7 +44,7 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
 "
 
 NATIVESDKFIXES ?= ""
-NATIVESDKFIXES_class-nativesdk = "\
+NATIVESDKFIXES:class-nativesdk = "\
            file://0001-nativesdk-glibc-Look-for-host-system-ld.so.cache-as-.patch \
            file://0002-nativesdk-glibc-Fix-buffer-overrun-with-a-relocated-.patch \
            file://0003-nativesdk-glibc-Raise-the-size-of-arrays-containing-.patch \
@@ -76,7 +76,7 @@ EXTRA_TARGET_CPPFLAGS = '${@ \
 
 TARGET_CPPFLAGS += "${EXTRA_TARGET_CPPFLAGS}"
 
-#EXTRA_OECONF_append = " --disable-werror"
+#EXTRA_OECONF:append = " --disable-werror"
 
 GLIBC_BROKEN_LOCALES = ""
 
@@ -100,7 +100,7 @@ EXTRA_OECONF = "--enable-kernel=${OLDEST_KERNEL} \
 
 EXTRA_OECONF += "${@get_libc_fpu_setting(bb, d)}"
 
-do_patch_append() {
+do_patch:append() {
     bb.build.exec_func('do_fix_readlib_c', d)
 }
 

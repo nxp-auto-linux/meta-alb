@@ -15,12 +15,12 @@ DEPENDS = "u-boot-mkimage-native dtc-native"
 UBOOT_DEPLOYSCRIPT_NAME_ITS ?= "bbdeployimage"
 LINUX_DEPLOYSCRIPT_NAME_SH ?= "bbdeployimage"
 LINUX_REPLACESCRIPT_NAME_SH ?= "bbreplacerootfs"
-UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2080abluebox ?= "ls2deployimage "
-UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2084abluebox ?= "ls2deployimage "
-UBOOT_DEPLOYSCRIPT_NAME_prepend_ls2084abbmini  ?= "ls2deployimage ls2factoryprep "
-UBOOT_DEPLOYSCRIPT_NAME_prepend_ls1043abluebox ?= "ls1nordeployimage "
-UBOOT_DEPLOYSCRIPT_NAME_prepend_ls1046abluebox ?= "ls1nordeployimage "
-UBOOT_DEPLOYSCRIPT_NAME_prepend_s32g274abluebox3 ?= "s32gqspideploy \
+UBOOT_DEPLOYSCRIPT_NAME:prepend:ls2080abluebox ?= "ls2deployimage "
+UBOOT_DEPLOYSCRIPT_NAME:prepend:ls2084abluebox ?= "ls2deployimage "
+UBOOT_DEPLOYSCRIPT_NAME:prepend:ls2084abbmini  ?= "ls2deployimage ls2factoryprep "
+UBOOT_DEPLOYSCRIPT_NAME:prepend:ls1043abluebox ?= "ls1nordeployimage "
+UBOOT_DEPLOYSCRIPT_NAME:prepend:ls1046abluebox ?= "ls1nordeployimage "
+UBOOT_DEPLOYSCRIPT_NAME:prepend:s32g274abluebox3 ?= "s32gqspideploy \
 	s32gemmcdeploy \
 	s32grcwdeploy \
 	"

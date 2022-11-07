@@ -79,7 +79,7 @@ python distro_never_write_package_pre () {
 }
 
 # This is run after the keys have been expanded, i.e., we can find
-# RDEPENDS_<pn> then directly for any name. The idea is that we check
+# RDEPENDS:<pn> then directly for any name. The idea is that we check
 # if any dependency is one that we convert to a different
 # PREFERRED_RPROVIDER and fix up the RDEPENDS to avoid file-rdeps
 # complaints on packaging.
@@ -93,7 +93,7 @@ def dnwp_fixuprdepends(d):
 
     modified = False
     for ppn in (d.getVar('PACKAGES') or '').split():
-        rdepkey = 'RDEPENDS_' + ppn
+        rdepkey = 'RDEPENDS:' + ppn
         rpmodified = False
         rdepends = bb.utils.explode_dep_versions2(d.getVar(rdepkey) or '')
         newrdepends = {}
@@ -122,7 +122,7 @@ def dnwp_fixuprdepends(d):
             # dependency no longer matches the redepends. This means that we
             # need to skip build-dep warnings. This is a bit ugly, but
             # it is a reasonable solution to the QA problem.
-            d.appendVar('INSANE_SKIP_' +  ppn, ' build-deps')
+            d.appendVar('INSANE_SKIP:' +  ppn, ' build-deps')
 
 addhandler distro_never_write_package_rdepends
 distro_never_write_package_rdepends[eventmask] = "bb.event.RecipeTaskPreProcess"

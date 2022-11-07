@@ -8,15 +8,15 @@ EXTRA_OEMAKE += " \
                 WITH_OPENSSL=n \
                 LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
                 "
-do_compile_append () {
+do_compile:append () {
         oe_runmake test_plugin
 }
 
-do_install_append () {
+do_install:append () {
         mkdir -p ${D}${libdir}/tee-supplicant/plugins
         install -D -p -m0444 ${S}/out/supp_plugin/*.plugin ${D}${libdir}/tee-supplicant/plugins/
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
                 ${libdir}/tee-supplicant/plugins/ \
                "

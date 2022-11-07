@@ -13,4 +13,4 @@ S = "${WORKDIR}/flann-${PV}"
 inherit cmake
 
 # On powerpc64, libraries reside in .../lib64
-EXTRA_OECMAKE_powerpc64 = "-DLIB_SUFFIX=64"
+EXTRA_OECMAKE:powerpc64 = "-DLIB_SUFFIX=64"

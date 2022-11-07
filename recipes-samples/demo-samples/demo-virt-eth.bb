@@ -15,12 +15,12 @@ do_install() {
         oe_runmake install INSTALLDIR=${DESTDIR}
 }
 
-FILES_${PN} = "${SAMPLESDIR}"
-FILES_${PN}-dbg += "${SAMPLESDIR}/.debug"
+FILES:${PN} = "${SAMPLESDIR}"
+FILES:${PN}-dbg += "${SAMPLESDIR}/.debug"
 
 DEMO_PCIE_APPS ?= "net_ep net_rc"
 
-DEMO_PCIE_APPS_ls2 = "net_rc"
-DEMO_PCIE_APPS_lx2160a = "net_rc"
+DEMO_PCIE_APPS:ls2 = "net_rc"
+DEMO_PCIE_APPS:lx2160a = "net_rc"
 
 EXTRA_OEMAKE = "samples=pcie_virt_eth apps="${DEMO_PCIE_APPS}""

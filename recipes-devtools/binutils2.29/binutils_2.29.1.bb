@@ -10,17 +10,17 @@ EXTRA_OECONF += "--with-sysroot=/ \
                 --with-system-zlib \
                 "
 
-EXTRA_OEMAKE_append_libc-musl = "\
+EXTRA_OEMAKE:append:libc-musl = "\
                                  gt_cv_func_gnugettext1_libc=yes \
                                  gt_cv_func_gnugettext2_libc=yes \
                                 "
-EXTRA_OECONF_class-native = "--enable-targets=all \
+EXTRA_OECONF:class-native = "--enable-targets=all \
                              --enable-64-bit-bfd \
                              --enable-install-libiberty \
                              --enable-install-libbfd \
                              --disable-werror"
 
-do_install_class-native () {
+do_install:class-native () {
 	autotools_do_install
 
 	# Install the libiberty header
@@ -44,6 +44,6 @@ do_install_class-native () {
 
 # Split out libbfd-*.so so including perf doesn't include extra stuff
 PACKAGE_BEFORE_PN += "libbfd"
-FILES_libbfd = "${libdir}/libbfd-*.so"
+FILES:libbfd = "${libdir}/libbfd-*.so"
 
 BBCLASSEXTEND = "native nativesdk"

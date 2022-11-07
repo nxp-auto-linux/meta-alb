@@ -26,11 +26,11 @@ python () {
 inherit autotools update-rc.d systemd
 
 PACKAGECONFIG = "libgcrypt"
-PACKAGECONFIG_libc-musl = "libargp"
+PACKAGECONFIG:libc-musl = "libargp"
 PACKAGECONFIG[libargp] = "--with-libargp,--without-libargp,argp-standalone,"
 PACKAGECONFIG[libgcrypt] = "--with-libgcrypt,--without-libgcrypt,libgcrypt,"
 
-do_install_append() {
+do_install:append() {
     # Only install the init script when 'sysvinit' is in DISTRO_FEATURES.
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d "${D}${sysconfdir}/init.d"
@@ -52,4 +52,4 @@ do_install_append() {
 INITSCRIPT_NAME = "rng-tools"
 INITSCRIPT_PARAMS = "start 30 2 3 4 5 . stop 30 0 6 1 ."
 
-SYSTEMD_SERVICE_${PN} = "rngd.service"
+SYSTEMD_SERVICE:${PN} = "rngd.service"

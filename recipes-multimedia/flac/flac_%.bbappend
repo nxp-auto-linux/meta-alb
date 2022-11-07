@@ -1,7 +1,7 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://0001-lpc_intrin_vsx.c-remove-altvex.patch"
 
-EXTRA_OECONF_e5500-64b = "--disable-oggtest \
+EXTRA_OECONF:e5500-64b = "--disable-oggtest \
                 --with-ogg-libraries=${STAGING_LIBDIR} \
                 --with-ogg-includes=${STAGING_INCDIR} \
                 --disable-xmms-plugin \

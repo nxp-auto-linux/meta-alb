@@ -1,10 +1,10 @@
 # Missing part family compatibility specifications
-REGLEX_ls2080a = "ls2080a"
-REGLEX_ls2084a = "ls2088a"
-REGLEX_ls2044a = "ls2088a"
-REGLEX_ls2048a = "ls2088a"
-REGLEX_lx2120a = "lx2160a"
-REGLEX_lx2080a = "lx2160a"
+REGLEX:ls2080a = "ls2080a"
+REGLEX:ls2084a = "ls2088a"
+REGLEX:ls2044a = "ls2088a"
+REGLEX:ls2048a = "ls2088a"
+REGLEX:lx2120a = "lx2160a"
+REGLEX:lx2080a = "lx2160a"
 
 do_deploy () {
     install -d ${DEPLOYDIR}/mc_app

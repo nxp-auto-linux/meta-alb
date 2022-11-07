@@ -3,7 +3,7 @@ LICENSE = "MIT"
 
 inherit packagegroup
 
-RDEPENDS_packagegroup-fsl-monitor = "\
+RDEPENDS:packagegroup-fsl-monitor = "\
     coreutils \
     cronie \
     bc \
@@ -17,6 +17,6 @@ RDEPENDS_packagegroup-fsl-monitor = "\
     make \
 "
 
-RDEPENDS_packagegroup-fsl-monitor_remove_ls102xa = "\
+RDEPENDS:packagegroup-fsl-monitor:remove:ls102xa = "\
     web-sysmon \
 "

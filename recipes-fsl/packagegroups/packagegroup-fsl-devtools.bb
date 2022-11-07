@@ -10,7 +10,7 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     bison \
     ccache \
     chrpath \
@@ -36,13 +36,13 @@ RDEPENDS_${PN} = " \
     u-boot-mkimage \
 "
 
-RDEPENDS_${PN}_remove_qoriq-ppc = " \
+RDEPENDS:${PN}:remove:qoriq-ppc = " \
     git \
     git-perltools \
     mdadm \
 "
 
-RDEPENDS_${PN}_append = " \
+RDEPENDS:${PN}:append = " \
      expect \
      gmp-dev \
      libmpc-dev \

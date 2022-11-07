@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # Prevent splitting busybox applets in two binaries (*.suid and *.nosuid)
 BUSYBOX_SPLIT_SUID = "0"
@@ -11,11 +11,11 @@ SRC_URI += " \
 "
 
 # disable FTPD - as it's provided by inetutils
-do_configure_append() {
+do_configure:append() {
     sed -i "/CONFIG_FTPD/c\# CONFIG_FTPD is not set" .config
 }
 
-do_install_append () {
+do_install:append () {
 
     if [ "${@(d.getVar('VIRTUAL-RUNTIME_init_manager'))}" != "busybox" ]; then
         rm -f ${D}${sysconfdir}/init.d/rcS

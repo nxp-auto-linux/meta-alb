@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += "\
 	file://0001-atf-Support-for-ls2084abbmini.patch \
@@ -6,19 +6,19 @@ SRC_URI += "\
 
 # What's in a name? That which we call a rose,
 # By any other name would smell as sweet.
-RCW_FOLDER_ls1043abluebox = "ls1043ardb"
-PLATFORM_ls1043abluebox = "ls1043ardb"
-RCW_FOLDER_ls1046abluebox = "ls1046ardb"
-PLATFORM_ls1046abluebox = "ls1046ardb"
+RCW_FOLDER:ls1043abluebox = "ls1043ardb"
+PLATFORM:ls1043abluebox = "ls1043ardb"
+RCW_FOLDER:ls1046abluebox = "ls1046ardb"
+PLATFORM:ls1046abluebox = "ls1046ardb"
 
 # We have slightly modified custom RCWs here
-PLATFORM_ls2080abluebox = "ls2088ardb"
-PLATFORM_ls2084abluebox = "ls2088ardb"
+PLATFORM:ls2080abluebox = "ls2088ardb"
+PLATFORM:ls2084abluebox = "ls2088ardb"
 
-DEPENDS_remove_ls2 = "u-boot-mkimage-native u-boot openssl openssl-native mbedtls rcw"
+DEPENDS:remove:ls2 = "u-boot-mkimage-native u-boot openssl openssl-native mbedtls rcw"
 
 # original do_compile requires openssl headers, but they are not really used
-do_compile_ls2() {
+do_compile:ls2() {
     if [ ! -f ${RECIPE_SYSROOT_NATIVE}/usr/bin/cst/srk.pri ]; then
        ${RECIPE_SYSROOT_NATIVE}/usr/bin/cst/gen_keys 1024
     else

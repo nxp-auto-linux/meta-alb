@@ -16,7 +16,7 @@ inherit nativeaptinstall
 APTGET_CHROOT_DIR = "${IMAGE_ROOTFS}"
 APTGET_SKIP_UPGRADE = "1"
 
-ROOTFS_POSTPROCESS_COMMAND_append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager; do_systemd_service_fixup; do_getty_fixup; "
+ROOTFS_POSTPROCESS_COMMAND:append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager; do_systemd_service_fixup; do_getty_fixup; "
 
 # This must be added first as it provides the foundation for
 # subsequent modifications to the rootfs
@@ -71,7 +71,7 @@ HOST_NAME = "ubuntu-${MACHINE_ARCH}"
 ##############################################################################
 
 # Minimum support for LS2 specific elements.
-IMAGE_INSTALL_append_fsl-lsch3 += "\
+IMAGE_INSTALL:append:fsl-lsch3 += "\
     mc-utils-image \
     restool \
 "
@@ -79,8 +79,8 @@ IMAGE_INSTALL_append_fsl-lsch3 += "\
 # We want easy installation of the BlueBox image to the target
 # Supported for any Layerscape Gen3 except LX2
 DEPLOYSCRIPTS ?= "bbdeployscripts"
-DEPLOYSCRIPTS_lx2160a = ""
-DEPENDS_append_fsl-lsch3 = " \
+DEPLOYSCRIPTS:lx2160a = ""
+DEPENDS:append:fsl-lsch3 = " \
     ${DEPLOYSCRIPTS} \
 "
 
@@ -174,13 +174,13 @@ fakeroot do_getty_fixup() {
 }
 
 IMAGE_ROOTFS_SIZE ?= "8192"
-IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
+IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
 # Add LLCE CAN if needed
-IMAGE_INSTALL_append_s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
+IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
 
 # Add sja1110 driver for RDB boards
-IMAGE_INSTALL_append_s32g274ardb2 = " sja1110"
-IMAGE_INSTALL_append_s32g399ardb3 = " sja1110"
+IMAGE_INSTALL:append:s32g274ardb2 = " sja1110"
+IMAGE_INSTALL:append:s32g399ardb3 = " sja1110"
 
 COMPATIBLE_MACHINE ="(.*ubuntu)"

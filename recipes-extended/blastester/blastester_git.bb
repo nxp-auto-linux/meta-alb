@@ -17,8 +17,8 @@ EXTRA_OEMAKE += "L2SIZE=4194304 NUMTHREADS=4 ARCH=ARM64"
 EXTRA_OEMAKE += "TEST_BLAS=${STAGING_LIBDIR}/libopenblas.a"
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-FILES_${PN} += "${datadir}/BLAS-Tester"
-FILES_${PN}-dbg += "${datadir}/BLAS-Tester/.debug"
+FILES:${PN} += "${datadir}/BLAS-Tester"
+FILES:${PN}-dbg += "${datadir}/BLAS-Tester/.debug"
 
 do_install() {
 	install -d ${D}${datadir}/BLAS-Tester

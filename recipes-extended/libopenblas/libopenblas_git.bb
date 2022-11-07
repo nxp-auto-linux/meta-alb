@@ -23,10 +23,10 @@ EXTRA_OEMAKE += "OPENBLAS_LIBRARY_DIR=${libdir}"
 EXTRA_OEMAKE += "OPENBLAS_BINARY_DIR=${bindir}"
 
 # Experimental!
-EXTRA_OEMAKE_append_aarch64 = " TARGET=ARMV8"
-EXTRA_OEMAKE_append_powerpc64 = " TARGET=PPC970"
+EXTRA_OEMAKE:append:aarch64 = " TARGET=ARMV8"
+EXTRA_OEMAKE:append:powerpc64 = " TARGET=PPC970"
 
-FILES_${PN}-dev += "${libdir}/cmake/openblas"
+FILES:${PN}-dev += "${libdir}/cmake/openblas"
 
 do_install() {
         oe_runmake DESTDIR=${D} PREFIX=${prefix} install

@@ -155,9 +155,9 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2', True) + ':do_deploy' or ''} \
 "
 
-SDCARD_GENERATION_COMMAND_fsl-lsch3 = "generate_nxp_sdcard"
-SDCARD_GENERATION_COMMAND_fsl-lsch2 = "generate_nxp_sdcard"
-SDCARD_GENERATION_COMMAND_s32 = "generate_nxp_sdcard"
+SDCARD_GENERATION_COMMAND:fsl-lsch3 = "generate_nxp_sdcard"
+SDCARD_GENERATION_COMMAND:fsl-lsch2 = "generate_nxp_sdcard"
+SDCARD_GENERATION_COMMAND:s32 = "generate_nxp_sdcard"
 
 # Add extra images in the boot partition
 add_extra_boot_img() {
@@ -414,7 +414,7 @@ generate_sdcardimage_entry() {
         fi
 }
 
-IMAGE_CMD_sdcard () {
+IMAGE_CMD:sdcard () {
 
 	if [ -n "${UBOOT_BOOTSPACE_OFFSET}" ]; then
 		UBOOT_BOOTSPACE_OFFSET=$(printf "%d" ${UBOOT_BOOTSPACE_OFFSET})

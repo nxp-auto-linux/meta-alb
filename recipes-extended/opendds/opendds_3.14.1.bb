@@ -4,7 +4,7 @@ DDS_SRC_BRANCH = "branch-DDS-3.14"
 
 require opendds.inc
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	# In some cases the binaries are not installed correctly. Check and fix.
 	if [ ! -e ${D}${bindir}/opendds_idl ]; then
 		cp -Lf ${S}/build/host/dds/idl/opendds_idl ${D}${bindir}/opendds_idl

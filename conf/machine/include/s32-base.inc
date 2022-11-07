@@ -1,5 +1,5 @@
 require conf/machine/include/soc-family.inc
-require conf/machine/include/tune-cortexa53.inc
+require conf/machine/include/arm/armv8a/tune-cortexa53.inc
 
 SOC_FAMILY = "s32"
 

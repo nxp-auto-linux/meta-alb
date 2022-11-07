@@ -110,7 +110,7 @@ IMAGE_INSTALL += " \
 
 # Supporting complex evaluation scenarios
 # NOTE: To enable opencv, you need to add the word "commercial" to
-#       the local.conf entry LICENSE_FLAGS_WHITELIST. We do not ship
+#       the local.conf entry LICENSE_FLAGS_ACCEPTED. We do not ship
 #       elements enabled with commercial requirements by default.
 #       In this specific case, "libav" is affected.
 #IMAGE_INSTALL += "opencv opencv-apps"

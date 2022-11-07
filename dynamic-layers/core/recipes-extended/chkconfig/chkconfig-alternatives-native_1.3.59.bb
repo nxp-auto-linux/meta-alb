@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 # The sysroot branch is 1.3.59 + some git commits from master + --sysroot
 # support for alternatives.
-SRC_URI = "git://github.com/kergoth/chkconfig;branch=sysroot"
+SRC_URI = "git://github.com/kergoth/chkconfig;branch=sysroot;protocol=https"
 S = "${WORKDIR}/git"
 UPSTREAM_CHECK_GITTAGREGEX = "chkconfig-(?P<pver>(\d+(\.\d+)+))"
 

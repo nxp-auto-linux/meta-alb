@@ -16,7 +16,7 @@ APTGET_EXTRA_PACKAGES += '${@ \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
-IMAGE_INSTALL:append += '${@ \
+IMAGE_INSTALL += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc-init", \
     "unsupportedubuntuversion" \
@@ -32,7 +32,7 @@ APTGET_EXTRA_PACKAGES += " \
 
 ROOTFS_POSTPROCESS_COMMAND:append = " do_disable_nm_wait_online;"
 
-IMAGE_INSTALL:append:ls2084abbmini += " \
+IMAGE_INSTALL:append:ls2084abbmini = " \
     kvaser \
 "
 

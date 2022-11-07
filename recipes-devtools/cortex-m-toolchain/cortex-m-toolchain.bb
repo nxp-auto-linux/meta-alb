@@ -27,4 +27,4 @@ extra_gcc_arm_populate_sysroot() {
 	cp -r ${S}/arm-none-eabi ${SYSROOT_DESTDIR}/${base_prefix}
 }
 
-INSANE_SKIP:${PN}:append += "already-stripped"
+INSANE_SKIP:${PN}:append = " already-stripped"

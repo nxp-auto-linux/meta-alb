@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 PV = "5.4"
-SRC_URI:append:ls2 += "\
+SRC_URI:append:ls2 = " \
 	file://0001-kernel-LS2-RDB-device-tree-was-not-quite-correct.patch \
 	file://0001-kernel-Added-phy-ioctl-support-to-the-DPAA2-dpmac-dr.patch \
 	file://0001-linux-qoriq-arm64-kernel-now-conserves-some-power-wh-5.4.patch \

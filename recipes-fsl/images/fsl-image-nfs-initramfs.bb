@@ -12,7 +12,7 @@ IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can',
 
 IMAGE_INSTALL:append:s32g274abluebox3 = " init-net-root"
 
-IMAGE_INSTALL:append += " \
+IMAGE_INSTALL:append = " \
 	init-nfs-boot     \
 	kernel-modules    \
 	nfs-utils-client  \

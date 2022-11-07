@@ -16,24 +16,24 @@ COMMONSRC_URI = " \
     file://lxc.cfg \
 "
 
-SRC_URI:append:ls2 += " \
+SRC_URI:append:ls2 = " \
     ${COMMONSRC_URI} \
     file://ls2blueboxconfig \
     file://enablegfxhwls2.cfg \
     file://dpaa2qdma.cfg \
 "
 
-SRC_URI:append:ls2084abbmini += " \
+SRC_URI:append:ls2084abbmini = " \
     file://gpio.cfg \
 "
 
 # Optional to simplify Ethernet debug
-#SRC_URI:append:ls2 += " \
+#SRC_URI:append:ls2 = " \
 #    file://dpaa2debugfs.cfg \
 #"
 
 # pci vdev sources
-SRC_URI:append:ls1043ardb += " \
+SRC_URI:append:ls1043ardb = " \
     git://github.com/nxp-auto-linux/vnet;protocol=https;branch=pci-vdev;name=pci-vdev;destsuffix=git/drivers/pci/pci-vdev \
     file://0001-Add-support-for-building-NXP-VETH-module.patch \
     file://0001-LS1043A-Adjust-device-tree-ranges-for-PCIe.patch \
@@ -50,13 +50,13 @@ DELTA_KERNEL_DEFCONFIG:append:ls2084abbmini = " gpio.cfg"
 #DELTA_KERNEL_DEFCONFIG:append:ls2 = " enablegfxhwls2.cfg"
 
 DELTA_KERNEL_DEFCONFIG:append:ls1043ardb = " ${COMMONDELTA_KERNEL_DEFCONFIG}"
-DELTA_KERNEL_DEFCONFIG:append:ls1043ardb += " pci-vdev.cfg"
-DELTA_KERNEL_DEFCONFIG:append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:ls1043ardb = " pci-vdev.cfg"
+DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'docker', ' docker.cfg', '', d)}"
 
-SRC_URI:append:ls2084abbmini += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'file://0001-pcie-ls2-kernel-support-for-pcie-demos.patch', '', d)}"
+SRC_URI:append:ls2084abbmini = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' file://0001-pcie-ls2-kernel-support-for-pcie-demos.patch', '', d)}"
 
 PCIE_DEMOS_LX2_PATCH ?= "0001-pcie-lx2-kernel-support-for-pcie-demos.patch"
 PCIE_DEMOS_LX2_PATCH:lx2160ahpcsom = "0001-pcie-lx2-hpcsom-kernel-support-for-pcie-demos.patch"
-SRC_URI:append:lx2160a += " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', 'file://${PCIE_DEMOS_LX2_PATCH}', '', d)}"
+SRC_URI:append:lx2160a = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' file://${PCIE_DEMOS_LX2_PATCH}', '', d)}"
 
 require gcc75compat.inc

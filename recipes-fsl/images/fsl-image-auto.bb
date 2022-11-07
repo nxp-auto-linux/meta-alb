@@ -41,8 +41,8 @@ IMAGE_INSTALL:append:gen1 = " aquantia-firmware-utility "
 
 # Supporting complex evaluation scenarios
 IMAGE_INSTALL += "openssl-misc"
-IMAGE_INSTALL:append:s32 += "openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"
-IMAGE_INSTALL:remove:s32 += "ipsec-tools"
+IMAGE_INSTALL:append:s32 = " openssl openssl-dev libcrypto libssl openssl-conf openssl-engines openssl-bin"
+IMAGE_INSTALL:remove:s32 = "ipsec-tools"
 
 # Increase the freespace
 IMAGE_ROOTFS_EXTRA_SPACE ?= "54000"

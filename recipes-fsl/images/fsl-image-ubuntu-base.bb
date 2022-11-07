@@ -71,7 +71,7 @@ HOST_NAME = "ubuntu-${MACHINE_ARCH}"
 ##############################################################################
 
 # Minimum support for LS2 specific elements.
-IMAGE_INSTALL:append:fsl-lsch3 += "\
+IMAGE_INSTALL:append:fsl-lsch3 = " \
     mc-utils-image \
     restool \
 "

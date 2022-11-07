@@ -86,32 +86,32 @@ KERNEL_MODULE_AUTOLOAD:s32g274aevb += "\
 DELTA_KERNEL_DEFCONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' containers.config', '', d)}"
 
 # VIRTIO
-DELTA_KERNEL_DEFCONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtio', 'virtio', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtio', ' virtio', '', d)}"
 
 # Docker configuration
-DELTA_KERNEL_DEFCONFIG:append += "${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'docker.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'docker', ' docker.config', '', d)}"
 SRC_URI += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'file://build/docker.config', '', d)} "
 
 # GPU configuration
-DELTA_KERNEL_DEFCONFIG:append += "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 'gpu.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', ' gpu.config', '', d)}"
 
 LLCE_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', '+can', '', d)}"
 LLCE_FEATURES:append = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', '+logger', '', d)}"
 
 # LLCE CAN Drivers
-DELTA_KERNEL_DEFCONFIG:append:s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', 'llce_can.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' llce_can.config', '', d)}"
 # LLCE logger
-DELTA_KERNEL_DEFCONFIG:append:s32g += "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', 'llce_logger.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', ' llce_logger.config', '', d)}"
 
 # Logging only
-KERNEL_MODULE_AUTOLOAD:append:s32g += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox llce_logger', '', d)}"
+KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', '+logger', ' llce-core llce-mailbox llce_logger', '', d)}"
 KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox', '', d)}"
 module_conf_llce-core = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-core load_fw=0', '', d)}"
 module_conf_llce-mailbox = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-mailbox config_platform=0', '', d)}"
 
 # CAN + Logging
-KERNEL_MODULE_AUTOLOAD:append:s32g += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce-core llce-mailbox llce_can llce_logger', '', d)}"
+KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', ' llce-core llce-mailbox llce_can llce_logger', '', d)}"
 KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce_can', '', d)}"
 module_conf_llce_can = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'options llce_can logging=1', '', d)}"
 
@@ -135,7 +135,7 @@ DEPENDS = "flex-native bison-native bc-native"
 
 # Enable Xen booting
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-kernel/linux/linux-yocto_virtualization.inc', '', d)}
-DELTA_KERNEL_DEFCONFIG:append += " \
+DELTA_KERNEL_DEFCONFIG:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen.cfg', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_s32.cfg', '', d)} \
     "
@@ -145,12 +145,12 @@ SRC_URI += "\
     "
 
 # Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
-DELTA_KERNEL_DEFCONFIG:append:gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee.cfg', '', d)}"
-SRC_URI:append:gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee.cfg', '', d)}"
+SRC_URI:append:gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' file://build/optee.cfg', '', d)}"
 
 # make everything compatible for the time being
 COMPATIBLE_MACHINE_$MACHINE = "$MACHINE"
 
 # Enable dm-verity
-DELTA_KERNEL_DEFCONFIG:append:gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'dm-verity.cfg', '', d)}"
-SRC_URI:append:gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://build/dm-verity.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' dm-verity.cfg', '', d)}"
+SRC_URI:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' file://build/dm-verity.cfg', '', d)}"

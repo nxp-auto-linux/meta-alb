@@ -8,7 +8,7 @@ SUMMARY = "Add custom nfs init script in rootfs"
 
 INIT_SCRIPT ?= "init-nfs-boot"
 
-DEPENDS:append:s32g274abluebox3 += "init-net"
+DEPENDS:append:s32g274abluebox3 = " init-net"
 
 SRC_URI += " \
     file://${INIT_SCRIPT} \

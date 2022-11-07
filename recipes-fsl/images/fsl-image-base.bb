@@ -26,7 +26,7 @@ IMAGE_INSTALL += "iputils"
 
 # For LS2/LX2, dpl-examples, management-complex, restool is a machine dependency.
 # rcw is dependency for image_types_fsl_flashimage.
-IMAGE_INSTALL:append:fsl-lsch3 += " \
+IMAGE_INSTALL:append:fsl-lsch3 = " \
     restool \
 "
 
@@ -42,7 +42,7 @@ IMAGE_INSTALL:append:s32 = " linux-qspi-tool "
 
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior
-IMAGE_INSTALL:append:fsl-lsch3 += " \
+IMAGE_INSTALL:append:fsl-lsch3 = " \
     linux-kernelitb-norootfs-image \
 "
 

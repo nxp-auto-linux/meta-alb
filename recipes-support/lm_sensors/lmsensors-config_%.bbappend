@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 #-----------------------------------------------------------------------
-SRC_URI:append:ls2080abluebox += " \
+SRC_URI:append:ls2080abluebox = " \
     file://bluebox.conf \
 "
 
@@ -11,7 +11,7 @@ do_install:append:ls2080abluebox() {
 }
 
 #-----------------------------------------------------------------------
-SRC_URI:append:ls2084abluebox += " \
+SRC_URI:append:ls2084abluebox = " \
     file://bluebox.conf \
 "
 
@@ -21,7 +21,7 @@ do_install:append:ls2084abluebox() {
 }
 
 #-----------------------------------------------------------------------
-SRC_URI:append:ls2084abbmini += " \
+SRC_URI:append:ls2084abbmini = " \
     file://ls2084abbmini.conf \
 "
 

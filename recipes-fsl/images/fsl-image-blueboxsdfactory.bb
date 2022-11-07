@@ -11,7 +11,7 @@ require recipes-fsl/images/${FACTORY_SDCARD_ROOTFS_IMAGE}.bb
 # and we want phytool to be able to debug boards on bring up
 # The Aquantia binaries (bin and cld) must be downloaded
 # separately.
-IMAGE_INSTALL:append:ls2084abbmini += "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', 'aqr-firmware-image', '', d)}"
+IMAGE_INSTALL:append:ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'aqr', ' aqr-firmware-image', '', d)}"
 
 FACTORY_EXTRA_IMAGE_INSTALL = "\
     phytool \

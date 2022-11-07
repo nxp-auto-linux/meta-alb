@@ -23,13 +23,13 @@ LOCALVERSION = ""
 DELTA_UBOOT_DEFCONFIG ?= ""
 
 # Enable Xen default boot if Xen enabled
-DELTA_UBOOT_DEFCONFIG:append:s32 += " ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_config.cfg', '', d)}"
+DELTA_UBOOT_DEFCONFIG:append:s32 = " ${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' xen_config.cfg', '', d)}"
 SRC_URI:append:s32 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_config.cfg', '', d)} \
 "
 
 # Enable OP-TEE
-DELTA_UBOOT_DEFCONFIG:append:gen1 += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee_config.cfg', '', d)}"
+DELTA_UBOOT_DEFCONFIG:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee_config.cfg', '', d)}"
 SRC_URI:append:gen1 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
 "

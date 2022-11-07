@@ -134,7 +134,7 @@ IMAGE_INSTALL += " \
     expect \
 "
 
-IMAGE_INSTALL:remove += " \
+IMAGE_INSTALL:remove = " \
 	packagegroup-core-ssh-dropbear \
 "
 

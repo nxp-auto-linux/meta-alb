@@ -15,7 +15,7 @@ PACKAGES-CORE = "\
     glibc-utils \
 "
 
-PACKAGES-CORE:append:s32 = "\
+PACKAGES-CORE:append:s32 = " \
     fbset-modes \
 "
 
@@ -47,7 +47,7 @@ PACKAGES-CORE-MISC = "\
     i2c-tools \
 "
 
-PACKAGES-CORE-MISC:append:fsl-lsch3 += "\
+PACKAGES-CORE-MISC:append:fsl-lsch3 = " \
     merge-files \
 "
 
@@ -86,7 +86,7 @@ PACKAGES-CORE-MISC += "\
     tcpreplay \
 "
 
-PACKAGES-CORE-MISC:append:fsl-lsch3 = "\
+PACKAGES-CORE-MISC:append:fsl-lsch3 = " \
     iproute2 \
     iproute2-tc \
     iptables \

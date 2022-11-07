@@ -1,5 +1,5 @@
 SUMMARY = "Random number generator daemon"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0b6f033afe6db235e559456585dc8cdc"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/gkernel/${BP}.tar.gz \

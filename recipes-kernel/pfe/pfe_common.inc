@@ -5,7 +5,7 @@
 inherit module
 
 SUMMARY = "Linux driver for the Packet Forwarding Engine hardware"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE-GPL2.txt;md5=5dcdfe25f21119aa5435eab9d0256af7"
 
 URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https"

@@ -1,7 +1,7 @@
 # Copyright 2017,2019 NXP
 
 SUMMARY = "Add support for KVASER USB CAN in BB Mini"
-LICENSE = "GPLv2 & BSD"
+LICENSE = "GPL-2.0-only & BSD"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=2cf4d51e36bb1104d17f3f6849f7565e \
     file://COPYING.GPL;md5=4cbb77fd75630b4028ece91b3a627eb4 \

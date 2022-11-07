@@ -2,7 +2,7 @@
 
 SUMMARY = "Kernel PCI test for Linux"
 DESCRIPTION = "Kernel PCI test for Linux"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 inherit linux-kernel-base kernel-arch
 inherit kernelsrc

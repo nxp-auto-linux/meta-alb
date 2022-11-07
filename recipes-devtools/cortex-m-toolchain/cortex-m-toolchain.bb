@@ -3,10 +3,10 @@
 # This recipe deploys the Cortex-M toolchain in binary format
 
 SUMMARY = "Pre-built Cortex-M7 toolchain"
-LICENSE = "GPL-3.0-with-GCC-exception & GPLv3"
+LICENSE = "GPL-3.0-with-GCC-exception & GPL-3.0-only"
 LIC_FILES_CHKSUM = "\
     file://${COMMON_LICENSE_DIR}/GPL-3.0-with-GCC-exception;md5=aef5f35c9272f508be848cd99e0151df \
-    file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891 \
+    file://${COMMON_LICENSE_DIR}/GPL-3.0-only;md5=c79ff39f19dfec6d293b95dea7b07891 \
 "
 
 BBCLASSEXTEND = "native"

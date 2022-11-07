@@ -2,7 +2,7 @@ SUMMARY = "Libcli is a shared library for a Cisco-like command-line interface"
 DESCRIPTION = "Libcli provides a shared library for including a Cisco-like command-line interface into other software."
 HOMEPAGE = "https://dparrish.com/pages/libcli"
 SECTION = "console/devel"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=cb8aedd3bced19bd8026d96a8b6876d7"
 
 DEPENDS = "virtual/crypt"

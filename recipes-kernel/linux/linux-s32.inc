@@ -1,6 +1,6 @@
 DESCRIPTION = "Linux kernel for S32 platforms"
 SECTION = "kernel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 
 inherit kernel
 

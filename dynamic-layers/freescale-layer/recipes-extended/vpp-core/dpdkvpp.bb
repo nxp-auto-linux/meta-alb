@@ -1,6 +1,6 @@
 DESCRIPTION = "Data Plane Development Kit"
 HOMEPAGE = "http://dpdk.org"
-LICENSE = "BSD-3-Clause & LGPLv2 & GPLv2"
+LICENSE = "BSD-3-Clause & LGPL-2.0-only & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://license/README;md5=3383def2d4c82237df281174e981a492"
 
 SRC_URI = "git://github.com/nxp-qoriq/dpdk;nobranch=1 \

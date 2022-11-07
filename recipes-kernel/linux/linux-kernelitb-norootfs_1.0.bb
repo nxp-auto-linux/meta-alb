@@ -7,8 +7,8 @@
 #
 DESCRIPTION = "Linux kernel ITB generation without rootfs"
 SECTION = "kernel"
-LICENSE = "GPL-2.0"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+LICENSE = "GPL-2.0-only"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
 # Default: No rootfs to be included in the itb
 # No ramdisk is required for any boot of a full rootfs

@@ -42,7 +42,7 @@ do_merge_delta_config() {
     # copy .config to defconfig as required by fsl-kernel-localversion
     cp .config ${WORKDIR}/defconfig
 }
-addtask merge_delta_config before do_preconfigure after do_patch
+addtask merge_delta_config before do_kernel_localversion after do_patch
 
 # Fix the dtc compile issue if DTC related options are not enabled in defconfig
 do_compile:prepend() {

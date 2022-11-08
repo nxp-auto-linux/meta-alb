@@ -1,15 +1,16 @@
-From 78baf18033f5578373491185d125f1d33e3dda57 Mon Sep 17 00:00:00 2001
-From: nxa15299 <Heinz.Wrobel@nxp.com>
-Date: Sat, 27 Jan 2018 11:18:46 +0100
-Subject: [PATCH] pseudo: realpath wrapper did not chroot translation properly
+From 5f7ca5f8818b4f77d0187f0b1c8fa4659bf1590e Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Tue, 8 Nov 2022 14:00:01 +0100
+Subject: [PATCH 19/20] pseudo: realpath wrapper did not do chroot translation
+ properly
 
-Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
- ports/unix/guts/realpath.c | 5 +++-
+ ports/unix/guts/realpath.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/ports/unix/guts/realpath.c b/ports/unix/guts/realpath.c
-index a59808d..61a3c0d 100644
+index 8d8118b..df5bbf6 100644
 --- a/ports/unix/guts/realpath.c
 +++ b/ports/unix/guts/realpath.c
 @@ -21,7 +21,9 @@
@@ -24,5 +25,5 @@ index a59808d..61a3c0d 100644
  		return NULL;
  	}
 -- 
-2.15.1
+2.34.1
 

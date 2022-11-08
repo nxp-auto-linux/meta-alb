@@ -80,7 +80,6 @@ PACKAGES-CORE-MISC += "\
     inetutils-inetd \
     inetutils-rsh \
     inetutils-rshd \
-    libhugetlbfs \
     lmsensors-sensors \
     tcpdump \
     tcpreplay \

@@ -35,7 +35,6 @@ PACKAGES-CORE-MISC:remove = "\
     inetutils-rshd \
     inetutils-logger \
     inetutils-rsh \
-    libhugetlbfs \
     lmsensors-sensors \
     tcpdump \
     tcpreplay \

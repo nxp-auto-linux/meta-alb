@@ -23,4 +23,6 @@ SRC_URI += " \
     file://0018-pseudo-Diagnostic-cleanup-for-utimensat.patch \
     file://0019-pseudo-realpath-wrapper-did-not-do-chroot-translatio.patch \
     file://0020-pseudo-did-not-treat-softlinks-correctly-in-chroot.patch \
+\
+    file://0001-pseudo-Critical-chroot-readlink-fix.patch \
 "

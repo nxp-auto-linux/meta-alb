@@ -51,6 +51,16 @@ GLIBCVERSION = '${@ \
 PREFERRED_VERSION_cross-localedef-native = "${GLIBCVERSION}"
 BINUVERSION="2.34"
 
+# We need to understand the python version in Ubuntu for dependency
+# management
+APTGET_PYTHON_VER = '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "3.8", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "3.8", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d)}'
+
+
 # More recent Ubuntu versions work with symlinks for the base
 # directories. We can't refer to symlink based files
 DISTRO_FEATURES:append = '${@ \
@@ -126,6 +136,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     file \
     findutils \
     flex \
+    gawk \
     glibc \
     glibc-locale \
     gcc-runtime \
@@ -145,6 +156,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     libxml2 \
     m4 \
     ncurses \
+    ncurses-terminfo-base \
     netbase \
     net-tools \
     opkg-utils \

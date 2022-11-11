@@ -93,8 +93,9 @@ APTGET_SKIP_CACHECLEAN ?= "0"
 # We can however speed up package installs to some extent
 APTGET_USE_NATIVE_DPKG ?= "1"
 
-# Python versions depend on Ubuntu version, but we need one default.
-APTGET_PYTHON_VER ?= "3.5"
+# Python versions depend on Ubuntu version and must be configured
+# before using this class
+APTGET_PYTHON_VER ?= "::python3versionnotconfigured!::"
 
 # Minimum package needs for apt to work right. Nothing else.
 APTGET_INIT_FAKETOOLS_PACKAGES ?= "dbus systemd"
@@ -866,6 +867,31 @@ fakeroot aptget_update_end() {
 		aptget_run_aptget clean
 	fi
 
+	# There are some directories which should be cleaned up.
+	# Due to softlinks, we need to be careful about what we remove
+	# and only remove inside the chroot environment.
+	# The insane.bbclass implementation of the empty-dirs check
+	# gets that wrong and resolves softlinks, suddenly pointing into
+	# the host root on kirkstone and complaining about irrelevant
+	# content.
+	# Actual removal of directory content is a little bit tricky
+	# if we don't want to rely on special tools that may not be
+	# there. ls and rm will likely be available with the given
+	# options on the host and target respectively.
+set -x
+	if [ -e "${APTGET_CHROOT_DIR}"/bin/sh ]; then
+		for dir in /run /var/run /var/volatile
+		do
+			if [ -d "${APTGET_CHROOT_DIR}$dir" ]; then
+				for file in `chroot "${APTGET_CHROOT_DIR}" ls -Ab "$dir"`
+				do
+					chroot "${APTGET_CHROOT_DIR}" rm -rf "$dir/$file"
+				done
+			fi
+		done
+	fi
+set +x
+
 	# Remove any proxy instrumentation
 	xt="/etc/apt/apt.conf.d/01yoctoinstallproxies"
     xf="/__etc_apt_apt.conf.d_01yoctoinstallproxies__"
@@ -879,6 +905,7 @@ fakeroot aptget_update_end() {
 	# networking config of our target rootfs.
     aptget_delete_faketool "/etc/hosts" "/__etchosts__"
     aptget_delete_faketool "/etc/resolv.conf" "/__etcresolvconf__"
+
 }
 
 python do_aptget_update() {
@@ -989,7 +1016,7 @@ APTGET_YOCTO_TRANSLATION += "\
 # This is a really ugly one for us because Yocto does a very fine
 # grained split of libc. Note how we avoid spaces in the wrong places!
 APTGET_YOCTO_TRANSLATION += "\
-	libc6:libc6,libc6-utils,glibc,eglibc\
+	libc6:libc6,libc6-utils,glibc,eglibc,\
 glibc-thread-db,eglibc-thread-db,\
 glibc-extra-nss,eglibc-extra-nss,\
 glibc-pcprofile,eglibc-pcprofile,\
@@ -1090,7 +1117,7 @@ glibc-gconv-utf-7,glibc-gconv-viscii\
 # If we are using this class, we want to ensure that our recipe
 # is also properly listed as rproviding the needed results
 # Images should not be rproviding anything as they don't result
-# in packages, i.e., they are not a dependency resultion element!
+# in packages, i.e., they are not a dependency resolution element!
 python () {
     if bb.data.inherits_class("image", d):
         return

@@ -1,8 +1,7 @@
-From 3969a052315404c467a54111849e13fc2357cb56 Mon Sep 17 00:00:00 2001
+From a5fad6571bf375a5e1eacc0074fc0350ad96f2ad Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 24 Jan 2020 13:17:38 +0100
-Subject: [PATCH 5/9] qemu-user: SO_PEERGROUPS was not emulated, breaking tgt
- code
+Date: Fri, 11 Nov 2022 14:11:27 +0200
+Subject: [PATCH] qemu-user: SO_PEERGROUPS was not emulated, breaking tgt code
 
 As this fairly new socket option was not handled, the default
 drop resulted in ERANGE being returned which caused the caller to
@@ -15,14 +14,14 @@ Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
  linux-user/alpha/sockbits.h   |  2 ++
- linux-user/generic/sockbits.h |  2 ++
+ linux-user/generic/sockbits.h |  1 +
  linux-user/hppa/sockbits.h    |  2 ++
  linux-user/mips/sockbits.h    |  2 ++
  linux-user/syscall.c          | 41 +++++++++++++++++++++++++++++++++++
- 5 files changed, 49 insertions(+)
+ 5 files changed, 48 insertions(+)
 
 diff --git a/linux-user/alpha/sockbits.h b/linux-user/alpha/sockbits.h
-index d54dc98c..4c10fa63 100644
+index d54dc98c0..4c10fa63c 100644
 --- a/linux-user/alpha/sockbits.h
 +++ b/linux-user/alpha/sockbits.h
 @@ -75,6 +75,8 @@
@@ -35,20 +34,19 @@ index d54dc98c..4c10fa63 100644
   * have to define SOCK_NONBLOCK to a different value here.
   */
 diff --git a/linux-user/generic/sockbits.h b/linux-user/generic/sockbits.h
-index e44733c6..af146f4d 100644
+index b3b4a8e44..db1732058 100644
 --- a/linux-user/generic/sockbits.h
 +++ b/linux-user/generic/sockbits.h
-@@ -9,6 +9,8 @@
+@@ -9,6 +9,7 @@
  #define GENERIC_SOCKBITS_H
  
  #define TARGET_SO_PASSSEC        34
 +#define TARGET_SO_PEERGROUPS   59
-+
  
  /* For setsockopt(2) */
  #define TARGET_SOL_SOCKET      1
 diff --git a/linux-user/hppa/sockbits.h b/linux-user/hppa/sockbits.h
-index 23f69a32..df7c62c0 100644
+index 23f69a329..df7c62c01 100644
 --- a/linux-user/hppa/sockbits.h
 +++ b/linux-user/hppa/sockbits.h
 @@ -67,6 +67,8 @@
@@ -61,10 +59,10 @@ index 23f69a32..df7c62c0 100644
   * have to define SOCK_NONBLOCK to a different value here.
   */
 diff --git a/linux-user/mips/sockbits.h b/linux-user/mips/sockbits.h
-index 0f022cd5..21a3c1bf 100644
+index 562cad88e..30bdaea43 100644
 --- a/linux-user/mips/sockbits.h
 +++ b/linux-user/mips/sockbits.h
-@@ -69,6 +69,8 @@
+@@ -71,6 +71,8 @@
  #define TARGET_SO_RCVBUFFORCE          33
  #define TARGET_SO_PASSSEC              34
  
@@ -74,10 +72,10 @@ index 0f022cd5..21a3c1bf 100644
   *
   * Please notice that for binary compat reasons MIPS has to
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 57debf3e..3bbcc7e8 100644
+index 379ec0460..02e49a3bf 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -2452,6 +2452,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+@@ -2595,6 +2595,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
          /* These don't just return a single integer */
          case TARGET_SO_PEERNAME:
              goto unimplemented;
@@ -114,7 +112,7 @@ index 57debf3e..3bbcc7e8 100644
 +                return -TARGET_EFAULT;
 +            }
 +            for (i = 0; i < n; i++) {
-+                    __put_user(hgroups[i], &tgroups[i]);
++                __put_user(hgroups[i], &tgroups[i]);
 +            }
 +            unlock_user(tgroups, optval_addr, len);
 +#else
@@ -126,5 +124,5 @@ index 57debf3e..3bbcc7e8 100644
              struct timeval tv;
              socklen_t tvlen;
 -- 
-2.17.1
+2.25.1
 

@@ -1,7 +1,7 @@
-From 53ca48a9d0b5bd7f35e34327cd97bbc91e3481fb Mon Sep 17 00:00:00 2001
-From: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-Date: Tue, 15 Dec 2020 14:20:13 +0200
-Subject: [PATCH 8/9] qemu-user: builtin strace much more comprehensive
+From 28aef86809484cd16ec54f8e84aae4939aeac4b3 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 11 Nov 2022 15:09:25 +0200
+Subject: [PATCH] qemu-user: builtin strace much more comprehensive
 
 This could be considered cosmetic but was invaluable in debugging
 other issues. A good number of syscalls was dumped in a confusing
@@ -10,16 +10,17 @@ not even show at all.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
 ---
  linux-user/strace.c    | 38 ++++++++++++++++++++++++++++++++++++--
- linux-user/strace.list | 26 +++++++++++++-------------
- 2 files changed, 49 insertions(+), 15 deletions(-)
+ linux-user/strace.list | 24 ++++++++++++------------
+ 2 files changed, 48 insertions(+), 14 deletions(-)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 13981341..83708728 100644
+index 2cdbf030b..b8560b511 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -144,8 +144,10 @@ print_signal(abi_ulong arg, int last)
+@@ -162,8 +162,10 @@ print_signal(abi_ulong arg, int last)
      case TARGET_SIGCHLD: signal_name = "SIGCHLD"; break;
      case TARGET_SIGCONT: signal_name = "SIGCONT"; break;
      case TARGET_SIGSTOP: signal_name = "SIGSTOP"; break;
@@ -30,7 +31,7 @@ index 13981341..83708728 100644
      }
      if (signal_name == NULL) {
          print_raw_param("%ld", arg, last);
-@@ -692,7 +694,7 @@ print_execve(const struct syscallname *name,
+@@ -651,7 +653,7 @@ print_execve(void *cpu_env, const struct syscallname *name,
          }
      }
  
@@ -39,7 +40,7 @@ index 13981341..83708728 100644
  }
  
  #ifdef TARGET_NR_ipc
-@@ -1251,6 +1253,7 @@ print_file_mode(abi_long mode, int last)
+@@ -1493,6 +1495,7 @@ print_file_mode(abi_long mode, int last)
  {
      const char *sep = "";
      const struct flags *m;
@@ -47,7 +48,7 @@ index 13981341..83708728 100644
  
      for (m = &mode_flags[0]; m->f_string != NULL; m++) {
          if ((m->f_value & mode) == m->f_value) {
-@@ -1263,7 +1266,7 @@ print_file_mode(abi_long mode, int last)
+@@ -1505,7 +1508,7 @@ print_file_mode(abi_long mode, int last)
  
      mode &= ~S_IFMT;
      /* print rest of the mode as octal */
@@ -56,7 +57,7 @@ index 13981341..83708728 100644
          qemu_log("%s%#o", sep, (unsigned int)mode);
  
      qemu_log("%s", get_comma(last));
-@@ -2920,6 +2923,23 @@ print_mmap(const struct syscallname *name,
+@@ -3548,6 +3551,23 @@ print_mmap(void *cpu_env, const struct syscallname *name,
  #define print_mmap2     print_mmap
  #endif
  
@@ -79,8 +80,8 @@ index 13981341..83708728 100644
 +
  #ifdef TARGET_NR_mprotect
  static void
- print_mprotect(const struct syscallname *name,
-@@ -3044,6 +3064,20 @@ print_tgkill(const struct syscallname *name,
+ print_mprotect(void *cpu_env, const struct syscallname *name,
+@@ -3672,6 +3692,20 @@ print_tgkill(void *cpu_env, const struct syscallname *name,
  }
  #endif
  
@@ -100,12 +101,12 @@ index 13981341..83708728 100644
 +
  #ifdef TARGET_NR_statx
  static void
- print_statx(const struct syscallname *name,
+ print_statx(void *cpu_env, const struct syscallname *name,
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index a04706a5..4af4af74 100644
+index 278596acd..d81758c5c 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -122,7 +122,7 @@
+@@ -124,7 +124,7 @@
  { TARGET_NR_dup2, "dup2" , "%s(%d,%d)", NULL, NULL },
  #endif
  #ifdef TARGET_NR_dup3
@@ -114,7 +115,7 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_epoll_create
  { TARGET_NR_epoll_create, "epoll_create", "%s(%d)", NULL, NULL },
-@@ -276,10 +276,10 @@
+@@ -278,10 +278,10 @@
  { TARGET_NR_getcwd, "getcwd" , "%s(%p,%d)", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getdents
@@ -127,7 +128,7 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_getdomainname
  { TARGET_NR_getdomainname, "getdomainname" , NULL, NULL, NULL },
-@@ -291,19 +291,19 @@
+@@ -293,19 +293,19 @@
  { TARGET_NR_getegid, "getegid" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getegid32
@@ -146,18 +147,11 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_getgid32
 -{ TARGET_NR_getgid32, "getgid32" , NULL, NULL, NULL },
-+{ TARGET_NR_getgid32, "getgid32" , "%s()", NULL, NULL },
++{ TARGET_NR_geteuid32, "geteuid32" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getgroups
  { TARGET_NR_getgroups, "getgroups" , NULL, NULL, NULL },
-@@ -388,13 +388,13 @@
- { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_gettimeofday
--{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
-+{ TARGET_NR_gettimeofday, "gettimeofday" , "%s(%#x,%#x)", NULL, NULL },
- #endif
- #ifdef TARGET_NR_getuid
+@@ -398,7 +398,7 @@
  { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getuid32
@@ -166,7 +160,7 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_getxattr
  { TARGET_NR_getxattr, "getxattr" , NULL, print_getxattr, NULL },
-@@ -616,7 +616,7 @@
+@@ -623,7 +623,7 @@
  { TARGET_NR_mq_unlink, "mq_unlink" , NULL, print_mq_unlink, NULL },
  #endif
  #ifdef TARGET_NR_mremap
@@ -175,7 +169,7 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_msgctl
  { TARGET_NR_msgctl, "msgctl" , NULL, NULL, NULL },
-@@ -1063,7 +1063,7 @@
+@@ -1070,7 +1070,7 @@
  { TARGET_NR_profil, "profil" , NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_pselect6
@@ -184,7 +178,7 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_ptrace
  { TARGET_NR_ptrace, "ptrace" , NULL, NULL, NULL },
-@@ -1219,7 +1219,7 @@
+@@ -1226,7 +1226,7 @@
  { TARGET_NR_sched_yield, "sched_yield" , NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_seccomp
@@ -193,7 +187,7 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_security
  { TARGET_NR_security, "security" , NULL, NULL, NULL },
-@@ -1625,7 +1625,7 @@
+@@ -1633,7 +1633,7 @@
  { TARGET_NR_vserver, "vserver" , NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_wait4
@@ -202,7 +196,7 @@ index a04706a5..4af4af74 100644
  #endif
  #ifdef TARGET_NR_waitid
  { TARGET_NR_waitid, "waitid" , "%s(%#x,%d,%p,%#x)", NULL, NULL },
-@@ -1649,7 +1649,7 @@
+@@ -1657,7 +1657,7 @@
  { TARGET_NR_sync_file_range2, "sync_file_range2", NULL, NULL, NULL },
  #endif
  #ifdef TARGET_NR_pipe2
@@ -212,5 +206,5 @@ index a04706a5..4af4af74 100644
  #ifdef TARGET_NR_atomic_cmpxchg_32
  { TARGET_NR_atomic_cmpxchg_32, "atomic_cmpxchg_32", NULL, NULL, NULL },
 -- 
-2.17.1
+2.25.1
 

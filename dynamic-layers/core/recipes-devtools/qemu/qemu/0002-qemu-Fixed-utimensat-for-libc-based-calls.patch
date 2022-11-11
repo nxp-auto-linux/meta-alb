@@ -1,7 +1,7 @@
-From 4972cc25f5998c4396e12789e09979d8111c846a Mon Sep 17 00:00:00 2001
+From f7022d74ba248a27709c462f8197101aa10c9cd1 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 24 Jan 2020 11:52:26 +0100
-Subject: [PATCH 2/9] qemu: Fixed utimensat() for libc based calls
+Date: Fri, 11 Nov 2022 13:17:14 +0200
+Subject: [PATCH] qemu: Fixed utimensat() for libc based calls
 
 Turns out that "touch" on Linux ends up with all NULL path for
 utimensat(). The std libc does not translate this into
@@ -16,11 +16,11 @@ Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
  1 file changed, 21 insertions(+), 13 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 198285ca..08fede67 100644
+index b330015df..4883205ee 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -261,6 +261,14 @@ static type name (type1 arg1,type2 arg2,type3 arg3)        \
-  return syscall(__NR_##name, arg1, arg2, arg3);        \
+@@ -278,6 +278,14 @@ static type name (type1 arg1,type2 arg2,type3 arg3)        \
+ 	return syscall(__NR_##name, arg1, arg2, arg3);        \
  }
  
 +#define _libc_syscall4(type,name,namelibc,type1,arg1,type2,arg2,type3,arg3,type4,arg4)	\
@@ -34,9 +34,9 @@ index 198285ca..08fede67 100644
  #define __NR_sys_uname __NR_uname
  #define __NR_sys_getcwd1 __NR_getcwd
  #define __NR_sys_getdents __NR_getdents
-@@ -412,17 +420,8 @@ _syscall2(int, sys_getcwd1, char *, buf, size_t, size)
+@@ -434,17 +442,8 @@ _syscall2(int, sys_getcwd1, char *, buf, size_t, size)
  
- #ifdef TARGET_NR_utimensat
+ #if defined(TARGET_NR_utimensat) || defined(TARGET_NR_utimensat_time64)
  #if defined(__NR_utimensat)
 -/* utimensat has an awful prototype that passes a structure.
 - * This complicates life if you want to use either libc or the syscall.
@@ -54,8 +54,8 @@ index 198285ca..08fede67 100644
  #else
  static int sys_utimensat(int dirfd, const char *pathname,
                           const struct timespec times[2], int flags)
-@@ -11930,8 +11929,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 target_to_host_timespec(ts+1, arg3+sizeof(struct target_timespec));
+@@ -12267,8 +12266,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+                 }
                  tsp = ts;
              }
 -            if (!arg2)
@@ -75,5 +75,5 @@ index 198285ca..08fede67 100644
                  if (!(p = lock_user_string(arg2))) {
                      return -TARGET_EFAULT;
 -- 
-2.17.1
+2.25.1
 

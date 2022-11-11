@@ -1,8 +1,8 @@
-From 14ed38d382c41fe8e27c235200bf73dffe00879f Mon Sep 17 00:00:00 2001
+From 9162e3c7c1eb3faa8da250ddf5f910ada47ab636 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 24 Jan 2020 11:42:09 +0100
-Subject: [PATCH 1/9] qemu: Reinstated syscall emulation through libc via
- command line option.
+Date: Fri, 11 Nov 2022 15:48:42 +0200
+Subject: [PATCH] qemu: Reinstated syscall emulation through libc via command
+ line option.
 
 The problem is that running qemu under pseudo or a LD_PRELOAD based
 fakeroot enviroment will fail if the LD_PRELOAD lib can no longer catch
@@ -14,18 +14,18 @@ chroot pseudo environment.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-
+Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
 ---
- linux-user/main.c    |  7 +++++
- linux-user/qemu.h    |  1 +
- linux-user/syscall.c | 73 +++++++++++++++++++++++++++++++++++++-------
- 3 files changed, 70 insertions(+), 11 deletions(-)
+ linux-user/main.c           |  7 ++++
+ linux-user/syscall.c        | 74 +++++++++++++++++++++++++++++++------
+ linux-user/user-internals.h |  1 +
+ 3 files changed, 71 insertions(+), 11 deletions(-)
 
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 541782fc..0a80e8a0 100644
+index 16def5215..cc27a4428 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -379,6 +379,11 @@ static void handle_arg_strace(const char *arg)
+@@ -380,6 +380,11 @@ static void handle_arg_strace(const char *arg)
      enable_strace = true;
  }
  
@@ -37,7 +37,7 @@ index 541782fc..0a80e8a0 100644
  static void handle_arg_version(const char *arg)
  {
      printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
-@@ -456,6 +461,8 @@ static const struct qemu_argument arg_table[] = {
+@@ -455,6 +460,8 @@ static const struct qemu_argument arg_table[] = {
       "",           "run in singlestep mode"},
      {"strace",     "QEMU_STRACE",      false, handle_arg_strace,
       "",           "log system calls"},
@@ -46,42 +46,30 @@ index 541782fc..0a80e8a0 100644
      {"seed",       "QEMU_RAND_SEED",   true,  handle_arg_seed,
       "",           "Seed for pseudo-random number generator"},
      {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 5c964389..d557e975 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -398,6 +398,7 @@ extern long safe_syscall_base(int *pending, long number, ...);
- 
- /* syscall.c */
- int host_to_target_waitstatus(int status);
-+extern int do_libcsyscall;
- 
- /* strace.c */
- void print_syscall(int num,
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 4859e162..198285ca 100644
+index 839fc7694..c70253641 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -58,6 +58,7 @@
- #include <linux/icmpv6.h>
+@@ -62,6 +62,7 @@
+ #include <linux/in6.h>
  #include <linux/errqueue.h>
  #include <linux/random.h>
 +#include <signal.h>
  #ifdef CONFIG_TIMERFD
  #include <sys/timerfd.h>
  #endif
-@@ -128,6 +129,8 @@
+@@ -142,6 +143,8 @@
  #include "fd-trans.h"
  #include "tcg/tcg.h"
  
-+int do_libcsyscall=0;
++int do_libcsyscall = 0;
 +
  #ifndef CLONE_IO
  #define CLONE_IO                0x80000000      /* Clone io context */
  #endif
-@@ -242,6 +245,21 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
- 	return syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5, arg6);	\
+@@ -259,6 +262,22 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
  }
+ 
  
 +#define _libc_syscall1(type,name,namelibc,type1,arg1)  \
 +static type name (type1 arg1)        \
@@ -94,16 +82,17 @@ index 4859e162..198285ca 100644
 +#define _libc_syscall3(type,name,namelibc,type1,arg1,type2,arg2,type3,arg3)  \
 +static type name (type1 arg1,type2 arg2,type3 arg3)        \
 +{                    \
-+ if (do_libcsyscall)             \
-+   return namelibc(arg1, arg2, arg3);        \
-+ return syscall(__NR_##name, arg1, arg2, arg3);        \
++	if (do_libcsyscall)             \
++		return namelibc(arg1, arg2, arg3);        \
++	return syscall(__NR_##name, arg1, arg2, arg3);        \
 +}
- 
++
  #define __NR_sys_uname __NR_uname
  #define __NR_sys_getcwd1 __NR_getcwd
-@@ -394,9 +412,17 @@ _syscall2(int, sys_getcwd1, char *, buf, size_t, size)
+ #define __NR_sys_getdents __NR_getdents
+@@ -415,9 +434,17 @@ _syscall2(int, sys_getcwd1, char *, buf, size_t, size)
  
- #ifdef TARGET_NR_utimensat
+ #if defined(TARGET_NR_utimensat) || defined(TARGET_NR_utimensat_time64)
  #if defined(__NR_utimensat)
 -#define __NR_sys_utimensat __NR_utimensat
 -_syscall4(int,sys_utimensat,int,dirfd,const char *,pathname,
@@ -122,7 +111,7 @@ index 4859e162..198285ca 100644
  #else
  static int sys_utimensat(int dirfd, const char *pathname,
                           const struct timespec times[2], int flags)
-@@ -699,6 +725,31 @@ const char *target_strerror(int err)
+@@ -559,6 +586,31 @@ const char *target_strerror(int err)
      return strerror(target_to_host_errno(err));
  }
  
@@ -154,7 +143,7 @@ index 4859e162..198285ca 100644
  #define safe_syscall0(type, name) \
  static type safe_##name(void) \
  { \
-@@ -748,7 +799,7 @@ static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
+@@ -608,7 +660,7 @@ static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
  
  safe_syscall3(ssize_t, read, int, fd, void *, buff, size_t, count)
  safe_syscall3(ssize_t, write, int, fd, const void *, buff, size_t, count)
@@ -163,16 +152,16 @@ index 4859e162..198285ca 100644
                int, flags, mode_t, mode)
  #if defined(TARGET_NR_wait4) || defined(TARGET_NR_waitpid)
  safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
-@@ -756,7 +807,7 @@ safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
+@@ -616,7 +668,7 @@ safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
  #endif
  safe_syscall5(int, waitid, idtype_t, idtype, id_t, id, siginfo_t *, infop, \
                int, options, struct rusage *, rusage)
 -safe_syscall3(int, execve, const char *, filename, char **, argv, char **, envp)
 +libc_syscall3(int, execve, const char *, filename, char **, argv, char **, envp)
  #if defined(TARGET_NR_select) || defined(TARGET_NR__newselect) || \
-     defined(TARGET_NR_pselect6)
+     defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6_time64)
  safe_syscall6(int, pselect6, int, nfds, fd_set *, readfds, fd_set *, writefds, \
-@@ -851,9 +902,9 @@ safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
+@@ -720,9 +772,9 @@ safe_syscall6(ssize_t, copy_file_range, int, infd, loff_t *, pinoff,
   * This will then work and use a 64-bit offset for both 32-bit and 64-bit hosts.
   */
  #ifdef __NR_fcntl64
@@ -184,7 +173,7 @@ index 4859e162..198285ca 100644
  #endif
  
  static inline int host_to_target_sock_type(int host_type)
-@@ -6695,10 +6746,10 @@ static inline int tswapid(int id)
+@@ -6976,10 +7028,10 @@ static inline int tswapid(int id)
  #define __NR_sys_setresgid __NR_setresgid
  #endif
  
@@ -199,6 +188,18 @@ index 4859e162..198285ca 100644
  
  void syscall_init(void)
  {
+diff --git a/linux-user/user-internals.h b/linux-user/user-internals.h
+index 661612a08..e6b350e6b 100644
+--- a/linux-user/user-internals.h
++++ b/linux-user/user-internals.h
+@@ -96,6 +96,7 @@ void probe_guest_base(const char *image_name,
+ 
+ /* syscall.c */
+ int host_to_target_waitstatus(int status);
++extern int do_libcsyscall;
+ 
+ #ifdef TARGET_I386
+ /* vm86.c */
 -- 
-2.17.1
+2.25.1
 

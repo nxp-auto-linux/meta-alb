@@ -6,8 +6,7 @@ SRC_URI += "\
 	file://0005-qemu-user-SO_PEERGROUPS-was-not-emulated-breaking-tg.patch \
 	file://0006-qemu-user-syscall.c-target_mmap-was-called-with-bad-.patch \
 \
-	file://0007-qemu-user-Subject-PATCH-qemu-user-Improved-diagnosti.patch \
-	file://0008-qemu-user-builtin-strace-much-more-comprehensive.patch \
+	file://0007-qemu-user-builtin-strace-much-more-comprehensive.patch \
 \
 	file://0001-qemu-user-strace-didn-t-print-faccessat-correctly.patch \
 	file://0001-qemu-user-add-syscall-emulation-through-libc-for-get.patch \

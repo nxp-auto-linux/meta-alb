@@ -1,7 +1,7 @@
-From 4cc4738618bc3d025f84dbc50248ea163dc74552 Mon Sep 17 00:00:00 2001
+From 0d05aa33ef22702073f8fbefa257d7d6f16169d4 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 24 Jan 2020 13:00:48 +0100
-Subject: [PATCH 4/9] qemu-user: seccomp handling was not checked properly and
+Date: Fri, 11 Nov 2022 13:55:20 +0200
+Subject: [PATCH] qemu-user: seccomp handling was not checked properly and
  crashed
 
 While it is not implemented properly still, it is now checked for
@@ -13,10 +13,10 @@ Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
  1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index dcf3519c..57debf3e 100644
+index 87e8f7b92..379ec0460 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -31,6 +31,7 @@
+@@ -33,6 +33,7 @@
  #include <sys/fsuid.h>
  #include <sys/personality.h>
  #include <sys/prctl.h>
@@ -24,7 +24,7 @@ index dcf3519c..57debf3e 100644
  #include <sys/resource.h>
  #include <sys/swap.h>
  #include <linux/capability.h>
-@@ -10126,9 +10127,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -10984,9 +10985,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
  #endif /* AARCH64 */
          case PR_GET_SECCOMP:
          case PR_SET_SECCOMP:
@@ -38,5 +38,5 @@ index dcf3519c..57debf3e 100644
              /* Most prctl options have no pointer arguments */
              return get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
 -- 
-2.17.1
+2.25.1
 

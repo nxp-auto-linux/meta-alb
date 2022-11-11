@@ -1,6 +1,6 @@
-From 17c9d576b1fdc4b2d3c1a6c84c02ddd676d51de1 Mon Sep 17 00:00:00 2001
+From 90beebd4bd5f91ecbf004b12c7a2255348b07ecd Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Sat, 25 Jan 2020 15:03:42 +0100
+Date: Fri, 11 Nov 2022 15:15:28 +0200
 Subject: [PATCH] qemu-user: strace didn't print faccessat() correctly
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
@@ -10,10 +10,10 @@ Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 0edb759..1a9cc85 100644
+index b8560b511..a40ed81e1 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1413,7 +1413,8 @@ print_faccessat(const struct syscallname *name,
+@@ -1944,7 +1944,8 @@ print_faccessat(void *cpu_env, const struct syscallname *name,
      print_at_dirfd(arg0, 0);
      print_string(arg1, 0);
      print_flags(access_flags, arg2, 0);
@@ -24,5 +24,5 @@ index 0edb759..1a9cc85 100644
  }
  #endif
 -- 
-2.17.1
+2.25.1
 

@@ -13,6 +13,9 @@ export PACKAGE_INSTALL = "${IMAGE_INSTALL}"
 
 inherit nativeaptinstall
 
+# We must permit network access during rootfs creation for apt to work
+do_rootfs[network] = "1"
+
 APTGET_CHROOT_DIR = "${IMAGE_ROOTFS}"
 APTGET_SKIP_UPGRADE = "1"
 

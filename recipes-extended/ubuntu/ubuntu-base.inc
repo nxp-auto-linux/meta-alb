@@ -28,7 +28,10 @@ do_populate_sdk[noexec] = "1"
 # to look at any build- or runtime-dependencies or debug symbols!
 # We have quite a number of deficiencies to ignore. The Ubuntu packages
 # and rootfs do not really conform to Yocto rules.
-INSANE_SKIP:${PN} += "already-stripped build-deps file-rdeps dev-so staticdev mime"
+# empty-dirs is a special case because we are doing things right here
+# and kirkstone gets it wrong by following softlinks and then seeing
+# host side files.
+INSANE_SKIP:${PN} += "already-stripped build-deps file-rdeps dev-so staticdev mime empty-dirs"
 INHIBIT_DEFAULT_DEPS = "1"
 
 # We need to keep all the other recipes happy that will rely on us
@@ -178,8 +181,6 @@ fakeroot do_shell_prepare() {
 
 fakeroot do_aptget_user_update:append() {
 
-	set -x
-
 	# Without an /etc/fstab, the rootfs remains read only
 	install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
 
@@ -192,29 +193,15 @@ fakeroot do_aptget_user_update:append() {
 	# Per Yocto docs it should never be packaged
 	rm -f "${APTGET_CHROOT_DIR}${infodir}/dir"
 
-	# There is an unfulfilled libldap dependency.
-	# Fixing the dependency seems a bit tricky to do,
-	# so we eliminate the single tool that causes
-	# the dependency problem. UNDERSTAND AND FIX!
-	#rm -f "${APTGET_CHROOT_DIR}/usr/lib/gnupg/gpgkeys_ldap"
-
 	# The default ubuntu-base rootfs does not do filesystem
 	# fixes on boot. Given the nature of the BlueBox, we want
 	# to enable that by default
 	if [ -f "${APTGET_CHROOT_DIR}/lib/init/vars.sh" ]; then
 		sed -i "s/^#*FSCKFIX\s*=.*/FSCKFIX=yes/g" "${APTGET_CHROOT_DIR}/lib/init/vars.sh"
 	fi
-
-	# Add /usr/bin/python3 symlink to /usr/bin/python3.x, as it is required
-	# by other packages depending on python3
-	if [ ! -f ${APTGET_CHROOT_DIR}/usr/bin/python3 ]; then
-		cd ${APTGET_CHROOT_DIR}/usr/bin/
-		ln -s python${APTGET_PYTHON_VER} python3
-		cd -
-	fi
-	set +x
 }
 
+do_install[network] = "1"
 python do_install() {
     bb.build.exec_func("do_shell_prepare", d)
     bb.build.exec_func("do_aptget_update", d)

@@ -1,6 +1,6 @@
-From 68e7e2a2b548e18202cf2315a201ee50131a685d Mon Sep 17 00:00:00 2001
+From 59dc812b15c25b0969339742fd9650ac95dec483 Mon Sep 17 00:00:00 2001
 From: Ionut-Valentin Vicovan <Ionut.Vicovan@nxp.com>
-Date: Fri, 5 Feb 2021 09:57:27 +0200
+Date: Mon, 14 Nov 2022 13:52:53 +0200
 Subject: [PATCH] Update busybox template to handle nosuid/suid flavors of
  busybox
 
@@ -20,11 +20,11 @@ Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
 Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
 ---
- templates/lxc-busybox.in | 108 ++++++++++++++++++++++++++-------------
- 1 file changed, 72 insertions(+), 36 deletions(-)
+ templates/lxc-busybox.in | 109 ++++++++++++++++++++++++++-------------
+ 1 file changed, 72 insertions(+), 37 deletions(-)
 
 diff --git a/templates/lxc-busybox.in b/templates/lxc-busybox.in
-index effdb73..83b93f8 100644
+index bc7207a5a..5c1dd903d 100755
 --- a/templates/lxc-busybox.in
 +++ b/templates/lxc-busybox.in
 @@ -56,7 +56,6 @@ USERNS="$(in_userns)"
@@ -45,13 +45,13 @@ index effdb73..83b93f8 100644
  ${rootfs}/lib \
  ${rootfs}/usr/lib \
  ${rootfs}/lib64 \
-@@ -136,13 +137,7 @@ EOF
+@@ -119,13 +120,7 @@ EOF
    # writable and readable for other
    chmod 644 "${rootfs}/etc/inittab" || return 1
  
 -  # Look for the pathname of "default.script" from the help of udhcpc
--  DEF_SCRIPT=`${BUSYBOX_EXE} udhcpc --help 2>&1 | egrep -- '-s.*Run PROG' | cut -d'/' -f2- | cut -d')' -f1`
--  DEF_SCRIPT_DIR=`dirname /${DEF_SCRIPT}`
+-  DEF_SCRIPT=$(${BUSYBOX_EXE} udhcpc --help 2>&1 | egrep -- '-s.*Run PROG' | cut -d'/' -f2- | cut -d')' -f1)
+-  DEF_SCRIPT_DIR=$(dirname /${DEF_SCRIPT})
 -  mkdir -p ${rootfs}/${DEF_SCRIPT_DIR}
 -  chmod 644 ${rootfs}/${DEF_SCRIPT_DIR} || return 1
 -
@@ -60,7 +60,7 @@ index effdb73..83b93f8 100644
  #!/bin/sh
  case "\$1" in
    deconfig)
-@@ -179,7 +174,7 @@ esac
+@@ -162,7 +157,7 @@ esac
  exit 0
  EOF
  
@@ -69,7 +69,7 @@ index effdb73..83b93f8 100644
  
   return "${res}"
  }
-@@ -187,40 +182,52 @@ EOF
+@@ -170,40 +165,51 @@ EOF
  configure_busybox()
  {
    rootfs="${1}"
@@ -81,12 +81,12 @@ index effdb73..83b93f8 100644
 -    echo "ERROR: Failed to copy busybox binary" 1>&2
 -    return 1
 -  fi
-+  which ${bb_binary} >/dev/null 2>&1
- 
+-
 -  # copy host passwd
 -  if ! cp "$(which passwd)" "${rootfs}/bin"; then
 -      echo "ERROR: Failed to copy passwd binary"
 -      return 1
++  which ${bb_binary} >/dev/null 2>&1
 +  if [ $? -ne 0 ]; then
 +    echo "${bb_binary} executable is not accessible"
    fi
@@ -121,22 +121,22 @@ index effdb73..83b93f8 100644
 +    ln ${rootfs}/bin/${bb_binary} ${rootfs}/sbin/init
 +  fi
 +  popd > /dev/null
- 
--  # /etc/fstab must exist for "mount -a"
--  touch "${rootfs}/etc/fstab"
++
 +  if [ ! -f "${rootfs}/etc/fstab" ]; then
 +    # /etc/fstab must exist for "mount -a"
 +    touch "${rootfs}/etc/fstab"
 +  fi
  
--  # passwd exec must be setuid
--  chmod +s "${rootfs}/bin/passwd"
--  touch "${rootfs}/etc/shadow"
+-  # /etc/fstab must exist for "mount -a"
+-  touch "${rootfs}/etc/fstab"
 +  if [ ! -x "${rootfs}/bin/passwd" -a -f "${rootfs}/bin/passwd" ]; then
 +    # passwd exec must be setuid
 +    chmod +s "${rootfs}/bin/passwd"
 +  fi
-+
+ 
+-  # passwd exec must be setuid
+-  chmod +s "${rootfs}/bin/passwd"
+-  touch "${rootfs}/etc/shadow"
 +  if [ ! -f "${rootfs}/etc/shadow" ]; then
 +    touch "${rootfs}/etc/shadow"
 +    # add empty password for root
@@ -145,7 +145,7 @@ index effdb73..83b93f8 100644
  
    return 0
  }
-@@ -348,14 +355,43 @@ if [ -z "$rootfs" ]; then
+@@ -332,14 +338,43 @@ if [ -z "$rootfs" ]; then
    fi
  fi
  
@@ -194,5 +194,5 @@ index effdb73..83b93f8 100644
  
  if ! copy_configuration "${path}" "${rootfs}" "${name}"; then
 -- 
-2.17.1
+2.25.1
 

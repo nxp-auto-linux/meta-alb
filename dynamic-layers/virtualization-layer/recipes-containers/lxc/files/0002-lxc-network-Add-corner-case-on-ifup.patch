@@ -1,6 +1,6 @@
-From dc6579fe23e80101c82efa02e0bfc1291261568c Mon Sep 17 00:00:00 2001
+From 75f6ecbfac2ceb9087c438d33e1f82176ab2872b Mon Sep 17 00:00:00 2001
 From: Ciprian Costea <ciprianmarian.costea@nxp.com>
-Date: Fri, 5 Feb 2021 10:01:19 +0200
+Date: Mon, 14 Nov 2022 14:01:48 +0200
 Subject: [PATCH] lxc: network: Add corner case on ifup
 
 'netdev->name' can reach 'ifup' with an empty value
@@ -13,10 +13,10 @@ Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/src/lxc/network.c b/src/lxc/network.c
-index cf1a0a6..0707890 100644
+index ad43694f2..4109188f3 100644
 --- a/src/lxc/network.c
 +++ b/src/lxc/network.c
-@@ -3423,9 +3423,11 @@ static int lxc_network_setup_in_child_namespaces_common(struct lxc_netdev *netde
+@@ -3861,9 +3861,11 @@ static int lxc_network_setup_in_child_namespaces_common(struct lxc_netdev *netde
  
  	/* set the network device up */
  	if (netdev->flags & IFF_UP) {
@@ -32,5 +32,5 @@ index cf1a0a6..0707890 100644
  		/* the network is up, make the loopback up too */
  		err = lxc_netdev_up("lo");
 -- 
-2.17.1
+2.25.1
 

@@ -1,0 +1,71 @@
+From 5474cd90e81be18dcfccd2a5c787b59cbf5a3685 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Mon, 14 Nov 2022 11:42:51 +0100
+Subject: [PATCH 5/7] glibc2.31: gcc 11 declaration hack
+
+Given different declarations, gcc 11 compared about out of bounds
+accesses. By unifying the declarations we fixed this at the expense
+of less accurate prototype information.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ sunrpc/netname.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/sunrpc/netname.c b/sunrpc/netname.c
+index 61d82ca31a..bcffb70985 100644
+--- a/sunrpc/netname.c
++++ b/sunrpc/netname.c
+@@ -29,7 +29,7 @@
+ static const char OPSYS[] = "unix";
+ 
+ int
+-user2netname (char netname[MAXNETNAMELEN + 1], const uid_t uid,
++user2netname (char *netname, const uid_t uid,
+ 	      const char *domain)
+ {
+   char dfltdom[MAXNETNAMELEN + 1];
+@@ -58,7 +58,7 @@ user2netname (char netname[MAXNETNAMELEN + 1], const uid_t uid,
+ libc_hidden_nolink_sunrpc (user2netname, GLIBC_2_1)
+ 
+ int
+-host2netname (char netname[MAXNETNAMELEN + 1], const char *host,
++host2netname (char *netname, const char *host,
+ 	      const char *domain)
+ {
+   char *p;
+@@ -123,7 +123,7 @@ libc_hidden_nolink_sunrpc (host2netname, GLIBC_2_1)
+ #endif
+ 
+ int
+-getnetname (char name[MAXNETNAMELEN + 1])
++getnetname (char *name)
+ {
+   uid_t uid;
+   int dummy;
+@@ -138,11 +138,11 @@ getnetname (char name[MAXNETNAMELEN + 1])
+ libc_hidden_nolink_sunrpc (getnetname, GLIBC_2_1)
+ 
+ /* Type of the lookup function for netname2user.  */
+-typedef int (*netname2user_function) (const char netname[MAXNETNAMELEN + 1],
++typedef int (*netname2user_function) (const char *netname,
+ 				      uid_t *, gid_t *, int *, gid_t *);
+ 
+ int
+-netname2user (const char netname[MAXNETNAMELEN + 1], uid_t * uidp, gid_t * gidp,
++netname2user (const char *netname, uid_t * uidp, gid_t * gidp,
+ 	      int *gidlenp, gid_t * gidlist)
+ {
+   static service_user *startp;
+@@ -189,7 +189,7 @@ libc_hidden_nolink_sunrpc (netname2user, GLIBC_2_1)
+ #endif
+ 
+ int
+-netname2host (const char netname[MAXNETNAMELEN + 1], char *hostname,
++netname2host (const char *netname, char *hostname,
+ 	      const int hostlen)
+ {
+   char *p1, *p2;
+-- 
+2.34.1
+

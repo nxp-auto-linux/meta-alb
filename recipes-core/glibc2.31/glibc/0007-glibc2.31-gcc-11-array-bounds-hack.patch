@@ -1,0 +1,33 @@
+From bec1ddc691827f320a0746922652070e5ce16774 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Mon, 14 Nov 2022 11:45:00 +0100
+Subject: [PATCH 7/7] glibc2.31: gcc 11 array-bounds hack
+
+I couldn't figure out why gcc 11 complained so I turned off the error
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ nis/ypclnt.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/nis/ypclnt.c b/nis/ypclnt.c
+index ada08bf982..fd49867d7e 100644
+--- a/nis/ypclnt.c
++++ b/nis/ypclnt.c
+@@ -373,7 +373,13 @@ do_ypcall_tr (const char *domain, u_long prog, xdrproc_t xargs,
+        type ypresp_key_val or ypresp_master or ypresp_order or
+        ypresp_maplist.  But the stat element is in a common prefix so
+        this does not matter.  */
++  #pragma GCC diagnostic push
++#if __GNUC_PREREQ (7, 0)
++  /* gcc 11 complains even though the code should not be out of bounds*/
++  #pragma GCC diagnostic ignored "-Warray-bounds"
++#endif
+     status = ypprot_err (((struct ypresp_val *) resp)->stat);
++  #pragma GCC diagnostic pop
+   return status;
+ }
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,32 @@
+From 4845df446d93c62beeb937b3758bfb7ee6fe8f83 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Mon, 14 Nov 2022 11:42:00 +0100
+Subject: [PATCH 4/7] glibc2.31: Quick fix for gcc 11 array bounds error
+
+Rather than allocating a partial timer which causes the issue we
+use a few more bytes and avoid it.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ sysdeps/unix/sysv/linux/timer_create.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeps/unix/sysv/linux/timer_create.c b/sysdeps/unix/sysv/linux/timer_create.c
+index b850a7631e..47d9b3f6bc 100644
+--- a/sysdeps/unix/sysv/linux/timer_create.c
++++ b/sysdeps/unix/sysv/linux/timer_create.c
+@@ -56,8 +56,9 @@ timer_create (clockid_t clock_id, struct sigevent *evp, timer_t *timerid)
+ 	   using struct timer as a derived class with the
+ 	   first two elements being in the superclass.  We only
+ 	   need these two elements here.  */
+-	struct timer *newp = (struct timer *) malloc (offsetof (struct timer,
+-								thrfunc));
++	/* Allocate full structure for GCC 11 compatibility to avoid
++	   -Werror=array-bounds */
++	struct timer *newp = (struct timer *) malloc (sizeof(struct timer));
+ 	if (newp == NULL)
+ 	  /* No more memory.  */
+ 	  return -1;
+-- 
+2.34.1
+

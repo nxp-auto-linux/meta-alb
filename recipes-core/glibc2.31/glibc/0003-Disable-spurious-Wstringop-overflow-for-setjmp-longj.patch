@@ -1,0 +1,98 @@
+From 8ed6bc2068e9d8b5acbb9db3165c8a22c0e2c6f3 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 11 Nov 2022 14:58:48 +0100
+Subject: [PATCH 3/7] Disable spurious -Wstringop-overflow for setjmp/longjmp
+ (bug 26647)
+
+This is direct port of the following patch for glibc 2.31:
+
+https://sourceware.org/git/?p=glibc.git;a=patch;h=2098d4034d398cbde6ccd4a2aaac52c518374698
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ csu/libc-start.c      | 9 +++++++++
+ locale/setlocale.c    | 2 +-
+ nptl/pthread_create.c | 9 +++++++++
+ nptl/unwind.c         | 9 +++++++++
+ 4 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/csu/libc-start.c b/csu/libc-start.c
+index 12468c5a89..4ebbf28b2d 100644
+--- a/csu/libc-start.c
++++ b/csu/libc-start.c
+@@ -292,7 +292,16 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
+   struct pthread_unwind_buf unwind_buf;
+ 
+   int not_first_call;
++  #pragma GCC diagnostic push
++#if __GNUC_PREREQ (7, 0)
++  /* This call results in a -Wstringop-overflow warning because struct
++     pthread_unwind_buf is smaller than jmp_buf.  setjmp and longjmp
++     do not use anything beyond the common prefix (they never access
++     the saved signal mask), so that is a false positive.  */
++  #pragma GCC diagnostic ignored "-Wstringop-overflow="
++#endif
+   not_first_call = setjmp ((struct __jmp_buf_tag *) unwind_buf.cancel_jmp_buf);
++  #pragma GCC diagnostic pop
+   if (__glibc_likely (! not_first_call))
+     {
+       struct pthread *self = THREAD_SELF;
+diff --git a/locale/setlocale.c b/locale/setlocale.c
+index 096d8ed895..488ec59201 100644
+--- a/locale/setlocale.c
++++ b/locale/setlocale.c
+@@ -377,7 +377,7 @@ setlocale (int category, const char *locale)
+   else
+     {
+       struct __locale_data *newdata = NULL;
+-      const char *newname[1] = { locale };
++      const char *newname[__LC_LAST] = { locale };
+ 
+       if (CATEGORY_USED (category))
+ 	{
+diff --git a/nptl/pthread_create.c b/nptl/pthread_create.c
+index d3fd58730c..f89344147e 100644
+--- a/nptl/pthread_create.c
++++ b/nptl/pthread_create.c
+@@ -420,7 +420,16 @@ START_THREAD_DEFN
+   struct pthread_unwind_buf unwind_buf;
+ 
+   int not_first_call;
++  #pragma GCC diagnostic push
++#if __GNUC_PREREQ (7, 0)
++  /* This call results in a -Wstringop-overflow warning because struct
++     pthread_unwind_buf is smaller than jmp_buf.  setjmp and longjmp
++     do not use anything beyond the common prefix (they never access
++     the saved signal mask), so that is a false positive.  */
++  #pragma GCC diagnostic ignored "-Wstringop-overflow="
++#endif
+   not_first_call = setjmp ((struct __jmp_buf_tag *) unwind_buf.cancel_jmp_buf);
++  #pragma GCC diagnostic pop
+ 
+   /* No previous handlers.  NB: This must be done after setjmp since the
+      private space in the unwind jump buffer may overlap space used by
+diff --git a/nptl/unwind.c b/nptl/unwind.c
+index 35ed2a7b10..79bdedcdeb 100644
+--- a/nptl/unwind.c
++++ b/nptl/unwind.c
+@@ -90,8 +90,17 @@ unwind_stop (int version, _Unwind_Action actions,
+ 	}
+     }
+ 
++  #pragma GCC diagnostic push
++#if __GNUC_PREREQ (7, 0)
++  /* This call results in a -Wstringop-overflow warning because struct
++     pthread_unwind_buf is smaller than jmp_buf.  setjmp and longjmp
++     do not use anything beyond the common prefix (they never access
++     the saved signal mask), so that is a false positive.  */
++  #pragma GCC diagnostic ignored "-Wstringop-overflow="
++#endif
+   if (do_longjump)
+     __libc_unwind_longjmp ((struct __jmp_buf_tag *) buf->cancel_jmp_buf, 1);
++  #pragma GCC diagnostic pop
+ 
+   return _URC_NO_REASON;
+ }
+-- 
+2.34.1
+

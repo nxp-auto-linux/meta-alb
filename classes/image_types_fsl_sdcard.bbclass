@@ -244,7 +244,8 @@ _generate_boot_image() {
 	fi
 
 	rm -f ${WORKDIR}/boot.img
-	mkfs.vfat -n "${BOOTDD_VOLUME_ID}" -S 512 ${FATSIZE} -C ${WORKDIR}/boot.img $BOOT_BLOCKS
+	bvid=`echo ${BOOTDD_VOLUME_ID} | head -c 10`
+	mkfs.vfat -n "$bvid" -S 512 ${FATSIZE} -C ${WORKDIR}/boot.img $BOOT_BLOCKS
 
 	mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${UBOOT_KERNEL_IMAGETYPE}-${MACHINE}.bin ::/${UBOOT_KERNEL_IMAGETYPE}
 

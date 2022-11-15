@@ -5,9 +5,11 @@
 # Any additional configuration of the target package management system is also 
 #    handled transparently as needed.
 #
-# Custom shell operations that require chroot can also be executed using this class,
-#    by adding them to a function named 'do_aptget_user_update' and defined in the
-#    caller recipe, and executing the task do_aptget_update then.
+# Custom shell operations that require chroot can also be executed using
+# this class by appending them to a function named
+# 'do_aptget_user_update' and defined in the caller recipe, and executing
+# the task do_aptget_update then. For special use cases we also have
+# 'do_aptget_user_update_preinstall' and 'do_aptget_user_finalupdate'
 #
 # All that is required in order to use this class is:
 # - define variables:
@@ -47,11 +49,14 @@
 #                      to automatically correct dependencies
 #   APTGET_INIT_PACKAGES - (optional) For apt to work right on arbitrary setups, some
 #                      minimum packages are needed. This is preset appropriately but may be changed.
+# - append to function 'do_aptget_user_update_preinstall' (optional) containing all custom processing that
+#          normally require to be executed under chroot (with root privileges)
+#          before any apt packages are installed
 # - append to function 'do_aptget_user_update' (optional) containing all custom processing that
 #          normally require to be executed under chroot (with root privileges)
 # - append to function 'do_aptget_user_finalupdate' (optional) containing all custom processing that
 #          normally require to be executed under chroot (with root privileges)
-# 		   after APTGET_EXTRA_PACKAGES_LAST has been processed.
+#          after APTGET_EXTRA_PACKAGES_LAST has been processed.
 # - call function 'do_aptget_update' either directly (e.g. call it from 'do_install')
 #        or indirectly (e.g. add it to the variable 'ROOTFS_POSTPROCESS_COMMAND')
 #
@@ -308,7 +313,7 @@ fakeroot aptget_preserve_file() {
         false
 }
 
-aptget_file_is_preserved() {
+fakeroot aptget_file_is_preserved() {
         test -e "${APTGET_CHROOT_DIR}$1.yocto" || test -L "${APTGET_CHROOT_DIR}$1.yocto"
 }
 
@@ -318,7 +323,7 @@ fakeroot aptget_restore_file() {
         fi
 }
 
-aptget_link_is_pointing_to() {
+fakeroot aptget_link_is_pointing_to() {
         test -L "${APTGET_CHROOT_DIR}$1" && test "`readlink ${APTGET_CHROOT_DIR}$1`" = "$2"
 }
 
@@ -556,7 +561,6 @@ fakeroot aptget_update_begin() {
 	# information.
 	aptget_update_presetvars;
 
-	aptgetfailure=0
 	# While we do our installation stunt in qemu land, we also want
 	# to be able to use host side networking configs. This means we
 	# need to protect the host and DNS config. We do a bit of a
@@ -567,6 +571,17 @@ fakeroot aptget_update_begin() {
 	cp "/etc/resolv.conf" "${APTGET_CHROOT_DIR}/__etcresolvconf__"
         aptget_install_faketool "/etc/resolv.conf" "/__etcresolvconf__"
 
+        # This is magic to fool package installations into thinking
+        # good things about our rootfs
+        aptget_install_fakeproc
+}
+
+fakeroot aptget_update_install() {
+	# Once the basic rootfs is unpacked, we use the local passwd
+	# information.
+	aptget_update_presetvars;
+
+	aptgetfailure=0
 	# We need to set at least one (dummy) user and we set passwords for all of them.
 	# useradd is not debian, but good enough for now.
 	# Technically, this should be done at image generation time,
@@ -606,10 +621,6 @@ END_USER
 
 		done
 	fi
-
-        # This is magic to fool package installations into thinking
-        # good things about our rootfs
-        aptget_install_fakeproc
 
 	# Yocto environment. If we kept apt packages privately from
 	# a prior run, prepopulate the package cache locally to avoid
@@ -828,6 +839,19 @@ fakeroot do_aptget_user_update() {
 
 # Must have to preset all variables properly. It also means that
 # the user of this class should not prepend to avoid ordering issues.
+fakeroot do_aptget_user_update_preinstall:prepend() {
+
+	aptget_update_presetvars;
+}
+
+# empty placeholder, override it in parent script for more functionality
+fakeroot do_aptget_user_update_preinstall() {
+
+	:
+}
+
+# Must have to preset all variables properly. It also means that
+# the user of this class should not prepend to avoid ordering issues.
 fakeroot do_aptget_user_finalupdate:prepend() {
 
 	aptget_update_presetvars;
@@ -910,6 +934,8 @@ set +x
 
 python do_aptget_update() {
     bb.build.exec_func("aptget_update_begin", d);
+    bb.build.exec_func("do_aptget_user_update_preinstall", d);
+    bb.build.exec_func("aptget_update_install", d);
     bb.build.exec_func("do_aptget_user_update", d);
     bb.build.exec_func("aptget_update_extrapackageslast", d);
     bb.build.exec_func("do_aptget_user_finalupdate", d);

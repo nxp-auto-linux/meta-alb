@@ -89,9 +89,37 @@ DEPENDS:append:fsl-lsch3 = " \
 
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 
-fakeroot do_update_host() {
-	set -x
+# User/group hacking needs to be done in the chroot context as the
+# Yocto tools don't match the Ubuntu tools
+ROOTFS_POSTPROCESS_COMMAND:remove = "systemd_create_users;"
+fakeroot do_aptget_user_update_preinstall:append () {
+	aptget_update_presetvars;
 
+	for conffile in ${APTGET_CHROOT_DIR}/usr/lib/sysusers.d/*.conf; do
+		[ -e $conffile ] || continue
+		grep -v "^#" $conffile | sed -e '/^$/d' | while read type name id comment; do
+		if [ "$type" = "u" ]; then
+			useradd_params="--shell /sbin/nologin"
+			[ "$id" != "-" ] && useradd_params="$useradd_params --uid $id"
+			[ "$comment" != "-" ] && useradd_params="$useradd_params --comment $comment"
+			useradd_params="$useradd_params --system $name"
+			chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/useradd $useradd_params || true
+		elif [ "$type" = "g" ]; then
+			groupadd_params=""
+			[ "$id" != "-" ] && groupadd_params="$groupadd_params --gid $id"
+			groupadd_params="$groupadd_params --system $name"
+			chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/groupadd $groupadd_params || true
+		elif [ "$type" = "m" ]; then
+			group=$id
+			chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/groupadd --system $group || true
+			chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/useradd --shell /sbin/nologin --system $name --no-user-group || true
+			chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/usermod -a -G $group $name
+		fi
+		done
+	done
+}
+
+fakeroot do_update_host() {
 	echo >"${APTGET_CHROOT_DIR}/etc/hostname" "${HOST_NAME}"
 
 	echo  >"${APTGET_CHROOT_DIR}/etc/hosts" "127.0.0.1 localhost"
@@ -104,13 +132,9 @@ fakeroot do_update_host() {
 	echo >>"${APTGET_CHROOT_DIR}/etc/hosts" "ff02::1 ip6-allnodes"
 	echo >>"${APTGET_CHROOT_DIR}/etc/hosts" "ff02::2 ip6-allrouters"
 	echo >>"${APTGET_CHROOT_DIR}/etc/hosts" "ff02::3 ip6-allhosts"
-
-	set +x
 }
 
 fakeroot do_update_dns() {
-	set -x
-
 	if [ ! -L "${APTGET_CHROOT_DIR}/etc/resolv.conf" ]; then
 		if [ -e "${APTGET_CHROOT_DIR}/etc/resolveconf" ]; then
 			mkdir -p "/run/resolveconf"
@@ -128,20 +152,14 @@ fakeroot do_update_dns() {
 			touch "${APTGET_CHROOT_DIR}/etc/resolv.conf"
 		fi
 	fi
-
-	set +x
 }
 
 fakeroot do_enable_network_manager() {
-	set -x
-
 	# In bionic, but not in xenial. We want all [network] interfaces to be managed
 	# so that we do not have to mess with interface files individually
 	if [ -e "${APTGET_CHROOT_DIR}/usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf" ]; then
 		sed -i -E "s/^unmanaged-devices\=\*/unmanaged-devices\=none/g" "${APTGET_CHROOT_DIR}/usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf"
 	fi
-
-	set +x
 }
 
 fakeroot do_systemd_service_fixup() {

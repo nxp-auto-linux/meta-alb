@@ -184,11 +184,6 @@ fakeroot do_aptget_user_update:append() {
 	# Without an /etc/fstab, the rootfs remains read only
 	install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
 
-	# After we are done installing our extra packages, we
-	# optionally kill the log directory content, so that we
-	# don't clutter the target
-	#rm -rf ${APTGET_CHROOT_DIR}/var/log/*
-
 	# The info dir file causes a Yocto complaint.
 	# Per Yocto docs it should never be packaged
 	rm -f "${APTGET_CHROOT_DIR}${infodir}/dir"
@@ -208,7 +203,7 @@ python do_install() {
 }
 
 PKGDEST = "${WORKDIR}/packages-split"
-python prep_xattr_postinst() {
+fakeroot python prep_xattr_postinst() {
     # Tricky hack. We go through the dirs and files of the split
     # package to determine if there is any non-root uid/gid to preserve.
     # if so, we generate a postinst script that should do just that.
@@ -220,19 +215,26 @@ python prep_xattr_postinst() {
     # tools that are not compatible to the Ubuntu rootfs tools at this
     # time. While fixing this would be nice, it takes a good amount of
     # work to understand how this might be achieved.
+    pkgd = d.getVar('PKGD', True)
     pkgdest = d.getVar('PKGDEST', True)
     packages = d.getVar('PACKAGES', True).split()
     for pkg in packages:
         lines = []
-        pkgpath = os.path.join(pkgdest, pkg)
-        for basedir, dirnames, filenames in os.walk(pkgpath):
-            basedirchroot = basedir[ len(pkgpath) : ]
+        pkgdpath = os.path.join(pkgd, "")
+        pkgdestpath = os.path.join(pkgdest, pkg)
+        for basedir, dirnames, filenames in os.walk(pkgdestpath):
+            basedirchroot = basedir[ len(pkgdestpath) : ]
             for f in dirnames + filenames:
                 ff = os.path.join(basedir, f)
                 s = os.lstat(ff)
                 if s.st_uid != 0 or s.st_gid != 0:
                     lines.append(str(s.st_uid) + ":" + str(s.st_gid) + ' "' + os.path.join(basedirchroot, f) + '"')
                     os.chown(ff, 0, 0)
+                    ffd = os.path.join(pkgd + basedirchroot, f)
+                    os.chown(ffd, 0, 0)
+                    s = os.lstat(ffd)
+                    if s.st_uid != 0 or s.st_gid != 0:
+                        bb.error("Can't reset UID/GID for %s!" % ff)
 
         if lines:
             prefix = '#!/bin/sh -e\n' \

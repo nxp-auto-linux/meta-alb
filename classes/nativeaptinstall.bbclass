@@ -829,8 +829,11 @@ END_PPA
         fi
 
         # The list of installed packages goes into the log
+        echo ""
         echo "Installed packages:"
-        chroot "${APTGET_CHROOT_DIR}" /usr/bin/dpkg -l | grep '^ii' | awk '{print $2}'
+        echo "==================="
+        chroot "${APTGET_CHROOT_DIR}" /usr/bin/dpkg -l | grep '^ii' | awk '{print $2}' | cut -d: -f1
+        echo ""
 }
 
 # Must have to preset all variables properly. It also means that

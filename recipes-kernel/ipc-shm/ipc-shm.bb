@@ -13,7 +13,7 @@ inherit module
 URL ?= "https://github.com/nxp-auto-linux/ipc-shm;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV = "57b05a6293d7e02f6ad6a0fa4651fe208f87e395"
+SRCREV = "89261c2aef54cc6c4dcb05a871a218c58504c068"
 
 S = "${WORKDIR}/git"
 DESTDIR="${D}"

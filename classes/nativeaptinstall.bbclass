@@ -111,6 +111,8 @@ APTGET_REMAINING_FAKETOOLS_PACKAGES ?= "kmod"
 APTGET_DL_CACHE ?= "${DL_DIR}/apt-get/${TRANSLATED_TARGET_ARCH}"
 APTGET_CACHE_DIR ?= "${APTGET_CHROOT_DIR}/var/cache/apt/archives"
 
+APTGET_DEBUG_SHELL ?= "0"
+
 DEPENDS += "qemu-native virtual/${TARGET_PREFIX}binutils rsync-native coreutils-native dpkg-native"
 
 # We need the proper parameter version for the tool
@@ -179,6 +181,12 @@ APTGET_HOST_PROXIES ?= ""
 APTGET_EXECUTABLE ?= "/usr/bin/apt-get"
 APTGET_DEFAULT_OPTS ?= "-qy -o=Dpkg::Use-Pty=0"
 
+aptget_debug_shell() {
+	if [ ${APTGET_DEBUG_SHELL} -ne 0 ]; then
+		set -x
+	fi
+}
+
 aptget_determine_host_proxies() {
 	ENV_HOST_PROXIES="${ENV_HOST_PROXIES}"
 	if [ -z "$ENV_HOST_PROXIES" ]; then
@@ -200,6 +208,7 @@ aptget_determine_host_proxies() {
 PSEUDO_PASSWD="${APTGET_CHROOT_DIR}:${STAGING_DIR_NATIVE}"
 
 aptget_update_presetvars() {
+	aptget_debug_shell
 	# To avoid useless and complicated directory references outside
 	# our chroot that just make processing more complex and time
 	# consuming, we work in the chroot directory
@@ -902,9 +911,8 @@ fakeroot aptget_update_end() {
 	# if we don't want to rely on special tools that may not be
 	# there. ls and rm will likely be available with the given
 	# options on the host and target respectively.
-set -x
 	if [ -e "${APTGET_CHROOT_DIR}"/bin/sh ]; then
-		for dir in /run /var/run /var/volatile
+		for dir in /run /var/run /var/volatile /var/log
 		do
 			if [ -d "${APTGET_CHROOT_DIR}$dir" ]; then
 				for file in `chroot "${APTGET_CHROOT_DIR}" ls -Ab "$dir"`
@@ -914,7 +922,6 @@ set -x
 			fi
 		done
 	fi
-set +x
 
 	# Remove any proxy instrumentation
 	xt="/etc/apt/apt.conf.d/01yoctoinstallproxies"
@@ -956,6 +963,7 @@ python do_aptget_update() {
 # case of a weird target rootfs without systemctl.
 IMAGE_FEATURES:append = " stateless-rootfs"
 fakeroot do_aptget_user_finalupdate:append() {
+	aptget_debug_shell
 	# This code is only executed when an image is built so that it
 	# does not affect non-image package generation.
 	if [ -n "${IMGDEPLOYDIR}" ]; then

@@ -212,6 +212,14 @@ python prep_xattr_postinst() {
     # Tricky hack. We go through the dirs and files of the split
     # package to determine if there is any non-root uid/gid to preserve.
     # if so, we generate a postinst script that should do just that.
+    # We then reset the ownership to root so that on an rpm install
+    # there won't be any warnings about unknown users or groups.
+    # We unfortunately cannot use the useradd.bbclass because it uses
+    # a static user/group definition whereas we need to pull it from
+    # the actual /etc/(passwd|group) information, and it also uses
+    # tools that are not compatible to the Ubuntu rootfs tools at this
+    # time. While fixing this would be nice, it takes a good amount of
+    # work to understand how this might be achieved.
     pkgdest = d.getVar('PKGDEST', True)
     packages = d.getVar('PACKAGES', True).split()
     for pkg in packages:
@@ -224,6 +232,7 @@ python prep_xattr_postinst() {
                 s = os.lstat(ff)
                 if s.st_uid != 0 or s.st_gid != 0:
                     lines.append(str(s.st_uid) + ":" + str(s.st_gid) + ' "' + os.path.join(basedirchroot, f) + '"')
+                    os.chown(ff, 0, 0)
 
         if lines:
             prefix = '#!/bin/sh -e\n' \

@@ -90,20 +90,52 @@ DEPENDS:append:fsl-lsch3 = " \
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 
 # User/group hacking needs to be done in the chroot context as the
-# Yocto tools don't match the Ubuntu tools
+# Yocto tools don't match the Ubuntu tools.
+# As it turns out, this isn't really a hard necessity to do apparently
+# on the Ubuntu rootfs because everything is already in order, but
+# we leave the code in just in case.
 ROOTFS_POSTPROCESS_COMMAND:remove = "systemd_create_users;"
 fakeroot do_aptget_user_update_preinstall:append () {
 	aptget_update_presetvars;
 
 	for conffile in ${APTGET_CHROOT_DIR}/usr/lib/sysusers.d/*.conf; do
 		[ -e $conffile ] || continue
-		grep -v "^#" $conffile | sed -e '/^$/d' | while read type name id comment; do
+		grep -v "^#" $conffile | sed -e '/^$/d' | while read fullline; do
+		# Magic for quoted args like the comment field
+		# We use xargs to deal with quoted fields but turn the
+		# result into separate lines so that we can get to the
+		# individual args. We pad for non-existing tails.
+		arglines=$(printf %s "$fullline"|xargs printf "%s\n")
+		arglines=$(printf "%s\n\n\n\n\n\n<EOF>\n" "$arglines")
+		type=$(    printf %s "$arglines"|head -n 1|tail -n 1)
+		name=$(    printf %s "$arglines"|head -n 2|tail -n 1)
+		id=$(      printf %s "$arglines"|head -n 3|tail -n 1)
+		comment=$( printf %s "$arglines"|head -n 4|tail -n 1)
+		homedir=$( printf %s "$arglines"|head -n 5|tail -n 1)
+		shell=$(   printf %s "$arglines"|head -n 6|tail -n 1)
+		[ "$comment" = "-" ] && comment=""
+		[ "$homedir" = "-" ] && homedir=""
+		[ "$shell" = "-" ] && shell=""
 		if [ "$type" = "u" ]; then
-			useradd_params="--shell /sbin/nologin"
-			[ "$id" != "-" ] && useradd_params="$useradd_params --uid $id"
-			[ "$comment" != "-" ] && useradd_params="$useradd_params --comment $comment"
+			user=`echo "$id"|cut -d: -f1`
+			group=`echo "$id"|cut -s -d: -f2-`
+			if [ -z "$shell" ]; then
+				if [ "$id" = "0" ]; then
+					shell="/bin/sh"
+				else
+					shell="/sbin/nologin"
+				fi
+			fi
+			useradd_params="--shell $shell"
+			[ "$user" != "-" ] && useradd_params="$useradd_params --uid $user"
+			[ ! -z "$group" ] && useradd_params="$useradd_params --gid $group"
+			[ ! -z "$homedir" ] && useradd_params="$useradd_params --home $homedir"
 			useradd_params="$useradd_params --system $name"
-			chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/useradd $useradd_params || true
+			if [ -z "$comment" ]; then
+				chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/useradd $useradd_params || true
+			else
+				chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/sbin/useradd --comment "$comment" $useradd_params || true
+			fi
 		elif [ "$type" = "g" ]; then
 			groupadd_params=""
 			[ "$id" != "-" ] && groupadd_params="$groupadd_params --gid $id"

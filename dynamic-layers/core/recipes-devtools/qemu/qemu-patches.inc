@@ -6,4 +6,6 @@ SRC_URI += "\
 	file://0005-qemu-user-syscall.c-target_mmap-was-called-with-bad-.patch \
 	file://0006-qemu-user-builtin-strace-much-more-comprehensive.patch \
 	file://0007-qemu-user-strace-didn-t-print-faccessat-correctly.patch \
+\
+	file://0001-qemu-Added-strace-updates-for-faccessat2-pipe-pipe2-.patch \
 "

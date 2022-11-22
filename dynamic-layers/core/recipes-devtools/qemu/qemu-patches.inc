@@ -8,4 +8,6 @@ SRC_URI += "\
 	file://0007-qemu-user-strace-didn-t-print-faccessat-correctly.patch \
 \
 	file://0001-qemu-Added-strace-updates-for-faccessat2-pipe-pipe2-.patch \
+\
+	file://0001-qemu-Run-statx-and-renameat2-optionall-through-libc.patch \
 "

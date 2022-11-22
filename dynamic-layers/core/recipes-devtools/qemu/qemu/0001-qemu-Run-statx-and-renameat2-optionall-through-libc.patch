@@ -1,0 +1,61 @@
+From 8477144ee4b429c2c870021a10fe7f86f0f41145 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Tue, 22 Nov 2022 07:38:37 +0100
+Subject: [PATCH] qemu: Run statx and renameat2 optionall through libc
+
+To permit tools like pseudo to pick up these two calls ... which are
+dealing with fs path args ... we also run them through the magic
+optional libc wrapper.
+
+If we didn't, then pseudo wouldn't pick up the accesses and qemu
+would get to see the wrong results.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ linux-user/syscall.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index c82ec7580..d6b4816b5 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -294,6 +294,14 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4)				\
+ 	return syscall(__NR_##name, arg1, arg2, arg3, arg4);				\
+ }
+ 
++#define _libc_syscall5(type,name,namelibc,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5)\
++static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5)\
++{\
++	if (do_libcsyscall)\
++		return namelibc(arg1, arg2, arg3, arg4, arg5);\
++	return syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5);\
++}
++
+ #define __NR_sys_uname __NR_uname
+ #define __NR_sys_getcwd1 __NR_getcwd
+ #define __NR_sys_getdents __NR_getdents
+@@ -403,8 +411,8 @@ _syscall5(int, kcmp, pid_t, pid1, pid_t, pid2, int, type,
+  * It is assumed that struct statx is architecture independent.
+  */
+ #if defined(TARGET_NR_statx) && defined(__NR_statx)
+-_syscall5(int, sys_statx, int, dirfd, const char *, pathname, int, flags,
+-          unsigned int, mask, struct target_statx *, statxbuf)
++_libc_syscall5(int, sys_statx, statx, int, dirfd, const char *, pathname, int, flags,
++               unsigned int, mask, struct target_statx *, statxbuf)
+ #endif
+ #if defined(TARGET_NR_membarrier) && defined(__NR_membarrier)
+ _syscall2(int, membarrier, int, cmd, int, flags)
+@@ -465,8 +473,8 @@ static int sys_utimensat(int dirfd, const char *pathname,
+ #ifdef TARGET_NR_renameat2
+ #if defined(__NR_renameat2)
+ #define __NR_sys_renameat2 __NR_renameat2
+-_syscall5(int, sys_renameat2, int, oldfd, const char *, old, int, newfd,
+-          const char *, new, unsigned int, flags)
++_libc_syscall5(int, sys_renameat2, renameat2, int, oldfd, const char *, old, int, newfd,
++               const char *, new, unsigned int, flags)
+ #else
+ static int sys_renameat2(int oldfd, const char *old,
+                          int newfd, const char *new, int flags)
+-- 
+2.34.1
+

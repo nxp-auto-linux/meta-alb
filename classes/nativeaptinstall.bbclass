@@ -973,11 +973,17 @@ fakeroot do_aptget_user_finalupdate:append() {
                 if [ -e "${APTGET_CHROOT_DIR}${root_prefix}/lib/systemd/systemd" ]; then
                         bbnote "Presetting systemd services via systemctl..."
                         if [ -e "${APTGET_CHROOT_DIR}${root_prefix}/bin/systemctl" ]; then
-                                chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/bin/systemctl --root=/ --preset-mode=enable-only preset-all
+                                services=`chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/bin/systemctl --root=/ --type=service --no-pager --no-legend list-unit-files`
+                        else
+                                services=`systemctl --root=/ --type=service --no-pager --no-legend list-unit-files`
+                        fi
+                        services=`printf %s "$services" | grep -v masked | cut -d\  -f1`
+                        if [ -e "${APTGET_CHROOT_DIR}${root_prefix}/bin/systemctl" ]; then
+                                printf %s "$services" | xargs chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/bin/systemctl --root=/ --preset-mode=enable-only preset
                         else
                                 # Fall back to the image.bbclass systemd_preset_all method
                                 # using the fake systemctl script
-                                systemctl --root="${APTGET_CHROOT_DIR}" --preset-mode=enable-only preset-all
+                                printf %s "$services" | xargs systemctl --root="${APTGET_CHROOT_DIR}" --preset-mode=enable-only preset
                         fi
                         bbnote "Done presetting systemd services via systemctl"
                 fi

@@ -9,7 +9,7 @@ require ubuntu-base.inc
 
 # There are some basic differences between different Ubuntu versions.
 # We try not to address them in the generic recipe
-APTGET_EXTRA_PACKAGES += "libffi6"
+APTGET_EXTRA_PACKAGES += "libffi6 python"
 
 # We should not have a single PROVIDES entry as this package
 # does not provide anything for build time of any other package!

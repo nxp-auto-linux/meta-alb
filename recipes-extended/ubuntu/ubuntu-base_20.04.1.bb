@@ -9,7 +9,7 @@ require ubuntu-base.inc
 
 # There are some basic differences between different Ubuntu versions.
 # We try not to address them in the generic recipe
-APTGET_EXTRA_PACKAGES += ""
+APTGET_EXTRA_PACKAGES += "python"
 
 # Ubuntu 20 unifies things and turns some things into symlinks. We
 # solve this with Yocto "usrmerge" but that isn't quite enough.

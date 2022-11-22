@@ -65,7 +65,7 @@ APTGET_EXTRA_PACKAGES += "\
     libnss-db \
     libssl-dev \
     openssl \
-	python${APTGET_PYTHON_VER} python bc db5.3 \
+	python${APTGET_PYTHON_VER} bc db5.3 \
 	xz-utils bzip2 gawk \
 "
 # Some packages are implicitly present in Ubuntu due to the kernel

@@ -11,8 +11,8 @@ APTGET_EXTRA_PPA += '${@ \
     , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "x2goserver x2goserver-xsession", \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "python-dev python-mode python-bluez x2goserver x2goserver-xsession", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "python-dev python-mode python-bluez x11vnc", \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
@@ -39,7 +39,6 @@ APTGET_EXTRA_PACKAGES += " \
     gcc g++ cpp \
     build-essential make makedev automake cmake dkms flex bison\
     gdb u-boot-tools device-tree-compiler \
-    python-dev \
     zip binutils-dev \
     docker.io \
 \
@@ -79,7 +78,6 @@ APTGET_EXTRA_PACKAGES += " \
     libsdl2-image-dev \
 \
     pymacs \
-    python-mode \
 \
     qgit \
 "
@@ -117,7 +115,7 @@ APTGET_EXTRA_PACKAGES += " \
 APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-${JAVAVERSION}-openjdk-${UBUNTU_TARGET_ARCH}/${JAVALIBPATHSUFFIX}"
 
 # bluez must not be allowed to (re)start any services, otherwise install will fail
-APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev python-bluez avahi-daemon rtkit"
+APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev avahi-daemon rtkit"
 
 APTGET_SKIP_UPGRADE = "0"
 

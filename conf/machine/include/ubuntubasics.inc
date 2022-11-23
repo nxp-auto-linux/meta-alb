@@ -48,7 +48,14 @@ GLIBCVERSION = '${@ \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
-BINUVERSION="2.34"
+# Little white lie about Ubuntu 18.04, which really uses binutils 2.31
+BINUVERSION='${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.34", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.34", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d) \
+    , d)}'
 
 # We need to understand the python version in Ubuntu for dependency
 # management

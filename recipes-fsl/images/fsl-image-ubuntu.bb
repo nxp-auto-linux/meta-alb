@@ -7,19 +7,33 @@ require fsl-image-ubuntu-base.bb
 APTGET_EXTRA_PPA += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "ppa:x2go/stable;", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
     "unsupportedubuntuversion" \
+    , d) \
     , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "python-dev python-mode python-bluez x2goserver x2goserver-xsession", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "python-dev python-mode python-bluez x11vnc", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "python-dev-is-python3 x2goserver x2goserver-xsession", \
     "unsupportedubuntuversion" \
+    , d) \
+    , d) \
+    , d)}'
+APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
+    "unsupportedubuntuversion" \
+    , d) \
     , d) \
     , d)}'
 IMAGE_INSTALL += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc-init", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
     "unsupportedubuntuversion" \
+    , d) \
     , d) \
     , d)}'
 
@@ -98,7 +112,9 @@ APTGET_EXTRA_PACKAGES += " \
 JAVAVERSION = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "8", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "11", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "11", \
    "unknownjavaversion" \
+    , d) \
     , d) \
     , d)}'
 JAVALIBPATHSUFFIX = '${@ \

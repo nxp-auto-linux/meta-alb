@@ -2,7 +2,8 @@
 # - 18.04.5
 # - 20.04.1
 #UBUNTU_TARGET_VERSION ?= "18.04.5"
-UBUNTU_TARGET_VERSION ?= "20.04.1"
+#UBUNTU_TARGET_VERSION ?= "20.04.1"
+UBUNTU_TARGET_VERSION ?= "22.04.1"
 
 UBUNTU_TARGET_MAJORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[0]}"
 UBUNTU_TARGET_MINORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[1]}"
@@ -42,16 +43,29 @@ IMAGE_TYPES_MASKED += "cpio cpio.gz cpio.gz.u-boot"
 # our purposes.
 # Ubuntu 18.04: max glibc 2.27...
 # Ubuntu 20.x: max glibc 2.31...
+# Ubuntu 22.x: max glibc 2.35...
 GLIBCVERSION = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.27", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.31%", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.35", \
     "unsupportedubuntuversion" \
+    , d) \
     , d) \
     , d)}'
 # Little white lie about Ubuntu 18.04, which really uses binutils 2.31
 BINUVERSION='${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.34", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.34", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.38", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d) \
+    , d)}'
+# Little white lie about Ubuntu 18.04, which really uses binutils 2.31
+BINUVERSION='${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.34", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.34", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.38", \
     "unsupportedubuntuversion" \
     , d) \
     , d) \
@@ -62,7 +76,9 @@ BINUVERSION='${@ \
 APTGET_PYTHON_VER = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "3.8", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "3.8", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "3.10", \
     "unsupportedubuntuversion" \
+    , d) \
     , d) \
     , d)}'
 
@@ -72,7 +88,9 @@ APTGET_PYTHON_VER = '${@ \
 DISTRO_FEATURES:append = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", " usrmerge", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", " usrmerge", \
    "unsupportedubuntuversion" \
+    , d) \
     , d) \
     , d)}'
 
@@ -141,8 +159,6 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     findutils \
     flex \
     gawk \
-    glibc \
-    glibc-locale \
     gcc-runtime \
     gdbm \
     initscripts \
@@ -154,6 +170,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     libffi \
     libgcc \
     liblzma \
+    libnsl2 \
     libpam \
     libpam-runtime \
     libsqlite3 \
@@ -174,6 +191,14 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     util-linux \
     xz \
     zlib \
+"
+
+# glibc has many subpackages, some of them cause a direct conflict
+# with Ubuntu
+DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
+    glibc \
+    glibc-locale \
+    libsegfault \
 "
 
 # We have some packages which we do not want to have in a target

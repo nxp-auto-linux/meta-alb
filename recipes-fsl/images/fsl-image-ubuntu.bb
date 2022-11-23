@@ -30,8 +30,6 @@ APTGET_EXTRA_PACKAGES += " \
     libssl-dev \
 "
 
-ROOTFS_POSTPROCESS_COMMAND:append = " do_disable_nm_wait_online;"
-
 IMAGE_INSTALL:append:ls2084abbmini = " \
     kvaser \
 "

@@ -48,7 +48,6 @@ GLIBCVERSION = '${@ \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
-PREFERRED_VERSION_cross-localedef-native = "${GLIBCVERSION}"
 BINUVERSION="2.34"
 
 # We need to understand the python version in Ubuntu for dependency
@@ -69,8 +68,6 @@ DISTRO_FEATURES:append = '${@ \
    "unsupportedubuntuversion" \
     , d) \
     , d)}'
-
-PREFERRED_PROVIDER_bison-native = "bison"
 
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"

@@ -8,7 +8,7 @@ UBUNTU_TARGET_MAJORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit
 UBUNTU_TARGET_MINORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[1]}"
 UBUNTU_TARGET_SUBVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[2]}"
 UBUNTU_TARGET_BASEVERSION ?= "${UBUNTU_TARGET_MAJORVERSION}.${UBUNTU_TARGET_MINORVERSION}"
-PREFERRED_VERSION_ubuntu-base = "${UBUNTU_TARGET_VERSION}"
+REQUIRED_VERSION_ubuntu-base = "${UBUNTU_TARGET_VERSION}"
 
 # I am sure there are smarter ways to map the architecture. This works
 # initially. FIX

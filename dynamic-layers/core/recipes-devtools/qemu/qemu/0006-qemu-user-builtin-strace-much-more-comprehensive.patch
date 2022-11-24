@@ -1,7 +1,7 @@
-From 28aef86809484cd16ec54f8e84aae4939aeac4b3 Mon Sep 17 00:00:00 2001
+From 76ba423e8f4327780fb474239cc1c50681e7e770 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 11 Nov 2022 15:09:25 +0200
-Subject: [PATCH] qemu-user: builtin strace much more comprehensive
+Date: Wed, 9 Nov 2022 09:21:24 +0100
+Subject: [PATCH 6/7] qemu-user: builtin strace much more comprehensive
 
 This could be considered cosmetic but was invaluable in debugging
 other issues. A good number of syscalls was dumped in a confusing
@@ -10,7 +10,6 @@ not even show at all.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
 ---
  linux-user/strace.c    | 38 ++++++++++++++++++++++++++++++++++++--
  linux-user/strace.list | 24 ++++++++++++------------
@@ -103,7 +102,7 @@ index 2cdbf030b..b8560b511 100644
  static void
  print_statx(void *cpu_env, const struct syscallname *name,
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 278596acd..d81758c5c 100644
+index 278596acd..e9fd77059 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
 @@ -124,7 +124,7 @@
@@ -147,7 +146,7 @@ index 278596acd..d81758c5c 100644
  #endif
  #ifdef TARGET_NR_getgid32
 -{ TARGET_NR_getgid32, "getgid32" , NULL, NULL, NULL },
-+{ TARGET_NR_geteuid32, "geteuid32" , "%s()", NULL, NULL },
++{ TARGET_NR_getgid32, "getgid32" , "%s()", NULL, NULL },
  #endif
  #ifdef TARGET_NR_getgroups
  { TARGET_NR_getgroups, "getgroups" , NULL, NULL, NULL },
@@ -206,5 +205,5 @@ index 278596acd..d81758c5c 100644
  #ifdef TARGET_NR_atomic_cmpxchg_32
  { TARGET_NR_atomic_cmpxchg_32, "atomic_cmpxchg_32", NULL, NULL, NULL },
 -- 
-2.25.1
+2.34.1
 

@@ -1,7 +1,9 @@
-From a5fad6571bf375a5e1eacc0074fc0350ad96f2ad Mon Sep 17 00:00:00 2001
+From 292da1266bd2b68d871a6d1b5a32528abfb52319 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 11 Nov 2022 14:11:27 +0200
-Subject: [PATCH] qemu-user: SO_PEERGROUPS was not emulated, breaking tgt code
+Date: Wed, 9 Nov 2022 09:07:14 +0100
+Subject: [PATCH 4/7] qemu-user: SO_PEERGROUPS was not emulated
+
+The missing emulation was breaking target code.
 
 As this fairly new socket option was not handled, the default
 drop resulted in ERANGE being returned which caused the caller to
@@ -14,11 +16,11 @@ Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
  linux-user/alpha/sockbits.h   |  2 ++
- linux-user/generic/sockbits.h |  1 +
+ linux-user/generic/sockbits.h |  2 ++
  linux-user/hppa/sockbits.h    |  2 ++
  linux-user/mips/sockbits.h    |  2 ++
  linux-user/syscall.c          | 41 +++++++++++++++++++++++++++++++++++
- 5 files changed, 48 insertions(+)
+ 5 files changed, 49 insertions(+)
 
 diff --git a/linux-user/alpha/sockbits.h b/linux-user/alpha/sockbits.h
 index d54dc98c0..4c10fa63c 100644
@@ -34,14 +36,15 @@ index d54dc98c0..4c10fa63c 100644
   * have to define SOCK_NONBLOCK to a different value here.
   */
 diff --git a/linux-user/generic/sockbits.h b/linux-user/generic/sockbits.h
-index b3b4a8e44..db1732058 100644
+index b3b4a8e44..027ceb1b7 100644
 --- a/linux-user/generic/sockbits.h
 +++ b/linux-user/generic/sockbits.h
-@@ -9,6 +9,7 @@
+@@ -9,6 +9,8 @@
  #define GENERIC_SOCKBITS_H
  
  #define TARGET_SO_PASSSEC        34
 +#define TARGET_SO_PEERGROUPS   59
++
  
  /* For setsockopt(2) */
  #define TARGET_SOL_SOCKET      1
@@ -72,10 +75,10 @@ index 562cad88e..30bdaea43 100644
   *
   * Please notice that for binary compat reasons MIPS has to
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 379ec0460..02e49a3bf 100644
+index 6a4fc96cc..a0de3dbc6 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -2595,6 +2595,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+@@ -2602,6 +2602,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
          /* These don't just return a single integer */
          case TARGET_SO_PEERNAME:
              goto unimplemented;
@@ -112,7 +115,7 @@ index 379ec0460..02e49a3bf 100644
 +                return -TARGET_EFAULT;
 +            }
 +            for (i = 0; i < n; i++) {
-+                __put_user(hgroups[i], &tgroups[i]);
++                    __put_user(hgroups[i], &tgroups[i]);
 +            }
 +            unlock_user(tgroups, optval_addr, len);
 +#else
@@ -124,5 +127,5 @@ index 379ec0460..02e49a3bf 100644
              struct timeval tv;
              socklen_t tvlen;
 -- 
-2.25.1
+2.34.1
 

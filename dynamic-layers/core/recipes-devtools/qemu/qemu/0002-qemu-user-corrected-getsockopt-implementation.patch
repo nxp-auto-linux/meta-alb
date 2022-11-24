@@ -1,7 +1,7 @@
-From 61b0307512449d00ae1af2675d7520a80c384c8a Mon Sep 17 00:00:00 2001
+From 6d95e5fd96bbe18448f6401470c4f324b701fae3 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 11 Nov 2022 13:32:55 +0200
-Subject: [PATCH] qemu-user: corrected getsockopt implementation
+Date: Wed, 9 Nov 2022 09:03:03 +0100
+Subject: [PATCH 2/7] qemu-user: corrected getsockopt implementation
 
 There was one formal type sizeof mixup and depending on what the caller
 passed in, innocent memory could have been overwritten.
@@ -15,10 +15,10 @@ Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
  1 file changed, 45 insertions(+), 25 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 4883205ee..87e8f7b92 100644
+index d78366dcb..113c7e24e 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -2585,6 +2585,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+@@ -2592,6 +2592,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
      abi_long ret;
      int len, val;
      socklen_t lv;
@@ -26,7 +26,7 @@ index 4883205ee..87e8f7b92 100644
  
      switch(level) {
      case TARGET_SOL_SOCKET:
-@@ -2642,22 +2643,25 @@ get_timeout:
+@@ -2649,22 +2650,25 @@ get_timeout:
              crlen = sizeof(cr);
              ret = get_errno(getsockopt(sockfd, level, SO_PEERCRED,
                                         &cr, &crlen));
@@ -61,7 +61,7 @@ index 4883205ee..87e8f7b92 100644
              break;
          }
          case TARGET_SO_PEERSEC: {
-@@ -2792,24 +2796,40 @@ get_timeout:
+@@ -2799,24 +2803,40 @@ get_timeout:
              return -TARGET_EFAULT;
          if (len < 0)
              return -TARGET_EINVAL;
@@ -116,7 +116,7 @@ index 4883205ee..87e8f7b92 100644
          break;
      case SOL_IP:
          switch(optname) {
-@@ -2832,7 +2852,7 @@ get_timeout:
+@@ -2839,7 +2859,7 @@ get_timeout:
                  return -TARGET_EFAULT;
              if (len < 0)
                  return -TARGET_EINVAL;
@@ -125,7 +125,7 @@ index 4883205ee..87e8f7b92 100644
              ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
              if (ret < 0)
                  return ret;
-@@ -2894,7 +2914,7 @@ get_timeout:
+@@ -2901,7 +2921,7 @@ get_timeout:
                  return -TARGET_EFAULT;
              if (len < 0)
                  return -TARGET_EINVAL;
@@ -135,5 +135,5 @@ index 4883205ee..87e8f7b92 100644
              if (ret < 0)
                  return ret;
 -- 
-2.25.1
+2.34.1
 

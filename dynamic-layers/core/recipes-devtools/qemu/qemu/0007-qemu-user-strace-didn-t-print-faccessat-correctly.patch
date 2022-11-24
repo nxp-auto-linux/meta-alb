@@ -1,10 +1,12 @@
-From 90beebd4bd5f91ecbf004b12c7a2255348b07ecd Mon Sep 17 00:00:00 2001
+From de1795b414c511996a42182116d690cac0acea48 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 11 Nov 2022 15:15:28 +0200
-Subject: [PATCH] qemu-user: strace didn't print faccessat() correctly
+Date: Wed, 9 Nov 2022 09:22:54 +0100
+Subject: [PATCH 7/7] qemu-user: strace didn't print faccessat() correctly
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  linux-user/strace.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
@@ -24,5 +26,5 @@ index b8560b511..a40ed81e1 100644
  }
  #endif
 -- 
-2.25.1
+2.34.1
 

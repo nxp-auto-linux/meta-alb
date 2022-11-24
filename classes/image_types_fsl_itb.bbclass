@@ -68,7 +68,7 @@ generate_itb() {
 
 }
 
-IMAGE_CMD_itb () {
+configure_and_generate_itb() {
         # If no ITB_ITS_FILE is specified, we create a default one
         IIF="${ITB_ITS_FILE}"
         IIFWRITE=1
@@ -157,4 +157,6 @@ IMAGE_CMD_itb () {
         generate_itb
 }
 
-
+IMAGE_CMD:itb () {
+	configure_and_generate_itb
+}

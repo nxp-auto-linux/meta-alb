@@ -26,7 +26,7 @@ ITBIMAGE_FULL_NAME[vardepsexclude] = "DATETIME"
 
 do_install() {
 	# Generate the image
-	IMAGE_CMD_itb
+	configure_and_generate_itb
 	
 	# Install the image into /boot
 	install -d ${D}/boot

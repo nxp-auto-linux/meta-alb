@@ -29,7 +29,7 @@ ITB_DTB_LOAD = "0x82000000"
 do_deploy[depends] += "u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${ITB_ROOTFS_BASENAME}:do_build"
 
 do_deploy() {
-        IMAGE_CMD_itb
+        IMAGE_CMD:itb
 }
 
 addtask deploy before do_build after do_unpack

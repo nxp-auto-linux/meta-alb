@@ -41,4 +41,4 @@ do_install:append() {
 	cp -a ${EXTERNAL_TOOLCHAIN}/${ELT_TARGET_SYS}/libc/usr/lib/libthread_db.so  ${D}${base_libdir}/
 }
 
-INSANE_SKIP:${PN}_ubuntu = "installed-vs-shipped build-deps"
+INSANE_SKIP:${PN}:ubuntu = "installed-vs-shipped build-deps"

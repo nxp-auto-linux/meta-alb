@@ -3,11 +3,11 @@ inherit linux-kernel-base
 # KERNEL_VERSION is inherited from .bb file
 
 # override default deploy location for ubuntu to match ubuntu's convention for kernel source dir 
-KERNEL_SOURCE_DIR_ubuntu = "${KERNEL_VERSION}"
-KERNEL_SRC_PATH_ubuntu = "/usr/src/kernel"
+KERNEL_SOURCE_DIR:ubuntu = "${KERNEL_VERSION}"
+KERNEL_SRC_PATH:ubuntu = "/usr/src/kernel"
 
 # deploy 'linux-headers-<version>-generic as symlink to KERNEL_SRC_PATH'
-KERNEL_HEADERS_DIR_ubuntu = "linux-headers-${KERNEL_VERSION}-generic"
+KERNEL_HEADERS_DIR:ubuntu = "linux-headers-${KERNEL_VERSION}-generic"
 
 # Ubuntu does not have /bin/awk by default!
 BINAWK_FILES = "\

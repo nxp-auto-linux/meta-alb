@@ -57,17 +57,17 @@ RDEPENDS:${PN}_imx = " \
 "
 
 SOC_TOOLS_TEST = ""
-SOC_TOOLS_TEST_vf  = "imx-test"
-SOC_TOOLS_TEST_mxs = "imx-test"
-SOC_TOOLS_TEST_mx3 = "imx-test"
-SOC_TOOLS_TEST_mx5 = "imx-test"
-SOC_TOOLS_TEST_mx6 = "imx-test"
-SOC_TOOLS_TEST_mx7 = "imx-test"
+SOC_TOOLS_TEST:vf  = "imx-test"
+SOC_TOOLS_TEST:mxs = "imx-test"
+SOC_TOOLS_TEST:mx3 = "imx-test"
+SOC_TOOLS_TEST:mx5 = "imx-test"
+SOC_TOOLS_TEST:mx6 = "imx-test"
+SOC_TOOLS_TEST:mx7 = "imx-test"
 
 # extra packages for QorIQ targets
 EXTRA_TOOLS ?= ""
-EXTRA_TOOLS_p1022ds = " packagegroup-fsl-graphics-minimal"
-EXTRA_TOOLS_t4240 = " cairo-dev"
+EXTRA_TOOLS:p1022ds = " packagegroup-fsl-graphics-minimal"
+EXTRA_TOOLS:t4240 = " cairo-dev"
 
 RDEPENDS:${PN}:append:qoriq = "\
     kernel-image \

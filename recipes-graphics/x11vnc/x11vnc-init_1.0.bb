@@ -33,7 +33,7 @@ do_install() {
 
 RDEPENDS:${PN} = "x11vnc"
 # No need to enforce this dependency for Ubuntu
-RDEPENDS:${PN}_ubuntu = ""
+RDEPENDS:${PN}:ubuntu = ""
 
 RPROVIDES:${PN} += "${PN}-systemd"
 RREPLACES:${PN} += "${PN}-systemd"

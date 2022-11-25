@@ -3,7 +3,7 @@
 # which permits nearly fully automatic factory imaging.
 
 FACTORY_SDCARD_ROOTFS_IMAGE ??= "fsl-image-auto"
-FACTORY_SDCARD_ROOTFS_IMAGE_ubuntu ?= "fsl-image-ubuntu"
+FACTORY_SDCARD_ROOTFS_IMAGE:ubuntu ?= "fsl-image-ubuntu"
 
 require recipes-fsl/images/${FACTORY_SDCARD_ROOTFS_IMAGE}.bb
 
@@ -16,7 +16,7 @@ IMAGE_INSTALL:append:ls2084abbmini = "${@bb.utils.contains('DISTRO_FEATURES', 'a
 FACTORY_EXTRA_IMAGE_INSTALL = "\
     phytool \
 "
-FACTORY_EXTRA_IMAGE_INSTALL_ubuntu = ""
+FACTORY_EXTRA_IMAGE_INSTALL:ubuntu = ""
 
 IMAGE_INSTALL += "${FACTORY_EXTRA_IMAGE_INSTALL}"
 
@@ -28,8 +28,8 @@ inherit fsl-rootfsimage
 FACTORY_FLASH_IMAGE_NAME ?= "fsl-image-flash"
 FACTORY_FLASH_IMAGE ?= "${FACTORY_FLASH_IMAGE_NAME}-${MACHINE}.flashimage"
 # no flash image yet for ubuntu
-FACTORY_FLASH_IMAGE_NAME_ubuntu = "${FACTORY_SDCARD_ROOTFS_IMAGE}"
-FACTORY_FLASH_IMAGE_ubuntu = ""
+FACTORY_FLASH_IMAGE_NAME:ubuntu = "${FACTORY_SDCARD_ROOTFS_IMAGE}"
+FACTORY_FLASH_IMAGE:ubuntu = ""
 do_rootfs[depends] += "${FACTORY_FLASH_IMAGE_NAME}:do_image_complete ${FACTORY_SDCARD_ROOTFS_IMAGE}:do_image_complete bbdeployscripts:do_deploy"
 IMAGE_ROOTFS_IMAGELIST:ls2084abbmini = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.tar.gz bbdeployimage.itb bbdeployimage.sh bbreplacerootfs.sh"
 IMAGE_ROOTFS_IMAGELIST:s32g274abluebox3 = "${FACTORY_FLASH_IMAGE} ${FACTORY_SDCARD_ROOTFS_IMAGE}-${MACHINE}.sdcard bbdeployimage.itb"

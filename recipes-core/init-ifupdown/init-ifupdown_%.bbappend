@@ -6,7 +6,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 #
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'file://interfaces', '', d)}"
 
-do_install_ubuntu () {
+do_install:ubuntu () {
        install -d ${D}${sysconfdir}/network/interfaces.d
        install -m 0644 ${WORKDIR}/interfaces ${D}${sysconfdir}/network/interfaces.d
 }
@@ -15,4 +15,4 @@ do_install_ubuntu () {
 # generates an error, as package version cannot be seen,
 # thus we need to overwrite this.
 
-RCONFLICTS:${PN}_ubuntu = ""
+RCONFLICTS:${PN}:ubuntu = ""

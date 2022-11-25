@@ -23,7 +23,7 @@ DEPENDS:class-native = "openssl-native  python-ply-native util-linux-native"
 
 inherit cmake
 inherit pkgconfig
-inherit python-dir pythonnative
+inherit python3-dir python3native
 
 export ARCH="arm64"
 export OPENSSL_PATH = "${RECIPE_SYSROOT}"

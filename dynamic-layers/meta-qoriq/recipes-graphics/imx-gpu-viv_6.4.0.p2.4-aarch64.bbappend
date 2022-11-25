@@ -1,6 +1,6 @@
 DEPENDS:append:qoriq = " patchelf-native"
 
-RPROVIDES:${PN}_qoriq += "imx-gpu-viv"
+RPROVIDES:${PN}:qoriq += "imx-gpu-viv"
 EXTRA_PROVIDES:append:qoriq = " \
     virtual/libgl \
     virtual/libgles1 \
@@ -12,10 +12,10 @@ EXTRA_PROVIDES:append:qoriq = " \
 INSANE_SKIP:libvdk-imx += "dev-deps"
 INSANE_SKIP:libegl-imx += "dev-deps"
 
-IMX_PACKAGES_GBM_qoriq = "libgbm-imx libgbm-imx-dev"
-HAS_GBM_qoriq = "true"
-IS_MX8_qoriq = "1"
-FILES:libgbm-imx_qoriq = "${libdir}/libgbm*${SOLIBS}"
+IMX_PACKAGES_GBM:qoriq = "libgbm-imx libgbm-imx-dev"
+HAS_GBM:qoriq = "true"
+IS_MX8:qoriq = "1"
+FILES:libgbm-imx:qoriq = "${libdir}/libgbm*${SOLIBS}"
 
 RDEPENDS:libgal-imx:remove = "kernel-module-imx-gpu-viv"
 COMPATIBLE_MACHINE = "(imxfbdev|imxgpu|qoriq)"

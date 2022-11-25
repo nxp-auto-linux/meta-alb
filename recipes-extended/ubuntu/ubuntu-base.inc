@@ -68,14 +68,14 @@ APTGET_EXTRA_PACKAGES += "\
 # Some packages are implicitly present in Ubuntu due to the kernel
 # and rootfs configuration. We pretend to have the respective Yocto
 # names therefore. Stuff is grouped for easier updates
-RPROVIDES:${PN}_ubuntu += " \
+RPROVIDES:${PN}:ubuntu += " \
 /bin/sh \
 flex \
 "
-RPROVIDES:${PN}_ubuntu += " \
+RPROVIDES:${PN}:ubuntu += " \
 shared-mime-info \
 "
-RPROVIDES:${PN}_ubuntu += " \
+RPROVIDES:${PN}:ubuntu += " \
 rtld(GNU_HASH) \
 libc6 \
 libc6-utils \
@@ -87,7 +87,7 @@ libgcc1-dev \
 libssl1.1 \
 update-alternatives \
 "
-RPROVIDES:${PN}_ubuntu += " \
+RPROVIDES:${PN}:ubuntu += " \
 pam-plugin-access \
 pam-plugin-debug \
 pam-plugin-deny \
@@ -127,7 +127,7 @@ pam-plugin-warn \
 pam-plugin-wheel \
 pam-plugin-xauth \
 "
-RPROVIDES:${PN}_ubuntu += " \
+RPROVIDES:${PN}:ubuntu += " \
 libform5 \
 libformw5 \
 libmenu5 \
@@ -144,7 +144,7 @@ glibc-utils \
 
 # A few things are provided where we don't have a Yocto equivalent
 # currently/possibly. We add them preemptively just in case
-RPROVIDES:${PN}_ubuntu += " \
+RPROVIDES:${PN}:ubuntu += " \
 pam-plugin-tty-audit \
 pam-plugin-userdb \
 pam-plugin-extrausers \
@@ -168,7 +168,7 @@ FILES:${PN} += "/dev"
 FILES:${PN} += "/lib"
 FILES:${PN} += "/run /dev /lib /media /boot /tmp /proc /opt /mnt /home /srv /sys /run /root"
 FILES:${PN}-dbg:append = " ${localstatedir}/lib/dpkg/info/.debug"
-FILES:${PN}-dbg_${TRANSLATED_TARGET_ARCH} += "${base_libdir}/${TRANSLATED_TARGET_ARCH}-linux-gnu/.debug"
+FILES:${PN}-dbg:${TRANSLATED_TARGET_ARCH} += "${base_libdir}/${TRANSLATED_TARGET_ARCH}-linux-gnu/.debug"
 
 fakeroot do_shell_prepare() {
 	cd "${D}"

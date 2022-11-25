@@ -149,7 +149,7 @@ DELTA_KERNEL_DEFCONFIG:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'o
 SRC_URI:append:gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' file://build/optee.cfg', '', d)}"
 
 # make everything compatible for the time being
-COMPATIBLE_MACHINE_$MACHINE = "$MACHINE"
+COMPATIBLE_MACHINE:$MACHINE = "$MACHINE"
 
 # Enable dm-verity
 DELTA_KERNEL_DEFCONFIG:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' dm-verity.cfg', '', d)}"

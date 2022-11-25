@@ -22,7 +22,7 @@ FILES:${PN} += "/sbin"
 
 # The downside of not having the symlink destination content is that we
 # are missing a few basic files that are must have for dependencies.
-RPROVIDES:${PN}_ubuntu += " \
+RPROVIDES:${PN}:ubuntu += " \
     /bin/bash \
     /bin/dash \
 "

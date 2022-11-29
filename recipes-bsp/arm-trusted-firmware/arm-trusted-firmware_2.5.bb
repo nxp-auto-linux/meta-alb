@@ -24,7 +24,7 @@ B = "${WORKDIR}/build"
 URL ?= "https://github.com/nxp-auto-linux/arm-trusted-firmware.git;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "5c379f54087c7ed23a1cc8e0eb5c18dbddc14fa7"
+SRCREV ?= "08ef0179cff364150f98c1257ffaae15272c21bd"
 
 
 BUILD_TYPE = "release"

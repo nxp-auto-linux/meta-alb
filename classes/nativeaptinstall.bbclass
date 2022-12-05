@@ -691,15 +691,11 @@ END_USER
                 fi
 
                 # For apt-key to be reliable, we need both gpg and dirmngr
-                # As workaround for an 18.04 gpg regressions, we also use curl
-                # In fact, for now we use it generally, because gpg can't
+                # We use curl generally, because gpg can't
                 # talk to dirmngr properly in the emulated environment.
                 # This needs to be debugged (FIX!), but the curl method
                 # works, too.
                 APTGET_GPG_BROKEN="1"
-                if [ "$DISTRO_RELEASE" = "18.04" ]; then
-                        APTGET_GPG_BROKEN="1"
-                fi
                 if [ -n "$APTGET_GPG_BROKEN" ]; then
                         x="gnupg curl"
                 else

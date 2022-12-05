@@ -1,7 +1,6 @@
 # We currently support recipies for:
-# - 18.04.5
 # - 20.04.1
-#UBUNTU_TARGET_VERSION ?= "18.04.5"
+# - 22.04.1
 #UBUNTU_TARGET_VERSION ?= "20.04.1"
 UBUNTU_TARGET_VERSION ?= "22.04.1"
 
@@ -41,44 +40,27 @@ IMAGE_TYPES_MASKED += "cpio cpio.gz cpio.gz.u-boot"
 # Note that the glibc is not compiled in Ubuntu identical fashion.
 # It remains a glibc that works for Yocto, which is good enough for
 # our purposes.
-# Ubuntu 18.04: max glibc 2.27...
 # Ubuntu 20.x: max glibc 2.31...
 # Ubuntu 22.x: max glibc 2.35...
 GLIBCVERSION = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.27", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.31%", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.35", \
     "unsupportedubuntuversion" \
     , d) \
-    , d) \
     , d)}'
-# Little white lie about Ubuntu 18.04, which really uses binutils 2.31
 BINUVERSION='${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.34", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.34", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.38", \
     "unsupportedubuntuversion" \
-    , d) \
-    , d) \
-    , d)}'
-# Little white lie about Ubuntu 18.04, which really uses binutils 2.31
-BINUVERSION='${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "2.34", \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "2.34", \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.38", \
-    "unsupportedubuntuversion" \
-    , d) \
     , d) \
     , d)}'
 
 # We need to understand the python version in Ubuntu for dependency
 # management
 APTGET_PYTHON_VER = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "3.8", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "3.8", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "3.10", \
     "unsupportedubuntuversion" \
-    , d) \
     , d) \
     , d)}'
 
@@ -86,11 +68,9 @@ APTGET_PYTHON_VER = '${@ \
 # More recent Ubuntu versions work with symlinks for the base
 # directories. We can't refer to symlink based files
 DISTRO_FEATURES:append = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "18.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", " usrmerge", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", " usrmerge", \
    "unsupportedubuntuversion" \
-    , d) \
     , d) \
     , d)}'
 

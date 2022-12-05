@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 
 COMMONSRC_URI = " \
@@ -58,5 +58,3 @@ SRC_URI:append:ls2084abbmini = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-d
 PCIE_DEMOS_LX2_PATCH ?= "0001-pcie-lx2-kernel-support-for-pcie-demos.patch"
 PCIE_DEMOS_LX2_PATCH:lx2160ahpcsom = "0001-pcie-lx2-hpcsom-kernel-support-for-pcie-demos.patch"
 SRC_URI:append:lx2160a = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' file://${PCIE_DEMOS_LX2_PATCH}', '', d)}"
-
-require gcc75compat.inc

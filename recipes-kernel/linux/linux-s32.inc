@@ -124,7 +124,6 @@ SRC_URI += "\
 "
 
 require vnet-s32.inc
-require gcc75compat.inc
 
 # Since Kernel version 4.19, task 'do_merge_delta_config' requires that the cross
 # compiler is available in recipe's sysroot. In order to avoid any erros/warnings

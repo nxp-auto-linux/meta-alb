@@ -70,6 +70,7 @@ do_compile() {
 		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
 		    MKIMAGE_CFG="${DEPLOY_DIR_IMAGE}/tools/u-boot-s32.cfgout-${suffix}" all
 		cp -vf "${ATF_BINARIES}/fip.s32" "${ATF_BINARIES}/fip.s32-${suffix}"
+		cp -vf "${ATF_BINARIES}/fip.bin" "${ATF_BINARIES}/fip.bin-${suffix}"
 	done
 }
 

@@ -4,6 +4,8 @@ DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
+require recipes-bsp/arm-trusted-firmware/atf-src.inc
+
 DEPENDS += "bc-native"
 DEPENDS += "coreutils-native"
 DEPENDS += "binutils-native"
@@ -19,13 +21,6 @@ inherit deploy
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
-
-# ATF repository
-URL ?= "https://github.com/nxp-auto-linux/arm-trusted-firmware.git;protocol=https"
-BRANCH ?= "${RELEASE_BASE}-${PV}"
-SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "66179fbc8f0ceb798cfe0daf51cb947c34f259e1"
-
 
 BUILD_TYPE = "release"
 

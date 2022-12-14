@@ -21,3 +21,6 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'conf/machine/inclu
 
 # When m7boot is enabled, the needed ATF settings are included from m7-boot.inc
 require ${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', 'conf/machine/include/m7-boot.inc', 'conf/machine/include/atf.inc', d)}
+
+# Allow extensibility from other Yocto layers that define this include file
+include conf/machine/include/s32-gen1-extra.inc

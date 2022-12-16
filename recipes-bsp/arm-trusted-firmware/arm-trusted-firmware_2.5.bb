@@ -39,6 +39,10 @@ XEN_ARGS = " \
 M7BOOT_ARGS = " \
                 FIP_OFFSET_DELTA=0x2000 \
                 "
+SCPRT_ARGS = " \
+                S32CC_USE_SCP=1 \
+                FIP_ALIGN=64 \
+                "
 
 EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
@@ -52,6 +56,7 @@ EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', '${M7BOOT_ARG
 
 EXTRA_OEMAKE += 'OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/" \
                  HOSTSTRIP=true'
+EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'scprt', '${SCPRT_ARGS}', '', d)}"
 
 BOOT_TYPE = "sdcard qspi"
 

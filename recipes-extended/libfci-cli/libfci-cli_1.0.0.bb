@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE-BSD3.txt;md5=6b674f4e7c2e72a1907ad7a7f03b800c
 
 PR = "r0"
 
-URL ?= "https://github.com/nxp-auto-linux/pfeng;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https"
 SRC_URI = "${URL}"
 SRCREV = "bf28d0e1fda486105b2542bd4b8739fc0cfde61d"
 

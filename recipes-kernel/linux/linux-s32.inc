@@ -10,7 +10,7 @@ SCMVERSION ?= "y"
 LOCALVERSION = ""
 DELTA_KERNEL_DEFCONFIG ?= ""
 
-URL ?= "https://github.com/nxp-auto-linux/linux;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/linux;protocol=https"
 BRANCH ??= "${RELEASE_BASE}-${PV}-rt"
 SRC_URI = "${URL};branch=${BRANCH}"
 

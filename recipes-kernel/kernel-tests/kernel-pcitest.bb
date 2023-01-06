@@ -20,6 +20,9 @@ KERNEL_PCITEST_SRC ?= " \
              tools/pci \
              tools/scripts \
 "
+
+SRC_URI:append:s32cc = " file://pcitest-ep-config.sh"
+
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 do_configure[prefuncs] += "copy_pci_source_from_kernel"
@@ -58,6 +61,12 @@ do_install() {
     oe_runmake -C tools/pci install
 }
 
+do_install:append:s32cc() {
+	# for some reason the file in SRC_URI is not copied to $WORKDIR
+	install -m 0755 ${THISDIR}/files/pcitest-ep-config.sh ${D}${bindir}/pcitest-ep-config.sh
+}
+
 FILES:${PN} += "${bindir}"
+RDEPENDS:${PN} += "bash"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

@@ -1,4 +1,4 @@
-# Copyright 2021 NXP
+# Copyright 2021,2023 NXP
 #
 # Recipe to configure a complete Xen boot flow on various use-cases
 inherit deploy
@@ -17,7 +17,7 @@ B = "${WORKDIR}/build"
 
 FILES:${PN} = "/boot/boot.scr /boot/boot.source"
 
-EXTRA_CMDS_FILE = "extra_cmds_s32"
+EXTRA_CMDS_FILE = "extra_cmds_s32gen1"
 SRC_URI = "file://${EXTRA_CMDS_FILE}"
 
 do_configure() {
@@ -41,6 +41,11 @@ do_configure() {
         echo "DOMU_RAMDISK[${i}]=\"${DOM0LESS_ROOTFS}-${MACHINE}.cpio.gz\"" >> ${CFG_FILE}
         i=`expr ${i} + 1`;
     done
+
+    # Append file name with extra commands to be added in boot script
+    if [ -n "${EXTRA_CMDS_FILE}" ]; then
+        echo "APPEND_EXTRA_CMDS=\"${B}/${EXTRA_CMDS_FILE}\"" >> "${CFG_FILE}"
+    fi
 }
 
 do_compile() {
@@ -48,14 +53,13 @@ do_compile() {
     UBOOT_DIR="${DEPLOY_DIR_IMAGE}"
     IMAGEBUILDER_CONFIG="${CFG_NAME}"
     PREPEND_PATH="/boot"
-    EXTRA_CMDS="${B}/${EXTRA_CMDS_FILE}"
 
     # Run Imagebuilder script
     uboot-script-gen -c ${IMAGEBUILDER_CONFIG} \
         -d "${UBOOT_DIR}" \
         -t "${LOAD_CMD}" \
         -p "${PREPEND_PATH}" \
-        -a "${EXTRA_CMDS}"
+        -s
 
     mv ${UBOOT_DIR}/boot.scr ${UBOOT_DIR}/boot.source ${B}/
 }

@@ -4,7 +4,7 @@
 
 SUMMARY = "u-boot environment setting tool"
 SECTION = "utils"
-RDEPENDS:${PN}:class-native = "bash u-boot-tools-native"
+RDEPENDS:${PN}:class-native = "bash u-boot-tools-native dtc-native"
 RDEPENDS:${PN}:class-target = "u-boot-tools"
 HOMEPAGE = "https://gitlab.com/ViryaOS/imagebuilder"
 LICENSE = "Apache-2.0"
@@ -14,14 +14,9 @@ BBCLASSEXTEND = "native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/imagebuilder:"
 
-SRCREV = "6f1950c30cfec0fee35a6c977166148274f037dd"
-SRC_URI = "git://gitlab.com/ViryaOS/imagebuilder.git;protocol=https;branch=master \
-    file://0001-imagebuilder-Automatically-add-direct-map-and-xen-pa.patch \
-    file://0002-imagebuilder-Add-support-for-prepending-path-to-file.patch \
-    file://0003-imagebuilder-Disable-autoboot.patch \
-    file://0004-imagebuilder-Use-dynamic-sizes-for-loaded-binaries.patch \
-    file://0005-imagebuilder-Allow-pasthrough-of-multiple-devices.patch \
-    file://0006-imagebuilder-Add-support-for-appending-extra-command.patch \
+SRCREV = "0dbdc99cf3accdfdbfe158b99ee0bc9fc71fcdbc"
+SRC_URI = "git://gitlab.com/xen-project/imagebuilder.git;protocol=https;branch=master \
+    file://0001-uboot-script-gen-Dynamically-compute-addr-and-size-w.patch \
 "
 
 SRC_URI[sha256sum] = "b4c1d3d482965e9764485fa2eaef5a8e4d03e9fef2c9dcae4752a73309455cf3"

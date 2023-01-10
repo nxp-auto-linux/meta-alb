@@ -1,0 +1,301 @@
+From 798018e41da2b22e221d355a5b05468ffd20b79a Mon Sep 17 00:00:00 2001
+From: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+Date: Fri, 30 Sep 2022 17:54:37 +0300
+Subject: [PATCH] uboot-script-gen: Dynamically compute addr and size when
+ loading binaries
+
+Normally, the Imagebuilder would precompute the sizes of the loaded
+binaries and addresses where they are loaded before generating the
+script, and the sizes and addresses that needed to be provided to
+Xen via /chosen would be hardcoded in the boot script.
+
+Added an option via "-s" parameter to avoid hardcoding any
+address in the boot script, and dynamically compute the
+loading addresses for binaries. The first loading address is based
+on the MEMORY_START parameter and after loading each binary,
+the loading address and the size of the binary are stored in
+variables with corresponding names. Then, the loading address
+for the next binary is computed and aligned to 0x200000.
+
+If the "-s" parameter is not used, the normal flow is executed,
+where the loading addresses and sizes for each binaries are
+precomputed and hardcoded inside the script, but the loading
+addresses and sizes for each binary are now also stored for eventual
+later use.
+
+Signed-off-by: Andrei Cherechesu <andrei.cherechesu@nxp.com>
+---
+ scripts/uboot-script-gen | 114 +++++++++++++++++++++++++++------------
+ 1 file changed, 80 insertions(+), 34 deletions(-)
+
+diff --git a/scripts/uboot-script-gen b/scripts/uboot-script-gen
+index b24dca2..16269f0 100755
+--- a/scripts/uboot-script-gen
++++ b/scripts/uboot-script-gen
+@@ -4,6 +4,9 @@ offset=$((2*1024*1024))
+ filesize=0
+ prog_req=(mkimage file fdtput mktemp awk)
+ 
++padding_mask=`printf "0x%X\n" $(($offset - 1))`
++padding_mask_inv=`printf "0x%X\n" $((~$padding_mask))`
++
+ function cleanup_and_return_err()
+ {
+     rm -f $UBOOT_SOURCE $UBOOT_SCRIPT
+@@ -28,6 +31,7 @@ function dt_mknode()
+ #   str
+ #   str_a
+ #   bool
++#   var
+ function dt_set()
+ {
+     local path=$1
+@@ -35,11 +39,26 @@ function dt_set()
+     local data_type=$3
+     local data=$4
+ 
++    if test $data_type = "var"
++    then
++        eval data_addr_var="$data"_addr
++        eval data_addr=\$"$data_addr_var"
++        eval data_size_var="$data"_size
++        eval data_size=\$"$data_size_var"
++    fi
+ 
+     if test "$UBOOT_SOURCE" && test ! "$FIT"
+     then
+         var=${var/\#/\\#}
+-        if test $data_type = "hex" || test $data_type = "int"
++        if test $data_type = "var"
++        then
++            if test $dynamic_loading_opt
++            then
++                echo "fdt set $path $var <0x0 0x\${"$data_addr_var"} 0x0 0x\${"$data_size_var"}>" >> $UBOOT_SOURCE
++            else
++                echo "fdt set $path $var <0x0 $data_addr 0x0 $data_size>" >> $UBOOT_SOURCE
++            fi
++        elif test $data_type = "hex" || test $data_type = "int"
+         then
+             echo "fdt set $path $var <$data>" >> $UBOOT_SOURCE
+         elif test $data_type = "str_a"
+@@ -63,7 +82,10 @@ function dt_set()
+ 
+     if test $FDTEDIT
+     then
+-        if test $data_type = "hex"
++        if test $data_type = "var"
++        then
++            fdtput $FDTEDIT -p -t x $path $var 0x0 "$data_addr" 0x0 "$data_size"
++        elif test $data_type = "hex"
+         then
+             fdtput $FDTEDIT -p -t x $path $var $data
+         elif test $data_type = "int"
+@@ -87,38 +109,35 @@ function dt_set()
+ function add_device_tree_kernel()
+ {
+     local path=$1
+-    local addr=$2
+-    local size=$3
+-    local bootargs=$4
++    local varname=$2
++    local bootargs=$3
+ 
+-    dt_mknode "$path" "module$addr"
+-    dt_set "$path/module$addr" "compatible" "str_a" "multiboot,kernel multiboot,module"
+-    dt_set "$path/module$addr" "reg" "hex"  "0x0 $addr 0x0 $(printf "0x%x" $size)"
+-    dt_set "$path/module$addr" "bootargs" "str" "$bootargs"
++    dt_mknode "$path" "module-$varname"
++    dt_set "$path/module-$varname" "compatible" "str_a" "multiboot,kernel multiboot,module"
++    dt_set "$path/module-$varname" "reg" "var"  "$varname"
++    dt_set "$path/module-$varname" "bootargs" "str" "$bootargs"
+ }
+ 
+ 
+ function add_device_tree_ramdisk()
+ {
+     local path=$1
+-    local addr=$2
+-    local size=$3
++    local varname=$2
+ 
+-    dt_mknode "$path"  "module$addr"
+-    dt_set "$path/module$addr" "compatible" "str_a" "multiboot,ramdisk multiboot,module"
+-    dt_set "$path/module$addr" "reg" "hex"  "0x0 $addr 0x0 $(printf "0x%x" $size)"
++    dt_mknode "$path" "module-$varname"
++    dt_set "$path/module-$varname" "compatible" "str_a" "multiboot,ramdisk multiboot,module"
++    dt_set "$path/module-$varname" "reg" "var"  "$varname"
+ }
+ 
+ 
+ function add_device_tree_passthrough()
+ {
+     local path=$1
+-    local addr=$2
+-    local size=$3
++    local varname=$2
+ 
+-    dt_mknode "$path"  "module$addr"
+-    dt_set "$path/module$addr" "compatible" "str_a" "multiboot,device-tree multiboot,module"
+-    dt_set "$path/module$addr" "reg" "hex"  "0x0 $addr 0x0 $(printf "0x%x" $size)"
++    dt_mknode "$path" "module-$varname"
++    dt_set "$path/module-$varname" "compatible" "str_a" "multiboot,device-tree multiboot,module"
++    dt_set "$path/module-$varname" "reg" "var"  "$varname"
+ }
+ 
+ function add_device_tree_mem()
+@@ -260,7 +279,7 @@ function xen_device_tree_editing()
+     then
+         dt_mknode "/chosen" "dom0"
+         dt_set "/chosen/dom0" "compatible" "str_a" "xen,linux-zimage xen,multiboot-module multiboot,module"
+-        dt_set "/chosen/dom0" "reg" "hex" "0x0 $dom0_kernel_addr 0x0 $(printf "0x%x" $dom0_kernel_size)"
++        dt_set "/chosen/dom0" "reg" "var" "dom0_linux"
+         dt_set "/chosen" "xen,dom0-bootargs" "str" "$DOM0_CMD"
+     fi
+ 
+@@ -268,7 +287,7 @@ function xen_device_tree_editing()
+     then
+         dt_mknode "/chosen" "dom0-ramdisk"
+         dt_set "/chosen/dom0-ramdisk" "compatible" "str_a" "xen,linux-initrd xen,multiboot-module multiboot,module"
+-        dt_set "/chosen/dom0-ramdisk" "reg" "hex" "0x0 $ramdisk_addr 0x0 $(printf "0x%x" $ramdisk_size)"
++        dt_set "/chosen/dom0-ramdisk" "reg" "var" "dom0_ramdisk"
+     fi
+ 
+     i=0
+@@ -315,14 +334,14 @@ function xen_device_tree_editing()
+             dt_set "/chosen/domU$i" "colors" "hex" "$(printf "0x%x" $bitcolors)"
+         fi
+ 
+-        add_device_tree_kernel "/chosen/domU$i" ${domU_kernel_addr[$i]} ${domU_kernel_size[$i]} "${DOMU_CMD[$i]}"
++        add_device_tree_kernel "/chosen/domU$i" "domU${i}_kernel" "${DOMU_CMD[$i]}"
+         if test "${domU_ramdisk_addr[$i]}"
+         then
+-            add_device_tree_ramdisk "/chosen/domU$i" ${domU_ramdisk_addr[$i]} ${domU_ramdisk_size[$i]}
++            add_device_tree_ramdisk "/chosen/domU$i" "domU${i}_ramdisk"
+         fi
+         if test "${domU_passthrough_dtb_addr[$i]}"
+         then
+-            add_device_tree_passthrough "/chosen/domU$i" ${domU_passthrough_dtb_addr[$i]} ${domU_passthrough_dtb_size[$i]}
++            add_device_tree_passthrough "/chosen/domU$i" "domU${i}_fdt"
+         fi
+         i=$(( $i + 1 ))
+     done
+@@ -350,7 +369,7 @@ function device_tree_editing()
+ 
+     if test $UBOOT_SOURCE
+     then
+-        echo "fdt addr $device_tree_addr" >> $UBOOT_SOURCE
++        echo "fdt addr \${host_fdt_addr}" >> $UBOOT_SOURCE
+         echo "fdt resize 1024" >> $UBOOT_SOURCE
+ 
+         if test $NUM_DT_OVERLAY && test $NUM_DT_OVERLAY -gt 0
+@@ -375,11 +394,33 @@ function device_tree_editing()
+ function add_size()
+ {
+     local filename=$1
++    local fit_scr_name=$2
++    local binary_name_addr="${fit_scr_name}_addr"
++    local binary_name_size="${fit_scr_name}_size"
++    eval "$fit_scr_name"_addr=$memaddr
++
+     local size=`stat -L --printf="%s" $filename`
++    filesize=$size
++    eval "$fit_scr_name"_size=`printf "0x%X\n" $size`
++    eval binary_name_size_value=\$"$binary_name_size"
++    
++    if test $dynamic_loading_opt
++    then
++        echo "setenv $binary_name_addr \${memaddr}" >> $UBOOT_SOURCE
++        echo "setenv $binary_name_size \${filesize}" >> $UBOOT_SOURCE
++        # Compute load addr for next binary dynamically
++        echo "setexpr memaddr \${memaddr} \+ \${filesize}" >> $UBOOT_SOURCE
++        echo "setexpr memaddr \${memaddr} \+ $padding_mask" >> $UBOOT_SOURCE
++        echo "setexpr memaddr \${memaddr} \& $padding_mask_inv" >> $UBOOT_SOURCE
++    else
++        # Store load addr and size as literals
++        echo "setenv $binary_name_addr $memaddr" >> $UBOOT_SOURCE
++        echo "setenv $binary_name_size $binary_name_size_value" >> $UBOOT_SOURCE
++    fi
++
+     memaddr=$(( $memaddr + $size + $offset - 1))
+     memaddr=$(( $memaddr & ~($offset - 1) ))
+     memaddr=`printf "0x%X\n" $memaddr`
+-    filesize=$size
+ }
+ 
+ function load_file()
+@@ -394,10 +435,13 @@ function load_file()
+     if test "$FIT"
+     then
+         echo "imxtract \$fit_addr $fit_scr_name $memaddr" >> $UBOOT_SOURCE
++    elif test "$dynamic_loading_opt"
++    then
++        echo "$LOAD_CMD \${memaddr} ${prepend_path:+$prepend_path/}$relative_path" >> $UBOOT_SOURCE
+     else
+         echo "$LOAD_CMD $memaddr ${prepend_path:+$prepend_path/}$relative_path" >> $UBOOT_SOURCE
+     fi
+-    add_size $filename
++    add_size $filename $fit_scr_name
+ }
+ 
+ function check_file_type()
+@@ -978,7 +1022,7 @@ function print_help
+ {
+     script=`basename "$0"`
+     echo "usage:"
+-    echo "	$script -c CONFIG_FILE -d DIRECTORY [-t LOAD_CMD] [-o FILE] [-k KEY_DIR/HINT [-u U-BOOT_DTB]] [-e] [-f] [-p PREPEND_PATH]"
++    echo "	$script -c CONFIG_FILE -d DIRECTORY [-t LOAD_CMD] [-o FILE] [-k KEY_DIR/HINT [-u U-BOOT_DTB]] [-e] [-f] [-p PREPEND_PATH] [-s]"
+     echo "	$script -h"
+     echo "where:"
+     echo "	CONFIG_FILE - configuration file"
+@@ -995,6 +1039,7 @@ function print_help
+     echo "	U-BOOT_DTB - u-boot control dtb so that the public key gets added to it"
+     echo "	-f - enable generating a FIT image"
+     echo "	PREPEND_PATH - path to be appended before file names to match deploy location within rootfs"
++    echo "	-s - enable dynamic loading of binaries by storing their addresses and sizes u-boot env variables"
+     echo "	-h - prints out the help message and exits "
+     echo "Defaults:"
+     echo "	CONFIG_FILE=$cfg_file, UBOOT_TYPE=\"LOAD_CMD\" env var, DIRECTORY=$uboot_dir"
+@@ -1002,7 +1047,7 @@ function print_help
+     echo "	$script -c ../config -d ./build42 -t \"scsi load 1:1\""
+ }
+ 
+-while getopts ":c:t:d:ho:k:u:fp:" opt; do
++while getopts ":c:t:d:ho:k:u:fp:s" opt; do
+     case ${opt} in
+     t )
+         case $OPTARG in
+@@ -1044,6 +1089,9 @@ while getopts ":c:t:d:ho:k:u:fp:" opt; do
+     p )
+         prepend_path="$OPTARG"
+         ;;
++    s )
++        dynamic_loading_opt=y
++        ;;
+     h )
+         print_help
+         exit 0
+@@ -1223,6 +1271,8 @@ uboot_addr=$memaddr
+ # 2MB are enough for a uboot script
+ memaddr=$(( $memaddr + $offset ))
+ memaddr=`printf "0x%X\n" $memaddr`
++start_addr=`printf "%x\n" $memaddr`
++echo "setenv memaddr $start_addr" >> $UBOOT_SOURCE
+ 
+ if test "$os" = "xen"
+ then
+@@ -1266,11 +1316,7 @@ fi
+ 
+ if [ "$BOOT_CMD" != "none" ]
+ then
+-    echo "$BOOT_CMD $kernel_addr - $device_tree_addr" >> $UBOOT_SOURCE
+-else
+-    # skip boot command but store load addresses to be used later
+-    echo "setenv host_kernel_addr $kernel_addr" >> $UBOOT_SOURCE
+-    echo "setenv host_fdt_addr $device_tree_addr" >> $UBOOT_SOURCE
++    echo "$BOOT_CMD \${host_kernel_addr} - \${host_fdt_addr}" >> $UBOOT_SOURCE
+ fi
+ 
+ if test "$FIT"
+-- 
+2.35.1
+

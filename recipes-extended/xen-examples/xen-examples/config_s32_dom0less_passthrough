@@ -10,10 +10,11 @@ DOM0_CMD="console=hvc0 earlycon=xen earlyprintk=xen root=/dev/mmcblk0p2 rootwait
 
 NUM_DOMUS=1
 DOMU_KERNEL[0]="Image"
-DOMU_MEM[0]=1024
+DOMU_MEM[0]=986
 DOMU_VCPUS[0]=1
 DOMU_PASSTHROUGH_DTB[0]="passthrough.dtb"
 DOMU_DIRECT_MAP[0]=1
+DOMU_STATIC_MEM[0]="0xc0800000 0xfc00000 0xd0400000 0x2de00000"
 
 UBOOT_SOURCE="boot.source"
 UBOOT_SCRIPT="boot.scr"

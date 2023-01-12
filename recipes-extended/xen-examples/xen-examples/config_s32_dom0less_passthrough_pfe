@@ -1,4 +1,4 @@
-# Copyright 2021-2022 NXP
+# Copyright 2021-2023 NXP
 
 MEMORY_START="0x85200000"
 MEMORY_END="0xFFFFFFFF"
@@ -18,3 +18,4 @@ DOMU_DIRECT_MAP[0]=1
 
 UBOOT_SOURCE="boot.source"
 UBOOT_SCRIPT="boot.scr"
+BOOT_CMD="none"

@@ -54,6 +54,3 @@ IMAGE_INSTALL:append:ls2 = " \
 IMAGE_INSTALL:append:lx2160a = " \
     restool \
 "
-
-# Fix do_package warning when depending on this recipe
-deltask do_packagedata

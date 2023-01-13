@@ -28,6 +28,3 @@ fix_inittab() {
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'fix_inittab; ', '', d)}"
-
-# Fix do_package warning when depending on this recipe
-deltask do_packagedata

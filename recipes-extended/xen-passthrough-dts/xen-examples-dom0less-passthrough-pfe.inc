@@ -1,6 +1,6 @@
-# Copyright 2021 NXP
+# Copyright 2021,2023 NXP
 
-PASSTHROUGH_NODE = "/pfe_slave@46000000"
+PASSTHROUGH_NODE = "/soc/pfe_slave@46000000"
 
 TEMPLATE_DTS = "template.dts"
 TEMPLATE_DTB = "template_pfe.dtb"

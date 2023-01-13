@@ -1,6 +1,6 @@
-# Copyright 2021 NXP
+# Copyright 2021,2023 NXP
 
-PASSTHROUGH_NODE = "/ethernet@4033c000"
+PASSTHROUGH_NODE = "/soc/ethernet@4033c000"
 
 TEMPLATE_DTS = "template_gmac.dts"
 TEMPLATE_DTB = "template_gmac.dtb"

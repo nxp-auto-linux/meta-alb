@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 NXP
+ * Copyright 2021,2023 NXP
  */
 /dts-v1/;
 
@@ -31,11 +31,16 @@
 		};
 		gmac0_rx: gmac0_rx {
 			#clock-cells = <0>;
-			clock-frequency = <125000000>;
+			clock-frequency = <25000000>;
+			compatible = "fixed-clock";
+		};
+		gmac0_ts: gmac0_ts {
+			#clock-cells = <0>;
+			clock-frequency = <200000000>;
 			compatible = "fixed-clock";
 		};
 		ethernet@4033c000 {
-			clocks = <&gmac0_axi &gmac0_axi &gmac0_tx &gmac0_tx &gmac0_tx &gmac0_tx &gmac0_rx &gmac0_rx &gmac0_rx &gmac0_rx>;
+			clocks = <&gmac0_axi &gmac0_axi &gmac0_tx &gmac0_tx &gmac0_tx &gmac0_tx &gmac0_rx &gmac0_rx &gmac0_rx &gmac0_rx &gmac0_ts>;
 		};
 	};
 };

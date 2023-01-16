@@ -3,7 +3,7 @@ require conf/machine/include/s32g3.inc
 MACHINEOVERRIDES =. "s32g3evb3:"
 MACHINEOVERRIDES =. "s32gevbx:"
 
-ATF_PLAT = "s32g3xxaevb"
+ATF_PLAT = "s32g3xxaevb3"
 
 UBOOT_DEFCONFIG = "s32g3xxaevb3_defconfig"
 UBOOT_FLASH_DEFCONFIG = "s32g3xxaevb3_qspi_defconfig"

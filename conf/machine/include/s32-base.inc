@@ -29,6 +29,11 @@ PREFERRED_VERSION_u-boot-s32 ?= "2020.04"
 PREFERRED_VERSION_u-boot-tools ?= "2020.04"
 PREFERRED_VERSION_xen ?= "4.14"
 
+PREFERRED_VERSION_optee-os ?= "3.18.0"
+PREFERRED_VERSION_optee-client ?= "3.18.0"
+PREFERRED_VERSION_optee-test ?= "3.18.0"
+PREFERRED_VERSION_optee-examples ?= "3.18.0"
+
 PREFERRED_VERSION_rng-tools ?= "5"
 PREFERRED_VERSION_tcpreplay ?= "4.4.2"
 

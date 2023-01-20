@@ -43,6 +43,9 @@ SCPRT_ARGS = " \
                 S32CC_USE_SCP=1 \
                 FIP_ALIGN=64 \
                 "
+HSE_ARGS = " \
+              HSE_SUPPORT=1 \
+	      "
 
 EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
@@ -57,6 +60,7 @@ EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', '${M7BOOT_ARG
 EXTRA_OEMAKE += 'OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/" \
                  HOSTSTRIP=true'
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'scprt', '${SCPRT_ARGS}', '', d)}"
+EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'hse', '${HSE_ARGS}', '', d)}"
 
 BOOT_TYPE = "sdcard qspi"
 

@@ -22,7 +22,7 @@ IMAGE_INSTALL += " \
 # Benchmark tools
 IMAGE_INSTALL += "dhrystone fio"
 
-IMAGE_INSTALL:append:gen1 = " perf"
+IMAGE_INSTALL:append:s32cc = " perf"
 
 # PCIe testing
 IMAGE_INSTALL += "kernel-pcitest"
@@ -30,14 +30,14 @@ IMAGE_INSTALL += "kernel-pcitest"
 # PCIe testing
 IMAGE_INSTALL += "kernel-pcitest"
 
-# Userspace support for QSPI Flash under Linux for S32GEN1 platforms
-IMAGE_INSTALL:append:gen1 = " mtd-utils "
+# Userspace support for QSPI Flash under Linux for S32CC platforms
+IMAGE_INSTALL:append:s32cc = " mtd-utils "
 
 # Support for accessing MDIO bus for GMAC phys
-IMAGE_INSTALL:append:gen1 = " mdio-proxy "
+IMAGE_INSTALL:append:s32cc = " mdio-proxy "
 
 # Tool for flashing the AQR107 firmware using mdio-proxy
-IMAGE_INSTALL:append:gen1 = " aquantia-firmware-utility "
+IMAGE_INSTALL:append:s32cc = " aquantia-firmware-utility "
 
 # Supporting complex evaluation scenarios
 IMAGE_INSTALL += "openssl-misc"

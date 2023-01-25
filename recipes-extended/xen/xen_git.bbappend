@@ -7,4 +7,4 @@ do_deploy:append() {
 	cd ${DEPLOYDIR} && ln -sf xen-${MACHINE} ${DEPLOYDIR}/xen && cd -
 }
 
-SRC_URI:append:gen1 = " file://xen_s32gen1.cfg"
+SRC_URI:append:s32cc = " file://xen_s32cc.cfg"

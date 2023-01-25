@@ -1,6 +1,6 @@
 IMAGE_FSTYPES = "wic tar.gz ext3"
 
-COMPATIBLE_MACHINE = "gen1"
+COMPATIBLE_MACHINE = "s32cc"
 
 do_make_wic() {
 

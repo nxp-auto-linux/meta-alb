@@ -16,5 +16,5 @@ require fsl-image-emptyrootfs.inc
 
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 
-# Userspace support for QSPI Flash under Linux for S32GEN1 platforms
-IMAGE_INSTALL:append:gen1 = " mtd-utils "
+# Userspace support for QSPI Flash under Linux for S32CC platforms
+IMAGE_INSTALL:append:s32cc = " mtd-utils "

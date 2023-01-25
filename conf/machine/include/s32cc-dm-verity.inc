@@ -10,4 +10,4 @@ IMAGE_BOOT_FILES:remove = "Image"
 IMAGE_BOOT_FILES:append = " Image-initramfs-${MACHINE}.bin;Image"
 IMAGE_BOOT_FILES:append = " ${@os.path.basename(d.getVar("KERNEL_DEVICETREE"))}"
 
-WKS_FILE = "s32gen1-sdimage-verity.wks.in"
+WKS_FILE = "s32cc-sdimage-verity.wks.in"

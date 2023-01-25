@@ -17,7 +17,7 @@ B = "${WORKDIR}/build"
 
 FILES:${PN} = "/boot/boot.scr /boot/boot.source"
 
-EXTRA_CMDS_FILE = "extra_cmds_s32gen1"
+EXTRA_CMDS_FILE = "extra_cmds_s32cc"
 SRC_URI = "file://${EXTRA_CMDS_FILE}"
 
 do_configure() {

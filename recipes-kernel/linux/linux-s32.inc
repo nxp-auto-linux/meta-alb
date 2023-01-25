@@ -144,12 +144,12 @@ SRC_URI += "\
     "
 
 # Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
-DELTA_KERNEL_DEFCONFIG:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee.cfg', '', d)}"
-SRC_URI:append:gen1 = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' file://build/optee.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee.cfg', '', d)}"
+SRC_URI:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' file://build/optee.cfg', '', d)}"
 
 # make everything compatible for the time being
 COMPATIBLE_MACHINE:$MACHINE = "$MACHINE"
 
 # Enable dm-verity
-DELTA_KERNEL_DEFCONFIG:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' dm-verity.cfg', '', d)}"
-SRC_URI:append:gen1 = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' file://build/dm-verity.cfg', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' dm-verity.cfg', '', d)}"
+SRC_URI:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' file://build/dm-verity.cfg', '', d)}"

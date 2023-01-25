@@ -1,7 +1,7 @@
 require conf/machine/include/s32-base.inc
 require conf/machine/include/systemd.inc
 
-SOC_FAMILY:append = ":gen1"
+SOC_FAMILY:append = ":s32cc"
 
 IMAGE_FSTYPES += "ext4"
 
@@ -17,10 +17,10 @@ UBOOT_ENV_SDCARD_OFFSET ?= "0x001e0000"
 FLASHIMAGE_DYNAMIC_OFFSETS ?= "1"
 
 # Enable DM-Verity
-require ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'conf/machine/include/s32-gen1-dm-verity.inc', '', d)}
+require ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'conf/machine/include/s32cc-dm-verity.inc', '', d)}
 
 # When m7boot is enabled, the needed ATF settings are included from m7-boot.inc
 require ${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', 'conf/machine/include/m7-boot.inc', 'conf/machine/include/atf.inc', d)}
 
 # Allow extensibility from other Yocto layers that define this include file
-include conf/machine/include/s32-gen1-extra.inc
+include conf/machine/include/s32cc-extra.inc

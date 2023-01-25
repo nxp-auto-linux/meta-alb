@@ -1,4 +1,4 @@
-require conf/machine/include/s32-gen1.inc
+require conf/machine/include/s32cc.inc
 
 EXTRA_IMAGECMD:ext4 = "-i 4096 -L ${IMAGE_NAME}"
 IMAGE_FSTYPES:remove = "jffs2 ubi ext2.gz ext2.gz.u-boot"

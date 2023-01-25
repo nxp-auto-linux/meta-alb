@@ -1,4 +1,4 @@
-require conf/machine/include/s32-gen1-board.inc
+require conf/machine/include/s32cc-board.inc
 
 KERNEL_DEFCONFIG ?= "s32cc_defconfig"
 

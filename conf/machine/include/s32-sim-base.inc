@@ -15,4 +15,4 @@ VIRTUAL-RUNTIME_keymaps = "keymaps"
 DISTRO_FEATURES:append = " virtio"
 DISTRO_FEATURES:remove = "systemd"
 
-SOC_FAMILY:append = ":gen1"
+SOC_FAMILY:append = ":s32cc"

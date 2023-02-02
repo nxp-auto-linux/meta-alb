@@ -71,7 +71,7 @@ libunwind8 libuuid1 libxml2 libxmlb2 libxtables12 libxxhash0 \
 libyaml-0-2 libzstd1 login logsave lsb-base lsb-release m4 mawk \
 media-types mount ncurses-base ncurses-bin net-tools netbase \
 networkd-dispatcher openssl packagekit packagekit-tools passwd \
-perl-base pinentry-curses pkexec policykit-1 polkitd procps \
+perl perl-base pinentry-curses pkexec policykit-1 polkitd procps \
 publicsuffix python-apt-common python3 python3-apt python3-blinker \
 python3-cffi-backend python3-cryptography python3-dbus python3-distro \
 python3-distro-info python3-gi python3-httplib2 \

@@ -47,7 +47,7 @@ do_compile() {
 
     # Generate passthrough dts file
     LINUX_DTB_NAME="$(basename ${KERNEL_DEVICETREE})"
-    python3 ${STAGING_BINDIR_NATIVE}/${PARTIAL_DTB_GEN_DIR}/${PARTIAL_DTB_GEN} \
+    nativepython3 ${STAGING_BINDIR_NATIVE}/${PARTIAL_DTB_GEN_DIR}/${PARTIAL_DTB_GEN} \
         -i "${DEPLOY_DIR_IMAGE}/${LINUX_DTB_NAME}" \
         -t "${B}/${TEMPLATE_DTB}" \
         -n "${PASSTHROUGH_NODE}"

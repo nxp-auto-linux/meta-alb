@@ -153,3 +153,7 @@ COMPATIBLE_MACHINE:$MACHINE = "$MACHINE"
 # Enable dm-verity
 DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' dm-verity.cfg', '', d)}"
 SRC_URI:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' file://build/dm-verity.cfg', '', d)}"
+
+# Enable support for pcie demos
+SRC_URI:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', ' file://build/pcie_demos.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', ' pcie_demos.config', '', d)}"

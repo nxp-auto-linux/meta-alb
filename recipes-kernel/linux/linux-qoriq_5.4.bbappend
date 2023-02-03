@@ -53,8 +53,8 @@ DELTA_KERNEL_DEFCONFIG:append:ls1043ardb = " ${COMMONDELTA_KERNEL_DEFCONFIG}"
 DELTA_KERNEL_DEFCONFIG:append:ls1043ardb = " pci-vdev.cfg"
 DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'docker', ' docker.cfg', '', d)}"
 
-SRC_URI:append:ls2084abbmini = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' file://0001-pcie-ls2-kernel-support-for-pcie-demos.patch', '', d)}"
+SRC_URI:append:ls2084abbmini = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', ' file://0001-pcie-ls2-kernel-support-for-pcie-demos.patch', '', d)}"
 
 PCIE_DEMOS_LX2_PATCH ?= "0001-pcie-lx2-kernel-support-for-pcie-demos.patch"
 PCIE_DEMOS_LX2_PATCH:lx2160ahpcsom = "0001-pcie-lx2-hpcsom-kernel-support-for-pcie-demos.patch"
-SRC_URI:append:lx2160a = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-support', ' file://${PCIE_DEMOS_LX2_PATCH}', '', d)}"
+SRC_URI:append:lx2160a = " ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', ' file://${PCIE_DEMOS_LX2_PATCH}', '', d)}"

@@ -1,4 +1,4 @@
 # Common settings for pcie based demos
 
-# we support BlueBox (ls2080abluebox) and BlueBox Mini (ls2084abbmini)
-COMPATIBLE_MACHINE = "ls2080abluebox|ls2084abbmini|lx2160a"
+# we support S32G, S32R and BlueBox 1-3
+COMPATIBLE_MACHINE = "s32cc|ls2080abluebox|ls2084abbmini|lx2160a"

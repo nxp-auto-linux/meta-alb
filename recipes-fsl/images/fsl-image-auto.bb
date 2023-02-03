@@ -24,6 +24,9 @@ IMAGE_INSTALL += "dhrystone fio"
 
 IMAGE_INSTALL:append:s32cc = " perf"
 
+# PCIe demos
+IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', \
+	' demo-pcie-shared-mem', '', d)}"
 # PCIe testing
 IMAGE_INSTALL += "kernel-pcitest"
 

@@ -26,12 +26,8 @@ IMAGE_INSTALL:append:s32cc = " perf"
 
 # PCIe demos
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', \
-	' demo-pcie-shared-mem', '', d)}"
-# PCIe testing
-IMAGE_INSTALL += "kernel-pcitest"
+	' kernel-pcitest demo-pcie-shared-mem', '', d)}"
 
-# PCIe testing
-IMAGE_INSTALL += "kernel-pcitest"
 
 # Userspace support for QSPI Flash under Linux for S32CC platforms
 IMAGE_INSTALL:append:s32cc = " mtd-utils "

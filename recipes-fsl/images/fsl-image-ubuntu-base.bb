@@ -19,7 +19,7 @@ do_rootfs[network] = "1"
 APTGET_CHROOT_DIR = "${IMAGE_ROOTFS}"
 APTGET_SKIP_UPGRADE = "1"
 
-ROOTFS_POSTPROCESS_COMMAND:append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager; do_systemd_service_fixup; do_getty_fixup; "
+ROOTFS_POSTPROCESS_COMMAND:append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager; do_systemd_service_fixup; do_getty_fixup; do_disable_systemd_logind; "
 
 # This must be added first as it provides the foundation for
 # subsequent modifications to the rootfs
@@ -224,6 +224,12 @@ fakeroot do_getty_fixup() {
 			fi
 		fi
 	fi
+}
+
+fakeroot do_disable_systemd_logind() {
+	# Mask systemd-logind.service in order to avoid unneeded delay
+	# in user login for Ubuntu based images
+	ln -sf "/dev/null" "${APTGET_CHROOT_DIR}/etc/systemd/system/systemd-logind.service"
 }
 
 IMAGE_ROOTFS_SIZE ?= "8192"

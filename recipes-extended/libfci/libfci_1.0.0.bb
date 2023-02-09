@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE-GPL2.txt;md5=5dcdfe25f21119aa5435eab9d0256af7
 
 PR = "r0"
 
-URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https"
+URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https;nobranch=1"
 SRC_URI = "${URL}"
 SRCREV = "bf28d0e1fda486105b2542bd4b8739fc0cfde61d"
 S = "${WORKDIR}/git"

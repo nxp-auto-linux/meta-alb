@@ -12,6 +12,8 @@ DEPENDS += "openssl-native"
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
+EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
+
 do_compile() {
 	oe_runmake -C "${S}" fiptool
 }

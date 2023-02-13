@@ -24,4 +24,4 @@ do_install() {
 	install -m 0755 ${S}/tools/fiptool/fiptool ${D}/${bindir}/
 }
 
-FILES_${PN} = "${bindir}/fiptool"
+FILES:${PN} = "${bindir}/fiptool"

@@ -15,6 +15,7 @@ BRANCH ??= "${RELEASE_BASE}-${PV}-rt"
 SRC_URI = "${URL};branch=${BRANCH}"
 
 DEPENDS:append = " libgcc dtc-native"
+DEPENDS:append = "${@ ' u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
 
 KERNEL_CC:append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append = " ${TOOLCHAIN_OPTIONS}"
@@ -50,6 +51,14 @@ do_compile:prepend() {
     if [ ! -e ${B}/scripts/dtc/dtc ]; then
         ln -sf ${STAGING_BINDIR_NATIVE}/dtc ${B}/scripts/dtc/dtc
     fi
+}
+
+# Switch from SIUL2 to SCMI drivers if needed
+do_compile:append() {
+	if ${SCMI_DTB_NODE_CHANGE}; then
+		dtb_name="${B}/arch/arm64/boot/dts/${KERNEL_DEVICETREE}"
+		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py ${dtb_name}
+	fi
 }
 
 do_install:append:s32() {

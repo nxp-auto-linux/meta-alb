@@ -13,6 +13,7 @@ DEPENDS += "dtc-native xxd-native"
 DEPENDS += "openssl-native"
 DEPENDS += "u-boot-s32"
 DEPENDS += "u-boot-tools-native"
+DEPENDS += "${@ 'u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os', '', d)}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -72,6 +73,12 @@ do_compile() {
 	unset CPPFLAGS
 
 	oe_runmake -C "${S}" clean
+
+	if ${SCMI_DTB_NODE_CHANGE}; then
+		oe_runmake -C "${S}" dtbs
+		dtb_name="${ATF_BINARIES}/fdts/$(basename ${KERNEL_DEVICETREE})"
+		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py ${dtb_name}
+	fi
 
 	for suffix in ${BOOT_TYPE}
 	do

@@ -62,3 +62,6 @@ IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can',
 
 # Add OP-TEE user-space components
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
+
+# Add PKCS11-HSE Library & Examples
+IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'hse', ' pkcs11-hse', '', d)}"

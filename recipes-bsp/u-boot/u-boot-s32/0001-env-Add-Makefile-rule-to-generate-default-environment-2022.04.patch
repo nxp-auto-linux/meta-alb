@@ -1,0 +1,41 @@
+From ccf3bd980023b279b389813a6928536e9eefc793 Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Wed, 15 Feb 2023 15:02:05 +0200
+Subject: [PATCH] env: Add Makefile rule to generate default environment
+
+Add new rule `env-default` to dump the default
+environment from env/built-in.o to a file named
+`env-default.txt`
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
+---
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index ee55957e9a..d4b244cb17 100644
+--- a/Makefile
++++ b/Makefile
+@@ -922,6 +922,7 @@ endif
+ 
+ # Always append INPUTS so that arch config.mk's can add custom ones
+ INPUTS-y += u-boot.srec u-boot.bin u-boot.sym System.map binary_size_check
++INPUTS-y += env-default
+ 
+ INPUTS-$(CONFIG_ONENAND_U_BOOT) += u-boot-onenand.bin
+ ifeq ($(CONFIG_SPL_FSL_PBL),y)
+@@ -1315,6 +1316,10 @@ u-boot.ldr:	u-boot
+ 		$(LDR) -T $(CONFIG_CPU) -c $@ $< $(LDR_FLAGS)
+ 		$(BOARD_SIZE_CHECK)
+ 
++# Extract default environment to a file
++env-default: env/built-in.o FORCE
++	$(shell $(CONFIG_SHELL) $(srctree)/scripts/get_default_envs.sh $(build-dir) > $@.txt)
++
+ # binman
+ # ---------------------------------------------------------------------------
+ # Use 'make BINMAN_DEBUG=1' to enable debugging
+-- 
+2.25.1
+

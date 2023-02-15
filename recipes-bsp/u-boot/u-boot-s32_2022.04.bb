@@ -2,7 +2,7 @@ require recipes-bsp/u-boot/u-boot-nxp.inc
 require recipes-bsp/u-boot/u-boot-src-${PV}.inc
 
 LIC_FILES_CHKSUM += " \
-    file://Licenses/lgpl-2.0.txt;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
+    file://Licenses/lgpl-2.0.txt;md5=4cf66a4984120007c9881cc871cf49db \
 "
 
 # Support for generating default environment

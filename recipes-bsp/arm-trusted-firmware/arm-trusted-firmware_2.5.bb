@@ -23,7 +23,7 @@ inherit deploy
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
-BUILD_TYPE = "release"
+BUILD_TYPE ?= "release"
 
 ATF_BINARIES = "${B}/${ATF_PLAT}/${BUILD_TYPE}"
 
@@ -54,6 +54,8 @@ EXTRA_OEMAKE += " \
                 BUILD_BASE=${B} \
                 PLAT=${ATF_PLAT} \
                 "
+
+EXTRA_OEMAKE += "${@oe.utils.conditional('BUILD_TYPE', 'debug', 'DEBUG=1', '', d)}"
 
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '${OPTEE_ARGS}', '', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${XEN_ARGS}', '', d)}"

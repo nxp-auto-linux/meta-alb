@@ -185,9 +185,8 @@ create_rootfs_partition () {
 # different than rootfs build time.
 # This can be easily reproduced when u-boot/atf/kernel are needed with no
 # rootfs change.
-# To fix this problem, this function excludes the timestamp from the rootfs
-# file name and get the existing rootfs.
-# If there is no match or more than 1, an error is thrown.
+# To fix this problem, this function reads the rootfs symbolic link that points
+# to the correct rootfs file.
 #
 # Nothing is needed for dependency, this is already handled using:
 # [vardepsexclude] += "DATETIME"
@@ -195,18 +194,13 @@ create_rootfs_partition () {
 update_rootfs_name () {
 	local img="$1"
 
-	img=$(echo "${img}" | sed  "s#-[0-9]*${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}#-\*${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}#g")
+	img=$(echo "${img}" | sed  "s#-[0-9]*${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}#.${SDCARD_ROOTFS_EXT}#g")
+	img=$(readlink -f "${img}" || true)
 
-	local base=$(basename "${img}")
-	local dir=$(dirname "${img}")
-
-	img=$(find "${dir}" -name "${base}")
-	local num=$(echo "${img}" | wc -l)
-
-	if [ "${num}" -eq "1" ]; then
+	if [ -f "${img}" ]; then
 		printf "%s" "${img}"
 	else
-		bberror "Can not match a unique rootfs file. Matches are: [ ${img} ]."
+		bberror "Rootfs file does not exist or invalid link: ${img}"
 	fi
 }
 
@@ -217,7 +211,7 @@ write_rootfs_partition () {
 	SDCARD_ROOTFS_SIZE="$2"
 	SDCARD_ROOTFS_NAME="$3"
 
-	if [ ! -f "${SDCARD_ROOTFS_NAME}" ]; then
+	if [ -n "${SDCARD_ROOTFS_NAME}" -a ! -f "${SDCARD_ROOTFS_NAME}" ]; then
 		SDCARD_ROOTFS_NAME=$(update_rootfs_name ${SDCARD_ROOTFS_NAME})
 	fi
 

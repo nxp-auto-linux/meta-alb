@@ -28,5 +28,8 @@ SCMI_USE_SCMI_GPIO ??= "0"
 SCMI_USE_SCMI_NVMEM ??= "0"
 SCMI_DTB_NODE_CHANGE = "${@'true' if int(d.getVar('SCMI_USE_SCMI_PINCTRL')) or int(d.getVar('SCMI_USE_SCMI_GPIO')) or int(d.getVar('SCMI_USE_SCMI_NVMEM')) else 'false'}"
 
+# Enable FIP Authentication. Please note that this will only generate an sdcard fip image.
+require ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'conf/machine/include/hse-secboot.inc', 'conf/machine/include/atf.inc', d)}
+
 # Allow extensibility from other Yocto layers that define this include file
 include conf/machine/include/s32cc-extra.inc

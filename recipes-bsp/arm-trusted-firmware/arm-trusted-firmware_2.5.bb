@@ -81,6 +81,9 @@ SCMI_HEADERS_TAGS:append:s32r := " s32r45"
 
 BOOT_TYPE = "sdcard qspi"
 
+SECBOOT = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'recipes-bsp/arm-trusted-firmware/atf-hse-secboot.inc', '', d)}"
+include ${SECBOOT}
+
 do_compile() {
 	unset LDFLAGS
 	unset CFLAGS

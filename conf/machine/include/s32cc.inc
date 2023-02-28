@@ -22,7 +22,10 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'conf/machine/inclu
 # When m7boot is enabled, the needed ATF settings are included from m7-boot.inc
 require ${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', 'conf/machine/include/m7-boot.inc', 'conf/machine/include/atf.inc', d)}
 
-SCMI_DTB_NODE_CHANGE ??= 'false'
+# Check whether to switch from SIUL2 drivers to SCMI ones
+SCMI_USE_SCMI_PINCTRL ??= "0"
+SCMI_USE_SCMI_GPIO ??= "0"
+SCMI_DTB_NODE_CHANGE = "${@'true' if int(d.getVar('SCMI_USE_SCMI_PINCTRL')) or int(d.getVar('SCMI_USE_SCMI_GPIO')) else 'false'}"
 
 # Allow extensibility from other Yocto layers that define this include file
 include conf/machine/include/s32cc-extra.inc

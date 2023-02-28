@@ -67,6 +67,9 @@ EXTRA_OEMAKE += 'OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/../" \
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'scprt', '${SCPRT_ARGS}', '', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'hse', '${HSE_ARGS}', '', d)}"
 
+PINCTRL_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
+GPIO_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"
+
 BOOT_TYPE = "sdcard qspi"
 
 do_compile() {
@@ -79,7 +82,10 @@ do_compile() {
 	if ${SCMI_DTB_NODE_CHANGE}; then
 		oe_runmake -C "${S}" dtbs
 		dtb_name="${ATF_BINARIES}/fdts/$(basename ${KERNEL_DEVICETREE})"
-		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py ${dtb_name}
+		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
+			${dtb_name} \
+			${GPIO_OPT} \
+			${PINCTRL_OPT}
 	fi
 
 	for suffix in ${BOOT_TYPE}

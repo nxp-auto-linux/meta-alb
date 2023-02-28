@@ -20,6 +20,9 @@ DEPENDS:append = "${@ ' u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHA
 KERNEL_CC:append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append = " ${TOOLCHAIN_OPTIONS}"
 
+PINCTRL_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
+GPIO_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"
+
 S = "${WORKDIR}/git"
 
 do_merge_delta_config[dirs] = "${B}"
@@ -57,7 +60,10 @@ do_compile:prepend() {
 do_compile:append() {
 	if ${SCMI_DTB_NODE_CHANGE}; then
 		dtb_name="${B}/arch/arm64/boot/dts/${KERNEL_DEVICETREE}"
-		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py ${dtb_name}
+		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
+			${dtb_name} \
+			${GPIO_OPT} \
+			${PINCTRL_OPT}
 	fi
 }
 

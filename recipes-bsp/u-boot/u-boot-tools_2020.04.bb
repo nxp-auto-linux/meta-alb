@@ -11,6 +11,7 @@ do_install:append() {
 	install -m 0755 ${S}/tools/nxp/scmi_dtb_node_change.py  ${D}${bindir}/scmi_dtb_node_change.py
 }
 
-FILES-${PN}-scmi = "${bindir}/scmi_dtb_node_change.py"
+FILES:${PN}-scmi = "${bindir}/scmi_dtb_node_change.py"
 PROVIDES += "${PN}-scmi"
-PROVIDES:class-native += "u-boot-tools-scmi-native"
+PROVIDES:class-native += "${BPN}-scmi-native"
+PACKAGES += "${PN}-scmi"

@@ -291,10 +291,6 @@ USAGE_LIST="$LAYER_LIST \
 # Really, conf files should be checked and not the machine name ...
 echo ${MACHINE} | egrep -q "${ARMMACHINE}"
 if [ $? -eq 0 ]; then
-    LAYER_LIST="$LAYER_LIST \
-        meta-linaro/meta-linaro-toolchain \
-    "
-
     add_layers_for_machines "${LSLAYERS}" "${BBLSMACHINE}"
 
     # ALB layers after LSLAYERS, to make sure ALB .bbappends are applied last

@@ -33,7 +33,6 @@ RDEPENDS:${PN} = "\
     rt-tests \
     stress-ng \
     sqlite3 \
-    strongswan \
     texinfo \
     unzip \
     usbutils \

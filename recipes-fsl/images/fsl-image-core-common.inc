@@ -43,7 +43,6 @@ PACKAGES-CORE-MISC = "\
     pkgconfig \
     procps \
     psmisc \
-    strongswan \
     i2c-tools \
 "
 

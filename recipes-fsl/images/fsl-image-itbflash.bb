@@ -26,7 +26,6 @@ PACKAGES-CORE:remove = "\
 PACKAGES-CORE-MISC:remove = "\
     elfutils \
     pkgconfig \
-    strongswan \
     tcpreplay \
     bridge-utils \
     inetutils-ftpd \

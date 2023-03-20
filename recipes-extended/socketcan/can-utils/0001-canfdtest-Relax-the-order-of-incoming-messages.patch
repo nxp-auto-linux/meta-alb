@@ -1,0 +1,176 @@
+From d793e1033300513d4f25c37ebbcf5e458e97a7e9 Mon Sep 17 00:00:00 2001
+From: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+Date: Thu, 9 Feb 2023 10:47:10 +0200
+Subject: [PATCH] canfdtest: Relax the order of incoming messages
+
+Currently, the canfdtest assumes that the host will receive a message
+before the one from DUT, but this is not always true. In a system with
+two pairs of interfaces connected to each other, where the same device
+acts as a host and DUT, the CAN frame from DUT might be received earlier
+than the one forwarded through the Linux kernel CAN stack due to scheduling
+policies.
+This patch introduces states for each received frame and considers it
+done once it was received on the host and DUTS interface.
+
+Setup example:
+	# CAN1 <--> CAN2
+	canfdtest -vv can1
+	canfdtest -vv -g can2
+
+	# CAN3 <--> CAN4
+	canfdtest -vv can3
+	canfdtest -vv -g can4
+----
+
+In Linux BSP this scenario can be reproduced with LLCE and shared FIFOs.
+
+canfdtest -vv llcecan1 &> log1 &
+canfdtest -vv -g llcecan2 &> log2 &
+
+// Add some delay to avoid frame id overlap
+usleep 14234567
+canfdtest -vv llcecan9 &> log9 &
+canfdtest -vv -g llcecan10 &> log10 &
+
+In this example, LLCE CAN1 & CAN9 share the same RX/TX FIFOs. The same
+applies to LLCE CAN2 & CAN10.
+
+Issue: ALB-9819
+Signed-off-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+---
+ canfdtest.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 65 insertions(+), 10 deletions(-)
+
+diff --git a/canfdtest.c b/canfdtest.c
+index e57a975..b78a491 100644
+--- a/canfdtest.c
++++ b/canfdtest.c
+@@ -44,6 +44,14 @@
+ #define CAN_MSG_COUNT	50
+ #define CAN_MSG_WAIT	27
+ 
++enum frame_status {
++	NONE = 0,
++	SENT = (1 << 0),
++	HOST_RECEIVED = (1 << 1),
++	DUT_RECEIVED = (1 << 2),
++	DONE = (SENT | HOST_RECEIVED | DUT_RECEIVED),
++};
++
+ static int running = 1;
+ static int verbose;
+ static int sockfd;
+@@ -270,10 +278,11 @@ static int can_echo_dut(void)
+ static int can_echo_gen(void)
+ {
+ 	struct can_frame *tx_frames;
+-	int *recv_tx;
++	enum frame_status *recv_tx;
+ 	struct can_frame rx_frame;
+ 	unsigned char counter = 0;
+ 	int send_pos = 0, recv_rx_pos = 0, recv_tx_pos = 0, unprocessed = 0, loops = 0;
++	int check_tx_pos = 0, check_rx_pos = 0;
+ 	int err = 0;
+ 	int i;
+ 
+@@ -301,6 +310,13 @@ static int can_echo_gen(void)
+ 				goto out_free;
+ 			}
+ 
++			recv_tx[send_pos] = SENT;
++
++			if (verbose > 1) {
++				printf(" send: ");
++				print_frame(&tx_frames[send_pos], 0);
++			}
++
+ 			send_pos++;
+ 			if (send_pos == inflight_count)
+ 				send_pos = 0;
+@@ -319,35 +335,74 @@ static int can_echo_gen(void)
+ 				goto out_free;
+ 			}
+ 
+-			if (verbose > 1)
++			if (verbose > 1) {
++				/* Host and dut frames */
++				if (rx_frame.can_id == CAN_MSG_ID)
++					printf("hrecv: ");
++				else
++					printf("drecv: ");
+ 				print_frame(&rx_frame, 0);
++			}
+ 
+ 			/* own frame */
+ 			if (rx_frame.can_id == CAN_MSG_ID) {
++				if (!(recv_tx[recv_tx_pos] & SENT)) {
++					printf("Host frame RX before TX!\n");
++					print_frame(&rx_frame, 0);
++					err = -1;
++					break;
++				}
++
+ 				compare_frame(&tx_frames[recv_tx_pos], &rx_frame, 0);
+-				recv_tx[recv_tx_pos] = 1;
++				if (recv_tx[recv_tx_pos] & HOST_RECEIVED) {
++					printf("The host received this frame twice:\n");
++					print_frame(&rx_frame, 0);
++					err = -1;
++					break;
++				}
++				recv_tx[recv_tx_pos] |= HOST_RECEIVED;
++				check_tx_pos = recv_tx_pos;
+ 				recv_tx_pos++;
+ 				if (recv_tx_pos == inflight_count)
+ 					recv_tx_pos = 0;
+ 				continue;
+ 			}
+ 
+-			if (!recv_tx[recv_rx_pos]) {
+-				printf("RX before TX!\n");
++			if (!(recv_tx[recv_rx_pos] & SENT)) {
++				printf("DUT RX before TX!\n");
+ 				print_frame(&rx_frame, 0);
+-				running = 0;
++				err = -1;
++				break;
+ 			}
++
+ 			/* compare with expected */
+ 			compare_frame(&tx_frames[recv_rx_pos], &rx_frame, 1);
++			if (!running) {
++				err = -1;
++				break;
++			}
++
++			if (recv_tx[recv_rx_pos] & DUT_RECEIVED) {
++				printf("The DUT received this frame twice:\n");
++				print_frame(&rx_frame, 0);
++				err = -1;
++				break;
++			}
++
++			recv_tx[recv_rx_pos] |= DUT_RECEIVED;
++			check_rx_pos = recv_rx_pos;
+ 			recv_rx_pos++;
+ 			if (recv_rx_pos == inflight_count)
+ 				recv_rx_pos = 0;
+ 
+-			loops++;
+-			if (test_loops && loops >= test_loops)
+-				break;
++			if (recv_tx[check_rx_pos] == DONE ||
++			    recv_tx[check_tx_pos] == DONE) {
++				loops++;
++				if (test_loops && loops >= test_loops)
++					break;
+ 
+-			unprocessed--;
++				unprocessed--;
++			}
+ 		}
+ 	}
+ 
+-- 
+2.25.1
+

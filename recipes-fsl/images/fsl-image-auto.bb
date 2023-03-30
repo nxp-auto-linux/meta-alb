@@ -64,3 +64,6 @@ IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos-supp
 
 # sysfs gpio interface is deprecated, include gpiod tools, lib and headers
 IMAGE_INSTALL:append = " libgpiod libgpiod-tools libgpiod-dev"
+
+# add demo sample applications
+IMAGE_INSTALL:append = " demo-samples"

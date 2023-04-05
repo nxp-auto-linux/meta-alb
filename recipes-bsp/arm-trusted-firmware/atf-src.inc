@@ -1,4 +1,4 @@
 URL ?= "git://github.com/nxp-auto-linux/arm-trusted-firmware.git;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "8508fc1663452ce7ae9f54f3859c52abfa826da5"
+SRCREV ?= "d58be844a3a65946acf827998c3802e2b3871ad5"

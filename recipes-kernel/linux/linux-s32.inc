@@ -111,6 +111,9 @@ SRC_URI += "\
 # GPU configuration
 DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', ' gpu.config', '', d)}"
 
+# MMC test configuration
+DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'bsp-utils', ' mmc_test.cfg', '', d)}"
+
 LLCE_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', '+can', '', d)}"
 LLCE_FEATURES:append = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', '+logger', '', d)}"
 
@@ -136,6 +139,7 @@ SRC_URI += "\
     file://build/gpu.config \
     file://build/llce_can.config \
     file://build/llce_logger.config \
+    file://build/mmc_test.cfg \
 "
 
 require vnet-s32.inc

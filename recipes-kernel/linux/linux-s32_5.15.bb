@@ -2,7 +2,7 @@ PV = "5.15.85"
 
 require recipes-kernel/linux/linux-s32.inc
 
-SRCREV = "6c67ffd8f165f704777d6718657a4f6f3d9827cd"
+SRCREV = "4b43f49572dfb18378685f5072c3ae897657400b"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 

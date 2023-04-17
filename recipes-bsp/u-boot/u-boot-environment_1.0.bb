@@ -36,16 +36,6 @@ UBOOT_ENV_NAME_MAP:s32 = " \
 	u-boot-flashenv-sd : sdcard; \
 "
 
-# Turns out that some board configs use a different size in U-Boot.
-# If we do not want to override the board config with a different one,
-# we have to be creative locally and second guess the environment size.
-# I don't like this, but until I have a better solution, this is it.
-UBOOT_ENV_IMAGE_SIZE:ls1043ardb = "131072 nand:8192 sdcard:8192"
-UBOOT_ENV_IMAGE_SIZE:ls1043abluebox = "131072 nand:8192 sdcard:8192"
-
-# For the factory image, we support a special environment
-UBOOT_ENV_NAME:append:ls2084abbmini = " u-boot-flashenv-factory"
-
 require u-boot-environment.inc
 
 DEPENDS:append:s32 = "${@oe.utils.conditional("DEFAULT_ENV", "", "" , " u-boot-s32", d)}"

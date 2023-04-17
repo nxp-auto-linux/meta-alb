@@ -22,6 +22,13 @@ POKY_DEFAULT_EXTRA_RDEPENDS:remove = "packagegroup-core-boot"
 INITRAMFS_IMAGE = ""
 POSTINST_INTERCEPTS_DIR = "<--InVaLiD-->"
 
+# We really should also have this line active, but recipe deficiencies
+# make this a non-option currently
+#FILESYSTEM_PERMS_TABLES = ""
+
+# Ubuntu does not use /var/volatile
+VOLATILE_LOG_DIR = "no"
+
 # Removal of flash image filesystem support
 # for Ubuntu images due to an issue regarding 'cpio'
 # utility when seeking on large files (> 2 GB).
@@ -139,6 +146,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     findutils \
     flex \
     gawk \
+    gcc:gcc,gcc-plugins \
     gcc-runtime \
     gdbm \
     initscripts \
@@ -150,6 +158,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     libffi \
     libgcc \
     liblzma \
+    libmpc:libmpc,libmpc-dev \
     libnsl2 \
     libpam \
     libpam-runtime \
@@ -167,6 +176,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     qemuwrapper-cross \
     shared-mime-info \
     sqlite3 \
+    tar \
     readline \
     util-linux \
     xz \

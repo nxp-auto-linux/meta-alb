@@ -1,8 +1,7 @@
 # A more complex image with customer required setup
 require fsl-image-ubuntu-base.bb
 
-# Example for use of "ppa:" to install x2go with xfce4
-# At this time, this is not available for all versions, so we
+# At this time x2go is not available for all versions, so we
 # also show how to do a VNC alternative.
 APTGET_EXTRA_PPA += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "", \
@@ -30,6 +29,25 @@ IMAGE_INSTALL += '${@ \
     , d)}'
 
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
+
+ROOTFS_POSTPROCESS_COMMAND:append = " do_make_x2go_safe; "
+fakeroot do_make_x2go_safe() {
+        # With recent xfce versions, x2go can lose I/O connectivity
+        # if screenblankers are active. Also, compositing can completely
+        # mess up the U/I. This installs a workaround.
+        d="${APTGET_CHROOT_DIR}/etc/x2go/Xsession.d"
+        f="97xfce_compatibility"
+        if [ -d $d ]; then
+                if [ ! -e "$d/$f" ]; then
+                        # No screen blanker
+                        echo  >"$d/$f" "xset s off"
+                        # No power saving
+                        echo >>"$d/$f" "xset -dpms"
+                        # No compositing
+                        echo >>"$d/$f" "xfconf-query -c xfwm4 -p /general/use_compositing -s false"
+                fi
+        fi
+}
 
 require kernel-source-debian.inc
 APTGET_EXTRA_PACKAGES += " \

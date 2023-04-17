@@ -1,5 +1,5 @@
 #
-# (C)2015-1017 NXP Semiconductors
+# (C)2015-1017, 2023 NXP Semiconductors
 # <Heinz.Wrobel@nxp.com>
 #
 # This class is used to create an itb file for the current
@@ -10,6 +10,14 @@
 #
 inherit image_types
 IMAGE_TYPES += "itb"
+
+# We may want to override the default kernel.
+# Other kernels reside in their respective sub directory per
+# implementation of kernel.bbclass
+ITB_KERNEL ?= "virtual/kernel"
+ITB_KERNEL_BASENAME ?= "kernel"
+ITB_KERNEL_DEPLOYDIR ?= "${DEPLOY_DIR_IMAGE}"
+ITB_KERNEL_DEPLOYSUBDIR ??= '${@ "" if (d.getVar("ITB_KERNEL_BASENAME") == "kernel") else d.getVar("ITB_KERNEL_BASENAME") }'
 
 # The itb requires the rootfs filesystem to be built before using
 # it so we must make this dependency explicit.
@@ -23,19 +31,19 @@ ITB_ROOTFS_COMPRESSION ?= "none"
 
 ITB_ROOTFS_SUFFIX ?= '${ITB_ROOTFS_TYPE}${@oe.utils.conditional("ITB_ROOTFS_COMPRESSION", "none", "", ".${ITB_ROOTFS_COMPRESSION}", d)}'
 ITB_ROOTFS_REALSUFFIX ?= '${@oe.utils.conditional("ITB_ROOTFS_SUFFIX", "", "", ".${ITB_ROOTFS_SUFFIX}", d)}'
-ITB_ROOTFS_DIR ?= "${DEPLOY_DIR_IMAGE}"
+ITB_ROOTFS_DIR ?= "${ITB_KERNEL_DEPLOYDIR}"
 ITB_ROOTFS_DIR_SLASH ?= "${ITB_ROOTFS_DIR}/"
 ITB_ROOTFS_BASENAME_MACHINE ?= "${ITB_ROOTFS_BASENAME}-${MACHINE}"
 IMAGE_TYPEDEP:itb ?= "${ITB_ROOTFS_SUFFIX}"
 
-#do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${@oe.utils.conditional("ITB_ROOTFS_TYPE", "", "", "${ITB_ROOTFS_BASENAME}:do_image_${ITB_ROOTFS_TYPE}", d)}'
-do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot virtual/kernel:do_deploy ${ITB_ROOTFS_BASENAME}:do_image_complete'
+#do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot ${ITB_KERNEL}:do_deploy ${@oe.utils.conditional("ITB_ROOTFS_TYPE", "", "", "${ITB_ROOTFS_BASENAME}:do_image_${ITB_ROOTFS_TYPE}", d)}'
+do_image_itb[depends] += 'u-boot-mkimage-native:do_populate_sysroot ${ITB_KERNEL}:do_deploy ${ITB_ROOTFS_BASENAME}:do_image_complete'
 
 # The ITB is defined by the image we are building, so we name it
 # based on the image.
 # The other defaults are derived from Layerscape aarch64 and may well need
 # overrides for other architectures
-ITB_ITS_FILE ?= "${S}/${IMAGE_NAME}.its"
+ITB_ITS_FILE ?= "${S}/${IMAGE_NAME}-${ITB_KERNEL_BASENAME}.its"
 ITB_DEPLOY_SUFFIX ?= ".itb"
 ITB_DEPLOY_ITBNAME ?= "${IMAGE_NAME}"
 ITB_DEPLOY_LINK_ITBNAME ?= "${IMAGE_LINK_NAME}"
@@ -50,25 +58,34 @@ ITB_DTB_LOAD     ?= "${DTB_LOAD}"
 # Create an itb image
 #
 generate_itb() {
-        gzip -c ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.bin >${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.gz
+        deployDir="${ITB_KERNEL_DEPLOYDIR}"
+        if [ -n "${ITB_KERNEL_DEPLOYSUBDIR}" ]; then
+                deployDir="$deployDir/${ITB_KERNEL_DEPLOYSUBDIR}"
+        fi
+	gzip -c $deployDir/${KERNEL_IMAGETYPE}-${MACHINE}.bin >$deployDir/${KERNEL_IMAGETYPE}-${MACHINE}.gz
 
         IIF="${ITB_ITS_FILE}"
         if [ -n "${KERNEL_ITS_FILE}" ]; then
                 IIF="${KERNEL_ITS_FILE}"
         fi
-        mkimage -f ${IIF} ${S}/kernel.itb
+        mkimage -f $IIF ${B}/${ITB_KERNEL_BASENAME}.itb
 
 	# Deploying an image can be suppressed, and/or the name
 	# can be customized
         if [ -n "${ITB_DEPLOYDIR}" ]; then
 		install -d ${ITB_DEPLOYDIR}
-		install -m 644 ${S}/kernel.itb ${ITB_DEPLOYDIR}/${ITB_DEPLOY_ITBNAME}${ITB_DEPLOY_SUFFIX}
+		install -m 644 ${B}/${ITB_KERNEL_BASENAME}.itb ${ITB_DEPLOYDIR}/${ITB_DEPLOY_ITBNAME}${ITB_DEPLOY_SUFFIX}
 		ln -sf ${ITB_DEPLOY_ITBNAME}${ITB_DEPLOY_SUFFIX} ${ITB_DEPLOYDIR}/${ITB_DEPLOY_LINK_ITBNAME}${ITB_DEPLOY_SUFFIX}
         fi
 
 }
 
 configure_and_generate_itb() {
+        deployDir="${ITB_KERNEL_DEPLOYDIR}"
+        if [ -n "${ITB_KERNEL_DEPLOYSUBDIR}" ]; then
+                deployDir="$deployDir/${ITB_KERNEL_DEPLOYSUBDIR}"
+        fi
+
         # If no ITB_ITS_FILE is specified, we create a default one
         IIF="${ITB_ITS_FILE}"
         IIFWRITE=1
@@ -99,7 +116,7 @@ configure_and_generate_itb() {
 
         if [ ${IIFWRITE} ]; then
                 echo >${IIF}  "/*"
-                echo >>${IIF} " * Copyright (C) 2015-2017, NXP"
+                echo >>${IIF} " * Copyright (C) 2015-2017, 2023, NXP"
                 echo >>${IIF} " */"
                 echo >>${IIF} ""
                 echo >>${IIF} "/dts-v1/;"
@@ -111,7 +128,7 @@ configure_and_generate_itb() {
                 echo >>${IIF} "    images {"
                 echo >>${IIF} "        kernel@1 {"
                 echo >>${IIF} "            description = \"${ITB_ARCH} Linux kernel\";"
-                echo >>${IIF} "            data = /incbin/(\"${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.gz\");"
+                echo >>${IIF} "            data = /incbin/(\"$deployDir/${KERNEL_IMAGETYPE}-${MACHINE}.gz\");"
                 echo >>${IIF} "            type = \"kernel\";"
                 echo >>${IIF} "            arch = \"${ITB_ARCH}\";"
                 echo >>${IIF} "            os = \"linux\";"
@@ -122,7 +139,7 @@ configure_and_generate_itb() {
                 echo >>${IIF} "        fdt@1 {"
                 echo >>${IIF} "            description = \"Flattened Device Tree blob\";"
                 DTS_BASE_NAME=`printf "${KERNEL_DEVICETREE}" | awk -F "." '{print $1}' | xargs basename`
-                echo >>${IIF} "            data = /incbin/(\"${DEPLOY_DIR_IMAGE}/${DTS_BASE_NAME}.dtb\");"
+                echo >>${IIF} "            data = /incbin/(\"$deployDir/${DTS_BASE_NAME}.dtb\");"
                 echo >>${IIF} "            type = \"flat_dt\";"
                 echo >>${IIF} "            arch = \"${ITB_ARCH}\";"
                 echo >>${IIF} "            compression = \"none\";"

@@ -54,23 +54,29 @@ do_deploy () {
         cd ${DEPLOYDIR}
 
         # Note that the itb is NOT using MACHINE. It contains all the machine specific scripts and is therefore universal.
-        install ${WORKDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.itb ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${PV}-${PR}.itb
+        if  [ -e "${WORKDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.itb" ]; then
+                install ${WORKDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.itb ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${PV}-${PR}.itb
 
-        rm -f ${UBOOT_DEPLOYSCRIPT_NAME_ITS}.itb
-        ln -sf ${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${PV}-${PR}.itb ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.itb
+                rm -f ${UBOOT_DEPLOYSCRIPT_NAME_ITS}.itb
+                ln -sf ${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${PV}-${PR}.itb ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.itb
+        fi
 
-        install ${WORKDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.img ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}-${PV}-${PR}.img
+        if  [ -e "${WORKDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.img" ]; then
+                install ${WORKDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}.img ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}-${PV}-${PR}.img
 
-        rm -f ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}.img
-        ln -sf ${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}-${PV}-${PR}.img ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}.img
+                rm -f ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}.img
+                ln -sf ${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}-${PV}-${PR}.img ${DEPLOYDIR}/${UBOOT_DEPLOYSCRIPT_NAME_ITS}-${MACHINE}.img
+        fi
 
-        install ${S}/${LINUX_DEPLOYSCRIPT_NAME_SH}.sh ${DEPLOYDIR}/${LINUX_DEPLOYSCRIPT_NAME_SH}-${MACHINE}-${PV}-${PR}.sh
-        rm -f ${DEPLOYDIR}/${LINUX_DEPLOYSCRIPT_NAME_SH}.sh
-        ln -sf ${LINUX_DEPLOYSCRIPT_NAME_SH}-${MACHINE}-${PV}-${PR}.sh ${DEPLOYDIR}/${LINUX_DEPLOYSCRIPT_NAME_SH}.sh
+        # Install universal shell scripts
+        for item in "${LINUX_DEPLOYSCRIPT_NAME_SH}" "${LINUX_REPLACESCRIPT_NAME_SH}"; do
+                if  [ -e "${S}/${item}.sh" ]; then
+                        install ${S}/${item}.sh ${DEPLOYDIR}/${item}-${MACHINE}-${PV}-${PR}.sh
 
-        install ${S}/${LINUX_REPLACESCRIPT_NAME_SH}.sh ${DEPLOYDIR}/${LINUX_REPLACESCRIPT_NAME_SH}-${MACHINE}-${PV}-${PR}.sh
-        rm -f ${DEPLOYDIR}/${LINUX_REPLACESCRIPT_NAME_SH}.sh
-        ln -sf ${LINUX_REPLACESCRIPT_NAME_SH}-${MACHINE}-${PV}-${PR}.sh ${DEPLOYDIR}/${LINUX_REPLACESCRIPT_NAME_SH}.sh
+                        rm -f ${DEPLOYDIR}/${item}.sh
+                        ln -sf ${item}-${MACHINE}-${PV}-${PR}.sh ${DEPLOYDIR}/${item}.sh
+                fi
+        done
 
 }
 addtask deploy after do_compile

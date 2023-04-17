@@ -6,6 +6,16 @@ inherit linux-kernel-base
 KERNEL_SOURCE_DIR:ubuntu = "${KERNEL_VERSION}"
 KERNEL_SRC_PATH:ubuntu = "/usr/src/kernel"
 
+UBUNTUGCCVERSION = '${@ \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "10", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "10", \
+    "unsupportedubuntuversion" \
+    , d) \
+    , d)}'
+# Compensate for the needed packages for kernel-devsrc.
+# We block the Yocto versions globally in ubuntubasics.inc
+APTGET_EXTRA_PACKAGES:ubuntu += "gcc-${UBUNTUGCCVERSION}-plugin-dev libmpc-dev"
+
 # deploy 'linux-headers-<version>-generic as symlink to KERNEL_SRC_PATH'
 KERNEL_HEADERS_DIR:ubuntu = "linux-headers-${KERNEL_VERSION}-generic"
 

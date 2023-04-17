@@ -43,31 +43,55 @@ FLASHIMAGE_FIP_OFFSET ?= "${FLASHIMAGE_UBOOT_OFFSET}"
 
 IMAGE_TYPEDEP:flashimage:append = " ${FLASHIMAGE_ROOTFS_SUFFIX}"
 
-do_image_flashimage[depends] += " \
-        ${@d.getVar('FLASHIMAGE_RESET_FILE', True) and d.getVar('FLASHIMAGE_RESET', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_UBOOT_FILE', True) and d.getVar('FLASHIMAGE_UBOOT', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_KERNEL_FILE', True) and d.getVar('FLASHIMAGE_KERNEL', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_DTB_FILE', True) and d.getVar('FLASHIMAGE_DTB', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_ROOTFS_FILE', True) and d.getVar('FLASHIMAGE_ROOTFS', True) and d.getVar('FLASHIMAGE_ROOTFS', True) + ':do_image_complete' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA1_FILE', True) and d.getVar('FLASHIMAGE_EXTRA1', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA2_FILE', True) and d.getVar('FLASHIMAGE_EXTRA2', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA3_FILE', True) and d.getVar('FLASHIMAGE_EXTRA3', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA4_FILE', True) and d.getVar('FLASHIMAGE_EXTRA4', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA5_FILE', True) and d.getVar('FLASHIMAGE_EXTRA5', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA6_FILE', True) and d.getVar('FLASHIMAGE_EXTRA6', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA7_FILE', True) and d.getVar('FLASHIMAGE_EXTRA7', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA8_FILE', True) and d.getVar('FLASHIMAGE_EXTRA8', True) + ':do_deploy' or ''} \
-        ${@d.getVar('FLASHIMAGE_EXTRA9_FILE', True) and d.getVar('FLASHIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
-"
-
-do_image_flashimage[prefuncs] += "${@bb.utils.contains('FLASHIMAGE_DYNAMIC_OFFSETS', '1' , 'update_flash_offsets', '', d)}"
-
+# Dependencies are added only if the class is actively used
 python __anonymous () {
-    types = d.getVar('IMAGE_FSTYPES') or ""
+    types = d.getVar('IMAGE_FSTYPES') or ''
     if 'flashimage' in types.split():
-        depends = d.getVar("DEPENDS")
+        task = 'do_image_flashimage'
+        depends = d.getVar("DEPENDS") or ''
         depends = "%s bc-native" % depends
         d.setVar("DEPENDS", depends)
+        bb.debug(1, "DEPENDS is '%s'" % depends)
+
+        depvars = [
+            "FLASHIMAGE_RESET",
+            "FLASHIMAGE_FIP",
+            "FLASHIMAGE_KERNEL",
+            "FLASHIMAGE_DTB",
+            "FLASHIMAGE_ROOTFS:do_image_complete",
+            "FLASHIMAGE_EXTRA1",
+            "FLASHIMAGE_EXTRA2",
+            "FLASHIMAGE_EXTRA3",
+            "FLASHIMAGE_EXTRA4",
+            "FLASHIMAGE_EXTRA5",
+            "FLASHIMAGE_EXTRA6",
+            "FLASHIMAGE_EXTRA7",
+            "FLASHIMAGE_EXTRA8",
+            "FLASHIMAGE_EXTRA9"
+            ]
+
+        dl = []
+        depends = d.getVarFlag('do_image_flashimage', 'depends')
+        if depends is not None:
+            dl.append(depends)
+        for vt in depvars:
+            v,t = (vt.split(':') + 2 * [None])[:2]
+            if v:
+                if not t:
+                    t = 'do_deploy'
+                if d.getVar(v + '_FILE'):
+                    dep = d.getVar(v) or ''
+                    if dep:
+                        dl.append("%s:%s" % (dep, t))
+        if dl:
+            depends = " ".join(dl)
+            d.setVarFlag(task, 'depends', depends)
+            bb.debug(1, "%s[depends] is '%s'" % (task, depends))
+
+        prefuncs = d.getVarFlag(task, 'prefuncs') or ''
+        prefuncs = "%s %s" % (prefuncs, bb.utils.contains('FLASHIMAGE_DYNAMIC_OFFSETS', '1' , 'update_flash_offsets', '', d))
+        d.setVarFlag(task, 'prefuncs', prefuncs)
+        bb.debug(1, "%s[prefuncs] is '%s'" % (task, prefuncs))
 }
 
 

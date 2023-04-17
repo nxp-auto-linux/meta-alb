@@ -34,6 +34,13 @@ FLASHIMAGE_ROOTFS_SUFFIX ?= ""
 FLASHIMAGE ?= "${IMAGE_NAME}.flashimage"
 FLASHIMAGE_DEPLOYDIR ?= "${IMGDEPLOYDIR}"
 
+# Backwards compatibility hack because 'UBOOT' has been partially
+# renamed to FIP instead of implementing a clean selection.
+# For now it is easier here to provide the fallback as needed and go
+# for FIP below
+FLASHIMAGE_FIP_FILE ?= "${FLASHIMAGE_UBOOT_FILE}"
+FLASHIMAGE_FIP_OFFSET ?= "${FLASHIMAGE_UBOOT_OFFSET}"
+
 IMAGE_TYPEDEP:flashimage:append = " ${FLASHIMAGE_ROOTFS_SUFFIX}"
 
 do_image_flashimage[depends] += " \
@@ -152,7 +159,7 @@ generate_flashimage() {
         FLASHIMAGE_BANK4_XOR=$(expr ${FLASHIMAGE_SIZE_D} / 2)
 
         generate_flashimage_entry "${FLASHIMAGE_RESET_FILE}"  "FLASHIMAGE_RESET_OFFSET"  "${FLASHIMAGE_RESET_OFFSET}"
-        generate_flashimage_entry "${FLASHIMAGE_UBOOT_FILE}"  "FLASHIMAGE_FIP_OFFSET"  "${FLASHIMAGE_FIP_OFFSET}"
+        generate_flashimage_entry "${FLASHIMAGE_FIP_FILE}"    "FLASHIMAGE_FIP_OFFSET"  "${FLASHIMAGE_FIP_OFFSET}"
         generate_flashimage_entry "${FLASHIMAGE_KERNEL_FILE}" "FLASHIMAGE_KERNEL_OFFSET" "${FLASHIMAGE_KERNEL_OFFSET}"
         generate_flashimage_entry "${FLASHIMAGE_DTB_FILE}"    "FLASHIMAGE_DTB_OFFSET"    "${FLASHIMAGE_DTB_OFFSET}"
         generate_flashimage_entry "${FLASHIMAGE_ROOTFS_FILE}" "FLASHIMAGE_ROOTFS_OFFSET" "${FLASHIMAGE_ROOTFS_OFFSET}"

@@ -329,6 +329,8 @@ fakeroot aptget_file_is_preserved() {
 fakeroot aptget_restore_file() {
         if aptget_file_is_preserved "$1"; then
                 mv -f "${APTGET_CHROOT_DIR}$1.yocto" "${APTGET_CHROOT_DIR}$1"
+        else
+                rm -f "${APTGET_CHROOT_DIR}$1"
         fi
 }
 
@@ -906,19 +908,11 @@ fakeroot aptget_update_end() {
         # gets that wrong and resolves softlinks, suddenly pointing into
         # the host root on kirkstone and complaining about irrelevant
         # content.
-        # Actual removal of directory content is a little bit tricky
-        # if we don't want to rely on special tools that may not be
-        # there. ls and rm will likely be available with the given
-        # options on the host and target respectively.
         if [ -e "${APTGET_CHROOT_DIR}"/bin/sh ]; then
-                for dir in /run /var/run /var/volatile /var/log
+                for dir in /run /var/run /var/log
                 do
-                        if [ -d "${APTGET_CHROOT_DIR}$dir" ]; then
-                                for file in `chroot "${APTGET_CHROOT_DIR}" ls -Ab "$dir"`
-                                do
-                                        chroot "${APTGET_CHROOT_DIR}" rm -rf "$dir/$file"
-                                done
-                        fi
+                        echo "Cleaning $dir..."
+                        chroot "${APTGET_CHROOT_DIR}" find "$dir" -type f -print -execdir rm -f '{}' \;
                 done
         fi
 

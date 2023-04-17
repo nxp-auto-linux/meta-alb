@@ -145,6 +145,15 @@ ncurses-terminfo-base \
 glibc-utils \
 "
 
+# kernel-devsrc relies on some of these, but we can't pull in the Yocto
+# versions. We need to install the corresponding Ubuntu versions.
+RPROVIDES:${PN}:ubuntu += " \
+gcc \
+gcc-plugins \
+gcc-runtime \
+libmpc-dev \
+"
+
 # A few things are provided where we don't have a Yocto equivalent
 # currently/possibly. We add them preemptively just in case
 RPROVIDES:${PN}:ubuntu += " \

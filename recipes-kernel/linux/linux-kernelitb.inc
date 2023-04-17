@@ -5,9 +5,12 @@
 # mechanisms, but hacking them in a layer is more complicated
 # than providing a generic recipe.
 #
-DEPENDS += "u-boot-mkimage-native virtual/kernel"
 
 S = "${WORKDIR}"
+
+# Using the smaller kernel targeted at flash deployment
+ITB_KERNEL ?= '${@ "virtual/kernel" if ((d.getVar("FLASHIMAGE_KERNEL") or "") == "") else d.getVar("FLASHIMAGE_KERNEL") }'
+ITB_KERNEL_BASENAME ?= '${@ "kernel" if ((d.getVar("FLASHIMAGE_KERNEL_BASENAME") or "") == "") else d.getVar("FLASHIMAGE_KERNEL_BASENAME") }'
 
 # We do not want to create a deployed image through the class as
 # that method is set up for images. For a standard recipe, we want
@@ -18,9 +21,9 @@ inherit deploy
 
 inherit image_types_fsl_itb
 
-do_install[depends] += "virtual/kernel:do_deploy"
+do_install[depends] += "u-boot-mkimage-native:do_populate_sysroot ${ITB_KERNEL}:do_deploy"
 
-ITBIMAGE_BASE_NAME = "kernel${ITB_ROOTFS_NAME_EXT}"
+ITBIMAGE_BASE_NAME = "${ITB_KERNEL_BASENAME}${ITB_ROOTFS_NAME_EXT}"
 ITBIMAGE_FULL_NAME = "${ITBIMAGE_BASE_NAME}-${MACHINE}-${DATETIME}"
 ITBIMAGE_FULL_NAME[vardepsexclude] = "DATETIME"
 
@@ -30,13 +33,13 @@ do_install() {
 	
 	# Install the image into /boot
 	install -d ${D}/boot
-	install -m 644 ${S}/kernel.itb ${D}/boot/${ITBIMAGE_FULL_NAME}.itb
+	install -m 644 ${B}/${ITB_KERNEL_BASENAME}.itb ${D}/boot/${ITBIMAGE_FULL_NAME}.itb
 	ln -sf ${ITBIMAGE_FULL_NAME}.itb ${D}/boot/${ITBIMAGE_BASE_NAME}.itb
 }
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
-	install -m 644 ${S}/kernel.itb ${DEPLOYDIR}/${ITBIMAGE_FULL_NAME}.itb
+	install -m 644 ${B}/${ITB_KERNEL_BASENAME}.itb ${DEPLOYDIR}/${ITBIMAGE_FULL_NAME}.itb
 	ln -sf ${ITBIMAGE_FULL_NAME}.itb ${DEPLOYDIR}/${ITBIMAGE_BASE_NAME}.itb
 }
 

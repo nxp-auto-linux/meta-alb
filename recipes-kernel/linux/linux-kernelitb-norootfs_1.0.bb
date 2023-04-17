@@ -15,5 +15,10 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171d
 ITB_ROOTFS_TYPE = ""
 ITB_ROOTFS_NAME_EXT = ""
 
+# We use the normal full kernel on this one as we do not have
+# to mix with a rootfs
+FLASHIMAGE_KERNEL = ""
+FLASHIMAGE_KERNEL_BASENAME = ""
+
 require linux-kernelitb.inc
 DEPENDS += "dtc-native"

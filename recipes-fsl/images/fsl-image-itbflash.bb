@@ -1,3 +1,27 @@
+# This image is to be used in a flash only.
+
+# We want to use the smaller flash targeted kernel as the normal
+# kernel is getting too big for flashes
+ITB_KERNEL ?= "linux-flash"
+ITB_KERNEL_BASE_NAME ?= "kernel-flash"
+FLASHIMAGE_KERNEL ?= "${ITB_KERNEL}"
+KERNELDEPMODDEPEND = "${FLASHIMAGE_KERNEL}:do_packagedata"
+KERNEL_DEPLOY_DEPEND = "${FLASHIMAGE_KERNEL}:do_deploy"
+
+# To do that we need to ensure that we replace normal kernel module
+# references with the smaller ones ...
+PACKAGES-CORE:remove = "kernel-modules"
+PACKAGES-CORE:append = "${ITB_KERNEL_BASE_NAME}-modules"
+PACKAGES-CORE-MISC:remove = "kernel-modules"
+PACKAGES-CORE-MISC:append = "${ITB_KERNEL_BASE_NAME}-modules"
+POKY_DEFAULT_EXTRA_RRECOMMENDS:remove = "kernel-module-af-packet"
+POKY_DEFAULT_EXTRA_RRECOMMENDS:append = "${ITB_KERNEL_BASE_NAME}-module-af-packet"
+# ... and also ensure that no package pulls in the normal kernel
+# even though we still reference the packagedata unfortunately
+PACKAGES-CORE-MISC:remove = "iproute2-tc"
+KERNELDEPMODDEPEND = "${ITB_KERNEL}:do_packagedata"
+KERNEL_DEPLOY_DEPEND = "${ITB_KERNEL}:do_deploy"
+
 require recipes-core/images/core-image-minimal.bb
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

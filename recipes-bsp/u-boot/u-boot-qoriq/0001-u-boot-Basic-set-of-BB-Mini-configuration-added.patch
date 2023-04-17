@@ -1,36 +1,33 @@
-From 7e33b80ea0e3276ea168173587322838ace3c8b3 Mon Sep 17 00:00:00 2001
+From 6ec307fefd97700a05e5cde28b066810fc4fe0f2 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Thu, 25 Feb 2021 11:15:09 +0100
-Subject: [PATCH 2/2] u-boot: Basic set of BB Mini configuration added
+Date: Wed, 18 Jan 2023 14:58:19 +0100
+Subject: [PATCH] u-boot: Basic set of BB Mini configuration added
 
 This adds a functional set of BB Mini configurations to support
-NOR and SD boot without TFA. This is similar to prior usage in ALB,
+NOR and SD boot TFA. This is similar to prior usage in ALB,
 but not identical.
 The memory map has been adapted to mirror LSDK. Specifically the
 environment in flash is in a different location.
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
- arch/arm/Kconfig                              |  20 +
+ arch/arm/Kconfig                              |  21 ++
  arch/arm/cpu/armv8/Kconfig                    |   1 +
  arch/arm/dts/Makefile                         |   1 +
- arch/arm/dts/fsl-ls2084a-bbmini.dts           |  75 ++++
- arch/arm/dts/fsl-ls2084a.dtsi                 | 203 ++++++++++
- board/freescale/ls2084abbmini/Kconfig         |  34 ++
+ arch/arm/dts/fsl-ls2084a-bbmini.dts           | 116 ++++++
+ board/freescale/ls2084abbmini/Kconfig         |  36 ++
  board/freescale/ls2084abbmini/MAINTAINERS     |   7 +
  board/freescale/ls2084abbmini/Makefile        |   8 +
- board/freescale/ls2084abbmini/README          | 162 ++++++++
- board/freescale/ls2084abbmini/ddr.c           | 186 +++++++++
- board/freescale/ls2084abbmini/ddr.h           |  57 +++
- .../ls2084abbmini/eth_ls2084abbmini.c         | 138 +++++++
- board/freescale/ls2084abbmini/ls2084abbmini.c | 375 ++++++++++++++++++
+ board/freescale/ls2084abbmini/README          |  92 +++++
+ board/freescale/ls2084abbmini/ddr.c           | 188 ++++++++++
+ board/freescale/ls2084abbmini/ddr.h           |  60 +++
+ .../ls2084abbmini/eth_ls2084abbmini.c         |  79 ++++
+ board/freescale/ls2084abbmini/ls2084abbmini.c | 348 ++++++++++++++++++
  .../ls2084abbmini/ls2084abbmini_qixis.h       |  19 +
- configs/ls2084abbmini_defconfig               |  82 ++++
- configs/ls2084abbmini_sdcard_defconfig        |  95 +++++
- include/configs/ls2084abbmini.h               | 278 +++++++++++++
- 17 files changed, 1741 insertions(+)
+ configs/ls2084abbmini_tfa_defconfig           | 108 ++++++
+ include/configs/ls2084abbmini.h               | 271 ++++++++++++++
+ 15 files changed, 1355 insertions(+)
  create mode 100644 arch/arm/dts/fsl-ls2084a-bbmini.dts
- create mode 100644 arch/arm/dts/fsl-ls2084a.dtsi
  create mode 100644 board/freescale/ls2084abbmini/Kconfig
  create mode 100644 board/freescale/ls2084abbmini/MAINTAINERS
  create mode 100644 board/freescale/ls2084abbmini/Makefile
@@ -40,15 +37,14 @@ Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
  create mode 100644 board/freescale/ls2084abbmini/eth_ls2084abbmini.c
  create mode 100644 board/freescale/ls2084abbmini/ls2084abbmini.c
  create mode 100644 board/freescale/ls2084abbmini/ls2084abbmini_qixis.h
- create mode 100644 configs/ls2084abbmini_defconfig
- create mode 100644 configs/ls2084abbmini_sdcard_defconfig
+ create mode 100644 configs/ls2084abbmini_tfa_defconfig
  create mode 100644 include/configs/ls2084abbmini.h
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index b21e1fdc00..594d0df61e 100644
+index 58dbca1573..a5d94cdb46 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -1218,6 +1218,25 @@ config TARGET_LS2081ARDB
+@@ -1362,6 +1362,26 @@ config TARGET_LS2081ARDB
  	  development platform that supports the QorIQ LS2081A/LS2041A
  	  Layerscape Architecture processor.
  
@@ -62,6 +58,7 @@ index b21e1fdc00..594d0df61e 100644
 +	select SUPPORT_SPL
 +	select FSL_DDR_BIST
 +	select FSL_DDR_INTERACTIVE if !SPL
++	select GPIO_EXTRA_HEADER
 +	imply SCSI
 +	imply SCSI_AHCI
 +	help
@@ -74,7 +71,7 @@ index b21e1fdc00..594d0df61e 100644
  config TARGET_LX2160ARDB
  	bool "Support lx2160ardb"
  	select ARCH_LX2160A
-@@ -1852,6 +1871,7 @@ source "board/freescale/ls2080a/Kconfig"
+@@ -2223,6 +2243,7 @@ source "board/emulation/qemu-arm/Kconfig"
  source "board/freescale/ls2080aqds/Kconfig"
  source "board/freescale/ls2080ardb/Kconfig"
  source "board/freescale/ls1088a/Kconfig"
@@ -83,23 +80,23 @@ index b21e1fdc00..594d0df61e 100644
  source "board/freescale/ls1021aqds/Kconfig"
  source "board/freescale/ls1043aqds/Kconfig"
 diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
-index c90567dc23..06a1e4514c 100644
+index 9967376eca..82c4c61507 100644
 --- a/arch/arm/cpu/armv8/Kconfig
 +++ b/arch/arm/cpu/armv8/Kconfig
-@@ -100,6 +100,7 @@ config PSCI_RESET
- 	depends on !ARCH_EXYNOS7 && !ARCH_BCM283X && \
- 		   !TARGET_LS2080A_SIMU && !TARGET_LS2080AQDS && \
+@@ -105,6 +105,7 @@ config PSCI_RESET
+ 	depends on !ARCH_APPLE && !ARCH_BCM283X && !ARCH_EXYNOS7 && \
+ 		   !TARGET_LS2080AQDS && \
  		   !TARGET_LS2080ARDB && !TARGET_LS2080A_EMU && \
 +		   !TARGET_LS2084ABBMINI && \
  		   !TARGET_LS1088ARDB && !TARGET_LS1088AQDS && \
  		   !TARGET_LS1012ARDB && !TARGET_LS1012AFRDM && \
  		   !TARGET_LS1012A2G5RDB && !TARGET_LS1012AQDS && \
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index b4944259ea..0e85f62fd7 100644
+index 95f2a49df4..851049feaf 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -368,6 +368,7 @@ dtb-$(CONFIG_ARCH_LS1021A) += ls1021a-qds-duart.dtb \
- dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
+@@ -446,6 +446,7 @@ dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
+ 	fsl-ls2080a-qds-42-x.dtb \
  	fsl-ls2080a-rdb.dtb \
  	fsl-ls2081a-rdb.dtb \
 +	fsl-ls2084a-bbmini.dtb \
@@ -108,10 +105,10 @@ index b4944259ea..0e85f62fd7 100644
  	fsl-ls1088a-qds.dtb \
 diff --git a/arch/arm/dts/fsl-ls2084a-bbmini.dts b/arch/arm/dts/fsl-ls2084a-bbmini.dts
 new file mode 100644
-index 0000000000..28d8affde2
+index 0000000000..e80494be75
 --- /dev/null
 +++ b/arch/arm/dts/fsl-ls2084a-bbmini.dts
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,116 @@
 +/*
 + * NXP ls2084a RDB board device tree source
 + *
@@ -122,11 +119,11 @@ index 0000000000..28d8affde2
 +
 +/dts-v1/;
 +
-+#include "fsl-ls2084a.dtsi"
++#include "fsl-ls2080a.dtsi"
 +
 +/ {
 +	model = "NXP Layerscape 2084A BlueBox Mini";
-+	compatible = "fsl,ls2080a-rdb", "fsl,ls2080a";
++	compatible = "fsl,ls2080a-bbmini", "fsl,ls2080a";
 +};
 +
 +&i2c0 {
@@ -184,224 +181,56 @@ index 0000000000..28d8affde2
 +	status = "okay";
 +};
 +
++&dpmac1 {
++	status = "okay";
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac5 {
++	status = "okay";
++	phy-handle = <&mdio2_phy1>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac6 {
++	status = "okay";
++	phy-handle = <&mdio2_phy2>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac7 {
++	status = "okay";
++	phy-handle = <&mdio2_phy3>;
++	phy-connection-type = "10gbase-r";
++};
++
++&emdio2 {
++	status = "okay";
++
++	/* AQR107 PHYs */
++	mdio2_phy1: emdio2_phy@1 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <0x0>;
++	};
++	mdio2_phy2: emdio2_phy@2 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <0x1>;
++	};
++	mdio2_phy3: emdio2_phy@3 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <0x2>;
++	};
++};
++
 +&sata {
 +	status = "okay";
 +};
-diff --git a/arch/arm/dts/fsl-ls2084a.dtsi b/arch/arm/dts/fsl-ls2084a.dtsi
-new file mode 100644
-index 0000000000..bf666b6048
---- /dev/null
-+++ b/arch/arm/dts/fsl-ls2084a.dtsi
-@@ -0,0 +1,203 @@
-+// SPDX-License-Identifier: GPL-2.0+ OR X11
-+/*
-+ * NXP ls2084a SOC common device tree source
-+ *
-+ * Copyright 2016, 2020 NXP Semiconductor
-+ */
-+
-+/ {
-+	compatible = "fsl,ls2084a";
-+	interrupt-parent = <&gic>;
-+	#address-cells = <2>;
-+	#size-cells = <2>;
-+
-+	memory@80000000 {
-+		device_type = "memory";
-+		reg = <0x00000000 0x80000000 0 0x80000000>;
-+		      /* DRAM space - 1, size : 2 GB DRAM */
-+	};
-+
-+	gic: interrupt-controller@6000000 {
-+		compatible = "arm,gic-v3";
-+		reg = <0x0 0x06000000 0 0x10000>, /* GIC Dist */
-+		      <0x0 0x06100000 0 0x100000>; /* GICR (RD_base + SGI_base) */
-+		#interrupt-cells = <3>;
-+		interrupt-controller;
-+		interrupts = <1 9 0x4>;
-+	};
-+
-+	timer {
-+		compatible = "arm,armv8-timer";
-+		interrupts = <1 13 0x8>, /* Physical Secure PPI, active-low */
-+			     <1 14 0x8>, /* Physical Non-Secure PPI, active-low */
-+			     <1 11 0x8>, /* Virtual PPI, active-low */
-+			     <1 10 0x8>; /* Hypervisor PPI, active-low */
-+	};
-+
-+	serial0: serial@21c0500 {
-+		device_type = "serial";
-+		compatible = "fsl,ns16550", "ns16550a";
-+		reg = <0x0 0x21c0500 0x0 0x100>;
-+		clock-frequency = <0>;	/* Updated by bootloader */
-+		interrupts = <0 32 0x1>; /* edge triggered */
-+	};
-+
-+	serial1: serial@21c0600 {
-+		device_type = "serial";
-+		compatible = "fsl,ns16550", "ns16550a";
-+		reg = <0x0 0x21c0600 0x0 0x100>;
-+		clock-frequency = <0>; 	/* Updated by bootloader */
-+		interrupts = <0 32 0x1>; /* edge triggered */
-+	};
-+
-+	fsl_mc: fsl-mc@80c000000 {
-+		compatible = "fsl,qoriq-mc";
-+		reg = <0x00000008 0x0c000000 0 0x40>,	 /* MC portal base */
-+		      <0x00000000 0x08340000 0 0x40000>; /* MC control reg */
-+	};
-+
-+	i2c0: i2c@2000000 {
-+		status = "disabled";
-+		compatible = "fsl,vf610-i2c";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		reg = <0x0 0x2000000 0x0 0x10000>;
-+		interrupts = <0 34 0x4>; /* Level high type */
-+	};
-+
-+	i2c1: i2c@2010000 {
-+		status = "disabled";
-+		compatible = "fsl,vf610-i2c";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		reg = <0x0 0x2010000 0x0 0x10000>;
-+		interrupts = <0 34 0x4>; /* Level high type */
-+	};
-+
-+	i2c2: i2c@2020000 {
-+		status = "disabled";
-+		compatible = "fsl,vf610-i2c";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		reg = <0x0 0x2020000 0x0 0x10000>;
-+		interrupts = <0 35 0x4>; /* Level high type */
-+	};
-+
-+	i2c3: i2c@2030000 {
-+		status = "disabled";
-+		compatible = "fsl,vf610-i2c";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		reg = <0x0 0x2030000 0x0 0x10000>;
-+		interrupts = <0 35 0x4>; /* Level high type */
-+	};
-+
-+	dspi: dspi@2100000 {
-+		compatible = "fsl,vf610-dspi";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		reg = <0x0 0x2100000 0x0 0x10000>;
-+		interrupts = <0 26 0x4>; /* Level high type */
-+		num-cs = <6>;
-+	};
-+
-+	qspi: quadspi@1550000 {
-+		compatible = "fsl,ls2080a-qspi";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		reg = <0x0 0x20c0000 0x0 0x10000>,
-+			<0x0 0x20000000 0x0 0x10000000>;
-+		reg-names = "QuadSPI", "QuadSPI-memory";
-+		status = "disabled";
-+	};
-+
-+	esdhc: esdhc@0 {
-+		compatible = "fsl,esdhc";
-+		reg = <0x0 0x2140000 0x0 0x10000>;
-+		interrupts = <0 28 0x4>; /* Level high type */
-+		little-endian;
-+		bus-width = <4>;
-+	};
-+
-+	usb0: usb3@3100000 {
-+		compatible = "fsl,layerscape-dwc3";
-+		reg = <0x0 0x3100000 0x0 0x10000>;
-+		interrupts = <0 80 0x4>; /* Level high type */
-+		dr_mode = "host";
-+	};
-+
-+	usb1: usb3@3110000 {
-+		compatible = "fsl,layerscape-dwc3";
-+		reg = <0x0 0x3110000 0x0 0x10000>;
-+		interrupts = <0 81 0x4>; /* Level high type */
-+		dr_mode = "host";
-+	};
-+
-+	pcie1: pcie@3400000 {
-+		compatible = "fsl,ls-pcie", "snps,dw-pcie";
-+		reg = <0x00 0x03400000 0x0 0x80000   /* dbi registers */
-+		       0x00 0x03480000 0x0 0x80000   /* lut registers */
-+		       0x20 0x00000000 0x0 0x20000>; /* configuration space */
-+		reg-names = "dbi", "lut", "config";
-+		#address-cells = <3>;
-+		#size-cells = <2>;
-+		device_type = "pci";
-+		num-lanes = <4>;
-+		bus-range = <0x0 0xff>;
-+		ranges = <0x81000000 0x0 0x00000000 0x20 0x00020000 0x0 0x00010000   /* downstream I/O */
-+			  0x82000000 0x0 0x40000000 0x20 0x40000000 0x0 0x40000000>; /* non-prefetchable memory */
-+	};
-+
-+	pcie2: pcie@3500000 {
-+		compatible = "fsl,ls-pcie", "snps,dw-pcie";
-+		reg = <0x00 0x03500000 0x0 0x80000   /* dbi registers */
-+		       0x00 0x03580000 0x0 0x80000   /* lut registers */
-+		       0x28 0x00000000 0x0 0x20000>; /* configuration space */
-+		reg-names = "dbi", "lut", "config";
-+		#address-cells = <3>;
-+		#size-cells = <2>;
-+		device_type = "pci";
-+		num-lanes = <4>;
-+		bus-range = <0x0 0xff>;
-+		ranges = <0x81000000 0x0 0x00000000 0x28 0x00020000 0x0 0x00010000   /* downstream I/O */
-+			  0x82000000 0x0 0x40000000 0x28 0x40000000 0x0 0x40000000>; /* non-prefetchable memory */
-+	};
-+
-+	pcie3: pcie@3600000 {
-+		compatible = "fsl,ls-pcie", "snps,dw-pcie";
-+		reg = <0x00 0x03600000 0x0 0x80000   /* dbi registers */
-+		       0x00 0x03680000 0x0 0x80000   /* lut registers */
-+		       0x30 0x00000000 0x0 0x20000>; /* configuration space */
-+		reg-names = "dbi", "lut", "config";
-+		#address-cells = <3>;
-+		#size-cells = <2>;
-+		device_type = "pci";
-+		num-lanes = <8>;
-+		bus-range = <0x0 0xff>;
-+		ranges = <0x81000000 0x0 0x00000000 0x30 0x00020000 0x0 0x00010000   /* downstream I/O */
-+			  0x82000000 0x0 0x40000000 0x30 0x40000000 0x0 0x40000000>; /* non-prefetchable memory */
-+	};
-+
-+	pcie4: pcie@3700000 {
-+		compatible = "fsl,ls-pcie", "snps,dw-pcie";
-+		reg = <0x00 0x03700000 0x0 0x80000   /* dbi registers */
-+		       0x00 0x03780000 0x0 0x80000   /* lut registers */
-+		       0x38 0x00000000 0x0 0x20000>; /* configuration space */
-+		reg-names = "dbi", "lut", "config";
-+		#address-cells = <3>;
-+		#size-cells = <2>;
-+		device_type = "pci";
-+		num-lanes = <4>;
-+		bus-range = <0x0 0xff>;
-+		ranges = <0x81000000 0x0 0x00000000 0x38 0x00020000 0x0 0x00010000   /* downstream I/O */
-+			  0x82000000 0x0 0x40000000 0x38 0x40000000 0x0 0x40000000>; /* non-prefetchable memory */
-+	};
-+
-+	sata: sata@3200000 {
-+			compatible = "fsl,ls2080a-ahci";
-+			reg = <0x0 0x3200000 0x0 0x10000>;
-+			interrupts = <0 133 0x4>; /* Level high type */
-+			status = "disabled";
-+	};
-+
-+};
 diff --git a/board/freescale/ls2084abbmini/Kconfig b/board/freescale/ls2084abbmini/Kconfig
 new file mode 100644
-index 0000000000..f9ae4f1bfc
+index 0000000000..dc131f35ba
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/Kconfig
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,36 @@
 +
 +if TARGET_LS2084ABBMINI
 +
@@ -435,10 +264,12 @@ index 0000000000..f9ae4f1bfc
 +endif
 +endif
 +
++source "board/freescale/common/Kconfig"
++
 +endif
 diff --git a/board/freescale/ls2084abbmini/MAINTAINERS b/board/freescale/ls2084abbmini/MAINTAINERS
 new file mode 100644
-index 0000000000..e0bf71739c
+index 0000000000..2646802e50
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/MAINTAINERS
 @@ -0,0 +1,7 @@
@@ -446,9 +277,9 @@ index 0000000000..e0bf71739c
 +M:	Heinz Wrobel <Heinz.Wrobel@nnxp.com>
 +S:	Maintained
 +F:	board/freescale/ls2084abbmini/
-+F:	board/freescale/ls2084a/ls2080abbmini.c
 +F:	include/configs/ls2084abbmini.h
-+F:	configs/ls2080abbmini_defconfig
++F:	configs/ls2084abluebox_tfa_defconfig
++F:	configs/ls2084abbmini_tfa_defconfig
 diff --git a/board/freescale/ls2084abbmini/Makefile b/board/freescale/ls2084abbmini/Makefile
 new file mode 100644
 index 0000000000..b6c7afbb06
@@ -465,129 +296,41 @@ index 0000000000..b6c7afbb06
 +obj-y += ddr.o
 diff --git a/board/freescale/ls2084abbmini/README b/board/freescale/ls2084abbmini/README
 new file mode 100644
-index 0000000000..b154c7ab0e
+index 0000000000..4b24578dd1
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/README
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,92 @@
 +Overview
 +--------
-+The LS2080A Reference Design (RDB) is a high-performance computing,
-+evaluation, and development platform that supports the QorIQ LS2080A
-+and LS2088A (and its personalitites) Layerscape Architecture processor.
++The LS2084A BlueBox Mini is a high-performance computing,
++evaluation, and development platform that supports the QorIQ LS2084A
++Layerscape Architecture processor.
 +
-+LS2080A SoC Overview
++LS2084A SoC Overview
 +------------------
-+The LS2080A integrated multicore processor combines eight ARM Cortex-A57
-+processor cores with high-performance data path acceleration logic and network
-+and peripheral bus interfaces required for networking, telecom/datacom,
-+wireless infrastructure, and mil/aerospace applications.
++Please refer arch/arm/cpu/armv8/fsl-layerscape/doc/README.soc for LS2084A
++ SoC overview.
 +
-+The LS2080A SoC includes the following function and features:
-+
-+ - Eight 64-bit ARM Cortex-A57 CPUs
-+ - 1 MB platform cache with ECC
-+ - Two 64-bit DDR4 SDRAM memory controllers with ECC and interleaving support
-+ - One secondary 32-bit DDR4 SDRAM memory controller, intended for use by
-+  the AIOP
-+ - Data path acceleration architecture (DPAA2) incorporating acceleration for
-+ the following functions:
-+   - Packet parsing, classification, and distribution (WRIOP)
-+   - Queue and Hardware buffer management for scheduling, packet sequencing, and
-+     congestion management, buffer allocation and de-allocation (QBMan)
-+   - Cryptography acceleration (SEC) at up to 10 Gbps
-+   - RegEx pattern matching acceleration (PME) at up to 10 Gbps
-+   - Decompression/compression acceleration (DCE) at up to 20 Gbps
-+   - Accelerated I/O processing (AIOP) at up to 20 Gbps
-+   - QDMA engine
-+ - 16 SerDes lanes at up to 10.3125 GHz
-+ - Ethernet interfaces
-+   - Up to eight 10 Gbps Ethernet MACs
-+   - Up to eight 1 / 2.5 Gbps Ethernet MACs
-+ - High-speed peripheral interfaces
-+   - Four PCIe 3.0 controllers, one supporting SR-IOV
-+ - Additional peripheral interfaces
-+   - Two serial ATA (SATA 3.0) controllers
-+   - Two high-speed USB 3.0 controllers with integrated PHY
-+   - Enhanced secure digital host controller (eSDXC/eMMC)
-+   - Serial peripheral interface (SPI) controller
-+   - Quad Serial Peripheral Interface (QSPI) Controller
-+   - Four I2C controllers
-+   - Two DUARTs
-+   - Integrated flash controller (IFC 2.0) supporting NAND and NOR flash
-+ - Support for hardware virtualization and partitioning enforcement
-+ - QorIQ platform's trust architecture 3.0
-+ - Service processor (SP) provides pre-boot initialization and secure-boot
-+  capabilities
-+
-+LS2088A SoC Overview
-+------------------
-+The QorIQ LS2088A processor is built on the Layerscape
-+architecture combining eight ARM A72 processor cores
-+with advanced, high-performance datapath acceleration
-+and network, peripheral interfaces required for
-+networking, telecom, wireless infrastructure, aerospace
-+applications and general-purpose embedded applications.
-+
-+Features summary:
-+ - Eight 64-bit ARM v8 Cortex-A72 CPUs
-+ - Two 64-bit DDR4 SDRAM memory controller with ECC
-+ - One 32-bit DDR3 SDRAM memory controller with ECC
-+ - Data path acceleration architecture 2.0 (DPAA2)
-+ - Ethernet interfaces
-+ - IFC, 4 PCIe, 2 SATA, 2 USB, 1 SDXC, 2 DUARTs etc
-+ - AIOP
-+ - 8 * 1/10G + 8 *1G WRIOP
-+ - L2 switch
-+
-+LS2088A is compliant to the Layerscape Chassis Generation 3.
-+
-+LS2088A SoC is similar to LS2085A Soc with some differences like
-+1)Timer controller offset is different
-+2)Errata A009635 and A008751 are fixed
-+3)Maia core
-+
-+These differences can be detected via runtime during boot.
-+So LS2085A, LS2088A will have common u-boot image
-+
-+LS2088A SoC has 3 more similar SoC personalities
-+1)LS2048A, few difference w.r.t LS2088A:
-+	a) Four 64-bit ARM v8 Cortex-A72 CPUs
-+
-+2)LS2084A, few difference w.r.t LS2088A:
-+	a) No AIOP
-+	b) No 32-bit DDR3 SDRAM memory
-+	c) 5 * 1/10G + 5 *1G WRIOP
-+	d) No L2 switch
-+
-+3)LS2044A, few difference w.r.t LS2084A:
-+	a) Four 64-bit ARM v8 Cortex-A72 CPUs
-+
-+ LS2080ARDB board Overview
-+ -----------------------
++ LS2084A BlueBox Mini board Overview
++ -----------------------------------
 + - SERDES Connections, 16 lanes supporting:
 +      - PCI Express - 3.0
 +      - SATA 3.0
 +      - XFI
 + - DDR Controller
 +     - Two ports of 72-bits (8-bits ECC) DDR4. Each port supports four
-+       chip-selects and two DIMM connectors. Support is up to 2133MT/s.
-+     - One port of 40-bits (8-bits ECC) DDR4 which supports four chip-selects
-+       and two DIMM connectors. Support is up to 1600MT/s.
++       chip-selects and one DIMM connector. Support is up to 2133MT/s.
 + -IFC/Local Bus
 +    - IFC rev. 2.0 implementation supporting Little Endian connection scheme.
 +    - 128 MB NOR flash 16-bit data bus
-+    - One 2 GB NAND flash with ECC support
 +    - CPLD connection
 + - USB 3.0
-+    - Two high speed USB 3.0 ports
-+    - First USB 3.0 port configured as Host with Type-A connector
-+    - Second USB 3.0 port configured as OTG with micro-AB connector
++    - One high speed USB 3.0 port
++    - USB 3.0 port configured as Host with Type-A connector
 + - SDHC adapter
-+    - SD Card Rev 2.0 and Rev 3.0
-+ - DSPI
-+    - 128 MB high-speed flash Memory for boot code and storage (up to 108MHz)
++    - SD Card Rev 2.0 and Rev 3.0, can be used as boot source
 + - 4 I2C controllers
-+ - Two SATA onboard connectors
++ - One SATA onboard connector
 + - UART
 + - ARM JTAG support
 +
@@ -601,7 +344,7 @@ index 0000000000..b154c7ab0e
 +0x05_1000_0000 .. 0x05_FFFF_FFFF	IFC region #2
 +0x80_8000_0000 .. 0xFF_FFFF_FFFF	DDR region #2
 +
-+Other addresses are either reserved, or not used directly by u-boot.
++Other addresses are either reserved, or not used directly by U-Boot.
 +This list should be updated when more addresses are used.
 +
 +IFC region map from core's view
@@ -620,23 +363,41 @@ index 0000000000..b154c7ab0e
 +Booting Options
 +---------------
 +a) NOR boot
-+b) NAND boot
++b) SD boot
++Memory map for NOR boot
++-----------------------
++Image				Flash Offset
++RCW+PBI				0x00000000
++Boot firmware (U-Boot)		0x00100000
++Boot firmware Environment	0x00300000
++PPA firmware			0x00400000
++Secure Headers			0x00600000
++DPAA2 MC			0x00A00000
++DPAA2 DPL			0x00D00000
++DPAA2 DPC			0x00E00000
++Kernel.itb			0x01000000
 +
-+Booting Linux flavors which do not support 48-bit VA (< Linux 3.18)
-+-------------------------------------------------------------------
-+One needs to use appropriate bootargs to boot Linux flavors which do
-+not support 48-bit VA (for e.g. < Linux 3.18) by appending mem=2048M, as shown
-+below:
++cfg_rcw_src switches needs to be changed for booting from different option.
++Refer to board documentation for correct switch setting.
 +
-+=> setenv bootargs 'console=ttyS1,115200 root=/dev/ram
-+   earlycon=uart8250,mmio,0x21c0600,115200 default_hugepagesz=2m hugepagesz=2m
-+   hugepages=16 mem=2048M'
++Memory map for SD boot
++-----------------------
++Image				Flash Offset
++RCW+PBI				0x00001000
++Boot firmware (U-Boot)		0x00100000
++Boot firmware Environment	0x00300000
++PPA firmware			0x00400000
++Secure Headers			0x00600000
++DPAA2 MC			0x00A00000
++DPAA2 DPL			0x00D00000
++DPAA2 DPC			0x00E00000
++Kernel.itb			0x01000000
 diff --git a/board/freescale/ls2084abbmini/ddr.c b/board/freescale/ls2084abbmini/ddr.c
 new file mode 100644
-index 0000000000..72ce872c75
+index 0000000000..07fa847333
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/ddr.c
-@@ -0,0 +1,186 @@
+@@ -0,0 +1,188 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright 2015 Freescale Semiconductor, Inc.
@@ -645,8 +406,10 @@ index 0000000000..72ce872c75
 +#include <common.h>
 +#include <fsl_ddr_sdram.h>
 +#include <fsl_ddr_dimm_params.h>
++#include <log.h>
 +#include <asm/arch/soc.h>
 +#include <asm/arch/clock.h>
++#include <asm/global_data.h>
 +#include "ddr.h"
 +
 +DECLARE_GLOBAL_DATA_PTR;
@@ -825,10 +588,10 @@ index 0000000000..72ce872c75
 +#endif /* CONFIG_TFABOOT */
 diff --git a/board/freescale/ls2084abbmini/ddr.h b/board/freescale/ls2084abbmini/ddr.h
 new file mode 100644
-index 0000000000..c1be76ba69
+index 0000000000..a57154da59
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/ddr.h
-@@ -0,0 +1,57 @@
+@@ -0,0 +1,60 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright 2015 Freescale Semiconductor, Inc.
@@ -871,6 +634,9 @@ index 0000000000..c1be76ba69
 +	 *   num|  hi| rank|  clk| wrlvl |   wrlvl   |  wrlvl
 +	 * ranks| mhz| GB  |adjst| start |   ctl2    |  ctl3
 +	 */
++	{2,  1666, 0, 8,     0x0F, 0x0D0C0A09, 0x0B0C0E08,},
++	{2,  1900, 0, 8,     0x10, 0x0F0D0B0A, 0x0B0E0F09,},
++	{2,  2200, 0, 8,     0x13, 0x120F0E0B, 0x0D10110B,},
 +	{}
 +};
 +
@@ -888,13 +654,13 @@ index 0000000000..c1be76ba69
 +#endif
 diff --git a/board/freescale/ls2084abbmini/eth_ls2084abbmini.c b/board/freescale/ls2084abbmini/eth_ls2084abbmini.c
 new file mode 100644
-index 0000000000..2451be6550
+index 0000000000..a66c2f8c05
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/eth_ls2084abbmini.c
-@@ -0,0 +1,138 @@
+@@ -0,0 +1,79 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * Copyright 2016, 2020 NXP
++ * Copyright 2016, 2020, 2023 NXP
 + *
 + */
 +
@@ -907,6 +673,7 @@ index 0000000000..2451be6550
 +#include <miiphy.h>
 +#include <phy.h>
 +#include <fm_eth.h>
++#include <asm/global_data.h>
 +#include <asm/io.h>
 +#include <exports.h>
 +#include <asm/arch/fsl_serdes.h>
@@ -915,66 +682,8 @@ index 0000000000..2451be6550
 +
 +DECLARE_GLOBAL_DATA_PTR;
 +
-+int board_eth_init(bd_t *bis)
++int board_eth_init(struct bd_info *bis)
 +{
-+#if defined(CONFIG_FSL_MC_ENET)
-+	int i;
-+	struct memac_mdio_info mdio_info;
-+	struct mii_dev *dev;
-+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
-+	u32 srds_s1;
-+	struct memac_mdio_controller *reg;
-+
-+	srds_s1 = in_le32(&gur->rcwsr[28]) &
-+				FSL_CHASSIS3_RCWSR28_SRDS1_PRTCL_MASK;
-+	srds_s1 >>= FSL_CHASSIS3_RCWSR28_SRDS1_PRTCL_SHIFT;
-+
-+	reg = (struct memac_mdio_controller *)CONFIG_SYS_FSL_WRIOP1_MDIO2;
-+	mdio_info.regs = reg;
-+	mdio_info.name = DEFAULT_WRIOP_MDIO2_NAME;
-+
-+	/* Register the EMI 2 */
-+	fm_memac_mdio_init(bis, &mdio_info);
-+
-+	switch (srds_s1) {
-+	case 0x2A:
-+		/* XFI retimer is on WRIOP1_DPMAC1, but without EMI1 hookup */
-+		/* The problem is that we appear to need a phy address
-+		 * for U-Boot to instantiate the port correctly. So
-+		 * we use an invalid address to make it happen.
-+		 */
-+		wriop_set_phy_address(WRIOP1_DPMAC1, 0, 31);
-+		wriop_disable_dpmac(WRIOP1_DPMAC2);
-+		wriop_disable_dpmac(WRIOP1_DPMAC3);
-+		wriop_disable_dpmac(WRIOP1_DPMAC4);
-+		wriop_set_phy_address(WRIOP1_DPMAC5, 0, AQ_PHY_ADDR1);
-+		wriop_set_phy_address(WRIOP1_DPMAC6, 0, AQ_PHY_ADDR2);
-+		wriop_set_phy_address(WRIOP1_DPMAC7, 0, AQ_PHY_ADDR3);
-+		wriop_disable_dpmac(WRIOP1_DPMAC8);
-+		break;
-+	default:
-+		for (i = WRIOP1_DPMAC1; i < NUM_WRIOP_PORTS; i++) {
-+			wriop_disable_dpmac(i);
-+		}
-+		printf("SerDes1 protocol 0x%x is not supported on NXP BlueBox Mini\n",
-+		       srds_s1);
-+		break;
-+	}
-+
-+	for (i = WRIOP1_DPMAC5; i <= WRIOP1_DPMAC7; i++) {
-+		switch (wriop_get_enet_if(i)) {
-+		case PHY_INTERFACE_MODE_XGMII:
-+			dev = miiphy_get_dev_by_name(DEFAULT_WRIOP_MDIO2_NAME);
-+			wriop_set_mdio(i, dev);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	cpu_eth_init(bis);
-+#endif /* CONFIG_FSL_MC_ENET */
-+
 +#ifdef CONFIG_PHY_AQUANTIA
 +	/*
 +	 * Export functions to be used by AQ firmware
@@ -1004,7 +713,7 @@ index 0000000000..2451be6550
 +		for (i = 0; i < 3; i++) {
 +			char buf[16];
 +
-+			sprintf(buf, "DPMAC%d@xgmii", 5 + i);
++			sprintf(buf, "DPMAC%d@10gbase-r", 5 + i);
 +			phydev = mdio_phydev_for_ethname(buf);
 +			if (phydev) {
 +				/* Enable LEDs */
@@ -1019,23 +728,21 @@ index 0000000000..2451be6550
 +	}
 +#endif
 +
-+	return pci_eth_init(bis);
++	return 0;
 +}
 +
 +#if defined(CONFIG_RESET_PHY_R)
 +void reset_phy(void)
 +{
-+#if defined(CONFIG_FSL_MC_ENET)
 +	mc_env_boot();
-+#endif
 +}
 +#endif /* CONFIG_RESET_PHY_R */
 diff --git a/board/freescale/ls2084abbmini/ls2084abbmini.c b/board/freescale/ls2084abbmini/ls2084abbmini.c
 new file mode 100644
-index 0000000000..3b80455108
+index 0000000000..308077920b
 --- /dev/null
 +++ b/board/freescale/ls2084abbmini/ls2084abbmini.c
-@@ -0,0 +1,375 @@
+@@ -0,0 +1,348 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright 2016-2018, 2020 NXP
@@ -1047,6 +754,7 @@ index 0000000000..3b80455108
 +#include <netdev.h>
 +#include <fsl_ifc.h>
 +#include <fsl_ddr.h>
++#include <asm/global_data.h>
 +#include <asm/io.h>
 +#include <hwconfig.h>
 +#include <fdt_support.h>
@@ -1057,7 +765,6 @@ index 0000000000..3b80455108
 +#include <i2c.h>
 +#include <asm/arch/soc.h>
 +#include <asm/arch/ppa.h>
-+#include <fsl_sec.h>
 +#include <asm/arch-fsl-layerscape/fsl_icid.h>
 +
 +#ifdef CONFIG_FSL_QIXIS
@@ -1131,31 +838,9 @@ index 0000000000..3b80455108
 +	return 100000000;
 +}
 +
-+static int select_i2c_ch_pca9547(u8 ch)
-+{
-+	int ret;
-+
-+#ifndef CONFIG_DM_I2C
-+	ret = i2c_write(I2C_MUX_PCA_ADDR_PRI, 0, 1, &ch, 1);
-+#else
-+	struct udevice *dev;
-+
-+	ret = i2c_get_chip_for_busnum(0, I2C_MUX_PCA_ADDR_PRI, 1, &dev);
-+	if (!ret)
-+		ret = dm_i2c_write(dev, 0, &ch, 1);
-+#endif
-+
-+	if (ret) {
-+		puts("PCA: failed to select proper channel\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
 +int i2c_multiplexer_select_vid_channel(u8 channel)
 +{
-+	return select_i2c_ch_pca9547(channel);
++	return select_i2c_ch_pca9547(channel, 0);
 +}
 +
 +int board_init(void)
@@ -1166,18 +851,12 @@ index 0000000000..3b80455108
 +
 +	init_final_memctl_regs();
 +
-+#ifdef CONFIG_ENV_IS_NOWHERE
-+	gd->env_addr = (ulong)&default_environment[0];
-+#endif
-+	select_i2c_ch_pca9547(I2C_MUX_CH_DEFAULT);
++	select_i2c_ch_pca9547(I2C_MUX_CH_DEFAULT, 0);
 +
 +#ifdef CONFIG_FSL_QIXIS
 +	QIXIS_WRITE(rst_ctl, QIXIS_RST_CTL_RESET_EN);
 +#endif
 +
-+#ifdef CONFIG_FSL_CAAM
-+	sec_init();
-+#endif
 +#ifdef CONFIG_FSL_LS_PPA
 +	ppa_init();
 +#endif
@@ -1187,8 +866,9 @@ index 0000000000..3b80455108
 +	out_le32(irq_ccsr + IRQCR_OFFSET / 4,
 +	         (AQR107_IRQ_MASK1|AQR107_IRQ_MASK2|AQR107_IRQ_MASK3));
 +#endif
-+#ifdef CONFIG_FSL_CAAM
-+	sec_init();
++
++#if !defined(CONFIG_SYS_EARLY_PCI_INIT) && defined(CONFIG_DM_ETH)
++	pci_init();
 +#endif
 +
 +	return 0;
@@ -1209,7 +889,7 @@ index 0000000000..3b80455108
 +	 * A future CPLD may mask things for a while after power up to
 +	 * permit U-Boot to update the thermal limits before panic
 +	 * kicks in.*/
-+	select_i2c_ch_pca9547(I2C_MUX_CH_ADT7481);
++	select_i2c_ch_pca9547(I2C_MUX_CH_ADT7481, 0);
 +
 +	/* We mask /ALERT so that we only check for overtemp */
 +#ifndef CONFIG_DM_I2C
@@ -1253,7 +933,7 @@ index 0000000000..3b80455108
 +	if (!ret)
 +		ret = dm_i2c_write(dev, 0x39, &byte, 1);
 +#endif
-+	select_i2c_ch_pca9547(I2C_MUX_CH_DEFAULT);
++	select_i2c_ch_pca9547(I2C_MUX_CH_DEFAULT, 0);
 +
 +	return ret;
 +}
@@ -1272,7 +952,7 @@ index 0000000000..3b80455108
 +	set_thermal_thresholds();
 +#ifdef CONFIG_VID
 +	/* Preconfiguration of VID limits per LS2084A specification */
-+	vid_set_mv_limits(1100, 1050, 950, 1100, 1075, 925, 900);
++	/* vid_set_mv_limits(1100, 1050, 950, 1100, 1075, 925, 900); */
 +
 +	if (adjust_vdd(0))
 +		printf("Warning: Adjusting core voltage failed.\n");
@@ -1331,7 +1011,7 @@ index 0000000000..3b80455108
 +#endif
 +
 +#ifdef CONFIG_OF_BOARD_SETUP
-+int ft_board_setup(void *blob, bd_t *bd)
++int ft_board_setup(void *blob, struct bd_info *bd)
 +{
 +	int i;
 +	u16 mc_memory_bank = 0;
@@ -1436,27 +1116,41 @@ index 0000000000..db3c6dc2a2
 +#define QIXIS_SYSCLK_166		0x7
 +
 +#endif /*__LS2_RDB_QIXIS_H__*/
-diff --git a/configs/ls2084abbmini_defconfig b/configs/ls2084abbmini_defconfig
+diff --git a/configs/ls2084abbmini_tfa_defconfig b/configs/ls2084abbmini_tfa_defconfig
 new file mode 100644
-index 0000000000..afe92440fd
+index 0000000000..5161b1c964
 --- /dev/null
-+++ b/configs/ls2084abbmini_defconfig
-@@ -0,0 +1,82 @@
++++ b/configs/ls2084abbmini_tfa_defconfig
+@@ -0,0 +1,108 @@
 +CONFIG_ARM=y
++CONFIG_GIC_V3_ITS=y
 +CONFIG_TARGET_LS2084ABBMINI=y
-+CONFIG_SYS_TEXT_BASE=0x30100000
-+CONFIG_ENV_SIZE=0x2000
-+CONFIG_ENV_SECT_SIZE=0x40000
-+CONFIG_ENV_OFFSET=0x500000
-+CONFIG_FSL_LS_PPA=y
-+CONFIG_DM_GPIO=y
-+CONFIG_NR_DRAM_BANKS=2
-+CONFIG_AHCI=y
++CONFIG_TFABOOT=y
++CONFIG_SYS_TEXT_BASE=0x82000000
++CONFIG_SYS_MALLOC_LEN=0x202000
 +CONFIG_SYS_MALLOC_F_LEN=0x6000
++CONFIG_NR_DRAM_BANKS=2
++CONFIG_ENV_SIZE=0x2000
++CONFIG_ENV_OFFSET=0x500000
++CONFIG_ENV_SECT_SIZE=0x40000
++CONFIG_DM_GPIO=y
++CONFIG_DEFAULT_DEVICE_TREE="fsl-ls2084a-bbmini"
++CONFIG_FSL_USE_PCA9547_MUX=y
++CONFIG_VID=y
++CONFIG_VID_FLS_ENV="ls2084abbmini_vdd_mv"
++CONFIG_VOL_MONITOR_LTC3882_READ=y
++CONFIG_VOL_MONITOR_LTC3882_SET=y
++CONFIG_QSPI_AHB_INIT=y
++CONFIG_ARMV8_SEC_FIRMWARE_SUPPORT=y
++CONFIG_SEC_FIRMWARE_ARMV8_PSCI=y
++CONFIG_AHCI=y
++CONFIG_REMAKE_ELF=y
++CONFIG_MP=y
 +CONFIG_FIT=y
 +CONFIG_FIT_VERBOSE=y
 +CONFIG_OF_BOARD_SETUP=y
 +CONFIG_OF_STDOUT_VIA_ALIAS=y
++CONFIG_DYNAMIC_SYS_CLK_FREQ=y
 +CONFIG_BOOTDELAY=10
 +CONFIG_HUSH_PARSER=y
 +CONFIG_USE_BOOTARGS=y
@@ -1467,6 +1161,10 @@ index 0000000000..afe92440fd
 +CONFIG_CMD_BOOTI=y
 +CONFIG_CMD_GREPENV=y
 +CONFIG_CMD_EEPROM=y
++CONFIG_SYS_EEPROM_PAGE_WRITE_BITS=3
++CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS=5
++CONFIG_CMD_DM=y
++CONFIG_CMD_GPIO=y
 +CONFIG_CMD_GPT=y
 +CONFIG_CMD_I2C=y
 +CONFIG_CMD_MMC=y
@@ -1480,121 +1178,25 @@ index 0000000000..afe92440fd
 +CONFIG_CMD_EXT2=y
 +CONFIG_CMD_FAT=y
 +CONFIG_CMD_DATE=y
-+CONFIG_MP=y
 +CONFIG_OF_CONTROL=y
-+CONFIG_DEFAULT_DEVICE_TREE="fsl-ls2084a-bbmini"
++CONFIG_ENV_OVERWRITE=y
 +CONFIG_ENV_IS_IN_FLASH=y
-+CONFIG_ENV_ADDR=0x580500000
-+CONFIG_NET_RANDOM_ETHADDR=y
-+CONFIG_DM=y
-+CONFIG_SATA_CEVA=y
-+CONFIG_FSL_CAAM=y
-+CONFIG_DM_I2C=y
-+CONFIG_I2C_SET_DEFAULT_BUS_NUM=y
-+CONFIG_I2C_DEFAULT_BUS_NUMBER=0
-+CONFIG_I2C_MUX=y
-+CONFIG_I2C_MUX_PCA954x=y
-+CONFIG_DM_MMC=y
-+CONFIG_FSL_ESDHC=y
-+CONFIG_MTD=y
-+CONFIG_MTD_NOR_FLASH=y
-+CONFIG_FLASH_CFI_DRIVER=y
-+CONFIG_SYS_FLASH_USE_BUFFER_WRITE=y
-+CONFIG_SYS_FLASH_CFI=y
-+CONFIG_DM_SPI_FLASH=y
-+CONFIG_PHYLIB=y
-+CONFIG_PHY_AQUANTIA=y
-+CONFIG_E1000=y
-+CONFIG_MII=y
-+CONFIG_PCI=y
-+CONFIG_DM_PCI=y
-+CONFIG_DM_PCI_COMPAT=y
-+CONFIG_PCIE_LAYERSCAPE=y
-+CONFIG_DM_RTC=y
-+CONFIG_DM_SCSI=y
-+CONFIG_CONS_INDEX=2
-+CONFIG_SYS_NS16550=y
-+CONFIG_SPI=y
-+CONFIG_DM_SPI=y
-+CONFIG_FSL_DSPI=y
-+CONFIG_USB=y
-+CONFIG_DM_USB=y
-+CONFIG_USB_XHCI_HCD=y
-+CONFIG_USB_XHCI_DWC3=y
-+CONFIG_USB_STORAGE=y
-+CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
-+CONFIG_DISTRO_DEFAULTS=y
-diff --git a/configs/ls2084abbmini_sdcard_defconfig b/configs/ls2084abbmini_sdcard_defconfig
-new file mode 100644
-index 0000000000..93b8027bc0
---- /dev/null
-+++ b/configs/ls2084abbmini_sdcard_defconfig
-@@ -0,0 +1,95 @@
-+CONFIG_ARM=y
-+CONFIG_TARGET_LS2084ABBMINI=y
-+CONFIG_SYS_TEXT_BASE=0x80400000
-+CONFIG_ENV_SIZE=0x2000
-+CONFIG_ENV_SECT_SIZE=0x40000
-+CONFIG_ENV_OFFSET=0x500000
-+CONFIG_FSL_LS_PPA=y
-+CONFIG_DM_GPIO=y
-+CONFIG_NR_DRAM_BANKS=2
-+CONFIG_AHCI=y
-+CONFIG_SPL=y
-+CONFIG_SPL_TEXT_BASE=0x1800a000
-+CONFIG_SPL_ENV_SUPPORT=y
-+CONFIG_SPL_I2C_SUPPORT=y
-+CONFIG_SPL_MPC8XXX_INIT_DDR_SUPPORT=y
-+CONFIG_SPL_LIBCOMMON_SUPPORT=y
-+CONFIG_SPL_LIBGENERIC_SUPPORT=y
-+CONFIG_SPL_MMC_SUPPORT=y
-+CONFIG_SPL_SERIAL_SUPPORT=y
-+CONFIG_SPL_DRIVERS_MISC_SUPPORT=y
-+CONFIG_SYS_MALLOC_F_LEN=0x6000
-+CONFIG_FIT=y
-+CONFIG_FIT_VERBOSE=y
-+CONFIG_OF_BOARD_SETUP=y
-+CONFIG_OF_STDOUT_VIA_ALIAS=y
-+CONFIG_SD_BOOT=y
-+CONFIG_BOOTDELAY=10
-+CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR=y
-+CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x8b0
-+CONFIG_HUSH_PARSER=y
-+CONFIG_USE_BOOTARGS=y
-+CONFIG_BOOTARGS="console=ttyS1,115200 root=/dev/ram0 earlycon=uart8250,mmio,0x21c0600 ramdisk_size=0x2000000 default_hugepagesz=2m hugepagesz=2m hugepages=256"
-+# CONFIG_USE_BOOTCOMMAND is not set
-+CONFIG_MISC_INIT_R=y
-+CONFIG_CMD_IMLS=y
-+CONFIG_CMD_BOOTI=y
-+CONFIG_CMD_GREPENV=y
-+CONFIG_CMD_EEPROM=y
-+CONFIG_CMD_GPT=y
-+CONFIG_CMD_I2C=y
-+CONFIG_CMD_MMC=y
-+CONFIG_CMD_PCI=y
-+CONFIG_CMD_USB=y
-+CONFIG_CMD_SETEXPR=y
-+CONFIG_CMD_DHCP=y
-+CONFIG_CMD_MII=y
-+CONFIG_CMD_PING=y
-+CONFIG_CMD_CACHE=y
-+CONFIG_CMD_EXT2=y
-+CONFIG_CMD_FAT=y
-+CONFIG_CMD_DATE=y
-+CONFIG_MP=y
-+CONFIG_OF_CONTROL=y
-+CONFIG_DEFAULT_DEVICE_TREE="fsl-ls2084a-bbmini"
 +CONFIG_ENV_IS_IN_MMC=y
 +CONFIG_ENV_ADDR=0x580500000
 +CONFIG_NET_RANDOM_ETHADDR=y
 +CONFIG_DM=y
++CONFIG_SATA=y
 +CONFIG_SATA_CEVA=y
 +CONFIG_FSL_CAAM=y
++CONFIG_DDR_CLK_FREQ=133333333
++CONFIG_DDR_ECC=y
++CONFIG_ECC_INIT_VIA_DDRCONTROLLER=y
++CONFIG_MPC8XXX_GPIO=y
 +CONFIG_DM_I2C=y
 +CONFIG_I2C_SET_DEFAULT_BUS_NUM=y
-+CONFIG_I2C_DEFAULT_BUS_NUMBER=0
 +CONFIG_I2C_MUX=y
 +CONFIG_I2C_MUX_PCA954x=y
++CONFIG_SYS_I2C_EEPROM_ADDR=0x57
 +CONFIG_DM_MMC=y
 +CONFIG_FSL_ESDHC=y
 +CONFIG_MTD=y
@@ -1602,15 +1204,16 @@ index 0000000000..93b8027bc0
 +CONFIG_FLASH_CFI_DRIVER=y
 +CONFIG_SYS_FLASH_USE_BUFFER_WRITE=y
 +CONFIG_SYS_FLASH_CFI=y
-+CONFIG_DM_SPI_FLASH=y
 +CONFIG_PHYLIB=y
 +CONFIG_PHY_AQUANTIA=y
++CONFIG_DM_ETH=y
++CONFIG_DM_MDIO=y
 +CONFIG_E1000=y
 +CONFIG_MII=y
++CONFIG_FSL_LS_MDIO=y
++CONFIG_NVME_PCI=y
 +CONFIG_PCI=y
-+CONFIG_DM_PCI=y
-+CONFIG_DM_PCI_COMPAT=y
-+CONFIG_PCIE_LAYERSCAPE=y
++CONFIG_PCIE_LAYERSCAPE_RC=y
 +CONFIG_DM_RTC=y
 +CONFIG_DM_SCSI=y
 +CONFIG_CONS_INDEX=2
@@ -1625,12 +1228,14 @@ index 0000000000..93b8027bc0
 +CONFIG_USB_STORAGE=y
 +CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
 +CONFIG_DISTRO_DEFAULTS=y
++CONFIG_OF_LIBFDT_OVERLAY=y
++CONFIG_OF_SYSTEM_SETUP=y
 diff --git a/include/configs/ls2084abbmini.h b/include/configs/ls2084abbmini.h
 new file mode 100644
-index 0000000000..9228cfeb3d
+index 0000000000..9ac4a52d8d
 --- /dev/null
 +++ b/include/configs/ls2084abbmini.h
-@@ -0,0 +1,278 @@
+@@ -0,0 +1,271 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright 2017-2018, 2020 NXP
@@ -1642,15 +1247,19 @@ index 0000000000..9228cfeb3d
 +
 +#include "ls2080a_common.h"
 +
-+#if !defined(CONFIG_SPL_BUILD)
-+#define I2C_VOL_MONITOR_ADDR           0x63
-+#define CONFIG_VOL_MONITOR_LTC3882_READ
-+#define CONFIG_VOL_MONITOR_LTC3882_SET
-+#define LTC_VID_CHANNEL 0
++/* For complex PCIe scenarios we need more stream IDs there.
++ * This patch tweaks the stream ID allocation to have more on PCIe
++ * by reducing the IDs for DPAA2. BB Mini doesn't use all DPAA2
++ * features, so this seems like a reasonable compromise.
++ */
++#undef FSL_PEX_STREAM_ID_END
++#define FSL_PEX_STREAM_ID_END          42
++#undef FSL_DPAA2_STREAM_ID_START
++#define FSL_DPAA2_STREAM_ID_START      43
 +
-+#define CONFIG_VID_FLS_ENV		"ls2084abbmini_vdd_mv"
-+#define CONFIG_VID
-+#endif
++/* Voltage ID support */
++#define I2C_VOL_MONITOR_ADDR           0x63
++#define LTC_VID_CHANNEL 0
 +
 +/* Backwards compatibility if an old style setup with PPA is booted */
 +#if defined(CONFIG_FSL_LS_PPA)
@@ -1678,9 +1287,6 @@ index 0000000000..9228cfeb3d
 +#define CONFIG_DDR_CLK_FREQ		133333333
 +#define COUNTER_FREQUENCY_REAL		(CONFIG_SYS_CLK_FREQ/4)
 +
-+#define CONFIG_DDR_SPD
-+#define CONFIG_DDR_ECC
-+#define CONFIG_ECC_INIT_VIA_DDRCONTROLLER
 +#define CONFIG_MEM_INIT_VALUE		0xdeadbeef
 +#define SPD_EEPROM_ADDRESS1	0x51
 +#define SPD_EEPROM_ADDRESS2	0x53
@@ -1700,8 +1306,6 @@ index 0000000000..9228cfeb3d
 +
 +#define CONFIG_SYS_SCSI_MAX_SCSI_ID		1
 +#define CONFIG_SYS_SCSI_MAX_LUN			1
-+#define CONFIG_SYS_SCSI_MAX_DEVICE		(CONFIG_SYS_SCSI_MAX_SCSI_ID * \
-+						CONFIG_SYS_SCSI_MAX_LUN)
 +#if defined (CONFIG_SD_BOOT) || defined(CONFIG_TFABOOT)
 +#define CONFIG_SYS_MMC_ENV_DEV         0
 +#endif
@@ -1843,7 +1447,6 @@ index 0000000000..9228cfeb3d
 +#define CONFIG_SYS_I2C_RTC_ADDR         0x68
 +
 +/* EEPROM */
-+#define CONFIG_ID_EEPROM
 +#define CONFIG_SYS_I2C_EEPROM_NXID
 +#define CONFIG_SYS_EEPROM_BUS_NUM	0
 +#define CONFIG_SYS_I2C_EEPROM_ADDR	0x57
@@ -1861,11 +1464,6 @@ index 0000000000..9228cfeb3d
 +#define CONFIG_GICSUPPORT
 +#define CONFIG_SUPPORT_IRQHANDLERS
 +#define CONFIG_CMD_IRQINFO
-+#endif
-+
-+/*  MMC  */
-+#ifdef CONFIG_MMC
-+#define CONFIG_SYS_FSL_MMC_HAS_CAPBLT_VS33
 +#endif
 +
 +#define BOOT_TARGET_DEVICES(func) \
@@ -1903,12 +1501,12 @@ index 0000000000..9228cfeb3d
 +#define AQR107_IRQ_MASK2	0x04
 +#define AQR107_IRQ_MASK3	0x10
 +
-+#define CONFIG_ETHPRIME		"DPMAC5@xgmii"
++#define CONFIG_ETHPRIME		"DPMAC5@10gbase-r"
 +#endif
 +
 +#include <asm/fsl_secure_boot.h>
 +
 +#endif /* __LS2084A_BBMINI_H */
 -- 
-2.17.1
+2.34.1
 

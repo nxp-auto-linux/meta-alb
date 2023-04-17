@@ -1,0 +1,66 @@
+From 36c19754c93779cf75fdb82dacf13492ac35a702 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 23 Dec 2022 10:58:46 +0100
+Subject: [PATCH] u-boot: Fix LS2 derivative detection
+
+While some derivatives are rather rare in the market, they still exist
+and should be detected properly.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ arch/arm/cpu/armv8/fsl-layerscape/mp.c  | 5 ++---
+ arch/arm/cpu/armv8/fsl-layerscape/soc.c | 8 ++++++--
+ 2 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/cpu/armv8/fsl-layerscape/mp.c b/arch/arm/cpu/armv8/fsl-layerscape/mp.c
+index 2e2688eadc..882fd65885 100644
+--- a/arch/arm/cpu/armv8/fsl-layerscape/mp.c
++++ b/arch/arm/cpu/armv8/fsl-layerscape/mp.c
+@@ -76,7 +76,7 @@ int fsl_layerscape_wake_seconday_cores(void)
+ 	struct ccsr_gur __iomem *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+ #ifdef CONFIG_FSL_LSCH3
+ 	struct ccsr_reset __iomem *rst = (void *)(CONFIG_SYS_FSL_RST_ADDR);
+-	u32 svr, ver, cluster, type;
++	u32 svr, cluster, type;
+ 	int j = 0, cluster_cores = 0;
+ #elif defined(CONFIG_FSL_LSCH2)
+ 	struct ccsr_scfg __iomem *scfg = (void *)(CONFIG_SYS_FSL_SCFG_ADDR);
+@@ -143,8 +143,7 @@ int fsl_layerscape_wake_seconday_cores(void)
+ 	gur_out32(&gur->bootlocptrl, (u32)gd->relocaddr);
+ 
+ 	svr = gur_in32(&gur->svr);
+-	ver = SVR_SOC_VER(svr);
+-	if (ver == SVR_LS2080A || ver == SVR_LS2085A) {
++	if (IS_SVR_DEV(svr, SVR_DEV(SVR_LS2085A))) {
+ 		gur_out32(&gur->scratchrw[6], 1);
+ 		asm volatile("dsb st" : : : "memory");
+ 		rst->brrl = cores;
+diff --git a/arch/arm/cpu/armv8/fsl-layerscape/soc.c b/arch/arm/cpu/armv8/fsl-layerscape/soc.c
+index d3a5cfaac1..ab92a71d44 100644
+--- a/arch/arm/cpu/armv8/fsl-layerscape/soc.c
++++ b/arch/arm/cpu/armv8/fsl-layerscape/soc.c
+@@ -85,6 +85,7 @@ bool soc_has_dp_ddr(void)
+ 
+ 	/* LS2085A, LS2088A, LS2048A has DP_DDR */
+ 	if ((SVR_SOC_VER(svr) == SVR_LS2085A) ||
++	    (SVR_SOC_VER(svr) == SVR_LS2045A) ||
+ 	    (SVR_SOC_VER(svr) == SVR_LS2088A) ||
+ 	    (SVR_SOC_VER(svr) == SVR_LS2048A))
+ 		return true;
+@@ -97,8 +98,11 @@ bool soc_has_aiop(void)
+ 	struct ccsr_gur __iomem *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+ 	u32 svr = gur_in32(&gur->svr);
+ 
+-	/* LS2085A has AIOP */
+-	if (SVR_SOC_VER(svr) == SVR_LS2085A)
++	/* LS2085A, LS2088A, LS2048A has AIOP */
++	if ((SVR_SOC_VER(svr) == SVR_LS2085A) ||
++	    (SVR_SOC_VER(svr) == SVR_LS2045A) ||
++	    (SVR_SOC_VER(svr) == SVR_LS2088A) ||
++	    (SVR_SOC_VER(svr) == SVR_LS2048A))
+ 		return true;
+ 
+ 	return false;
+-- 
+2.34.1
+

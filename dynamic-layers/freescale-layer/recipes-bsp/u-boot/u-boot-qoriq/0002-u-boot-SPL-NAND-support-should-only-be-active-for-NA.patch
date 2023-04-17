@@ -1,20 +1,20 @@
-From 301e8e3853e7ee4a49b7c9bfdf0158a8ad209874 Mon Sep 17 00:00:00 2001
+From 09e996dfc7cf3e8422b34b649c1b22c830c82350 Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Fri, 19 Feb 2021 16:56:55 +0100
-Subject: [PATCH] u-boot: SPL NAND support should only be active if NAND boot
- is active
+Date: Thu, 22 Dec 2022 15:48:22 +0100
+Subject: [PATCH 2/5] u-boot: SPL NAND support should only be active for NAND
+ boot
 
-Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Dan Nica <dan.nica@nxp.com>
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  include/configs/ls2080a_common.h | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/include/configs/ls2080a_common.h b/include/configs/ls2080a_common.h
-index b58776a788..f62c3bd4fe 100644
+index f2725af053..f6300574a0 100644
 --- a/include/configs/ls2080a_common.h
 +++ b/include/configs/ls2080a_common.h
-@@ -197,6 +197,7 @@ unsigned long long get_qixis_addr(void);
+@@ -164,6 +164,7 @@ unsigned long long get_qixis_addr(void);
  #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
  #define CONFIG_SYS_MAXARGS		64	/* max command args */
  
@@ -22,7 +22,7 @@ index b58776a788..f62c3bd4fe 100644
  #define CONFIG_SPL_BSS_START_ADDR	0x80100000
  #define CONFIG_SPL_BSS_MAX_SIZE		0x00100000
  #define CONFIG_SPL_MAX_SIZE		0x16000
-@@ -204,12 +205,14 @@ unsigned long long get_qixis_addr(void);
+@@ -171,12 +172,14 @@ unsigned long long get_qixis_addr(void);
  #define CONFIG_SPL_TARGET		"u-boot-with-spl.bin"
  
  #ifdef CONFIG_NAND_BOOT
@@ -38,5 +38,5 @@ index b58776a788..f62c3bd4fe 100644
  #define CONFIG_SYS_BOOTM_LEN   (64 << 20)      /* Increase max gunzip size */
  
 -- 
-2.17.1
+2.34.1
 

@@ -1,19 +1,21 @@
-From 52ea3fa30d3611370ee2b968d23075c649d0110b Mon Sep 17 00:00:00 2001
+From 02c74aa8e555d79c5639c68f9e01a08392bb44eb Mon Sep 17 00:00:00 2001
 From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
-Date: Thu, 17 Jan 2019 11:31:39 +0200
-Subject: [PATCH 03/15] u-boot: Correct Vitesse PHY init code
+Date: Thu, 22 Dec 2022 16:31:05 +0100
+Subject: [PATCH 5/5] u-boot: Correct Vitesse PHY init code
+
+A number of spec violations fixed
 
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Dan Nica <dan.nica@nxp.com>
 ---
- drivers/net/phy/vitesse.c | 105 +++++++++++++++++++++++++++++++++++++++++++---
+ drivers/net/phy/vitesse.c | 105 +++++++++++++++++++++++++++++++++++---
  1 file changed, 99 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
-index e5e9922..eba30d0 100644
+index eca26c9893..cbe5119f27 100644
 --- a/drivers/net/phy/vitesse.c
 +++ b/drivers/net/phy/vitesse.c
-@@ -269,12 +269,6 @@ static int vsc8664_config(struct phy_device *phydev)
+@@ -270,12 +270,6 @@ static int vsc8664_config(struct phy_device *phydev)
  {
  	u32 val;
  
@@ -26,7 +28,7 @@ index e5e9922..eba30d0 100644
  	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS,
  		  PHY_EXT_PAGE_ACCESS_EXTENDED);
  	val = phy_read(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_SERDES_AND_SIGDET);
-@@ -282,6 +276,97 @@ static int vsc8664_config(struct phy_device *phydev)
+@@ -283,6 +277,97 @@ static int vsc8664_config(struct phy_device *phydev)
  	phy_write(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_SERDES_AND_SIGDET, val);
  	phy_write(phydev, MDIO_DEVAD_NONE, PHY_EXT_PAGE_ACCESS, 0);
  
@@ -124,7 +126,7 @@ index e5e9922..eba30d0 100644
  	/* Enable LED blink */
  	val = phy_read(phydev, MDIO_DEVAD_NONE, MIIM_VSC8664_LED_CON);
  	val &= ~(1 << 2);
-@@ -434,7 +519,15 @@ int phy_vitesse_init(void)
+@@ -435,7 +520,15 @@ int phy_vitesse_init(void)
  	phy_register(&VSC8574_driver);
  	phy_register(&VSC8584_driver);
  	phy_register(&VSC8514_driver);
@@ -141,5 +143,5 @@ index e5e9922..eba30d0 100644
  	phy_register(&cis8201_driver);
  	phy_register(&cis8204_driver);
 -- 
-2.7.4
+2.34.1
 

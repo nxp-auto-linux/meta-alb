@@ -1,0 +1,30 @@
+From 54d21f5c3c6ba9595bc8c49e1dadda67cb5bce5e Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 22 Dec 2022 16:27:54 +0100
+Subject: [PATCH 4/5] u-boot: Enable single rank DDR timing for older T4 RDBs
+
+This patch has been provided by York Sun originally.
+Apparently, the single rank DDR DIMMs used for the early T4
+RDB have never been properly validated against U-Boot.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ board/freescale/t4rdb/ddr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/board/freescale/t4rdb/ddr.h b/board/freescale/t4rdb/ddr.h
+index 74a2779611..bee1626ebb 100644
+--- a/board/freescale/t4rdb/ddr.h
++++ b/board/freescale/t4rdb/ddr.h
+@@ -34,7 +34,7 @@ static const struct board_specific_parameters udimm0[] = {
+ 	{2,  2140, 0,  8,     8, 0x090a0b0e, 0x0f11120c},
+ 	{1,  1350, 0, 10,     8, 0x0809090b, 0x0c0c0d0a},
+ 	{1,  1700, 0, 10,     8, 0x080a0a0c, 0x0c0d0e0a},
+-	{1,  1900, 0,  8,     8, 0x080a0a0c, 0x0e0e0f0a},
++	{1,  1900, 0,  8,    10, 0x0b0c0d0f, 0x1012130e},
+ 	{1,  2140, 0,  8,     8, 0x090a0b0c, 0x0e0f100b},
+ 	{}
+ };
+-- 
+2.34.1
+

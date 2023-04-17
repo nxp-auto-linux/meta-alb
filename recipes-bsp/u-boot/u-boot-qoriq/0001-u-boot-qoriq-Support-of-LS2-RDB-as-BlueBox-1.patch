@@ -1,0 +1,322 @@
+From 5b6924477f7e2244ba3023e879ad635cccf23f97 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 20 Jan 2023 15:11:52 +0100
+Subject: [PATCH] u-boot-qoriq: Support of LS2 RDB as BlueBox 1
+
+we have a separate config as the original RDB config and dts are not
+really correct or complete enough for our purpose.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ arch/arm/dts/fsl-ls208xa-bluebox.dts | 171 +++++++++++++++++++++++++++
+ configs/ls2084abluebox_tfa_defconfig | 120 +++++++++++++++++++
+ 2 files changed, 291 insertions(+)
+ create mode 100644 arch/arm/dts/fsl-ls208xa-bluebox.dts
+ create mode 100644 configs/ls2084abluebox_tfa_defconfig
+
+diff --git a/arch/arm/dts/fsl-ls208xa-bluebox.dts b/arch/arm/dts/fsl-ls208xa-bluebox.dts
+new file mode 100644
+index 0000000000..2b68671a12
+--- /dev/null
++++ b/arch/arm/dts/fsl-ls208xa-bluebox.dts
+@@ -0,0 +1,171 @@
++// SPDX-License-Identifier: GPL-2.0+ OR X11
++/*
++ * NXP ls2080a RDB board device tree source for QSPI-boot
++ *
++ * Author: Priyanka Jain <priyanka.jain@nxp.com>
++ *
++ * Copyright 2017 NXP
++ */
++
++/dts-v1/;
++
++#include "fsl-ls2080a.dtsi"
++
++/ {
++	model = "Freescale Layerscape 2080a RDB Board";
++	compatible = "fsl,ls2080a-rdb", "fsl,ls2080a";
++
++	aliases {
++		spi0 = &qspi;
++		spi1 = &dspi;
++	};
++};
++
++&dpmac1 {
++	status = "okay";
++	phy-handle = <&mdio1_phy1>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac2 {
++	status = "okay";
++	phy-handle = <&mdio1_phy2>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac3 {
++	status = "okay";
++	phy-handle = <&mdio1_phy3>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac4 {
++	status = "okay";
++	phy-handle = <&mdio1_phy4>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac5 {
++	status = "okay";
++	phy-handle = <&mdio2_phy1>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac6 {
++	status = "okay";
++	phy-handle = <&mdio2_phy2>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac7 {
++	status = "okay";
++	phy-handle = <&mdio2_phy3>;
++	phy-connection-type = "10gbase-r";
++};
++
++&dpmac8 {
++	status = "okay";
++	phy-handle = <&mdio2_phy4>;
++	phy-connection-type = "10gbase-r";
++};
++
++&emdio1 {
++	status = "okay";
++
++	/* CS4340 PHYs */
++	mdio1_phy1: emdio1_phy@1 {
++		reg = <0x10>;
++	};
++	mdio1_phy2: emdio1_phy@2 {
++		reg = <0x11>;
++	};
++	mdio1_phy3: emdio1_phy@3 {
++		reg = <0x12>;
++	};
++	mdio1_phy4: emdio1_phy@4 {
++		reg = <0x13>;
++	};
++};
++
++&emdio2 {
++	status = "okay";
++
++	/* AQR405 PHYs */
++	mdio2_phy1: emdio2_phy@1 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <0x0>;
++	};
++	mdio2_phy2: emdio2_phy@2 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <0x1>;
++	};
++	mdio2_phy3: emdio2_phy@3 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <0x2>;
++	};
++	mdio2_phy4: emdio2_phy@4 {
++		compatible = "ethernet-phy-ieee802.3-c45";
++		reg = <0x3>;
++	};
++};
++
++&dspi {
++	bus-num = <0>;
++	status = "okay";
++
++	dflash0: n25q512a {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		spi-max-frequency = <3000000>;
++		spi-cpol;
++		spi-cpha;
++		reg = <0>;
++	};
++};
++
++&qspi {
++	status = "okay";
++
++	s25fs512s0: flash@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		spi-max-frequency = <50000000>;
++		reg = <0>;
++	};
++
++	s25fs512s1: flash@1 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		spi-max-frequency = <50000000>;
++		reg = <1>;
++	};
++};
++
++&i2c0 {
++	status = "okay";
++	u-boot,dm-pre-reloc;
++
++	pca9547@75 {
++		compatible = "nxp,pca9547";
++		reg = <0x75>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		 i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0x01>;
++			rtc@68 {
++				compatible = "dallas,ds3232";
++				reg = <0x68>;
++			};
++		};
++	};
++};
++
++&sata {
++	status = "okay";
++};
+diff --git a/configs/ls2084abluebox_tfa_defconfig b/configs/ls2084abluebox_tfa_defconfig
+new file mode 100644
+index 0000000000..36519cb287
+--- /dev/null
++++ b/configs/ls2084abluebox_tfa_defconfig
+@@ -0,0 +1,120 @@
++CONFIG_ARM=y
++CONFIG_GIC_V3_ITS=y
++CONFIG_TARGET_LS2080ARDB=y
++CONFIG_TFABOOT=y
++CONFIG_SYS_TEXT_BASE=0x82000000
++CONFIG_SYS_MALLOC_LEN=0x202000
++CONFIG_SYS_MALLOC_F_LEN=0x6000
++CONFIG_NR_DRAM_BANKS=2
++CONFIG_ENV_SIZE=0x2000
++CONFIG_ENV_OFFSET=0x500000
++CONFIG_ENV_SECT_SIZE=0x40000
++CONFIG_DM_GPIO=y
++CONFIG_DEFAULT_DEVICE_TREE="fsl-ls208xa-bluebox"
++CONFIG_FSL_USE_PCA9547_MUX=y
++CONFIG_VID=y
++CONFIG_VID_FLS_ENV="ls2080ardb_vdd_mv"
++CONFIG_VOL_MONITOR_IR36021_READ=y
++CONFIG_VOL_MONITOR_IR36021_SET=y
++CONFIG_QSPI_AHB_INIT=y
++CONFIG_ARMV8_SEC_FIRMWARE_SUPPORT=y
++CONFIG_SEC_FIRMWARE_ARMV8_PSCI=y
++CONFIG_AHCI=y
++CONFIG_REMAKE_ELF=y
++CONFIG_MP=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_OF_BOARD_SETUP=y
++CONFIG_OF_STDOUT_VIA_ALIAS=y
++CONFIG_DYNAMIC_SYS_CLK_FREQ=y
++CONFIG_BOOTDELAY=10
++CONFIG_HUSH_PARSER=y
++CONFIG_USE_BOOTARGS=y
++CONFIG_BOOTARGS="console=ttyS1,115200 root=/dev/ram0 earlycon=uart8250,mmio,0x21c0600 ramdisk_size=0x2000000 default_hugepagesz=2m hugepagesz=2m hugepages=256"
++# CONFIG_USE_BOOTCOMMAND is not set
++CONFIG_MISC_INIT_R=y
++CONFIG_CMD_IMLS=y
++CONFIG_CMD_BOOTI=y
++CONFIG_CMD_GREPENV=y
++CONFIG_CMD_EEPROM=y
++CONFIG_SYS_EEPROM_PAGE_WRITE_BITS=3
++CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS=5
++CONFIG_CMD_DM=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_GPT=y
++CONFIG_CMD_I2C=y
++CONFIG_CMD_MMC=y
++CONFIG_CMD_NAND=y
++CONFIG_CMD_PCI=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_SETEXPR=y
++CONFIG_CMD_DHCP=y
++CONFIG_CMD_MII=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EXT2=y
++CONFIG_CMD_FAT=y
++CONFIG_CMD_DATE=y
++CONFIG_OF_CONTROL=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_IS_IN_FLASH=y
++CONFIG_ENV_IS_IN_MMC=y
++CONFIG_ENV_IS_IN_SPI_FLASH=y
++CONFIG_ENV_ADDR=0x580500000
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_DM=y
++CONFIG_SATA=y
++CONFIG_SATA_CEVA=y
++CONFIG_FSL_CAAM=y
++CONFIG_DDR_CLK_FREQ=133333333
++CONFIG_DDR_ECC=y
++CONFIG_ECC_INIT_VIA_DDRCONTROLLER=y
++CONFIG_MPC8XXX_GPIO=y
++CONFIG_DM_I2C=y
++CONFIG_I2C_SET_DEFAULT_BUS_NUM=y
++CONFIG_I2C_MUX=y
++CONFIG_I2C_MUX_PCA954x=y
++CONFIG_SYS_I2C_EEPROM_ADDR=0x57
++CONFIG_DM_MMC=y
++CONFIG_FSL_ESDHC=y
++CONFIG_MTD=y
++CONFIG_MTD_NOR_FLASH=y
++CONFIG_FLASH_CFI_DRIVER=y
++CONFIG_SYS_FLASH_USE_BUFFER_WRITE=y
++CONFIG_SYS_FLASH_CFI=y
++CONFIG_MTD_RAW_NAND=y
++CONFIG_NAND_FSL_IFC=y
++CONFIG_SYS_NAND_ONFI_DETECTION=y
++CONFIG_DM_SPI_FLASH=y
++# CONFIG_SPI_FLASH_BAR is not set
++CONFIG_SPI_FLASH_SPANSION=y
++CONFIG_SPI_FLASH_STMICRO=y
++# CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
++CONFIG_PHYLIB=y
++CONFIG_PHY_AQUANTIA=y
++CONFIG_PHY_CORTINA=y
++CONFIG_DM_ETH=y
++CONFIG_DM_MDIO=y
++CONFIG_E1000=y
++CONFIG_MII=y
++CONFIG_FSL_LS_MDIO=y
++CONFIG_NVME_PCI=y
++CONFIG_PCI=y
++CONFIG_PCIE_LAYERSCAPE_RC=y
++CONFIG_DM_RTC=y
++CONFIG_DM_SCSI=y
++CONFIG_CONS_INDEX=2
++CONFIG_SYS_NS16550=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_FSL_DSPI=y
++CONFIG_FSL_QSPI=y
++CONFIG_USB=y
++CONFIG_DM_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_DWC3=y
++CONFIG_USB_STORAGE=y
++CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
++CONFIG_DISTRO_DEFAULTS=y
++CONFIG_OF_LIBFDT_OVERLAY=y
++CONFIG_OF_SYSTEM_SETUP=y
+-- 
+2.34.1
+

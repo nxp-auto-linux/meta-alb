@@ -1,0 +1,146 @@
+// A generic framework for booting typical linux distributions with
+// common presets derived from older NXP BSPs/SDKs.
+// The user can #include this file from the main environment definition
+// for a Yocto machine.
+//
+// The "boot_targets" variable is a list of boot targets to be set by
+// the file including this one. They are checked in sequence and it is
+// recommended to finish the list with "rcwdev".
+// Available targets are
+//      mmc0/mmc1       This covers both SDHC and eMMC
+//      scsi0/scsi1     This is really for the SATA ports
+//      nvme0/nvme1     PCIe NVMe modules
+//      usb0/usb1       Available USB ports
+//      xspi            QPSI flash on first port, boot kernel.itb
+//      nor             Parallel NOR flash, boot kernel.itb
+//      rcwdev          The RCW boot source, whichever one
+//      nfs             Boot kernel from RCW source and rootfs over NFS
+//      dhcp            Fetch and execute a boot script over DHCP
+//
+// Numerous variables then need to be set to support the various types
+// of boot targets. Not all need to be set for each target.
+// Common recommendations that may work are given in brackets.
+//
+// Always needed:
+//      load_addr       DRAM address for things to load, [0xa0000000]
+//      setrcwdev       run to setenv the boot source in $rcwdev
+//      rcwdev          Set by "run setrcwdev" to the boot source/target
+//      setbootargs     run to setenv bootargs. Must also include
+//                      $bootargsextra
+//
+// Secure boot support
+//      secureboot              Set to run secure boot checks
+//      boot_script_hdr         name of DHCP boot script header
+//      scripthdraddr           RAM address for loading script header [0x80080000]
+//      kernelheader_start      QSPI address of kernel header [0x00600000]
+//      kernelheader_size       QSPI size of kernel header [0x00040000]
+//      kernelheader_addr_r     RAM address of kernel header [0x80200000]
+//
+// Need for flash boot (xspi, nor)
+//      ramdisk_size            Needed for /dev/ram0 boot. [0x2000000]
+//      kernel_size             Flash area size for kernel.itb [0x3000000]
+//
+// Needed for any filesystem based rootfs boot (mmc?, scsi?, usb?)
+//      boot_itbname            ITB name in filesystem [kernel.itb]
+//      boot_prefixes           Search prefix in filesystem [/ /boot]
+//      boot_scripts            boot script names for board
+//      boot_syslinux_conf      Ext Linux boot name [extlinux/extlinux.conf]
+//
+// Needed for network boot (nfs, dhcp)
+//      serverip                NFS/TFTP server
+//      gatewayip               NFS gateway
+//      ipaddr                  NFS local ip
+//      netmask                 NFS net mask
+//      netdev                  NFS net device name
+//      rootpath                NFS root path
+//
+// Needed for script targets (dhcp)
+//      scriptaddr              RAM address for loading script
+//
+// EFI support (dhcp, mmc?, scsi?, usb?)
+//      fdtfile                 name of fdt for EFI boot
+//      efi_dtb_prefixes        Search prefix in filesystem [/ /dtb /dtb/current]
+//      fdt_addr_r              EFI boot device tree [0x90000000]
+//      fdtcontroladdr          EFI dtb alternative  [0xfbb30f00]
+//      kernel_addr_r           EFI kernel load addr [0x81000000]
+//
+// Boot target specifics
+// dhcp
+//      boot_script_dhcp        name of DHCP boot script [boot.scr.uimg]
+//      boot_net_usb_start      run for USB network init [optional]
+//      boot_pci_enum           run for PCIe network init [optional]
+//
+// xspi
+//      kernel_start            QSPI offset for kernel.itb [0x1000000]
+//
+// nor
+//      kernel_start_nor        NOR address for kernel.itb [0x581000000]
+//
+//
+// The assumption is made that MMC/QSPI/NOR offsets are identical.
+//
+// NOTE: All "internal" names end with "_" and the names are seriously
+// abbreviated so that this can also be used in an 8KB environment and
+// still leave space for the board specific elements
+
+b_a_s_=load $dt_ $dn_:$dbp_ $scriptaddr $p_$f_;env exists secureboot&&load $dt_ $dn_:$dbp_ $scripthdraddr $p_$boot_script_hdr&&esbc_validate $scripthdraddr;run b_a_s__
+b_a_s__=setenv devtype $dt_;setenv devnum $dn_;setenv devpart_boot $dpb_;source $scriptaddr
+b_e_bin_=if fdt addr $fdt_addr_r;then bootefi bootmgr $fdt_addr_r;else bootefi bootmgr $fdtcontroladdr;fi;load $dt_ $dn_:$dbp_ $kernel_addr_r efi/boot/bootaa64.efi;if fdt addr $fdt_addr_r;then bootefi $kernel_addr_r $fdt_addr_r;else bootefi $kernel_addr_r $fdtcontroladdr;fi
+b_el_=sysboot $dt_ $dn_:$dbp_ any $scriptaddr $p_$boot_syslinux_conf
+b_il_=echo "Trying to load $boot_itbname from $t_..";load $dt_ $dn_:$dbp_ $load_addr $p_$boot_itbname&&bootm $load_addr -
+b_sba_=run rd_${dt_}_;rootdev=$rd_;bootargsextra=$bae_;run setbootargs;
+
+distro_bootcmd=for t_ in $boot_targets;do run bootcmd_$t_;done
+
+bootcmd=run bootcmd_iv_;env exists bootcmd_debug&&run bootcmd_debug;run distro_bootcmd;env exists secureboot&&esbc_halt;
+bootcmd_ni_=nfs mmc nvme scsi usb xspi nor rcwdev
+bootcmd_vars_=p_ dn_ dt_ dbp_ rd_ bae_ eoa_ eov_ x_ s_ f_ bootargsextra rootdev devtype devnum devpart_boot
+bootcmd_iv_=setenv t_;for t_ in $bootcmd_ni_;do env exists ${t_}_b_&&setenv ${t_}_ni_&&${t_}_ni_=true;done;for t_ in $bootcmd_vars_;do setenv $t_;done
+
+bootcmd_dhcp=env exists boot_net_usb_start&&run boot_net_usb_start;env exists boot_pci_enum&&run boot_pci_enum;if dhcp $scriptaddr $boot_script_dhcp;then run b_a_s__;fi;\
+ f_=$fdtfile;eov_=$bootp_vci;eoa_=$bootp_arch;setenv bootp_vci PXEClient:Arch:00011:UNDI:003000;setenv bootp_arch 0xb;\
+ if dhcp $kernel_addr_r;then tftpboot $fdt_addr_r dtb/$f_;if fdt addr $fdt_addr_r;then bootefi $kernel_addr_r $fdt_addr_r;else bootefi $kernel_addr_r $fdtcontroladdr;fi;fi;setenv bootp_vci $eov_;setenv bootp_arch $eoa_
+bootcmd_nfs=dt_=nfs;run bc_dt_
+bootcmd_mmc0=dn_=0;dt_=mmc;run bc_dt_
+bootcmd_mmc1=dn_=1;dt_=mmc;run bc_dt_
+bootcmd_nvme0=dn_=0;dt_=nvme;run bc_dt_
+bootcmd_nvme1=dn_=1;dt_=nvme;run bc_dt_
+bootcmd_scsi0=dn_=0;dt_=scsi;run bc_dt_
+bootcmd_scsi1=dn_=1;dt_=scsi;run bc_dt_
+bootcmd_usb0=dn_=0;dt_=usb;run bc_dt_
+bootcmd_usb1=dn_=1;dt_=usb;run bc_dt_
+bootcmd_xspi=dn_=0;dt_=xspi;run bc_dt_
+bootcmd_nor=dn_=0;dt_=nor;run bc_dt_
+bootcmd_rcwdev=env exists setrcwdev&&run setrcwdev&&run bootcmd_$rcwdev
+bc_dt_=env exists ${dt_}_i_&&run ${dt_}_i_;run ${dt_}_b_
+
+xspi_b_=run b_sba_;echo "Loading kernel.itb from QSPI flash..";sf probe $dn_:0&&sf read $load_addr $kernel_start $kernel_size ;env exists secureboot&&sf read $kernelheader_addr_r $kernelheader_start $kernelheader_size&&esbc_validate $kernelheader_addr_r;bootm $load_addr
+nor_b_=run b_sba_;echo "Loading kernel.itb from NOR flash..";cp.b $kernel_start_nor $load_addr $kernel_size;env exists secureboot&&cp.b $kernelheader_start_nor $kernelheader_addr_r $kernelheader_size&&esbc_validate $kernelheader_addr_r;bootm $load_addr
+nfs_b_=dt_=$rcwdev;run b_sba_;run ${dt_}_b_
+dev_b_=if $dt_ dev $dn_;then run scan_dev_for_boot_part;fi
+mmc_b_=run dev_b_
+nvme_b_=run dev_b_
+scsi_b_=run dev_b_
+usb_b_=run dev_b_
+nvme_i_=if $nvme_ni_;then nvme_ni_=false;nvme scan;fi
+scsi_i_=if $scsi_ni_;then scsi_ni_=false;scsi scan;fi
+usb_i_=if $usb_ni_;then usb_ni_=false;usb start;fi
+
+rd_nfs_=rd_=nfs;bae_="rw nfsroot=$serverip:$rootpath ip=$ipaddr:$serverip:$gatewayip:$netmask:$hostname:$netdev:off"
+rd_mmc_=rd_="mmcblk${dn_}p$dbp_";bae_="noinitrd"
+rd_nvme_=rd_="nvme${dn_}n1p$dbp_";bae_="noinitrd"
+rd_scsi_=rd_="sda$dbp_";bae_="noinitrd"
+rd_usb_=rd_="sdc$dbp_";bae_="noinitrd"
+rd_xspi_=rd_="ram0";bae_="ramdisk_size=$ramdisk_size"
+rd_nor_=rd_="ram0";bae_="ramdisk_size=$ramdisk_size"
+
+load_efi_dtb=load $dt_ $dn_:$dbp_ $fdt_addr_r $p_$f_
+
+scan_dev_for_boot_part=part list $dt_ $dn_ devplist;env exists devplist || devplist=1;for dbp_ in $devplist;do if fstype $dt_ $dn_:$dbp_ bootfstype;then run scan_dfboot_;fi;done
+scan_dfboot_=echo Scanning $dt_ $dn_:$dbp_...;run b_sba_;for p_ in $boot_prefixes;do run scan_dfextlinux_;run scan_dfscripts_;run scan_dfitblinux_;done;run scan_dfefi_;
+scan_dfefi_=f_=$fdtfile;for p_ in $efi_dtb_prefixes;do if test -e $dt_ $dn_:$dbp_ $p_$f_;then run load_efi_dtb;fi;done;if test -e $dt_ $dn_:$dbp_ efi/boot/bootaa64.efi;then echo Found EFI removable media binary efi/boot/bootaa64.efi;run b_e_bin_;echo EFI LOAD FAILED: continuing...;fi;
+scan_dflinux_=for f_ in $s_; do if test -e $dt_ $dn_:$dbp_ $p_$f_;then echo Found $p_$f_;run $x_;echo Booting $f_ FAILED: continuing...;fi;done
+scan_dfextlinux_=x_=b_el_;s_=$boot_syslinux_conf;run scan_dflinux_
+scan_dfitblinux_=x_=b_il_;s_=$boot_itbname;run scan_dflinux_
+scan_dfscripts_=x_=b_a_s_;s_=$boot_scripts;run scan_dflinux_
+

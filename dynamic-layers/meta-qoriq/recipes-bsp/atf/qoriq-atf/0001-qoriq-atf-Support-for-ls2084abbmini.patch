@@ -1,0 +1,373 @@
+From c927910d5af010f81f66ada49316ddd56cd29f97 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Wed, 18 Jan 2023 10:45:18 +0100
+Subject: [PATCH] qoriq-atf: Support for ls2084abbmini
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ plat/nxp/soc-ls2088a/ls2084abbmini/ddr_init.c | 132 ++++++++++++++++++
+ plat/nxp/soc-ls2088a/ls2084abbmini/plat_def.h |  79 +++++++++++
+ plat/nxp/soc-ls2088a/ls2084abbmini/platform.c |  28 ++++
+ .../nxp/soc-ls2088a/ls2084abbmini/platform.mk |  38 +++++
+ .../soc-ls2088a/ls2084abbmini/platform_def.h  |  13 ++
+ plat/nxp/soc-ls2088a/ls2084abbmini/policy.h   |  23 +++
+ 6 files changed, 313 insertions(+)
+ create mode 100644 plat/nxp/soc-ls2088a/ls2084abbmini/ddr_init.c
+ create mode 100644 plat/nxp/soc-ls2088a/ls2084abbmini/plat_def.h
+ create mode 100644 plat/nxp/soc-ls2088a/ls2084abbmini/platform.c
+ create mode 100644 plat/nxp/soc-ls2088a/ls2084abbmini/platform.mk
+ create mode 100644 plat/nxp/soc-ls2088a/ls2084abbmini/platform_def.h
+ create mode 100644 plat/nxp/soc-ls2088a/ls2084abbmini/policy.h
+
+diff --git a/plat/nxp/soc-ls2088a/ls2084abbmini/ddr_init.c b/plat/nxp/soc-ls2088a/ls2084abbmini/ddr_init.c
+new file mode 100644
+index 000000000..9734608f9
+--- /dev/null
++++ b/plat/nxp/soc-ls2088a/ls2084abbmini/ddr_init.c
+@@ -0,0 +1,132 @@
++/*
++ * Copyright 2018-2019, 2023 NXP
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <errno.h>
++
++#include <common/debug.h>
++#include <ddr.h>
++#include <lib/utils.h>
++
++#include <platform_def.h>
++
++#ifdef CONFIG_STATIC_DDR
++#error No static value defined
++#endif
++
++static const struct rc_timing rcb_1[] = {
++	{U(1600), U(10), U(9)},
++	{U(1867), U(12), U(0xB)},
++	{U(2134), U(12), U(0xB)},
++	{}
++};
++
++static const struct rc_timing rce_1[] = {
++	{U(1600), U(10), U(9)},
++	{U(1867), U(12), U(0xA)},
++	{U(2134), U(12), U(0xB)},
++	{}
++};
++
++static const struct board_timing udimm1[] = {
++	{U(0x01), rcb_1, U(0x01020306), U(0x07090A00)},
++	{U(0x04), rce_1, U(0x01020407), U(0x090A0B05)},
++	{U(0x1f), rce_1, U(0x01020306), U(0x07080903)},
++};
++
++static const struct rc_timing rcb[] = {
++	{U(1600), U(8), U(0x0F)},
++	{U(1867), U(8), U(0x10)},
++	{U(2134), U(8), U(0x13)},
++	{}
++};
++
++static const struct board_timing rdimm[] = {
++	{U(0x01), rcb, U(0xFEFCFAFA), U(0xFAFCFEF9)},
++	{U(0x04), rcb, U(0xFEFCFAFA), U(0xFAFCFEF9)},
++};
++
++int ddr_board_options(struct ddr_info *priv)
++{
++	struct memctl_opt *popts = &priv->opt;
++	const struct ddr_conf *conf = &priv->conf;
++	const unsigned long ddr_freq = priv->clk / 1000000;
++	int ret;
++
++	if (popts->rdimm) {
++		ret = cal_board_params(priv, rdimm,
++				       ARRAY_SIZE(rdimm));
++	} else {
++		ret = cal_board_params(priv, udimm1,
++				       ARRAY_SIZE(udimm1));
++	}
++	if (ret != 0) {
++		return ret;
++	}
++
++	popts->cpo_sample = U(0x78);
++
++	popts->wrlvl_override = 1;
++	popts->wrlvl_sample = 0x0;	/* 32 clocks */
++
++	if (ddr_freq < 2350) {
++		if (conf->cs_in_use == 0xf) {
++			popts->ddr_cdr1 = DDR_CDR1_DHC_EN |
++					  DDR_CDR1_ODT(DDR_CDR_ODT_80ohm);
++			popts->ddr_cdr2 = DDR_CDR2_ODT(DDR_CDR_ODT_80ohm);
++			popts->twot_en = 1;	/* enable 2T timing */
++		} else {
++			popts->ddr_cdr1 = DDR_CDR1_DHC_EN |
++					  DDR_CDR1_ODT(DDR_CDR_ODT_60ohm);
++			popts->ddr_cdr2 = DDR_CDR2_ODT(DDR_CDR_ODT_60ohm) |
++					  DDR_CDR2_VREF_RANGE_2;
++		}
++	} else {
++		popts->ddr_cdr1 = DDR_CDR1_DHC_EN |
++				  DDR_CDR1_ODT(DDR_CDR_ODT_100ohm);
++		popts->ddr_cdr2 = DDR_CDR2_ODT(DDR_CDR_ODT_100ohm) |
++				  DDR_CDR2_VREF_RANGE_2;
++	}
++
++	return 0;
++}
++
++long long init_ddr(void)
++{
++	int spd_addr[] = { 0x51, 0x53 };
++	struct ddr_info info;
++	struct sysinfo sys;
++	long long dram_size;
++
++	zeromem(&sys, sizeof(sys));
++	get_clocks(&sys);
++	debug("platform clock %lu\n", sys.freq_platform);
++	debug("DDR PLL1 %lu\n", sys.freq_ddr_pll0);
++	debug("DDR PLL2 %lu\n", sys.freq_ddr_pll1);
++
++	zeromem(&info, sizeof(info));
++	/* Set two DDRC here. Unused DDRC will be removed automatically. */
++	info.num_ctlrs = NUM_OF_DDRC;
++	info.dimm_on_ctlr = DDRC_NUM_DIMM;
++	info.spd_addr = spd_addr;
++	info.ddr[0] = (void *)NXP_DDR_ADDR;
++	info.ddr[1] = (void *)NXP_DDR2_ADDR;
++	info.clk = get_ddr_freq(&sys, 0);
++	if (info.clk == 0) {
++		info.clk = get_ddr_freq(&sys, 1);
++	}
++
++	dram_size = dram_init(&info
++#if defined(NXP_HAS_CCN504) || defined(NXP_HAS_CCN508)
++		    , NXP_CCN_HN_F_0_ADDR
++#endif
++		    );
++
++	if (dram_size < 0) {
++		ERROR("DDR init failed.\n");
++	}
++
++	return dram_size;
++}
+diff --git a/plat/nxp/soc-ls2088a/ls2084abbmini/plat_def.h b/plat/nxp/soc-ls2088a/ls2084abbmini/plat_def.h
+new file mode 100644
+index 000000000..1160d4d13
+--- /dev/null
++++ b/plat/nxp/soc-ls2088a/ls2084abbmini/plat_def.h
+@@ -0,0 +1,79 @@
++/*
++ * Copyright 2018, 2023 NXP
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PLAT_DEF_H
++#define PLAT_DEF_H
++
++#include <arch.h>
++/*
++ * Required without TBBR.
++ * To include the defines for DDR PHY
++ * Images.
++ */
++#include <tbbr_img_def.h>
++
++#include <policy.h>
++#include <soc.h>
++
++#define NXP_SYSCLK_FREQ		100000000
++#define NXP_DDRCLK_FREQ		133333333
++
++/* UART related definition */
++#define NXP_CONSOLE_ADDR	NXP_UART1_ADDR
++#define NXP_CONSOLE_BAUDRATE	115200
++
++/* Size of cacheable stacks */
++#if defined(IMAGE_BL2)
++#if defined(TRUSTED_BOARD_BOOT)
++#define PLATFORM_STACK_SIZE	0x2000
++#else
++#define PLATFORM_STACK_SIZE	0x1000
++#endif
++#elif defined(IMAGE_BL31)
++#define PLATFORM_STACK_SIZE	0x2000
++#endif
++
++#define FIRMWARE_WELCOME_STR	"Welcome to BlueBox Mini Trusted Boot\n"
++
++#define BL2_START		NXP_OCRAM_ADDR
++#ifdef SD_BOOT
++#define BL2_LIMIT		(NXP_OCRAM_ADDR + NXP_OCRAM_SIZE - NXP_SD_BLOCK_BUF_SIZE)
++#else
++#define BL2_LIMIT		(NXP_OCRAM_ADDR + NXP_OCRAM_SIZE)
++#endif
++#define BL2_NOLOAD_START	NXP_OCRAM_ADDR
++#define BL2_NOLOAD_LIMIT	BL2_BASE
++
++
++/* SD block buffer */
++#define NXP_SD_BLOCK_BUF_SIZE	(0x3000)
++#define NXP_SD_BLOCK_BUF_ADDR	(NXP_OCRAM_ADDR + NXP_OCRAM_SIZE - NXP_SD_BLOCK_BUF_SIZE)
++
++
++/* IO defines as needed by IO driver framework */
++#define MAX_IO_DEVICES		4
++#define MAX_IO_BLOCK_DEVICES	1
++#define MAX_IO_HANDLES		4
++
++#define BL31_WDOG_SEC		89
++
++/*
++ * Define properties of Group 1 Secure and Group 0 interrupts as per GICv3
++ * terminology. On a GICv2 system or mode, the lists will be merged and treated
++ * as Group 0 interrupts.
++ */
++#define PLAT_LS_G1S_IRQ_PROPS(grp) \
++	INTR_PROP_DESC(BL32_IRQ_SEC_PHY_TIMER, GIC_HIGHEST_SEC_PRIORITY, grp, \
++			GIC_INTR_CFG_EDGE)
++
++/* SGI 15 and Secure watchdog interrupts assigned to Group 0 */
++#define PLAT_LS_G0_IRQ_PROPS(grp)	\
++	INTR_PROP_DESC(BL31_WDOG_SEC, GIC_HIGHEST_SEC_PRIORITY, grp, \
++			GIC_INTR_CFG_EDGE), \
++	INTR_PROP_DESC(15, GIC_HIGHEST_SEC_PRIORITY, grp, \
++			GIC_INTR_CFG_LEVEL)
++
++#endif /* PLAT_DEF_H */
+diff --git a/plat/nxp/soc-ls2088a/ls2084abbmini/platform.c b/plat/nxp/soc-ls2088a/ls2084abbmini/platform.c
+new file mode 100644
+index 000000000..8b3eadabf
+--- /dev/null
++++ b/plat/nxp/soc-ls2088a/ls2084abbmini/platform.c
+@@ -0,0 +1,28 @@
++/*
++ * Copyright 2022 NXP
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <plat_common.h>
++
++#pragma weak board_enable_povdd
++#pragma weak board_disable_povdd
++
++bool board_enable_povdd(void)
++{
++#ifdef CONFIG_POVDD_ENABLE
++	return true;
++#else
++	return false;
++#endif
++}
++
++bool board_disable_povdd(void)
++{
++#ifdef CONFIG_POVDD_ENABLE
++	return true;
++#else
++	return false;
++#endif
++}
+diff --git a/plat/nxp/soc-ls2088a/ls2084abbmini/platform.mk b/plat/nxp/soc-ls2088a/ls2084abbmini/platform.mk
+new file mode 100644
+index 000000000..f1652ac4a
+--- /dev/null
++++ b/plat/nxp/soc-ls2088a/ls2084abbmini/platform.mk
+@@ -0,0 +1,38 @@
++#
++# Copyright 2018, 2023 NXP
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++
++# board-specific build parameters
++BOOT_MODE		?=	nor
++BOARD			:=	ls2084abbmini
++POVDD_ENABLE		:=	no
++
++# DDR Compilation Configs
++CONFIG_DDR_NODIMM	:=	0
++NUM_OF_DDRC		:=	2
++DDRC_NUM_DIMM		:=	1
++DDRC_NUM_CS		:=	4
++DDR_ECC_EN		:=	yes
++CONFIG_STATIC_DDR 	:=	0
++
++# On-Board Flash Details
++# 128MB IFC NOR Flash
++NOR_FLASH_SZ		:=	0x8000000
++
++# Platform specific features.
++WARM_BOOT		:=	no
++
++# Adding Platform files build files
++BL2_SOURCES	+=	${BOARD_PATH}/ddr_init.c\
++			${BOARD_PATH}/platform.c
++
++SUPPORTED_BOOT_MODE	:=	nor	\
++				sd
++
++# Adding platform board build info
++include plat/nxp/common/plat_make_helper/plat_common_def.mk
++
++# Adding SoC build info
++include plat/nxp/soc-ls2088a/soc.mk
+diff --git a/plat/nxp/soc-ls2088a/ls2084abbmini/platform_def.h b/plat/nxp/soc-ls2088a/ls2084abbmini/platform_def.h
+new file mode 100644
+index 000000000..9a3007e9a
+--- /dev/null
++++ b/plat/nxp/soc-ls2088a/ls2084abbmini/platform_def.h
+@@ -0,0 +1,13 @@
++/*
++ * Copyright 2022 NXP
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PLATFORM_DEF_H
++#define PLATFORM_DEF_H
++
++#include "plat_def.h"
++#include "plat_default_def.h"
++
++#endif
+diff --git a/plat/nxp/soc-ls2088a/ls2084abbmini/policy.h b/plat/nxp/soc-ls2088a/ls2084abbmini/policy.h
+new file mode 100644
+index 000000000..0b426f362
+--- /dev/null
++++ b/plat/nxp/soc-ls2088a/ls2084abbmini/policy.h
+@@ -0,0 +1,23 @@
++/*
++ * Copyright 2018, 2023 NXP
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef POLICY_H
++#define	POLICY_H
++
++/*
++ * Set this to 0x0 to leave the default SMMU page size in sACR
++ * Set this to 0x1 to change the SMMU page size to 64K
++ */
++#define POLICY_SMMU_PAGESZ_64K	0x1
++
++/*
++ * POLICY_PERF_WRIOP = 0 : No Performance enhancement for WRIOP RN-I
++ * POLICY_PERF_WRIOP = 1 : No Performance enhancement for WRIOP RN-I = 7
++ * POLICY_PERF_WRIOP = 2 : No Performance enhancement for WRIOP RN-I = 23
++ */
++#define POLICY_PERF_WRIOP	0
++
++#endif /* POLICY_H */
+-- 
+2.34.1
+

@@ -1,0 +1,34 @@
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+auto fm1-mac1
+iface fm1-mac1 inet dhcp
+dhcpcd_opts -Gb
+
+auto fm1-mac2
+iface fm1-mac2 inet dhcp
+dhcpcd_opts -Gb
+
+auto fm1-mac3
+iface fm1-mac3 inet dhcp
+dhcpcd_opts -Gb
+
+auto fm1-mac4
+iface fm1-mac4 inet dhcp
+dhcpcd_opts -Gb
+
+auto fm1-mac5
+iface fm1-mac5 inet dhcp
+dhcpcd_opts -Gb
+
+auto fm1-mac6
+iface fm1-mac6 inet dhcp
+dhcpcd_opts -Gb
+
+auto fm1-mac9
+iface fm1-mac9 inet dhcp
+dhcpcd_opts -Gb
+

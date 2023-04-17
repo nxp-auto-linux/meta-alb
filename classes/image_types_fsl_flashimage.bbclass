@@ -67,22 +67,16 @@ python __anonymous () {
 add_flash_region () {
         # Add a new flash region for writing an image
         # Check if there is an overlap with an existing region
-
         start="$1"
         size="$2"
         name="$3"
 
         end=$(printf "%d + %d\n" ${start} ${size} | bc)
 
-        restore_ifs=$IFS
-        IN="${flash_regions}"
-
-        set -- "$IN"
-        IFS=';'
-        for entry in ${IN}; do
-                start0=$(echo ${entry} | cut -d '-' -f1)
-                end0=$(echo ${entry} | cut -d '-' -f2)
-                if ((start <= end0 && end >= start0)); then
+        for entry in ${flash_regions}; do
+                start0=$(printf "%s" ${entry} | cut -d '-' -f1)
+                end0=$(printf "%s" ${entry} | cut -d '-' -f2)
+                if [ "${start}" -lt "${end0}" ] && [ "${end}" -gt "${start0}" ]; then
                         error_str=$(printf "%s (0x%x - 0x%x) overlaps with (0x%x - 0x%x)" "${name}" "${start}" "${end}" "${start0}" "${end0}")
                         bberror "Flash regions overlap: ${error_str}"
                         exit 1
@@ -90,9 +84,8 @@ add_flash_region () {
         done
 
         # Save regions in string using format:
-        #     start0-end0;start1-end1; ...
-        flash_regions="${flash_regions}${start}-${end};"
-        IFS=${restore_ifs}
+        #     start0-end0 start1-end1 ...
+        flash_regions="${flash_regions} ${start}-${end}"
 }
 
 #
@@ -107,7 +100,7 @@ generate_flashimage_entry() {
 
         if [ -n "${FLASHIMAGE_FILE}" ]; then
                 if [ -z "${FLASHIMAGE_FILE_OFFSET_VARIABLE}" ]; then
-                    bberror "${FLASHIMAGE_FILE} is set but offset for this file inside the flashimage is undefined"
+                    bberror "${FLASHIMAGE_FILE} is set but offset ${FLASHIMAGE_FILE_OFFSET_NAME} for this file inside the flashimage is undefined"
                     exit 1
                 fi
 
@@ -126,7 +119,8 @@ generate_flashimage_entry() {
                 if [ "${FLASHIMAGE_BANK4}" = "yes" ]; then
                         if [ ${FLASHIMAGE_FILE_OFFSET} -lt ${FLASHIMAGE_BANK4_XOR} ]; then
                                 if [ ${FLASHIMAGE_MAX} -gt ${FLASHIMAGE_BANK4_XOR} ]; then
-                                        bberror "${FLASHIMAGE_FILE} is reaching into flash bank 4 to ${FLASHIMAGE_MAX}. Please reduce size or turn off bank 4 in the config!"
+                                        error_str=$(printf "%s is reaching into flash bank 4 to 0x%x. Please reduce size or turn off bank 4 in the config!" "${FLASHIMAGE_FILE}" ${FLASHIMAGE_MAX})
+                                        bberror "${error_str}"
                                         exit 1
                                 fi
                         fi
@@ -142,6 +136,9 @@ generate_flashimage_entry() {
                         # and it's inability to support any xor operation.
                         # This only works because our xor operation really is half the overall size.
                         FLASHIMAGE_TMP=$(printf "(%d + %d) %% %d\n" ${FLASHIMAGE_FILE_OFFSET} ${FLASHIMAGE_BANK4_XOR} ${FLASHIMAGE_SIZE_D} | bc)
+
+                        add_flash_region "${FLASHIMAGE_TMP}" "${FLASHIMAGE_FILE_SIZE}" "${FLASHIMAGE_FILE_OFFSET_NAME}"
+
                         bbnote "Generating flashimage entry at ${FLASHIMAGE_TMP} for ${FLASHIMAGE_FILE}"
                         dd if=${FLASHIMAGE_FILE} of=${FLASHIMAGE} conv=notrunc,fsync bs=32K oflag=seek_bytes seek=${FLASHIMAGE_TMP}
                 fi

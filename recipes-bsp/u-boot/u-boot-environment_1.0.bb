@@ -19,7 +19,7 @@ def uboot_env_get_uri_list(env_list):
 
 UBOOT_ENV_NAME ??= "u-boot-flashenv"
 SRC_URI = " \
-    ${@uboot_env_get_uri_list(d.getVar('UBOOT_ENV_NAME', True))} \
+    ${@uboot_env_get_uri_list(d.getVar('UBOOT_ENV_NAME'))} \
 "
 
 DEFAULT_ENV:s32 ??= "u-boot-default-flashenv"
@@ -35,6 +35,10 @@ UBOOT_ENV_NAME_MAP:s32 = " \
 	u-boot-flashenv    : qspi; \
 	u-boot-flashenv-sd : sdcard; \
 "
+
+# We support includes if specified in the machine conf
+UBOOT_ENV_INC_NAME ??= ""
+SRC_URI:append = " ${@uboot_env_get_uri_list(d.getVar('UBOOT_ENV_INC_NAME'))}"
 
 require u-boot-environment.inc
 

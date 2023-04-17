@@ -8,4 +8,4 @@ SRC_URI += "\
 # due to gcc 10 setting -fno-common by default
 TOOLCHAIN_OPTIONS += "-fcommon"
 
-COMPATIBLE_MACHINE:append = "|(ls2080a|ls2084a)"
+COMPATIBLE_MACHINE:append = "|(ls2084a)"

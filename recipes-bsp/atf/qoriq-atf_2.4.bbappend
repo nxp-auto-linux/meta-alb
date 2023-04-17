@@ -12,7 +12,6 @@ RCW_FOLDER:ls1046abluebox = "ls1046ardb"
 PLATFORM:ls1046abluebox = "ls1046ardb"
 
 # We have slightly modified custom RCWs here
-PLATFORM:ls2080abluebox = "ls2088ardb"
 PLATFORM:ls2084abluebox = "ls2088ardb"
 
 DEPENDS:remove:ls2 = "u-boot-mkimage-native u-boot openssl openssl-native mbedtls rcw"

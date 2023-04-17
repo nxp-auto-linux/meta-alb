@@ -14,14 +14,6 @@ IMAGE_INSTALL += "\
 
 # Stuff that may not be in release SDKs, but we want it for the BlueBox
 # to be able to control it better on BlueBox Classic chassis
-IMAGE_INSTALL:append:ls2080ardb = " \
-    lmsensors-fancontrol \
-    lmsensors-pwmconfig \
-"
-IMAGE_INSTALL:append:ls2080abluebox = " \
-    lmsensors-fancontrol \
-    lmsensors-pwmconfig \
-"
 IMAGE_INSTALL:append:ls2084abluebox = " \
     lmsensors-fancontrol \
     lmsensors-pwmconfig \

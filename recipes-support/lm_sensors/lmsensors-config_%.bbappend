@@ -1,16 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 #-----------------------------------------------------------------------
-SRC_URI:append:ls2080abluebox = " \
-    file://bluebox.conf \
-"
-
-do_install:append:ls2080abluebox() {
-    # Install sensors configuration file
-    install -m 0644 ${WORKDIR}/bluebox.conf ${D}${sysconfdir}/sensors.d
-}
-
-#-----------------------------------------------------------------------
 SRC_URI:append:ls2084abluebox = " \
     file://bluebox.conf \
 "

@@ -1,5 +1,4 @@
 # Missing part family compatibility specifications
-REGLEX:ls2080a = "ls2080a"
 REGLEX:ls2084a = "ls2088a"
 REGLEX:ls2044a = "ls2088a"
 REGLEX:ls2048a = "ls2088a"

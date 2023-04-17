@@ -1,6 +1,6 @@
 /*
  * Copyright 2016 Freescale Semiconductor, Inc.
- * Copyright 2017 NXP
+ * Copyright 2017, 2023 NXP
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -12,12 +12,6 @@
  *   * Neither the name of the above-listed copyright holders nor the
  *     names of any contributors may be used to endorse or promote products
  *     derived from this software without specific prior written permission.
- *
- *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
- * Foundation, either version 2 of that License or (at your option) any
- * later version.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -33,7 +27,11 @@
  */
 
 /*
- * DPC for BlueBox Mini boards featuring SerDes 0x2A_0x41.
+ * DPC for ls2084a RDB boards featuring SerDes 0x2A_0x41.
+ * This DPC defines one network interface mapped on the ETH0 copper port.
+ * This together with the available DPMCP objects should be enough to boot Linux
+ * and to allow the dynamic addition of other objects to the Linux container,
+ * using the 'restool' utility.
  */
 /dts-v1/;
 /* DPC */
@@ -41,19 +39,23 @@
 	resources {
 		icid_pools {
 			icid_pool@1 {
-				num = <100>;
-				base_icid = <0>;
+				num = <0x64>;
+				base_icid = <0x0>;
 			};
 		};
 	};
 	mc_general {
+		/* Configure the DDR log */
 		log {
 			mode = "LOG_MODE_ON";
 			level = "LOG_LEVEL_WARNING";
 		};
+		/* Configure the UART log */
+		/* If CONSOLE_MODE_ON all commands take longer time to execute! */
 		console {
 			mode = "CONSOLE_MODE_OFF";
-			uart_id = <2>;
+			uart_id = <0x2>;
+			level = "LOG_LEVEL_WARNING";
 		};
 	};
 	controllers {
@@ -67,29 +69,20 @@
 		};
 	};
 	board_info {
-		/* For NXP BlueBox Mini SerDes 0x2a_41 */
+		/* For RDB SerDes 0x2a_41 */
 		ports {
 			/* AQR PHYs */
-			/* While these should be MAC_LINK_TYPE_PHY,
-			 * there is a DPAA2 driver deficiency currently
-			 * which leads to lack of flow-control, thereby
-			 * messing up transmit activity in 100M/1G
-			 * setups. Configuring the XFI link as 10G fixed
-			 * independent of the actual link speed helps
-			 * to stabilize the setup
-			 */
 			mac@5 {
-				link_type = "MAC_LINK_TYPE_FIXED";
+				link_type = "MAC_LINK_TYPE_PHY";
 			};
 			mac@6 {
-				link_type = "MAC_LINK_TYPE_FIXED";
+				link_type = "MAC_LINK_TYPE_PHY";
 			};
 			mac@7 {
-				link_type = "MAC_LINK_TYPE_FIXED";
+				link_type = "MAC_LINK_TYPE_PHY";
 			};
-			/* SFP+ cage */
-			mac@1 {
-				link_type = "MAC_LINK_TYPE_FIXED";
+			mac@8 {
+				link_type = "MAC_LINK_TYPE_PHY";
 			};
 		};
 	};

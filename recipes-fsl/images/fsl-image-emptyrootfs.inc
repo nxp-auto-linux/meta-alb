@@ -10,3 +10,5 @@ fakeroot python do_rootfs:prepend () {
 }
 inherit image
 ROOTFS_BOOTSTRAP_INSTALL = ""
+KERNELDEPMODDEPEND = ""
+KERNEL_DEPLOY_DEPEND = ""

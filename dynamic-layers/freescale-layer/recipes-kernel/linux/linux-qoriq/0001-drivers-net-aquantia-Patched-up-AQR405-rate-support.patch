@@ -1,0 +1,165 @@
+From a15f63736bd15af6fb7c1125990715af3c769a53 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Mon, 27 Feb 2023 15:24:11 +0100
+Subject: [PATCH] drivers/net/aquantia: Patched up AQR405 rate support
+
+The existing code, when used with an XFI/10GBASE- link to the MAC,
+killed the multirate capability of the AQR405. While this is not a
+full multirate patch in the sense that the PHY infrastructure knows
+about everything, it aligns more to AQR107 capabilities and does not
+mess up the default provisioning for 1G links anymore.
+We essentially relay on PAUSE frames for this patch to work.
+Basic connectivitiy is better than no connectivity however.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ drivers/net/phy/aquantia_main.c | 82 +++++++++++++++++++++++++++++----
+ 1 file changed, 74 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia_main.c
+index c0976adbe0df..35c07837c3d9 100644
+--- a/drivers/net/phy/aquantia_main.c
++++ b/drivers/net/phy/aquantia_main.c
+@@ -270,6 +270,24 @@ static int aqr_config_aneg(struct phy_device *phydev)
+ 	return genphy_c45_check_and_restart_aneg(phydev, changed);
+ }
+ 
++static int aqr405_config_aneg(struct phy_device *phydev)
++{
++	bool changed = false;
++	u16 reg;
++	int ret;
++
++	if (phydev->autoneg == AUTONEG_DISABLE)
++		return genphy_c45_pma_setup_forced(phydev);
++
++	ret = genphy_c45_an_config_aneg(phydev);
++	if (ret < 0)
++		return ret;
++	if (ret > 0)
++		changed = true;
++
++	return genphy_c45_check_and_restart_aneg(phydev, false);
++}
++
+ static struct {
+ 	u16 syscfg;
+ 	int cnt;
+@@ -599,6 +617,29 @@ static int aqr107_config_init(struct phy_device *phydev)
+ 	return aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
+ }
+ 
++static int aqr405_config_init(struct phy_device *phydev)
++{
++	int ret;
++
++	/* Check that the PHY interface type is compatible */
++	if (phydev->interface != PHY_INTERFACE_MODE_SGMII &&
++	    phydev->interface != PHY_INTERFACE_MODE_2500BASEX &&
++	    phydev->interface != PHY_INTERFACE_MODE_XGMII &&
++	    phydev->interface != PHY_INTERFACE_MODE_USXGMII &&
++	    phydev->interface != PHY_INTERFACE_MODE_10GKR &&
++	    phydev->interface != PHY_INTERFACE_MODE_10GBASER)
++		return -ENODEV;
++
++	WARN(phydev->interface == PHY_INTERFACE_MODE_XGMII,
++	     "Your devicetree is out of date, please update it. The AQR405 family doesn't support XGMII, maybe you mean USXGMII or 10GBASE-R.\n");
++
++	ret = aqr107_wait_reset_complete(phydev);
++	if (!ret)
++		aqr107_chip_info(phydev);
++
++	return aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
++}
++
+ static int aqcs109_config_init(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -623,33 +664,33 @@ static int aqcs109_config_init(struct phy_device *phydev)
+ 	return aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
+ }
+ 
+-static void aqr107_link_change_notify(struct phy_device *phydev)
++static int link_change_notify_common(struct phy_device *phydev)
+ {
+ 	u8 fw_major, fw_minor;
+ 	bool downshift, short_reach, afr;
+-	int mode, val;
++	int val;
+ 
+ 	if (phydev->state != PHY_RUNNING || phydev->autoneg == AUTONEG_DISABLE)
+-		return;
++		return -1;
+ 
+ 	val = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_RX_LP_STAT1);
+ 	/* call failed or link partner is no Aquantia PHY */
+ 	if (val < 0 || !(val & MDIO_AN_RX_LP_STAT1_AQ_PHY))
+-		return;
++		return -1;
+ 
+ 	short_reach = val & MDIO_AN_RX_LP_STAT1_SHORT_REACH;
+ 	downshift = val & MDIO_AN_RX_LP_STAT1_AQRATE_DOWNSHIFT;
+ 
+ 	val = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_RX_LP_STAT4);
+ 	if (val < 0)
+-		return;
++		return -1;
+ 
+ 	fw_major = FIELD_GET(MDIO_AN_RX_LP_STAT4_FW_MAJOR, val);
+ 	fw_minor = FIELD_GET(MDIO_AN_RX_LP_STAT4_FW_MINOR, val);
+ 
+ 	val = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_RX_VEND_STAT3);
+ 	if (val < 0)
+-		return;
++		return -1;
+ 
+ 	afr = val & MDIO_AN_RX_VEND_STAT3_AFR;
+ 
+@@ -659,6 +700,21 @@ static void aqr107_link_change_notify(struct phy_device *phydev)
+ 		   downshift ? ", fast-retrain downshift advertised" : "",
+ 		   afr ? ", fast reframe advertised" : "");
+ 
++	return 0;
++}
++
++static void link_change_notify(struct phy_device *phydev)
++{
++	(void)link_change_notify_common(phydev);
++}
++
++static void aqr107_link_change_notify(struct phy_device *phydev)
++{
++	int mode, val;
++
++	if (link_change_notify_common(phydev) < 0)
++		return;
++
+ 	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_RSVD_STAT9);
+ 	if (val < 0)
+ 		return;
+@@ -764,10 +820,20 @@ static struct phy_driver aqr_driver[] = {
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR405),
+ 	.name		= "Aquantia AQR405",
+-	.config_aneg    = aqr_config_aneg,
++	.probe		= aqr107_probe,
++	.config_init	= aqr405_config_init,
++	.config_aneg    = aqr405_config_aneg,
+ 	.config_intr	= aqr_config_intr,
+ 	.handle_interrupt = aqr_handle_interrupt,
+-	.read_status	= aqr_read_status,
++	.read_status	= aqr107_read_status,
++	.get_tunable    = aqr107_get_tunable,
++	.set_tunable    = aqr107_set_tunable,
++	.suspend	= aqr107_suspend,
++	.resume		= aqr107_resume,
++	.get_sset_count	= aqr107_get_sset_count,
++	.get_strings	= aqr107_get_strings,
++	.get_stats	= aqr107_get_stats,
++	.link_change_notify = link_change_notify,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR112),
+-- 
+2.34.1
+

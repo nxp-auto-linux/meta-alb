@@ -1,20 +1,20 @@
-From 2b99cc5fdb20035f1ec3e698a449562f61144c1a Mon Sep 17 00:00:00 2001
-From: nxa15299 <Heinz.Wrobel@nxp.com>
-Date: Fri, 12 Jan 2018 11:12:20 +0100
-Subject: [PATCH] kernel: LS2 RDB device tree was not quite correct
+From 15a0c0e517947d9261a427d6078627c737cf7d5b Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Tue, 27 Dec 2022 17:35:09 +0100
+Subject: [PATCH 2/2] kernel: LS2 RDB device tree was not quite correct
 
 The WD chip for fan control was missing
 
-Signed-off-by: nxa15299 <Heinz.Wrobel@nxp.com>
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  arch/arm64/boot/dts/freescale/fsl-ls208xa-rdb.dtsi | 13 +++++++++++++
  1 file changed, 13 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/freescale/fsl-ls208xa-rdb.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls208xa-rdb.dtsi
-index 8e919dc..f6235f8 100644
+index a752f06a2e74..cedb2ae2e0ef 100644
 --- a/arch/arm64/boot/dts/freescale/fsl-ls208xa-rdb.dtsi
 +++ b/arch/arm64/boot/dts/freescale/fsl-ls208xa-rdb.dtsi
-@@ -106,6 +106,19 @@
+@@ -85,6 +85,19 @@ adt7481@4c {
  				reg = <0x4c>;
  			};
  		};
@@ -35,5 +35,5 @@ index 8e919dc..f6235f8 100644
  };
  
 -- 
-1.8.3.1
+2.34.1
 

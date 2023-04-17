@@ -1,0 +1,926 @@
+From 19acdffd79cca3a0a2237a4eb60c6e43af0564da Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Sat, 1 Apr 2023 19:54:10 +0200
+Subject: [PATCH] linux-qoriq: dts support for BlueBox3
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ .../freescale/fsl-lx2160a-bluebox3-rev-a.dts  |  23 +
+ .../dts/freescale/fsl-lx2160a-bluebox3.dts    | 875 ++++++++++++++++++
+ 2 files changed, 898 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3-rev-a.dts
+ create mode 100644 arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3-rev-a.dts b/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3-rev-a.dts
+new file mode 100644
+index 000000000000..5911e72bbb60
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3-rev-a.dts
+@@ -0,0 +1,23 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++//
++// Device Tree file for LX2160A BlueBox3 Rev A
++//
++// Copyright 2020, 2023 NXP
++
++/dts-v1/;
++
++#include "fsl-lx2160a-bluebox3.dts"
++
++&sw1_mii3_phy {
++	/* AR8035 PHY address */
++	reg = <0x1>;
++};
++
++&sw2_mii3_phy {
++	/* AR8035 PHY address */
++	reg = <0x2>;
++};
++
++&usb1 {
++	status = "disabled";
++};
+diff --git a/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts b/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts
+new file mode 100644
+index 000000000000..69b73999fec4
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dts
+@@ -0,0 +1,875 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++//
++// Device Tree file for LX2160A BlueBox3
++//
++// Copyright 2020-2021, 2023 NXP
++
++/dts-v1/;
++
++#include "fsl-lx2160a.dtsi"
++
++/ {
++	model = "NXP Layerscape LX2160A BlueBox3";
++	compatible = "fsl,lx2160a-rdb", "fsl,lx2160a";
++
++	aliases {
++		crypto = &crypto;
++		serial0 = &uart0;
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++	};
++
++	sb_3v3: regulator-sb3v3 {
++		compatible = "regulator-fixed";
++		regulator-name = "MC34717-3.3VSB";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++};
++
++&crypto {
++	status = "okay";
++};
++
++&dpmac5 {
++	phy-handle = <&aquantia_phy1>;
++	phy-connection-type = "usxgmii";
++	managed = "in-band-status";
++};
++
++&dpmac6 {
++	phy-handle = <&aquantia_phy2>;
++	phy-connection-type = "usxgmii";
++	managed = "in-band-status";
++};
++
++&dpmac9 {
++	phy-handle = <&aquantia_phy3>;
++	phy-connection-type = "usxgmii";
++	managed = "in-band-status";
++};
++
++&dpmac10 {
++	phy-handle = <&aquantia_phy4>;
++	phy-connection-type = "usxgmii";
++	managed = "in-band-status";
++};
++
++&dpmac17 {
++	phy-connection-type = "rgmii-id";
++
++	fixed-link {
++		speed = <1000>;
++		full-duplex;
++	};
++};
++
++&dpmac18 {
++	phy-connection-type = "rgmii-id";
++
++	fixed-link {
++		speed = <1000>;
++		full-duplex;
++	};
++};
++
++&emdio1 {
++	status = "okay";
++	sw1_mii3_phy: ethernet-phy@1 {
++		/* AR8035 PHY */
++		compatible = "ethernet-phy-id004d.d072";
++		interrupts-extended = <&extirq 6 IRQ_TYPE_LEVEL_LOW>;
++		reg = <0x5>;
++		eee-broken-1000t;
++	};
++
++	sw2_mii3_phy: ethernet-phy@2 {
++		/* AR8035 PHY */
++		compatible = "ethernet-phy-id004d.d072";
++		interrupts-extended = <&extirq 7 IRQ_TYPE_LEVEL_LOW>;
++		reg = <0x6>;
++		eee-broken-1000t;
++	};
++
++	aquantia_phy1: ethernet-phy@8 {
++		/* AQR113 PHY */
++		compatible = "ethernet-phy-id31c3.1c12", "ethernet-phy-ieee802.3-c45";
++		interrupts-extended = <&extirq 2 IRQ_TYPE_LEVEL_LOW>;
++		reg = <0x8>;
++	};
++
++	aquantia_phy2: ethernet-phy@0 {
++		/* AQR113 PHY */
++		compatible = "ethernet-phy-id31c3.1c12", "ethernet-phy-ieee802.3-c45";
++		interrupts-extended = <&extirq 3 IRQ_TYPE_LEVEL_LOW>;
++		reg = <0x0>;
++	};
++};
++
++&can0 {
++	status = "okay";
++
++	can-transceiver {
++		max-bitrate = <5000000>;
++	};
++};
++
++&can1 {
++	status = "okay";
++
++	can-transceiver {
++		max-bitrate = <5000000>;
++	};
++};
++
++&emdio2 {
++	status = "okay";
++
++	aquantia_phy3: ethernet-phy@8 {
++		/* AQR113 PHY */
++		compatible = "ethernet-phy-id31c3.1c12", "ethernet-phy-ieee802.3-c45";
++		interrupts-extended = <&extirq 4 IRQ_TYPE_LEVEL_LOW>;
++		reg = <0x8>;
++	};
++
++	aquantia_phy4: ethernet-phy@0 {
++		/* AQR113 PHY */
++		compatible = "ethernet-phy-id31c3.1c12", "ethernet-phy-ieee802.3-c45";
++		interrupts-extended = <&extirq 5 IRQ_TYPE_LEVEL_LOW>;
++		reg = <0x0>;
++	};
++};
++
++&pcs_mdio5 {
++	status = "okay";
++};
++
++&pcs_mdio6 {
++	status = "okay";
++};
++
++&pcs_mdio9 {
++	status = "okay";
++};
++
++&pcs_mdio10 {
++	status = "okay";
++};
++
++&esdhc0 {
++	sd-uhs-sdr104;
++	sd-uhs-sdr50;
++	sd-uhs-sdr25;
++	sd-uhs-sdr12;
++	status = "okay";
++};
++
++&esdhc1 {
++	mmc-hs200-1_8v;
++	mmc-hs400-1_8v;
++	bus-width = <8>;
++	status = "okay";
++};
++
++&fspi {
++	status = "okay";
++
++	mt35xu512aba0: flash@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		m25p,fast-read;
++		spi-max-frequency = <50000000>;
++		reg = <0>;
++		spi-rx-bus-width = <8>;
++		spi-tx-bus-width = <8>;
++	};
++
++	mt35xu512aba1: flash@1 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		m25p,fast-read;
++		spi-max-frequency = <50000000>;
++		reg = <1>;
++		spi-rx-bus-width = <8>;
++		spi-tx-bus-width = <8>;
++	};
++};
++
++&i2c0 {
++	status = "okay";
++
++	i2c-mux@77 {
++		compatible = "nxp,pca9547";
++		reg = <0x77>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0x1>;
++
++			fan-controller@4c {
++				compatible = "smsc,emc2305";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x4c>;
++
++				fan6: fan@0 {
++					reg = <0>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan7: fan@1 {
++					reg = <1>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan8: fan@2 {
++					reg = <2>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan9: fan@3 {
++					reg = <3>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan10: fan@4 {
++					reg = <4>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++			};
++
++			fan-controller@4d {
++				compatible = "smsc,emc2305";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x4d>;
++
++				fan1: fan@0 {
++					reg = <0>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan2: fan@1 {
++					reg = <1>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan3: fan@2 {
++					reg = <2>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan4: fan@3 {
++					reg = <3>;
++					#cooling-cells = <2>;
++					cooling-levels = <0 25 128 255>;
++				};
++
++				fan5: fan@4 {
++					reg = <4>;
++					#cooling-cells = <2>;
++					// ducy cycle = (cooling-lveles[index] / 255) * 100%
++					// (0 / 255) * 100% = 0%
++					// (25 / 255) * 100% = 9.8%
++					// (128 / 255) * 100% = 50%
++					// (255 / 255) * 100% = 100%
++					cooling-levels = <0 25 128 255>;
++				};
++			};
++		};
++
++		i2c@2 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0x2>;
++
++			power-monitor@40 {
++				compatible = "ti,ina220";
++				reg = <0x40>;
++				shunt-resistor = <500>;
++			};
++		};
++
++		i2c@3 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0x3>;
++
++			temp2: temperature-sensor@48 {
++				compatible = "nxp,sa56004";
++				reg = <0x48>;
++				vcc-supply = <&sb_3v3>;
++				#thermal-sensor-cells = <1>;
++			};
++
++			temp1: temperature-sensor@4c {
++				compatible = "nxp,sa56004";
++				reg = <0x4c>;
++				vcc-supply = <&sb_3v3>;
++				#thermal-sensor-cells = <1>;
++			};
++		};
++
++		i2c@4 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0x4>;
++
++			rtc@51 {
++				compatible = "nxp,pcf2129";
++				reg = <0x51>;
++				// IRQ11_B
++				interrupts-extended = <&extirq 11 IRQ_TYPE_LEVEL_LOW>;
++			};
++		};
++
++		i2c@7 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0x7>;
++
++			i2c-mux@75 {
++				compatible = "nxp,pca9547";
++				reg = <0x75>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0x0>;
++
++					spi_bridge: spi@28 {
++						compatible = "nxp,sc18is602b";
++						reg = <0x28>;
++						#address-cells = <1>;
++						#size-cells = <0>;
++					};
++				};
++			};
++		};
++	};
++};
++
++&i2c5 {
++	status = "okay";
++
++	i2c-mux@77 {
++		compatible = "nxp,pca9846";
++		reg = <0x77>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++		i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0x1>;
++			i2c-mux@70 {
++				/* The i2c multiplexer and temp sensors are on T6 riser card */
++				compatible = "nxp,pca9548";
++				reg = <0x70>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				i2c@6 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0x6>;
++					q12: temperature-sensor@4c {
++						compatible = "nxp,sa56004";
++						reg = <0x4c>;
++						vcc-supply = <&sb_3v3>;
++						#thermal-sensor-cells = <1>;
++					};
++				};
++				i2c@7 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0x7>;
++					q11: temperature-sensor@4c {
++						compatible = "nxp,sa56004";
++						reg = <0x4c>;
++						vcc-supply = <&sb_3v3>;
++						#thermal-sensor-cells = <1>;
++					};
++					q13: temperature-sensor@48 {
++						compatible = "nxp,sa56004";
++						reg = <0x48>;
++						vcc-supply = <&sb_3v3>;
++						#thermal-sensor-cells = <1>;
++					};
++					q14: temperature-sensor@4a {
++						compatible = "nxp,sa56004";
++						reg = <0x4a>;
++						vcc-supply = <&sb_3v3>;
++						#thermal-sensor-cells = <1>;
++					};
++				};
++			};
++		};
++	};
++};
++
++&spi_bridge {
++	/* SW1 */
++	ethernet-switch@0 {
++		compatible = "nxp,sja1110a";
++		reg = <0>;
++		spi-max-frequency = <4000000>;
++		spi-cpol;
++		dsa,member = <0 0>;
++
++		ethernet-ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			/* Microcontroller port */
++			port@0 {
++				reg = <0>;
++				status = "disabled";
++			};
++
++			/* SW1_P1 */
++			port@1 {
++				reg = <1>;
++				label = "con_2x20";
++				phy-mode = "sgmii";
++
++				fixed-link {
++					speed = <1000>;
++					full-duplex;
++				};
++			};
++
++			port@2 {
++				reg = <2>;
++				ethernet = <&dpmac17>;
++				phy-mode = "rgmii-id";
++
++				fixed-link {
++					speed = <1000>;
++					full-duplex;
++				};
++			};
++
++			port@3 {
++				reg = <3>;
++				label = "1ge_p1";
++				phy-mode = "rgmii-id";
++				phy-handle = <&sw1_mii3_phy>;
++			};
++
++			port@4 {
++				reg = <4>;
++				label = "to_sw2";
++				phy-mode = "sgmii";
++
++				fixed-link {
++					speed = <1000>;
++					full-duplex;
++				};
++			};
++
++			port@5 {
++				reg = <5>;
++				label = "trx1";
++				phy-mode = "internal";
++				phy-handle = <&sw1_port5_base_t1_phy>;
++			};
++
++			port@6 {
++				reg = <6>;
++				label = "trx2";
++				phy-mode = "internal";
++				phy-handle = <&sw1_port6_base_t1_phy>;
++			};
++
++			port@7 {
++				reg = <7>;
++				label = "trx3";
++				phy-mode = "internal";
++				phy-handle = <&sw1_port7_base_t1_phy>;
++			};
++
++			port@8 {
++				reg = <8>;
++				label = "trx4";
++				phy-mode = "internal";
++				phy-handle = <&sw1_port8_base_t1_phy>;
++			};
++
++			port@9 {
++				reg = <9>;
++				label = "trx5";
++				phy-mode = "internal";
++				phy-handle = <&sw1_port9_base_t1_phy>;
++			};
++
++			port@a {
++				reg = <10>;
++				label = "trx6";
++				phy-mode = "internal";
++				phy-handle = <&sw1_port10_base_t1_phy>;
++			};
++		};
++
++		mdios {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			mdio@0 {
++				reg = <0>;
++				compatible = "nxp,sja1110-base-t1-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				sw1_port5_base_t1_phy: ethernet-phy@1 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x1>;
++				};
++
++				sw1_port6_base_t1_phy: ethernet-phy@2 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x2>;
++				};
++
++				sw1_port7_base_t1_phy: ethernet-phy@3 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x3>;
++				};
++
++				sw1_port8_base_t1_phy: ethernet-phy@4 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x4>;
++				};
++
++				sw1_port9_base_t1_phy: ethernet-phy@5 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x5>;
++				};
++
++				sw1_port10_base_t1_phy: ethernet-phy@6 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x6>;
++				};
++			};
++		};
++	};
++
++	/* SW2 */
++	ethernet-switch@2 {
++		compatible = "nxp,sja1110a";
++		reg = <2>;
++		spi-max-frequency = <4000000>;
++		spi-cpol;
++		dsa,member = <1 1>;
++
++		ethernet-ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			/* Microcontroller port */
++			port@0 {
++				reg = <0>;
++				status = "disabled";
++			};
++
++			port@1 {
++				reg = <1>;
++				label = "to_sw1";
++				phy-mode = "sgmii";
++
++				fixed-link {
++					speed = <1000>;
++					full-duplex;
++				};
++			};
++
++			port@2 {
++				reg = <2>;
++				ethernet = <&dpmac18>;
++				phy-mode = "rgmii-id";
++
++				fixed-link {
++					speed = <1000>;
++					full-duplex;
++				};
++			};
++
++			port@3 {
++				reg = <3>;
++				label = "1ge_p2";
++				phy-mode = "rgmii-id";
++				phy-handle = <&sw2_mii3_phy>;
++			};
++
++			port@4 {
++				reg = <4>;
++				label = "to_sw3";
++				phy-mode = "2500base-x";
++
++				fixed-link {
++					speed = <2500>;
++					full-duplex;
++				};
++			};
++
++			port@5 {
++				reg = <5>;
++				label = "trx7";
++				phy-mode = "internal";
++				phy-handle = <&sw2_port5_base_t1_phy>;
++			};
++
++			port@6 {
++				reg = <6>;
++				label = "trx8";
++				phy-mode = "internal";
++				phy-handle = <&sw2_port6_base_t1_phy>;
++			};
++
++			port@7 {
++				reg = <7>;
++				label = "trx9";
++				phy-mode = "internal";
++				phy-handle = <&sw2_port7_base_t1_phy>;
++			};
++
++			port@8 {
++				reg = <8>;
++				label = "trx10";
++				phy-mode = "internal";
++				phy-handle = <&sw2_port8_base_t1_phy>;
++			};
++
++			port@9 {
++				reg = <9>;
++				label = "trx11";
++				phy-mode = "internal";
++				phy-handle = <&sw2_port9_base_t1_phy>;
++			};
++
++			port@a {
++				reg = <10>;
++				label = "trx12";
++				phy-mode = "internal";
++				phy-handle = <&sw2_port10_base_t1_phy>;
++			};
++		};
++
++		mdios {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			mdio@0 {
++				reg = <0>;
++				compatible = "nxp,sja1110-base-t1-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				sw2_port5_base_t1_phy: ethernet-phy@1 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x1>;
++				};
++
++				sw2_port6_base_t1_phy: ethernet-phy@2 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x2>;
++				};
++
++				sw2_port7_base_t1_phy: ethernet-phy@3 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x3>;
++				};
++
++				sw2_port8_base_t1_phy: ethernet-phy@4 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x4>;
++				};
++
++				sw2_port9_base_t1_phy: ethernet-phy@5 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x5>;
++				};
++
++				sw2_port10_base_t1_phy: ethernet-phy@6 {
++					compatible = "ethernet-phy-ieee802.3-c45";
++					reg = <0x6>;
++				};
++			};
++		};
++	};
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&uart1 {
++	status = "okay";
++};
++
++&usb0 {
++	status = "okay";
++};
++
++&usb1 {
++	status = "okay";
++};
++
++&thermal_zones {
++	/* cpu-thermal is used to control LX2's temperature */
++	cpu-thermal {
++		polling-delay-passive = <1000>;
++		polling-delay = <5000>;
++		thermal-sensors = <&temp1 1>,
++				  <&temp2 1>;
++
++		trips {
++			cpu_alert0: cpu-alert0 {
++				temperature = <35000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++
++			cpu_alert1: cpu-alert1 {
++				temperature = <55000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++
++			cpu_alert2: cpu-alert2 {
++				temperature = <75000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++
++			cpu_crit: cpu-crit {
++				temperature = <95000>;
++				hysteresis = <2000>;
++				type = "critical";
++			};
++		};
++
++		cooling-maps {
++			map0 {
++				trip = <&cpu_alert0>;
++				cooling-device = <&fan5 1 1>;
++			};
++			map1 {
++				trip = <&cpu_alert1>;
++				cooling-device = <&fan5 2 2>;
++			};
++			map2 {
++				trip = <&cpu_alert2>;
++				cooling-device = <&fan5 3 3>;
++			};
++		};
++	};
++	/* cpu-c[om]p[artment]-thermal is used to control cpu compartment's temperature */
++	cpu-cp-thermal {
++		polling-delay-passive = <1000>;
++		polling-delay = <5000>;
++		thermal-sensors = <&q13 1>;
++
++		trips {
++			cpu_cp_alert: cpu-cp-alert {
++				temperature = <70000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++		};
++
++		cooling-maps {
++			map0 {
++				trip = <&cpu_cp_alert>;
++				cooling-device = <&fan1 3 3>, <&fan2 3 3>, <&fan6 3 3>, <&fan7 3 3>;
++			};
++		};
++	};
++
++	/* pcie-[switch-]c[om]p[artment]-thermal is used to control pcie switch compartment's temperature */
++	pcie-cp-thermal {
++		polling-delay-passive = <1000>;
++		polling-delay = <5000>;
++		thermal-sensors = <&q11 1>,
++				  <&q12 1>,
++				  <&q14 1>;
++
++		trips {
++			pcie_cp_alert: pcie-cp-alert {
++				temperature = <70000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++		};
++
++		cooling-maps {
++			map0 {
++				trip = <&pcie_cp_alert>;
++				cooling-device = <&fan3 3 3>, <&fan4 3 3>, <&fan8 3 3>, <&fan9 3 3>;
++			};
++		};
++	};
++	/* pex8780-thermal is used to control pcie switch pex8780's temperature, pex8780 is on T6 riser card */
++	pex8780-thermal {
++		polling-delay-passive = <1000>;
++		polling-delay = <5000>;
++		thermal-sensors = <&q12 1>; /* Assuming that the pex8780's temperature is from U57 */
++
++		trips {
++			pex8780_alert0: pex8780-alert0 {
++				temperature = <35000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++
++			pex8780_alert1: pex8780-alert1 {
++				temperature = <55000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++
++			pex8780_alert2: pex8780-alert2 {
++				temperature = <75000>;
++				hysteresis = <2000>;
++				type = "active";
++			};
++			pex8780_crit: pex8780-crit {
++				temperature = <95000>;
++				hysteresis = <2000>;
++				type = "critical";
++			};
++		};
++
++		cooling-maps {
++			map0 {
++				trip = <&pex8780_alert0>;
++				cooling-device = <&fan10 1 1>;
++			};
++			map1 {
++				trip = <&pex8780_alert1>;
++				cooling-device = <&fan10 2 2>;
++			};
++			map2 {
++				trip = <&pex8780_alert2>;
++				cooling-device = <&fan10 3 3>;
++			};
++		};
++	};
++};
+-- 
+2.34.1
+

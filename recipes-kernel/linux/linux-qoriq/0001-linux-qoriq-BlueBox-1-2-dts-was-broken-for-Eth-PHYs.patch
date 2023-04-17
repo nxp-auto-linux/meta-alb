@@ -1,0 +1,119 @@
+From e351f99194224e1d441b47350b22ae238ce499c5 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Fri, 27 Jan 2023 07:23:09 +0100
+Subject: [PATCH] linux-qoriq: BlueBox 1/2 dts was broken for Eth PHYs
+
+We didn't chose the right 10gbase-r type and the PHY mapping wasn't
+up to the current kernel capabilities.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ .../boot/dts/freescale/fsl-ls2084a-bbmini.dts  | 18 +++++++++---------
+ .../boot/dts/freescale/fsl-ls2084a-bluebox.dts | 16 ++++++++--------
+ 2 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
+index 5df9e634fad6..15a1660927fb 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bbmini.dts
+@@ -124,22 +124,19 @@ &emdio1 {
+ &emdio2 {
+ 	/* AQR107 PHYs */
+ 	mdio2_phy1: emdio2_phy@1 {
+-		compatible = "ethernet-phy-ieee802.3-c45";
+-		interrupts = <0 1 0x4>; /* Level high type */
++		compatible = "ethernet-phy-id13e5.b4e0", "ethernet-phy-ieee802.3-c45";
++		interrupts-extended = <&extirq 1 IRQ_TYPE_LEVEL_LOW>;
+ 		reg = <0x0>;
+-		phy-connection-type = "xfi";
+ 	};
+ 	mdio2_phy2: emdio2_phy@2 {
+-		compatible = "ethernet-phy-ieee802.3-c45";
+-		interrupts = <0 2 0x4>; /* Level high type */
++		compatible = "ethernet-phy-id13e5.b4e0", "ethernet-phy-ieee802.3-c45";
++		interrupts-extended = <&extirq 2 IRQ_TYPE_LEVEL_LOW>;
+ 		reg = <0x1>;
+-		phy-connection-type = "xfi";
+ 	};
+ 	mdio2_phy3: emdio2_phy@3 {
+-		compatible = "ethernet-phy-ieee802.3-c45";
+-		interrupts = <0 4 0x4>; /* Level high type */
++		compatible = "ethernet-phy-id13e5.b4e0", "ethernet-phy-ieee802.3-c45";
++		interrupts-extended = <&extirq 4 IRQ_TYPE_LEVEL_LOW>;
+ 		reg = <0x2>;
+-		phy-connection-type = "xfi";
+ 	};
+ };
+ 
+@@ -148,10 +145,13 @@ mdio2_phy3: emdio2_phy@3 {
+  */
+ &dpmac5 {
+ 	phy-handle = <&mdio2_phy1>;
++	phy-connection-type = "10gbase-r";
+ };
+ &dpmac6 {
+ 	phy-handle = <&mdio2_phy2>;
++	phy-connection-type = "10gbase-r";
+ };
+ &dpmac7 {
+ 	phy-handle = <&mdio2_phy3>;
++	phy-connection-type = "10gbase-r";
+ };
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bluebox.dts b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bluebox.dts
+index f5ca6b89c06e..4ecc2c1b52aa 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2084a-bluebox.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2084a-bluebox.dts
+@@ -26,42 +26,42 @@ chosen {
+ 
+ &dpmac1 {
+ 	phy-handle = <&mdio1_phy1>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &dpmac2 {
+ 	phy-handle = <&mdio1_phy2>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &dpmac3 {
+ 	phy-handle = <&mdio1_phy3>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &dpmac4 {
+ 	phy-handle = <&mdio1_phy4>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &dpmac5 {
+ 	phy-handle = <&mdio2_phy1>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &dpmac6 {
+ 	phy-handle = <&mdio2_phy2>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &dpmac7 {
+ 	phy-handle = <&mdio2_phy3>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &dpmac8 {
+ 	phy-handle = <&mdio2_phy4>;
+-	phy-connection-type = "xgmii";
++	phy-connection-type = "10gbase-r";
+ };
+ 
+ &emdio1 {
+-- 
+2.34.1
+

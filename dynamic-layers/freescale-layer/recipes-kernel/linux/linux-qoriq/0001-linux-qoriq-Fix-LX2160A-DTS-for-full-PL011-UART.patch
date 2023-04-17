@@ -1,0 +1,80 @@
+From ba40b4eae9054ca9e1e4d39ba4ee0ead89d729d6 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Thu, 23 Mar 2023 15:59:59 +0100
+Subject: [PATCH] linux-qoriq: Fix LX2160A DTS for full PL011 UART
+
+The prior configuration was an SBSA UART that can't be configured or
+modified, or even enabled if it isn't the boot console.
+With properly defined clocks, the PL011 configuration can be used.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ .../arm64/boot/dts/freescale/fsl-lx2160a.dtsi | 32 ++++++++++++++-----
+ 1 file changed, 24 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi b/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
+index 5230d62b6d6c..0e50f4c7127a 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
+@@ -926,34 +926,50 @@ QORIQ_CLK_PLL_DIV(8)>,
+ 		};
+ 
+ 		uart0: serial@21c0000 {
+-			compatible = "arm,sbsa-uart","arm,pl011";
++			compatible = "arm,pl011", "arm,primecell";
++			clocks = <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>,
++				 <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>;
++			clock-names = "uartclk", "apb_pclk";
+ 			reg = <0x0 0x21c0000 0x0 0x1000>;
+ 			interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
+-			current-speed = <115200>;
+ 			status = "disabled";
+ 		};
+ 
+ 		uart1: serial@21d0000 {
+-			compatible = "arm,sbsa-uart","arm,pl011";
++			compatible = "arm,pl011", "arm,primecell";
++			clocks = <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>,
++				 <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>;
++			clock-names = "uartclk", "apb_pclk";
+ 			reg = <0x0 0x21d0000 0x0 0x1000>;
+ 			interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
+-			current-speed = <115200>;
+ 			status = "disabled";
+ 		};
+ 
+ 		uart2: serial@21e0000 {
+-			compatible = "arm,sbsa-uart","arm,pl011";
++			compatible = "arm,pl011", "arm,primecell";
++			clocks = <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>,
++				 <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>;
++			clock-names = "uartclk", "apb_pclk";
+ 			reg = <0x0 0x21e0000 0x0 0x1000>;
+ 			interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>;
+-			current-speed = <115200>;
+ 			status = "disabled";
+ 		};
+ 
+ 		uart3: serial@21f0000 {
+-			compatible = "arm,sbsa-uart","arm,pl011";
++			compatible = "arm,pl011", "arm,primecell";
++			clocks = <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>,
++				 <&clockgen QORIQ_CLK_PLATFORM_PLL
++					    QORIQ_CLK_PLL_DIV(8)>;
++			clock-names = "uartclk", "apb_pclk";
+ 			reg = <0x0 0x21f0000 0x0 0x1000>;
+ 			interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+-			current-speed = <115200>;
+ 			status = "disabled";
+ 		};
+ 
+-- 
+2.34.1
+

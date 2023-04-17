@@ -1,0 +1,29 @@
+From 19f425231e7376d4d6fc2e59e72aaad4bcb09669 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Sat, 1 Apr 2023 19:24:55 +0200
+Subject: [PATCH 1/2] fsl-lx2160a.dtsi: Added thermal zone name
+
+Without a name for the SoC thermal_zone, referencing it is a problem
+in board specific dts files.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi b/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
+index 347c93dde358..0e50f4c7127a 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
+@@ -440,7 +440,7 @@ sysclk: sysclk {
+ 		clock-output-names = "sysclk";
+ 	};
+ 
+-	thermal-zones {
++	thermal_zones: thermal-zones {
+ 		cluster6-7 {
+ 			polling-delay-passive = <1000>;
+ 			polling-delay = <5000>;
+-- 
+2.34.1
+

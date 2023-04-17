@@ -1,0 +1,41 @@
+From 2ec2b5d1e3235903384276a244ed0fd022fbc583 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Tue, 27 Dec 2022 17:34:04 +0100
+Subject: [PATCH 1/2] linux-qoriq: arm64 kernel now conserves power on
+ stop/crash
+
+Signed-off-by: Heinz Wrobel <heinz.wrobel@nxp.com>
+Signed-off-by: Priyanka Jain <priyanka.jain@nxp.com>
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ arch/arm64/kernel/process.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
+index 23efabcb00b8..44919ef4b609 100644
+--- a/arch/arm64/kernel/process.c
++++ b/arch/arm64/kernel/process.c
+@@ -97,7 +97,8 @@ void machine_halt(void)
+ {
+ 	local_irq_disable();
+ 	smp_send_stop();
+-	while (1);
++	while (1)
++		cpu_do_idle();
+ }
+ 
+ /*
+@@ -143,7 +144,8 @@ void machine_restart(char *cmd)
+ 	 * Whoops - the architecture was unable to reboot.
+ 	 */
+ 	printk("Reboot failed -- System halted\n");
+-	while (1);
++	while (1)
++		cpu_do_idle();
+ }
+ 
+ #define bstr(suffix, str) [PSR_BTYPE_ ## suffix >> PSR_BTYPE_SHIFT] = str
+-- 
+2.34.1
+

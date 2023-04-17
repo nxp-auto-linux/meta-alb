@@ -1,0 +1,74 @@
+From 923f79d2f6a9b75825c91f95605f10c2be41ef3d Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Mon, 23 Jan 2023 17:02:46 +0100
+Subject: [PATCH] fsl-mc: DPAA2 interfaces are in U-Boot order now
+
+The drivers started to enumerate the DPAA2 elements in the order
+returned by the MC. U-Boot however starts to enumerate from lowest
+to highest number and assigns names that way. The MC order was
+highest to lowest, thereby introducing a delta between U-Boot and kernel
+that is more than irritating. This patch sorts the MC returned list
+so that the DPAA2 driver will also again enumerate elements from
+lowest to highest.
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ drivers/bus/fsl-mc/dprc-driver.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/drivers/bus/fsl-mc/dprc-driver.c b/drivers/bus/fsl-mc/dprc-driver.c
+index 2fcf33a9b7c3..176abe1cdce6 100644
+--- a/drivers/bus/fsl-mc/dprc-driver.c
++++ b/drivers/bus/fsl-mc/dprc-driver.c
+@@ -13,6 +13,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/msi.h>
+ #include <linux/fsl/mc.h>
++#include <linux/sort.h>
+ 
+ #include "fsl-mc-private.h"
+ 
+@@ -218,6 +219,19 @@ static void dprc_add_new_devices(struct fsl_mc_device *mc_bus_dev,
+ 	}
+ }
+ 
++static int dprc_cmp_object_order(const void *a, const void *b)
++{
++	struct fsl_mc_obj_desc *oa = (struct fsl_mc_obj_desc *)a;
++	struct fsl_mc_obj_desc *ob = (struct fsl_mc_obj_desc *)b;
++	int cmp;
++
++	cmp = strcmp(oa->type, ob->type);
++	if (!cmp)
++		cmp = (oa->id - ob->id);
++
++	return cmp;
++}
++
+ /**
+  * dprc_scan_objects - Discover objects in a DPRC
+  *
+@@ -308,6 +322,20 @@ int dprc_scan_objects(struct fsl_mc_device *mc_bus_dev,
+ 				obj_desc->type, obj_desc->id);
+ 		}
+ 
++		/*
++		 * U-Boot enumerates interfaces from 0 on, but this
++		 * object list isn't sorted alike. In fact, it may be
++		 * reversed which means that naming conventions for
++		 * interfaces change as they are not used the same 
++		 * way. We sort to avoid that problem and have
++		 * deterministic id assignment when the array is later
++		 * walked.
++		 */
++		sort(child_obj_desc_array, num_child_objects,
++			sizeof(child_obj_desc_array[0]),
++			dprc_cmp_object_order,
++			0);
++
+ 		if (dprc_get_obj_failures != 0) {
+ 			dev_err(&mc_bus_dev->dev,
+ 				"%d out of %d devices could not be retrieved\n",
+-- 
+2.34.1
+

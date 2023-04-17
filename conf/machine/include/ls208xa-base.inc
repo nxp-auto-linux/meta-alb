@@ -28,7 +28,7 @@ require conf/machine/include/qoriq-arm64.inc
 require conf/machine/include/arm/arch-arm64.inc
 
 DTB_LOAD = "0x90000000"
-UBOOT_ENTRYPOINT = "0x80080000"
+UBOOT_ENTRYPOINT = "0x80200000"
 
 # We also want to permit SD card image generation.
 # This sets up the defaults, just in case the image

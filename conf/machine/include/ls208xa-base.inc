@@ -22,19 +22,6 @@ BB_DANGLINGAPPENDS_WARNONLY = "1"
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"
 PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
 
-
-# Add and force using version 10.24.0, latest available with LS2084 support
-# 10.24.1 from meta-qoriq does not have LS2084 support
-PREFERRED_VERSION_management-complex = "10.24.0"
-
-# Add and force using version 10.24.0, latest available with LS2084 support
-# 10.24.1 from meta-qoriq does not have LS2084 support
-PREFERRED_VERSION_management-complex = "10.24.0"
-
-PREFERRED_VERSION_rng-tools ?= "5"
-PREFERRED_VERSION_tcpreplay = "4.4.2"
-PREFERRED_VERSION_dpdk = "19.11-20.04"
-
 # For all other elements we use the SDK defaults
 require conf/machine/include/qoriq-arm64.inc
 require conf/machine/include/arm/arch-arm64.inc

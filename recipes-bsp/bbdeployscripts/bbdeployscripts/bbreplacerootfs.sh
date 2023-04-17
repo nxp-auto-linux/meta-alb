@@ -21,55 +21,94 @@
 #               ./bbreplacerootfs.sh
 #       [1. Alternative: Use a USB stick /dev/run/media/usb...]
 #       [2. Alternative: Different partition, e.g., /run/media/sda2]
-# 
 #
-ROOTFS="/run/media/sda1"
-
+#
+ROOTFSLOC="/run/media/"
 DESKTOP_IMAGE="fsl-image-blueboxdt"
 DEFAULT_IMAGE="fsl-image-auto"
+
+# Defaults for SATA as most used interface
+ROOTDEVNAME="SATA SSD"
+ROOTDEV="sda"
+ROOTDEVPARTPREFIX=""
 
 # Select the image file depending on the SoC we run on
 IMAGETYPE=unknown
 SOCTYPE=unknown
 BLUEBOXNAME=unknown
-ppccheck=`cat /proc/cpuinfo |grep e6500`
+ppccheck=`grep e6500 /proc/cpuinfo`
 if [ "$ppccheck" != "" ]; then
         SOCTYPE=t4
         BLUEBOXNAME=bluebox
 else
-        corecheck=`cat /proc/cpuinfo |grep 0xd08$`
-        if [ "$corecheck" != "" ]; then
+        corecheck=$(grep 0xd08$ /proc/cpuinfo)
+        if [ -n "$corecheck" ]; then
                 # Cortex-A72
-                SOCTYPE=ls2084a
-                if [ "`devmem2 $((0x520000000)) b|grep :.0x|sed s/.*:.//`" != "0x41" ]; then
+                svr=$(devmem2 0x01e000a4 w|grep :.0x|sed s/.*:.//)
+                case ${svr:0:6} in
+                        0x8736)
+                                SOCTYPE=lx2160a
+                                rcswsr29=$(devmem2 0x01e00170 w|grep :.0x|sed s/.*:.//)
+                                if [ "${rcswsr29:4:2}" = "5F" ]; then
+                                        BLUEBOXNAME=bluebox3
+                                        ROOTDEVNAME="NVMe SSD"
+                                        ROOTDEV="nvme0n1"
+                                        ROOTDEVPARTPREFIX="p"
+                                else
+                                        BLUEBOXNAME=rdb2bluebox
+                                fi
+                                ;;
+                        0x8709)
+                                SOCTYPE=ls2084a
+                                if [ "$(devmem2 $((0x520000000)) b|grep :.0x|sed s/.*:.//)" != "0x41" ]; then
+                                        BLUEBOXNAME=bluebox
+                                else
+                                        BLUEBOXNAME=bbmini
+                                fi
+                                ;;
+                esac
+        else
+                corecheck=$(grep 0xd07$ /proc/cpuinfo)
+                if [ -n "$corecheck" ]; then
+                        # Cortex-A57
+                        SOCTYPE=ls2080a
                         BLUEBOXNAME=bluebox
                 else
-                        BLUEBOXNAME=bbmini
+                        corecheck=$(grep 0xd03$ /proc/cpuinfo)
+                        if [ -n "$corecheck" ]; then
+                                # Cortex-A53
+                                :
+                        fi
                 fi
-        fi
-        corecheck=`cat /proc/cpuinfo |grep 0xd07$`
-        if [ "$corecheck" != "" ]; then
-                # Cortex-A57
-                SOCTYPE=ls2080a
-                BLUEBOXNAME=bluebox
         fi
 fi
 
+MACHINE="${SOCTYPE}${BLUEBOXNAME}"
+
 # We prefer the desktop enabled rootfs over the standard one
 if [ -z "$1" ]; then
-        if [ -f "${DESKTOP_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz" ]; then
-                ROOTFS_IMAGE=${DESKTOP_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz
+        if [ -f "${DESKTOP_IMAGE}-${MACHINE}.tar.gz" ]; then
+                ROOTFS_IMAGE=${DESKTOP_IMAGE}-${MACHINE}.tar.gz
         else
-                ROOTFS_IMAGE=${DEFAULT_IMAGE}-${SOCTYPE}${BLUEBOXNAME}.tar.gz
+                ROOTFS_IMAGE=${DEFAULT_IMAGE}-${MACHINE}.tar.gz
         fi
 else
         ROOTFS_IMAGE="$1"
 fi
 
+echo ""
+echo "Board: ${MACHINE}, massstorage is ${ROOTDEVNAME}"
+echo ""
+
+
 if [ ! -e "$ROOTFS_IMAGE" ]; then
-        echo "'$ROOTFS_IMAGE' cannot be found in the current directory"
+        echo "'$ROOTFS_IMAGE' cannot be found in the current directory!"
         exit 1
 fi
+
+# This is where we finally want to unpack
+ROOTFSPREFIX="${ROOTFSLOC}${ROOTDEV}${ROOTDEVPARTPREFIX}"
+ROOTFS="${ROOTFSPREFIX}1"
 
 if [ ! -d "$ROOTFS" ]; then
         echo "The rootfs to replace is not mounted at '$ROOTFS'"
@@ -122,12 +161,15 @@ for i in bin boot dev etc lib lib64 linuxrc media mnt opt proc root run sbin srv
 done
 cd - >/dev/null
 
+
+# Finally, we can unpack our new rootfs!
 echo
 echo "Unpacking the new rootfs..."
 echo
-(export EXTRACT_UNSAFE_SYMLINKS=1; tar -xz -C "$ROOTFS" -f "${ROOTFS_IMAGE}")
+(export EXTRACT_UNSAFE_SYMLINKS=1; tar -xz -C "${ROOTFS}" -f "${ROOTFS_IMAGE}")
 sync
 
+echo
 echo "Restoring relevant user files from previous rootfs..."
 echo
 for i in ${FILES2RESCUEANDRESTORE}; do

@@ -110,6 +110,8 @@ BASE_IMAGE_ROOTFS_ALIGNMENT ?= "4096"
 SDCARD_BINARY_SPACE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
 IMAGE_ROOTFS_ALIGNMENT = "${SDCARD_BINARY_SPACE}"
 
+BOOT_SPACE ??= "0"
+
 def get_extra_files_fields(d, findex):
     pkgs = []
     extra_files = d.getVar('SDCARDIMAGE_BOOT_EXTRA_FILES', True)
@@ -372,7 +374,9 @@ generate_nxp_sdcard () {
 
 	# Create partition table
 	parted -s ${SDCARD} mklabel msdos
-	parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
+	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
+		parted -s ${SDCARD} unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(expr ${IMAGE_ROOTFS_ALIGNMENT} \+ ${BOOT_SPACE_ALIGNED})
+	fi
 	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
 	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
 	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}
@@ -418,8 +422,9 @@ IMAGE_CMD:sdcard () {
 	fi
 
 	# Align boot partition and calculate total SD card image size
+	# No FAT partition will be created if BOOT_SPACE is 0.
 	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE} + ${BASE_IMAGE_ROOTFS_ALIGNMENT} - 1)
-	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE_ALIGNED} - ${BOOT_SPACE_ALIGNED} % ${BASE_IMAGE_ROOTFS_ALIGNMENT})
+	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE_ALIGNED} - ${BOOT_SPACE_ALIGNED} % ${BASE_IMAGE_ROOTFS_ALIGNMENT} || true)
 
 	# If the size has not been preset, we default to flash image
 	# sizes if available turned into [KiB] or to a hardcoded mini

@@ -10,80 +10,69 @@
 //       $MACHINE                   Current MACHINE variable
 //----------------------------------------------------------------------
 //
+#include "distro_boot.txt"
+#define BOOT_SCRIPT_HDR_concat(m) hdr_##m##_bs.out
+#define BOOT_SCRIPT_HDR_eval(m) BOOT_SCRIPT_HDR_concat(m)
+#define BOOT_SCRIPT_HDR BOOT_SCRIPT_HDR_eval($MACHINE)
+#define BOOT_SCRIPT_BOARD_concat(m) m##_boot.scr
+#define BOOT_SCRIPT_BOARD_eval(m) BOOT_SCRIPT_BOARD_concat(m)
+#define BOOT_SCRIPT_BOARD BOOT_SCRIPT_BOARD_eval($MACHINE)
+BOARD=$MACHINE
 baudrate=115200
-boot_from_flash=run loadcmd_flash && run mc_loadlinuxdpl && run bootcmd_flash
-bootcmd=run bootcmd_debug; \
-        mmc dev ${mmcdev}; \
-        if run loadbootscript; then \
-                run bootscript; \
-        elif test -n "$enablenfs" && test $enablenfs -gt 0 && run loadcmd_nfs; then \
-		run mc_loadlinuxdpl && run bootcmd_nfs; \
-        elif run loadcmd_sdhc; then \
-                run mc_loadlinuxdpl && run bootcmd_sdhc; \
-        elif run loadcmd_ssd; then \
-                run mc_loadlinuxdpl && run bootcmd_ssd; \
-        elif run loadcmd_flash; then \
-                run mc_loadlinuxdpl && run bootcmd_flash; \
-        else echo Automatic boot failed.; \
-        fi;
-bootcmd_debug=true
-bootcmd_flash=echo Booting ITB from NOR flash...; setenv bootdev ram0; setenv bootargsextra ramdisk_size=$ramdisk_size; run setbootargs; bootm $kernel_load
-bootcmd_ssd=echo Booting ITB from SSD ...; setenv bootdev sda${scsipart}; setenv bootargsextra noinitrd; run setbootargs; bootm $kernel_load -
-bootcmd_sdhc=echo Booting ITB from SDHC...; setenv bootdev mmcblk0p${mmcpart}; setenv bootargsextra noinitrd; run setbootargs; bootm $kernel_load -
-bootcmd_nfs=echo Booting ITB via NFS...; setenv bootdev nfs; setenv bootargsextra rw nfsroot=$serverip:$rootpath ip=$ipaddr:$serverip:$gatewayip:$netmask:$hostname:$netdev:off; run setbootargs; bootm $kernel_load -
+boot_net_usb_start=usb start
+boot_pci_enum=pci enum
+boot_prefixes=/ /boot/
+boot_itbname=kernel.itb
+boot_script_dhcp=boot.scr.uimg
+boot_script_hdr=BOOT_SCRIPT_HDR
+boot_scripts=BOOT_SCRIPT_BOARD
+boot_syslinux_conf=extlinux/extlinux.conf
+
+boot_targets=scsi0 nvme0 mmc0 usb0 mmc1 rcwdev
 bootdelay=3
-bootrcw_sdhc=mw.b 520000060 20;mw.b 520000061 fe; mw.b 520000010 1
-bootscript=echo Running bootscript from mmc ...; source
+
 consoledev=ttyS1
-dpc_addr=0x580e00000
-dpl_addr=0x580d00000
-ethact=DPMAC5@xgmii
-ethprime=DPMAC5@xgmii
-factoryprep=ext2load mmc 0:2 90000000 boot/bbdeployimage.itb; source 90000000:ls2factoryprep
+efi_dtb_prefixes=/ /dtb/ /dtb/current/
+ethact=DPMAC5@10gbase-r
+ethprime=DPMAC5@10gbase-r
+fdt_addr_r=0x90000000
 fdt_high=0xa0000000
-fdt_load=0xa2000000
-gatewayip=192.168.2.1
 hwconfig=fsl_ddr:bank_intlv=auto
 initrd_high=0xffffffffffffffff
-ipaddr=192.168.2.100
-loadcmd_flash=echo Loading from flash at $kernel_start...; cp.b $kernel_start $kernel_load $kernel_size
-
-
-loadcmd_ssd=echo Searching for boot image on SSD...; scsi scan && ext2load scsi ${scsidev}:${scsipart} $kernel_load $kernel_name
-loadcmd_sdhc=echo Searching for boot image on SD-Card...; mmc rescan && mmc info && ext2load mmc ${mmcdev}:${mmcpart} $kernel_load $kernel_name
-loadcmd_nfs=echo Searching for NFS boot image via TFTP...; tftp $kernel_load $machine/$kernel_name;
-
-//mcinitcmd=fsl_mc start mc $mc_addr $dpc_addr
-//mc_loadlinuxdpl=fsl_mc apply dpl $dpl_addr
-mcinitcmd=if itest.b *0x1e00003 -eq 0x20; then mmc read 90a00000 5000 1800; mmc read 90e00000 7000 800; fsl_mc start mc 90a00000 90e00000; else fsl_mc start mc $mc_addr $dpc_addr; fi
-mc_loadlinuxdpl=if itest.b *0x1e00003 -eq 0x20; then mmc read 90d00000 6800 800; fsl_mc apply dpl 90d00000; else fsl_mc apply dpl $dpl_addr; fi
-
-machine=$MACHINE
-midfan=mw.b 5200000c0 28
-mmcdev=0
-mmcpart=2
-//kernel_addr=0x100000
-kernel_load=0xa0000000
+kernel_addr_r=0x81000000
 kernel_name=boot/kernel.itb
 kernel_size=0x03000000
-kernel_start=0x581000000
-loadaddr=0x80100000
-loadbootscript=mmc rescan && fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};
-lowpower_aqr107=for i in 5 6 7;do mdio write DPMAC$i@xgmii 0x1e.0 0x800;done
-mc_addr=0x580a00000
-netdev=eth0
-netmask=255.255.255.0
-progfile=tftp $loadaddr $file && protect off $addr +$filesize && erase $addr +$filesize && cp.b $loadaddr $addr $filesize && cmp.b $loadaddr $addr $filesize
-ramdisk_addr=0x800000
+kernel_start_nor=0x581000000
+kernelheader_addr_r=0x80200000
+kernelheader_size=0x40000
+kernelheader_start_nor=0x58600000
+load_addr=0xa0000000
 ramdisk_size=0x2000000
-rootpath=/opt/nfsroot/$machine
-script=boot.scr
-scsidev=0
-scsidevs=1
-scsipart=1
-serverip=192.168.2.1
-setbootargs=setenv bootargs console=$consoledev,$baudrate root=/dev/$bootdev earlycon=uart8250,mmio,0x21c0600 default_hugepagesz=2m hugepages=512 $bootargsextra $bootargs_debug
+
+fsl_bootcmd_mcinitcmd_set=true
+mcmemsize=0x40000000
+mcinitcmd=run setrcwdev && run mcinitcmd_${rcwdev} && fsl_mc start mc 0x80a00000 0x80e00000 && fsl_mc lazyapply dpl 0x80100000
+mcinitcmd_mmc0=mmc rescan; mmc read 0x80a00000 0x5000 0x1800 && mmc read 0x80e00000 0x7000 0x800 && mmc read 0x80100000 0x6800 0x800
+mcinitcmd_nor=cp.b 0x580a00000 0x80a00000 0x300000 && cp.b 0x580e00000 0x80e00000 0x100000 && cp.b 0x580d00000 0x80100000 0x100000
+
+setbootargs=setenv bootargs console=${consoledev},${baudrate} earlycon=uart8250,mmio,0x21c0600 default_hugepagesz=2m hugepages=512 root=/dev/${rootdev} ${bootargsextra} ${bootargs_debug}
+setrcwdev=if itest.b *0x1e00003 -eq 0x20; then if itest.b *0x1e00002 -ge 0x80; then mmc dev 1; setenv rcwdev mmc1; else mmc dev 0; setenv rcwdev mmc0; fi; else setenv rcwdev nor; fi
+scriptaddr=0x80000000
+scripthdraddr=0x80080000
+soc=fsl-layerscape
+
+bootcmd_debug=run silentfan
+progfile=tftp $load_addr $file && protect off $addr +$filesize && erase $addr +$filesize && cp.b $load_addr $addr $filesize && cmp.b $load_addr $addr $filesize
+updenv=setenv addr 0x580500000;setenv file $BOARD/u-boot-flashenv-$BOARD.bin;run progfile
+upddpcl=setenv addr 0x580e00000;setenv file $BOARD/$BOARD-dpc-0x2a41.dtb;run progfile;setenv addr 0x580d00000;setenv file $BOARD/$BOARD-dpl-ethbluebox.0x2A_0x41.dtb;run progfile
+bootrcw_mmc0=mw.b 520000060 20;mw.b 520000061 fe; mw.b 520000010 1
+factoryprep=run silentfan; ext2load mmc 0:2 90000000 boot/bbdeployimage.itb; source 90000000:ls2factoryprep
+factorynorflash=run silentfan; ext2load mmc 0:2 90000000 boot/bbdeployimage.itb; source 90000000:ls2deployflash
+lowpower_aqr107=for i in 5 6 7;do mdio write DPMAC$i@10gbase-r 0x1e.0 0x800;done
+midfan=mw.b 5200000c0 28
 silentfan=mw.b 5200000c0 0
+
 stderr=serial
 stdin=serial
 stdout=serial
+vendor=nxp

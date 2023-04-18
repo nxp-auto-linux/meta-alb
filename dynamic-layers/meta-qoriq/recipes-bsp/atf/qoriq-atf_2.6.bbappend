@@ -12,6 +12,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += " \
     file://0001-qoriq-atf-Support-for-ls2084abbmini.patch \
+    file://0001-qoriq-atf-Basic-support-for-LX2160A-BlueBox3.patch \
 "
 
 # What's in a name? That which we call a rose,
@@ -23,4 +24,6 @@ PLATFORM:ls1046abluebox = "ls1046ardb"
 
 # We have slightly modified custom RCWs here
 PLATFORM:ls2084abluebox = "ls2088ardb"
+
+PLATFORM:lx2160ardb2bluebox = "lx2160ardb"
 

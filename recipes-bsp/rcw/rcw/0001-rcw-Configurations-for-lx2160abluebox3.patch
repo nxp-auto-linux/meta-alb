@@ -1,0 +1,1004 @@
+From 4ac9dcb3d8e20da4bf2f5a37bfc8241f58f81d60 Mon Sep 17 00:00:00 2001
+From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+Date: Mon, 27 Mar 2023 17:28:16 +0200
+Subject: [PATCH] rcw: Configurations for lx2160abluebox3
+
+Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
+---
+ Makefile                                      |  1 +
+ lx2160abluebox3/Makefile                      |  2 +
+ .../rcw_2000_700_2900_sd_31_2_2.rcw           | 84 +++++++++++++++++++
+ .../rcw_2000_700_2900_xspi_31_2_2.rcw         | 84 +++++++++++++++++++
+ .../rcw_2200_750_3200_sd_31_2_2.rcw           | 84 +++++++++++++++++++
+ .../rcw_2200_750_3200_xspi_31_2_2.rcw         | 84 +++++++++++++++++++
+ .../rcw_2000_700_2900_sd_31_2_3.rcw           | 84 +++++++++++++++++++
+ .../rcw_2000_700_2900_xspi_31_2_3.rcw         | 84 +++++++++++++++++++
+ .../rcw_2200_750_3200_sd_31_2_3.rcw           | 84 +++++++++++++++++++
+ .../rcw_2200_750_3200_xspi_31_2_3.rcw         | 84 +++++++++++++++++++
+ lx2160abluebox3/README                        | 80 ++++++++++++++++++
+ lx2160abluebox3/a050426_bb3.rcw               | 26 ++++++
+ ...change_S1_11_to_S1_0x1f_reset_sequence.rcw | 81 ++++++++++++++++++
+ lx2160abluebox3/disable_sata.rcw              | 14 ++++
+ 14 files changed, 876 insertions(+)
+ create mode 100644 lx2160abluebox3/Makefile
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_sd_31_2_2.rcw
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_xspi_31_2_2.rcw
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_sd_31_2_2.rcw
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_xspi_31_2_2.rcw
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_sd_31_2_3.rcw
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_xspi_31_2_3.rcw
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_sd_31_2_3.rcw
+ create mode 100644 lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_xspi_31_2_3.rcw
+ create mode 100644 lx2160abluebox3/README
+ create mode 100644 lx2160abluebox3/a050426_bb3.rcw
+ create mode 100644 lx2160abluebox3/change_S1_11_to_S1_0x1f_reset_sequence.rcw
+ create mode 100644 lx2160abluebox3/disable_sata.rcw
+
+diff --git a/Makefile b/Makefile
+index de0fac2..607352b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,7 @@
+ DESTDIR = .
+ BOARDS = b4420qds b4860qds \
+ 	 ls2080abluebox ls2084abluebox ls2084abbmini \
++	 lx2160abluebox3 \
+ 	 ls1012ardb ls1012a2g5rdb ls1012afrdm ls1012afrwy ls1012aqds \
+ 	 ls1021aqds ls1021atwr ls1021atsn \
+ 	 ls1043aqds ls1043ardb \
+diff --git a/lx2160abluebox3/Makefile b/lx2160abluebox3/Makefile
+new file mode 100644
+index 0000000..d7e9447
+--- /dev/null
++++ b/lx2160abluebox3/Makefile
+@@ -0,0 +1,2 @@
++include ../Makefile.inc
++
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_sd_31_2_2.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_sd_31_2_2.rcw
+new file mode 100644
+index 0000000..2608a56
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_sd_31_2_2.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  2
++ *
++ * Boot from SDHC
++ *
++ * Frequencies:
++ * Core     -- 2000 MHz
++ * Platform -- 700  MHz
++ * DDR      -- 2900 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_CFG=3
++MEM_PLL_RAT=29
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=29
++CGA_PLL1_RAT=20
++CGA_PLL2_RAT=20
++CGB_PLL1_RAT=20
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PLL_PD_PLL5=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=2
++SRDS_REFCLKF_DIS_S2=1
++SRDS_REFCLKF_DIS_S3=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++/* Added by TF-A: #include <../lx2160asi/bootlocptr_sd.rcw> */
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_28.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++
++/*PCIe Errata A-008851*/
++/* Gen3 only: #include <../lx2160asi/a008851_PEX1.rcw> */
++/* Gen3 only: #include <../lx2160asi/a008851_PEX2.rcw> */
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <a050426_bb3.rcw>
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_xspi_31_2_2.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_xspi_31_2_2.rcw
+new file mode 100644
+index 0000000..7b8b370
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2000_700_2900_xspi_31_2_2.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  2
++ *
++ * Boot from XSPI
++ *
++ * Frequencies:
++ * Core     -- 2000 MHz
++ * Platform -- 700  MHz
++ * DDR      -- 2900 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_CFG=3
++MEM_PLL_RAT=29
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=29
++CGA_PLL1_RAT=20
++CGA_PLL2_RAT=20
++CGB_PLL1_RAT=20
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PLL_PD_PLL5=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=2
++SRDS_REFCLKF_DIS_S2=1
++SRDS_REFCLKF_DIS_S3=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++/* Added by TF-A: #include <../lx2160asi/bootlocptr_nor.rcw> */
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_28.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++
++/*PCIe Errata A-008851*/
++/* Gen3 only: #include <../lx2160asi/a008851_PEX1.rcw> */
++/* Gen3 only: #include <../lx2160asi/a008851_PEX2.rcw> */
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <a050426_bb3.rcw>
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_sd_31_2_2.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_sd_31_2_2.rcw
+new file mode 100644
+index 0000000..eb8dcf1
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_sd_31_2_2.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  2
++ *
++ * Boot from SDHC
++ *
++ * Frequencies:
++ * Core     -- 2200 MHz
++ * Platform -- 750  MHz
++ * DDR      -- 3200 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=15
++MEM_PLL_CFG=3
++MEM_PLL_RAT=32
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=32
++CGA_PLL1_RAT=22
++CGA_PLL2_RAT=22
++CGB_PLL1_RAT=22
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PLL_PD_PLL5=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=2
++SRDS_REFCLKF_DIS_S2=1
++SRDS_REFCLKF_DIS_S3=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++/* Added by TF-A: #include <../lx2160asi/bootlocptr_sd.rcw> */
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_32.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++
++/*PCIe Errata A-008851*/
++/* Gen3 only: #include <../lx2160asi/a008851_PEX1.rcw> */
++/* Gen3 only: #include <../lx2160asi/a008851_PEX2.rcw> */
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <a050426_bb3.rcw>
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_xspi_31_2_2.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_xspi_31_2_2.rcw
+new file mode 100644
+index 0000000..c659a46
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_2/rcw_2200_750_3200_xspi_31_2_2.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  2
++ *
++ * Boot from XSPI
++ *
++ * Frequencies:
++ * Core     -- 2200 MHz
++ * Platform -- 750  MHz
++ * DDR      -- 3200 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=15
++MEM_PLL_CFG=3
++MEM_PLL_RAT=32
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=32
++CGA_PLL1_RAT=22
++CGA_PLL2_RAT=22
++CGB_PLL1_RAT=22
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PLL_PD_PLL5=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=2
++SRDS_REFCLKF_DIS_S2=1
++SRDS_REFCLKF_DIS_S3=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++/* Added by TF-A: #include <../lx2160asi/bootlocptr_nor.rcw> */
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_32.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++
++/*PCIe Errata A-008851*/
++/* Gen3 only: #include <../lx2160asi/a008851_PEX1.rcw> */
++/* Gen3 only: #include <../lx2160asi/a008851_PEX2.rcw> */
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <a050426_bb3.rcw>
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_sd_31_2_3.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_sd_31_2_3.rcw
+new file mode 100644
+index 0000000..0510f0e
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_sd_31_2_3.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  3
++ *
++ * Boot from SDHC
++ *
++ * Frequencies:
++ * Core     -- 2000 MHz
++ * Platform -- 700  MHz
++ * DDR      -- 2900 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_CFG=3
++MEM_PLL_RAT=29
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=29
++CGA_PLL1_RAT=20
++CGA_PLL2_RAT=20
++CGB_PLL1_RAT=20
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=3
++SRDS_REFCLKF_DIS_S2=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++/* Added by TF-A: #include <../lx2160asi/bootlocptr_sd.rcw> */
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_28.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++#include <../lx2160asi/a009531_PEX6.rcw>
++
++/*PCIe Errata A-008851*/
++/* Gen3 only: #include <../lx2160asi/a008851_PEX1.rcw> */
++/* Gen3 only: #include <../lx2160asi/a008851_PEX2.rcw> */
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++#include <../lx2160asi/a008851_PEX6.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <a050426_bb3.rcw>
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_xspi_31_2_3.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_xspi_31_2_3.rcw
+new file mode 100644
+index 0000000..6358428
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2000_700_2900_xspi_31_2_3.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  3
++ *
++ * Boot from XSPI
++ *
++ * Frequencies:
++ * Core     -- 2000 MHz
++ * Platform -- 700  MHz
++ * DDR      -- 2900 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=14
++MEM_PLL_CFG=3
++MEM_PLL_RAT=29
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=29
++CGA_PLL1_RAT=20
++CGA_PLL2_RAT=20
++CGB_PLL1_RAT=20
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=3
++SRDS_REFCLKF_DIS_S2=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++#include <../lx2160asi/bootlocptr_nor.rcw>
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_28.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++#include <../lx2160asi/a009531_PEX6.rcw>
++
++/*PCIe Errata A-008851*/
++#include <../lx2160asi/a008851_PEX1.rcw>
++#include <../lx2160asi/a008851_PEX2.rcw>
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++#include <../lx2160asi/a008851_PEX6.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <../lx2160asi/a050426.rcw>
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_sd_31_2_3.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_sd_31_2_3.rcw
+new file mode 100644
+index 0000000..31fa361
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_sd_31_2_3.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  3
++ *
++ * Boot from SDHC
++ *
++ * Frequencies:
++ * Core     -- 2200 MHz
++ * Platform -- 750  MHz
++ * DDR      -- 3200 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=15
++MEM_PLL_CFG=3
++MEM_PLL_RAT=32
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=32
++CGA_PLL1_RAT=22
++CGA_PLL2_RAT=22
++CGB_PLL1_RAT=22
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=3
++SRDS_REFCLKF_DIS_S2=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++/* Added by TF-A: #include <../lx2160asi/bootlocptr_sd.rcw> */
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_32.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++#include <../lx2160asi/a009531_PEX6.rcw>
++
++/*PCIe Errata A-008851*/
++/* Gen3 only: #include <../lx2160asi/a008851_PEX1.rcw> */
++/* Gen3 only: #include <../lx2160asi/a008851_PEX2.rcw> */
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++#include <../lx2160asi/a008851_PEX6.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <a050426_bb3.rcw>
+diff --git a/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_xspi_31_2_3.rcw b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_xspi_31_2_3.rcw
+new file mode 100644
+index 0000000..fa02864
+--- /dev/null
++++ b/lx2160abluebox3/PPUUPPUU_PP_RR_31_2_3/rcw_2200_750_3200_xspi_31_2_3.rcw
+@@ -0,0 +1,84 @@
++/*
++ * SerDes Protocol 1 -  31
++ * SerDes Protocol 2 -  2
++ * SerDes Protocol 3 -  3
++ *
++ * Boot from XSPI
++ *
++ * Frequencies:
++ * Core     -- 2200 MHz
++ * Platform -- 750  MHz
++ * DDR      -- 3200 MT/s
++ *
++ * Do not get confused with SRDS_PRTCL_S1=11
++ * Serdes Protocol 11 is converted to 31(0x1f)
++ * using reset sequence.
++ *
++ */
++
++#include <../lx2160asi/lx2160a.rcwi>
++
++SYS_PLL_RAT=15
++MEM_PLL_CFG=3
++MEM_PLL_RAT=32
++MEM2_PLL_CFG=3
++MEM2_PLL_RAT=32
++CGA_PLL1_RAT=22
++CGA_PLL2_RAT=22
++CGB_PLL1_RAT=22
++CGB_PLL2_RAT=9
++HWA_CGA_M1_CLK_SEL=1
++HWA_CGB_M1_CLK_SEL=6
++BOOT_LOC=26
++SYSCLK_FREQ=600
++IIC2_PMUX=6
++IIC3_PMUX=2
++IIC4_PMUX=2
++USB3_CLK_FSEL=39
++SRDS_PLL_PD_PLL3=1
++SRDS_PRTCL_S1=11
++SRDS_PRTCL_S2=2
++SRDS_PRTCL_S3=3
++SRDS_REFCLKF_DIS_S2=1
++SRDS_PLL_REF_CLK_SEL_S1=2
++SRDS_DIV_PEX_S1=2
++SRDS_DIV_PEX_S2=1
++SRDS_DIV_PEX_S3=1
++
++/* Errata to write on scratch reg for validation */
++#include <../lx2160asi/scratchrw1.rcw>
++
++/* Boot Location Pointer */
++#include <../lx2160asi/bootlocptr_nor.rcw>
++
++/* common PBI commands */
++#include <../lx2160asi/common.rcw>
++
++/* Modify FlexSPI Clock Divisor value */
++#include <../lx2160asi/flexspi_divisor_32.rcw>
++
++/*PCIe Errata A-009531*/
++#include <../lx2160asi/a009531_PEX1.rcw>
++#include <../lx2160asi/a009531_PEX2.rcw>
++#include <../lx2160asi/a009531_PEX3.rcw>
++#include <../lx2160asi/a009531_PEX5.rcw>
++#include <../lx2160asi/a009531_PEX6.rcw>
++
++/*PCIe Errata A-008851*/
++#include <../lx2160asi/a008851_PEX1.rcw>
++#include <../lx2160asi/a008851_PEX2.rcw>
++#include <../lx2160asi/a008851_PEX3.rcw>
++#include <../lx2160asi/a008851_PEX5.rcw>
++#include <../lx2160asi/a008851_PEX6.rcw>
++
++/* Apply reset sequence 11->0x1f */
++#include <change_S1_11_to_S1_0x1f_reset_sequence.rcw>
++
++/* SerDes Errata A-050479*/
++#include <../lx2160asi/a050479.rcw>
++
++/* Disable Peripherals */
++#include <disable_sata.rcw>
++
++/* Errata A-050426 */
++#include <../lx2160asi/a050426.rcw>
+diff --git a/lx2160abluebox3/README b/lx2160abluebox3/README
+new file mode 100644
+index 0000000..88d015d
+--- /dev/null
++++ b/lx2160abluebox3/README
+@@ -0,0 +1,80 @@
++The RCW directories names for the LX2160A BlueBox3 boards conform to the following
++naming convention:
++
++abcdefgh_ij_RR_l_m_n:
++
++a = What is available on Serdes1 Lane0
++b = What is available on Serdes1 Lane1
++c = What is available on Serdes1 Lane2
++d = What is available on Serdes1 Lane3
++e = What is available on Serdes1 Lane4
++f = What is available on Serdes1 Lane5
++g = What is available on Serdes1 Lane6
++h = What is available on Serdes1 Lane7
++i = What is available in Slot 1 (on Serdes 2)
++j = What is available in Slot 2 (on Serdes 3)
++
++For the Slots (a..k):
++ 'N' is NULL, not available/not used
++ 'S' is SGMII
++ 'P' is PCIe
++ 'F' is XFI
++ 'U' is USXGMII
++
++RGMII Interface (R):
++  'R' is RGMII Interface 1G
++
++Serdes1 protocol (l) in decimal:
++l = 'serdes1 protocol value' (31 fixed)
++
++Serdes2 protocol (m) in decimal: 
++m = 'serdes2 protocol value'
++
++Serdes3 protocol (n) in decimal:
++n = 'serdes3 protocol value'
++
++Ref clock setting on board
++==========================
++DDR Ref clock: 100 MHz
++Sys PLL Ref clock: 100MHz
++
++Files naming convention
++=============================
++rcw_x_y_z_b_l_m_n.rcw
++
++x = Core frequency
++y = Platform frequency
++z = DDR frequency
++b = Boot source
++l = 'serdes1 protocol value'
++m = 'serdes2 protocol value'
++n = 'serdes3 protocol value'
++
++For example,
++  rcw_2000_700_2900_xspi_31_2_2.rcw means rcw for xspi boot, core frequency 2000MHz, Platform frequecny 700MHz and DDR Memory Data Rate as 2900 MT/s, with serdes1=31 serdes2=2 serdes3=2.
++
++Errata Workaround Implemented
++=============================
++A-009531:
++  The PCI Express controller as the completer sends completion packets with IDO
++  bit set in packet header even when the IDO Completion Enable bit is cleared in
++  the controller’s Device Control 2 Register.
++  Applicable for Synopsys PCIe controller
++
++A-008851:
++  Invalid transmitter/receiver preset values are used in Gen3 equalization
++  phases during link training for RC mode
++  This errata is valid only for PCI gen3.
++  Workaround:
++   write 0x00000001 to MISC_CONTROL_1_OFF
++   write 0x4747 to Lane Equalization Control register for each lane
++  Applicable for Synopsys PCIe controller
++
++A-050479:
++  Link Training fails during the Speed-Switch
++  Workaround:
++   Please program bit 31 of PEX*CR8 to 1'b0 for all PEXs
++
++A-050426:
++  After PORESET de-assertion, internal RAM first write or
++  read access corruption may occur
+diff --git a/lx2160abluebox3/a050426_bb3.rcw b/lx2160abluebox3/a050426_bb3.rcw
+new file mode 100644
+index 0000000..a36cd9e
+--- /dev/null
++++ b/lx2160abluebox3/a050426_bb3.rcw
+@@ -0,0 +1,26 @@
++/*
++ * Work-around for erratum A-050426
++ *
++ * Problem: After PORESET de-assertion, internal RAM first write or
++ * read access corruption may occur
++ * The internal RAM associated with QDMA, FECA, and PCIe may fail
++ * the first memory write or read access after completion of reset
++ *
++ * Workaround: PBI sequence is required after the boot sequence is completed
++ * and when the SoC comes out of POR reset.
++ */
++
++/* For BlueBox3 we do not need all entries! */
++
++#include <../lx2160asi/a050426_pre.rcw>
++#include <../lx2160asi/a050426_pex_prefix.rcw>
++#include <../lx2160asi/a050426_pex1.rcw>
++#include <../lx2160asi/a050426_pex2.rcw>
++#include <../lx2160asi/a050426_pex3.rcw>
++/* #include <../lx2160asi/a050426_pex4.rcw> */
++#include <../lx2160asi/a050426_pex5.rcw>
++#include <../lx2160asi/a050426_pex6.rcw>
++#include <../lx2160asi/a050426_sd_eth_prefix.rcw>
++#include <../lx2160asi/a050426_sd1_eth.rcw>
++/* #include <../lx2160asi/a050426_sd2_eth.rcw> */
++#include <../lx2160asi/a050426_post.rcw>
+diff --git a/lx2160abluebox3/change_S1_11_to_S1_0x1f_reset_sequence.rcw b/lx2160abluebox3/change_S1_11_to_S1_0x1f_reset_sequence.rcw
+new file mode 100644
+index 0000000..c2f73ba
+--- /dev/null
++++ b/lx2160abluebox3/change_S1_11_to_S1_0x1f_reset_sequence.rcw
+@@ -0,0 +1,81 @@
++/*
++ * This file contains a specific NXP validated sequence to convert
++ * SerDes 1 from an RCW preconfigured configuration 11 to a special
++ * supported configuration "0x1f" which replaces SerDes configuration
++ * 11's SGMII links with USXGMII/XFI Links as shown.
++ *
++ * *
++ *         H   G        F         E        D    C       B         A
++ * Lane    0   1        2         3        4    5       6         7
++ *        ---------------------------------------------------------------
++ *  0x1f | PCIe.1 x2 | USXGMII | USXGMII | PCIe.2 x2 | USXGMII | USXGMII |
++ *       |   gen2    | /XFI.5  | /XFI.6  |   gen2    | /XFI.9  | /XFI.10 |
++ *        ---------------------------------------------------------------
++ *
++ * To select this "0x1f" configuration, set SRDS_PRTCL_S1 to decimal 11
++ * and use the sequence of PBI writes below exactly as given.
++ *
++ * Modifications to this sequence are not supported.
++ *
++ */
++
++.pbi
++write 0x01EA10A0,0x00000000
++write 0x01EA10B0,0x99009900
++
++write 0x01EA0404,0x00000000
++write 0x01EA0408,0x90300008
++write 0x01EA0410,0x00003000
++write 0x01EA0414,0x00000000
++
++write 0x01EA0504,0x00040000
++write 0x01EA0508,0x86100008
++write 0x01EA0510,0x00003000
++write 0x01EA0514,0x00001000
++
++write 0x01EA0A24,0x01000200
++write 0x01EA0A44,0x01000001
++write 0x01EA0B24,0x01000200
++write 0x01EA0B44,0x01000001
++
++write 0x01EA0E24,0x01000200
++write 0x01EA0E44,0x01000001
++write 0x01EA0F24,0x01000200
++write 0x01EA0F44,0x01000001
++
++write 0x01EA0800,0x00000052
++write 0x01EA0900,0x00000052
++write 0x01EA0C00,0x00000052
++write 0x01EA0D00,0x00000052
++
++write 0x01EA0824,0x10000000
++write 0x01EA0924,0x10000000
++write 0x01EA0C24,0x10000000
++write 0x01EA0D24,0x10000000
++
++write 0x01EA0830,0x10808307
++write 0x01EA0930,0x10808307
++write 0x01EA0C30,0x10808307
++write 0x01EA0D30,0x10808307
++
++write 0x01EA0844,0x10000000
++write 0x01EA0944,0x10000000
++write 0x01EA0C44,0x10000000
++write 0x01EA0D44,0x10000000
++
++write 0x01EA0848,0x10000000
++write 0x01EA0948,0x10000000
++write 0x01EA0C48,0x10000000
++write 0x01EA0D48,0x10000000
++
++write 0x01EA0850,0x00000000
++write 0x01EA0950,0x00000000
++write 0x01EA0C50,0x00000000
++write 0x01EA0D50,0x00000000
++
++write 0x01EA0858,0x81000020
++write 0x01EA0958,0x81000020
++write 0x01EA0C58,0x81000020
++write 0x01EA0D58,0x81000020
++
++.end
+diff --git a/lx2160abluebox3/disable_sata.rcw b/lx2160abluebox3/disable_sata.rcw
+new file mode 100644
+index 0000000..613b6e9
+--- /dev/null
++++ b/lx2160abluebox3/disable_sata.rcw
+@@ -0,0 +1,14 @@
++/*
++* SATA (1,2,3,4) clock Gating
++*
++* Description:
++* A given application may not use all the peripherals on the device. In this case, it may be
++* desirable to disable unused peripherals. DEVDISRn provides a mechanism for gating
++* clocks to IP blocks that are not used when running an application.
++*
++* Disable clock of SATA (1/2/3/4) by using DEVDISR register
++*
++*/
++.pbi
++write 0x1e00070,0x000f0000
++.end
+-- 
+2.34.1
+

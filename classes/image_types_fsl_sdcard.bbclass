@@ -389,10 +389,12 @@ generate_nxp_sdcard () {
 
 	_burn_bootloader
 
-	_generate_boot_image 1
-
 	# Burn Partitions
-	dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
+		_generate_boot_image 1
+		dd if=${WORKDIR}/boot.img of=${SDCARD} conv=notrunc,fsync seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+	fi
+
 	write_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} ${SDCARD_ROOTFS_REAL}
 	write_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${SDCARD_ROOTFS_EXTRA1_FILE}
 	write_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} ${SDCARD_ROOTFS_EXTRA2_FILE}

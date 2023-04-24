@@ -1,6 +1,6 @@
 require ppa.inc
 
-SRC_URI = "git://github.com/nxp-qoriq/ppa-generic.git;nobranch=1 \
+SRC_URI = "git://github.com/nxp-qoriq/ppa-generic.git;protocol=https;nobranch=1 \
 "
 
 SRC_URI += "file://0001-build-disable-parallel-make-to-avoid-compile-time-ra.patch \

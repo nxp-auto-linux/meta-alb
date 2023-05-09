@@ -27,8 +27,9 @@ EXTRA_OEMAKE += " \
 do_install() {
         install -d ${D}${libdir}
         install -d ${D}${bindir}
+        install -d ${D}${includedir}
 
-        oe_runmake -C "${S}" install INSTALL_LIBDIR=${D}${libdir} INSTALL_BINDIR=${D}${bindir}
+        oe_runmake -C "${S}" install INSTALL_LIBDIR=${D}${libdir} INSTALL_BINDIR=${D}${bindir} INSTALL_INCLUDEDIR=${D}${includedir}
 }
 
 include ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'recipes-bsp/hse/pkcs11-hse-tz-kp.inc', '', d)}

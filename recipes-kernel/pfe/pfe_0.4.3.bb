@@ -13,7 +13,7 @@ PFE_LOCAL_FIRMWARE_DIR ?= "."
 
 PFE_FW_BIN ?= "class_s32g.elf"
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/extra/pfeng;protocol=https \
+SRC_URI = "git://github.com/nxp-auto-linux/pfeng;protocol=https \
 	file://${PFE_LOCAL_FIRMWARE_DIR}/${PFE_FW_BIN} \
 	"
 SRCREV = "c2c18ad5ec07a242c12081dfa26bb296c57c98e6"

@@ -20,7 +20,7 @@ PE = "1"
 SRC_URI[md5sum] = "aa0fd134249c113daf977e2300ea4394"
 FSL_LOCAL_MIRROR ?= "file://."
 
-SRC_URI = " git://source.codeaurora.org/external/autobsps32/gpu;branch=alb/master;protocol=https \
+SRC_URI = " git://github.com/nxp-auto-linux/gpu;branch=alb/master;protocol=https \
            ${FSL_LOCAL_MIRROR}/Vivante_userspace_libraries_and_demos/gpu-viv-bin-s32v234-6.2.4.p4-hardfp.run;fsl-eula=true \
           "
 SRCREV = "926c8e57ec103740ede3a8ad9c264e8cbc8c03fc"

@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 inherit module
 
 # SJA for kernel 4.14
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/sja1105x;branch=alb/master;protocol=https"
+SRC_URI = "git://github.com/nxp-auto-linux/sja1105x;branch=alb/master;protocol=https"
 SRCREV = "a85c4a130ab54e5629613d0452bf7ab6f4550e97"
 
 KERNEL_NAME = "${PREFERRED_PROVIDER_virtual/kernel}"

@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://net/ethernet/stmicro/stmmac/Makefile;endline=1;md5=da
 inherit module
 
 SRC_URI = " \
-	git://source.codeaurora.org/external/autobsps32/extra/gmac;protocol=https \
+	git://github.com/nxp-auto-linux/extra/gmac;protocol=https \
 	file://Makefile \
 	"
 SRCREV = "7f4dcf44303aeb5a1fca849054d3fde1dee7e534"

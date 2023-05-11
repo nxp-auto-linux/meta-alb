@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-SRC_URI = "git://source.codeaurora.org/external/qoriq/qoriq-components/ppa-generic.git;nobranch=1 \
+SRC_URI = "git://github.com/nxp-qoriq/ppa-generic.git;nobranch=1 \
 "
 
 SRC_URI += "file://0001-build-disable-parallel-make-to-avoid-compile-time-ra.patch \

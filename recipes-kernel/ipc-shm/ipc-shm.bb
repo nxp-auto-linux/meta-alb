@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 
 inherit module
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/ipcf/ipc-shm;branch=master;protocol=https"
+SRC_URI = "git://github.com/nxp-auto-linux/ipc-shm;branch=master;protocol=https"
 SRCREV = "af9a41d262a57a2c3f4be0f4042adc10b47ffdd6"
 
 S = "${WORKDIR}/git"

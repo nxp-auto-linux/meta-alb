@@ -1,6 +1,6 @@
 require recipes-kernel/linux/linux-s32.inc
 
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/linux;protocol=https;branch=release/bsp23.5"
+SRC_URI = "git://github.com/nxp-auto-linux/linux;protocol=https;branch=release/bsp23.5"
 SRCREV = "dea23d288eff96bd65765797749bb6cdd93410c9"
 
 # Temporary override 'LIC_FILES_CHKSUM' variable until

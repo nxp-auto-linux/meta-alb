@@ -8,7 +8,7 @@ S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 # ATF repository
-SRC_URI = "git://source.codeaurora.org/external/autobsps32/arm-trusted-firmware.git;protocol=https;branch=alb/master"
+SRC_URI = "git://github.com/nxp-auto-linux/arm-trusted-firmware.git;protocol=https;branch=alb/master"
 SRCREV ?= "476f28fdcc2f88f63156e63c61dfbbf510d55b70"
 
 PLATFORM_s32g275sim = "s32g"

@@ -7,8 +7,8 @@ SRCREV = "f121e2071eccc565889dd943b3219fbb9349cfcc"
 BACKPORTS += "\
            file://CVE-2016-6131.patch \
            file://0001-fix-glibc-2.26-build-with-gcc-6.3.1.patch \
-           https://source.codeaurora.org/external/s32ds/compiler/gnu_nxp/plain/gcc.6-3-1-linaro-backport-armv8r-cortex-r52;name=r52;apply=yes \
-           https://source.codeaurora.org/external/s32ds/compiler/gnu_nxp/plain/gcc.fix_armv8-libgfortran;name=fortran;apply=yes \
+	   https://raw.githubusercontent.com/nxp-auto-tools/s32ds_patches/master/arm_compiler/gnu-nxp-g27a1317/gcc.6-3-1-linaro-backport-armv8r-cortex-r52;name=r52;apply=yes \
+	   https://raw.githubusercontent.com/nxp-auto-tools/s32ds_patches/master/arm_compiler/gnu-nxp-g27a1317/gcc.fix_armv8-libgfortran;name=fortran;apply=yes \
 "
 
 SRC_URI[r52.md5sum] = "2e74cc013418f1fc7464af814ffb65f3"
@@ -20,3 +20,6 @@ BACKPORTS += "\
 "
 
 require gcc-common-fsl.inc
+
+BB_STRICT_CHECKSUM = "0"
+

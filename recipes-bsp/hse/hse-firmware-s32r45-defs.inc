@@ -1,0 +1,5 @@
+HSE_MACHINE = "S32R45"
+HSE_VERSION ?= "0_1_0_4"
+HSE_LIC ?= "license.txt"
+HSE_LIC_MD5 ?= "50209a0d1e14b47fb0f2be58e040930f"
+HSE_SOC_REV ?= ""

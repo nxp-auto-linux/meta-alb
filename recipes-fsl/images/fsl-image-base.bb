@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017-2022 NXP
+# Copyright 2017-2023 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -62,7 +62,7 @@ IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave'
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-xen.inc', '', d)}
 
 # Add LLCE CAN if needed
-IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
+IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can iproute2-devlink ', '', d)}"
 
 # Add OP-TEE user-space components
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"

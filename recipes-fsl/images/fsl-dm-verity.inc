@@ -19,5 +19,5 @@ addtask make_wic after do_image_complete before do_build
 
 do_make_wic[depends] += " \
 	${@d.getVar('ATF_IMAGE_FILE', True) and d.getVar('ATF_IMAGE', True) + ':do_deploy' or ''} \
-	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER', True) + ':do_deploy' or ''} \
+	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER_RECIPE', True) + ':do_deploy' or ''} \
 "

@@ -7,7 +7,7 @@ PR = "r0"
 
 URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https;nobranch=1"
 SRC_URI = "${URL}"
-SRCREV = "bf076e6e74e9a87bf013f4872719938c86ad5176"
+SRCREV = "95cbda87469e8a1f147df1943e82e7bee319a393"
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/xfci/libfci"
 LIBBUILDDIR = "${S}/sw/xfci/libfci/build/${TARGET_SYS}-release"

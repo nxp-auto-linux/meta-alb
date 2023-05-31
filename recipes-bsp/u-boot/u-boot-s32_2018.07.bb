@@ -19,7 +19,7 @@ DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc dtc-native bc-native"
 
 SRC_URI = "git://github.com/nxp-auto-linux/u-boot;protocol=https;branch=release/bsp23.5"
 
-SRCREV = "3d53b62ba81d57cf5805d4ae08a7ce53d6d11b85"
+SRCREV = "25f795113ad31ae714e2bb8fe1c6da4e066911e9"
 
 SCMVERSION = "y"
 LOCALVERSION = ""

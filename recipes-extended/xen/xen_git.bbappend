@@ -7,4 +7,7 @@ do_deploy:append() {
 	cd ${DEPLOYDIR} && ln -sf xen-${MACHINE} ${DEPLOYDIR}/xen && cd -
 }
 
-SRC_URI:append:s32cc = " file://xen_s32cc.cfg"
+SRC_URI:append:s32cc = " \
+			file://xen_s32cc.cfg \
+			${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://xen_optee.cfg', '', d)} \
+			"

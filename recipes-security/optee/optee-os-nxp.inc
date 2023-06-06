@@ -20,8 +20,12 @@ HSE_ARGS = " \
               CFG_CRYPTO_DRIVER=y \
               HSE_FWDIR=${STAGING_INCDIR}/hse-interface \
 	       "
+XEN_ARGS = " \
+              CFG_VIRTUALIZATION=y \
+           "
 
 EXTRA_OEMAKE += " \
                 PLATFORM_FLAVOR=${PLATFORM_FLAVOR} \
                 "
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'hse', '${HSE_ARGS}', '', d)}"
+EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${XEN_ARGS}', '', d)}"

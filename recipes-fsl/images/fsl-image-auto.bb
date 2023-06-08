@@ -11,6 +11,7 @@ COPY_LIC_MANIFEST = "1"
 COPY_LIC_DIRS = "1"
 
 IMAGE_INSTALL += " \
+    dtc \
     kernel-devicetree \
     packagegroup-core-buildessential \
     packagegroup-core-full-cmdline \

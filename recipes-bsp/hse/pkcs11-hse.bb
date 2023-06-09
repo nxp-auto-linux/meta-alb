@@ -15,7 +15,7 @@ RDEPENDS:${PN} += "libp11 openssl hse-firmware"
 
 S = "${WORKDIR}/git"
 
-CFLAGS:append = " ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
+CFLAGS:append = " ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS} -fPIC"
 
 EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \

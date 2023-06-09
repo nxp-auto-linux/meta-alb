@@ -229,9 +229,6 @@ fakeroot do_getty_fixup() {
 IMAGE_ROOTFS_SIZE ?= "8192"
 IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
-# Add LLCE CAN if needed
-IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
-
 # Add sja1110 driver for RDB boards
 IMAGE_INSTALL:append:s32g274ardb2 = " sja1110"
 IMAGE_INSTALL:append:s32g399ardb3 = " sja1110"

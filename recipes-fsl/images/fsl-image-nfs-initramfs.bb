@@ -8,8 +8,6 @@ inherit image_types
 
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 
-IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can', '', d)}"
-
 IMAGE_INSTALL:append:s32g274abluebox3 = " init-net-root"
 
 IMAGE_INSTALL:append = " \

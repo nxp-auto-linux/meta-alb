@@ -61,9 +61,6 @@ IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave'
 # Enable Xen and add Xen Packages
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-fsl/images/fsl-image-xen.inc', '', d)}
 
-# Add LLCE CAN if needed
-IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' linux-firmware-llce-can iproute2-devlink ', '', d)}"
-
 # Add OP-TEE user-space components
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
 

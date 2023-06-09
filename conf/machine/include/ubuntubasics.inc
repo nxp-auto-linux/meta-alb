@@ -151,6 +151,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     gdbm \
     initscripts \
     iproute2 \
+    iproute2-devlink \
     iputils-ping \
     kmod \
     libc6 \

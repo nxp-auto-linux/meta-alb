@@ -58,8 +58,8 @@ do_compile:prepend() {
 
 # Switch from SIUL2 to SCMI drivers if needed
 do_compile:append() {
+	dtb_name="${B}/arch/arm64/boot/dts/${KERNEL_DEVICETREE}"
 	if ${SCMI_DTB_NODE_CHANGE}; then
-		dtb_name="${B}/arch/arm64/boot/dts/${KERNEL_DEVICETREE}"
 		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
 			${dtb_name} \
 			${GPIO_OPT} \
@@ -114,35 +114,16 @@ DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 
 # MMC test configuration
 DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'bsp-utils', ' mmc_test.cfg', '', d)}"
 
-LLCE_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', '+can', '', d)}"
-LLCE_FEATURES:append = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', '+logger', '', d)}"
-
-# LLCE CAN Drivers
-DELTA_KERNEL_DEFCONFIG:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can', ' llce_can.config', '', d)}"
-# LLCE logger
-DELTA_KERNEL_DEFCONFIG:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', ' llce_logger.config', '', d)}"
-
-# Logging only
-KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', '+logger', ' llce-core llce-mailbox llce_logger', '', d)}"
-KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'llce-core llce-mailbox', '', d)}"
-module_conf_llce-core = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-core load_fw=0', '', d)}"
-module_conf_llce-mailbox = "${@bb.utils.contains('LLCE_FEATURES', '+logger', 'options llce-mailbox config_platform=0', '', d)}"
-
-# CAN + Logging
-KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', ' llce-core llce-mailbox llce_can llce_logger', '', d)}"
-KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'llce_can', '', d)}"
-module_conf_llce_can = "${@bb.utils.contains('LLCE_FEATURES', '+can+logger', 'options llce_can logging=1', '', d)}"
 
 SRC_URI += "\
     file://build/containers.config \
     file://build/virtio \
     file://build/gpu.config \
-    file://build/llce_can.config \
-    file://build/llce_logger.config \
     file://build/mmc_test.cfg \
 "
 
 require vnet-s32.inc
+require llce.inc
 
 # Since Kernel version 4.19, task 'do_merge_delta_config' requires that the cross
 # compiler is available in recipe's sysroot. In order to avoid any erros/warnings

@@ -11,7 +11,7 @@ SDCARD_ROOTFS = "ext4"
 
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 
-UBOOT_ENV_SDCARD_OFFSET ?= "0x001e0000"
+UBOOT_ENV_SDCARD_OFFSET ?= "0x00280000"
 
 # The following variable enables dynamic retrieval of FLASHIMAGE offsets from the Linux's device tree
 FLASHIMAGE_DYNAMIC_OFFSETS ?= "1"

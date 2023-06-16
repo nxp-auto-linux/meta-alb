@@ -25,7 +25,8 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', 'conf/machine/include/
 # Check whether to switch from SIUL2 drivers to SCMI ones
 SCMI_USE_SCMI_PINCTRL ??= "0"
 SCMI_USE_SCMI_GPIO ??= "0"
-SCMI_DTB_NODE_CHANGE = "${@'true' if int(d.getVar('SCMI_USE_SCMI_PINCTRL')) or int(d.getVar('SCMI_USE_SCMI_GPIO')) else 'false'}"
+SCMI_USE_SCMI_NVMEM ??= "0"
+SCMI_DTB_NODE_CHANGE = "${@'true' if int(d.getVar('SCMI_USE_SCMI_PINCTRL')) or int(d.getVar('SCMI_USE_SCMI_GPIO')) or int(d.getVar('SCMI_USE_SCMI_NVMEM')) else 'false'}"
 
 # Allow extensibility from other Yocto layers that define this include file
 include conf/machine/include/s32cc-extra.inc

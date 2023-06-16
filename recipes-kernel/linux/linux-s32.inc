@@ -22,6 +22,7 @@ KERNEL_LD:append = " ${TOOLCHAIN_OPTIONS}"
 
 PINCTRL_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
 GPIO_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"
+NVMEM_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_NVMEM', '1', '--nvmem', '--no-nvmem', d)}"
 
 S = "${WORKDIR}/git"
 
@@ -63,7 +64,8 @@ do_compile:append() {
 		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
 			${dtb_name} \
 			${GPIO_OPT} \
-			${PINCTRL_OPT}
+			${PINCTRL_OPT} \
+            ${NVMEM_OPT}
 	fi
 }
 

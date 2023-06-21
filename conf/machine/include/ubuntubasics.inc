@@ -173,6 +173,7 @@ DISTRO_NEVER_WRITE_PACKAGE:class-target += "\
     perl \
     procps \
     python3 \
+    python3-core \
     qemuwrapper-cross \
     shared-mime-info \
     sqlite3 \

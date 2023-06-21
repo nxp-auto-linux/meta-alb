@@ -152,6 +152,7 @@ gcc \
 gcc-plugins \
 gcc-runtime \
 libmpc-dev \
+python3-core \
 "
 
 # A few things are provided where we don't have a Yocto equivalent

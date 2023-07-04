@@ -71,6 +71,10 @@ PINCTRL_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl'
 GPIO_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"
 NVMEM_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_NVMEM', '1', '--nvmem', '--no-nvmem', d)}"
 
+SCMI_HEADERS_TAGS = " s32gen1 s32cc"
+SCMI_HEADERS_TAGS:append:s32g := " s32g"
+SCMI_HEADERS_TAGS:append:s32r := " s32r45"
+
 BOOT_TYPE = "sdcard qspi"
 
 do_compile() {
@@ -108,6 +112,27 @@ do_deploy() {
 		cp -vf "${ATF_BINARIES}/fip.s32-${suffix}" ${DEPLOYDIR}
 	done
 }
+
+do_install:append() {
+	install -d ${D}${includedir}/scmi-hdrs
+	for tag in ${SCMI_HEADERS_TAGS}
+	do
+		for proto in clock reset perf
+		do
+			hdr=$(find ${S} -name "*${tag}-*scmi*${proto}.h")
+			if [ -z "${hdr}" ]
+			then
+				continue
+			fi
+
+			install -m 0644 "${hdr}" ${D}${includedir}/scmi-hdrs
+		done
+	done
+}
+
+FILES:${PN}-scmi-hdrs = " ${includedir}/scmi-hdrs/*.h "
+PROVIDES += "${PN}-scmi-hdrs"
+PACKAGES += "${PN}-scmi-hdrs"
 
 addtask deploy after do_compile
 

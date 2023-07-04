@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2022 NXP
+# Copyright 2017-2023 NXP
 #
 
 require recipes-fsl/images/fsl-image-base.bb
@@ -68,3 +68,6 @@ IMAGE_INSTALL:append = " libgpiod libgpiod-tools libgpiod-dev"
 
 # add demo sample applications
 IMAGE_INSTALL:append = " demo-samples"
+
+# add cpufrequtils package 
+IMAGE_INSTALL:append = " cpufrequtils"

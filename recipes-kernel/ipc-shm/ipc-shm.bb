@@ -1,6 +1,6 @@
 # SPDX-License-Identifier:	BSD-3-Clause
 #
-# Copyright 2018-2019 NXP
+# Copyright 2018-2019, 2023 NXP
 #
 
 SUMMARY = "Support for Inter-Process(or) Communication over Shared Memory (ipc-shm)"
@@ -24,7 +24,7 @@ EXTRA_OEMAKE:append = " --file ./makefile_samples apps="${DEMO_IPCF_APPS}" INSTA
 
 PLATFORM_FLAVOR:s32g2 = "s32g2"
 PLATFORM_FLAVOR:s32g3 = "s32g3"
-PLATFORM_FLAVOR:s32r45evb = "s32r45"
+PLATFORM_FLAVOR:s32r45 = "s32r45"
 EXTRA_OEMAKE:append = " PLATFORM_FLAVOR=${PLATFORM_FLAVOR} "
 
 # Prevent to load ipc-shm-uio at boot time

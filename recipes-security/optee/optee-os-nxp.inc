@@ -14,7 +14,7 @@ DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'hse', 'hse-firmware'
 
 PLATFORM_FLAVOR:s32g2 = "s32g2"
 PLATFORM_FLAVOR:s32g3 = "s32g3"
-PLATFORM_FLAVOR:s32r45evb = "s32r"
+PLATFORM_FLAVOR:s32r45 = "s32r"
 
 HSE_ARGS = " \
               CFG_CRYPTO_DRIVER=y \

@@ -22,7 +22,7 @@ HOSTTOOLS += "parted mkfs.vfat mcopy"
 # S32 BSP default providers
 PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"
-PREFERRED_PROVIDER_virtual/kernel = "linux-s32"
+PREFERRED_PROVIDER_virtual/kernel ?= "linux-s32"
 
 PREFERRED_VERSION_linux-s32 ?= "5.15.96"
 PREFERRED_VERSION_u-boot-s32 ?= "2020.04"

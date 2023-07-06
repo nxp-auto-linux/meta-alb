@@ -75,7 +75,7 @@ INHERIT += "fsl-dynamic-packagearch"
 
 # Mask some recipes which address other architectures, and
 # which reside in layers that we may not use for S32
-BBMASK = "u-boot-qoriq linux-qoriq"
+BBMASK += "u-boot-qoriq linux-qoriq"
 
 # Xen Examples support variables
 DOM0LESS_ROOTFS ?= "fsl-image-dom0less"

@@ -11,7 +11,6 @@ SRCREV ?= "39104f1b57cc40cb1e21042cfab01d25fde638ee"
 
 S = "${WORKDIR}/git"
 BUILD = "${WORKDIR}/build"
-BOOT_TYPE = "sdcard qspi"
 IVT_FILE_BASE = "fip.s32"
 
 do_compile() {

@@ -5,6 +5,8 @@ SOC_FAMILY:append = ":s32cc"
 
 IMAGE_FSTYPES += "ext4"
 
+BOOT_TYPE ?= "sdcard qspi"
+
 # Specific definitions for .sdcard image generation
 IMAGE_FSTYPES += "sdcard"
 SDCARD_ROOTFS = "ext4"

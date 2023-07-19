@@ -79,8 +79,6 @@ SCMI_HEADERS_TAGS = " s32gen1 s32cc"
 SCMI_HEADERS_TAGS:append:s32g := " s32g"
 SCMI_HEADERS_TAGS:append:s32r := " s32r45"
 
-BOOT_TYPE = "sdcard qspi"
-
 SECBOOT = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'recipes-bsp/arm-trusted-firmware/atf-hse-secboot.inc', '', d)}"
 include ${SECBOOT}
 

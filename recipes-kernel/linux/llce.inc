@@ -3,6 +3,7 @@
 SRC_URI += "\
     file://build/llce_can.config \
     file://build/llce_logger.config \
+    file://build/llce_linflex.config \
     file://scripts/get_node_path.py \
 "
 
@@ -11,18 +12,20 @@ DEPENDS:append = " python-fdt-native"
 LLCE_FEATURES := "${@bb.utils.contains_any('DISTRO_FEATURES', 'llce-can llce-can-multihost', ' can', ' no-can', d)}"
 LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can-logger', ' logger', '', d)}"
 LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-fw-load', '', ' nofwload', d)}"
+LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-linflex', ' lin', '', d)}"
 
 # LLCE config fragments
 DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains('LLCE_FEATURES', 'can', ' llce_can.config', '', d)}"
 DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains('LLCE_FEATURES', 'logger', ' llce_logger.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains('LLCE_FEATURES', 'lin', ' llce_linflex.config', '', d)}"
 
 # Core
-KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains_any('LLCE_FEATURES', 'can logger', ' llce-core', '', d)}"
+KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains_any('LLCE_FEATURES', 'can logger lin', ' llce-core', '', d)}"
 KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', 'nofwload', 'llce-core', '', d)}"
 module_conf_llce-core = "${@bb.utils.contains('LLCE_FEATURES', 'nofwload', 'options llce-core load_fw=0', '', d)}"
 
 # Mailbox
-KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains_any('LLCE_FEATURES', 'can logger', ' llce-mailbox', '', d)}"
+KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains_any('LLCE_FEATURES', 'can logger lin', ' llce-mailbox', '', d)}"
 KERNEL_MODULE_PROBECONF += "${@bb.utils.contains('LLCE_FEATURES', 'no-can', 'llce-mailbox', '', d)}"
 module_conf_llce-mailbox = "${@bb.utils.contains('LLCE_FEATURES', 'no-can', 'options llce-mailbox config_platform=0', '', d)}"
 

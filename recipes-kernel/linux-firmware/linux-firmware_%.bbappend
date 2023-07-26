@@ -6,7 +6,7 @@ NXP_FIRMWARE_LOCAL_DIR ?= "."
 # originates in poky, so make sure that we don't break default
 # functionality
 SRC_URI:append:s32 = " \
-	${@bb.utils.contains_any('DISTRO_FEATURES', 'llce-can llce-multihost-primary', ' \
+	${@bb.utils.contains('DISTRO_FEATURES', 'llce-fw-load', ' \
 		file://${NXP_FIRMWARE_LOCAL_DIR}/dte.bin \
 		file://${NXP_FIRMWARE_LOCAL_DIR}/frpe.bin \
 		file://${NXP_FIRMWARE_LOCAL_DIR}/ppe_tx.bin \
@@ -15,7 +15,7 @@ SRC_URI:append:s32 = " \
 "
 
 do_install:append () {
-	if ${@bb.utils.contains_any('DISTRO_FEATURES', 'llce-can llce-multihost-primary', 'true', 'false', d)}; then
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'llce-fw-load', 'true', 'false', d)}; then
 		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/dte.bin ${D}/${base_libdir}/firmware/dte.bin
 		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/frpe.bin ${D}/${base_libdir}/firmware/frpe.bin
 		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_tx.bin ${D}/${base_libdir}/firmware/ppe_tx.bin
@@ -23,8 +23,8 @@ do_install:append () {
 	fi
 }
 
-PACKAGES =+ "${PN}-llce-can"
-FILES:${PN}-llce-can = "${base_libdir}/firmware/dte.bin \
+PACKAGES =+ "${PN}-llce"
+FILES:${PN}-llce = "${base_libdir}/firmware/dte.bin \
 			${base_libdir}/firmware/frpe.bin \
 			${base_libdir}/firmware/ppe_tx.bin \
 			${base_libdir}/firmware/ppe_rx.bin"

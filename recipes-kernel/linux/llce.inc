@@ -8,10 +8,9 @@ SRC_URI += "\
 
 DEPENDS:append = " python-fdt-native"
 
-LLCE_FEATURES := "${@bb.utils.contains_any('DISTRO_FEATURES', 'llce-can llce-multihost-primary llce-multihost-secondary', ' can', ' no-can', d)}"
-LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-logger', ' logger', '', d)}"
-LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-multihost-secondary', ' nofwload', '', d)}"
-LLCE_FEATURES:append := "${@bb.utils.contains('LLCE_FEATURES', 'no-can', ' nofwload', '', d)}"
+LLCE_FEATURES := "${@bb.utils.contains_any('DISTRO_FEATURES', 'llce-can llce-can-multihost', ' can', ' no-can', d)}"
+LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can-logger', ' logger', '', d)}"
+LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-fw-load', '', ' nofwload', d)}"
 
 # LLCE config fragments
 DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains('LLCE_FEATURES', 'can', ' llce_can.config', '', d)}"
@@ -34,22 +33,18 @@ KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', 'can
 KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', 'logger', ' llce_logger', '', d)}"
 
 RDEPENDS:kernel-base:append = "${@bb.utils.contains('LLCE_FEATURES', 'can', ' iproute2-devlink', '', d)}"
-RDEPENDS:kernel-base:append = "${@bb.utils.contains('LLCE_FEATURES', 'nofwload', '', ' linux-firmware-llce-can', d)}"
+RDEPENDS:kernel-base:append = "${@bb.utils.contains('LLCE_FEATURES', 'nofwload', '', ' linux-firmware-llce', d)}"
 
 python () {
-    mh_primary = bb.utils.contains('DISTRO_FEATURES', 'llce-multihost-primary', True, False, d)
-    mh_secondary = bb.utils.contains('DISTRO_FEATURES', 'llce-multihost-secondary', True, False, d)
+    mh = bb.utils.contains('DISTRO_FEATURES', 'llce-can-multihost', True, False, d)
     not_mh = bb.utils.contains('DISTRO_FEATURES', 'llce-can', True, False, d)
 
-    if mh_primary and mh_secondary:
-        bb.fatal("Invalid configuration. Please select llce-multihost-primary or llce-multihost-secondary.")
-
-    if not_mh and (mh_primary or mh_secondary):
-        bb.fatal("Invalid configuration. The llce-can feature is intended for non-multihost scenarios and cannot be used in conjunction with llce-multihost-primary or llce-multihost-secondary features.")
+    if not_mh and mh:
+        bb.fatal("Invalid configuration. The llce-can feature is intended for non-multihost scenarios and cannot be used in conjunction with llce-can-multihost feature.")
 }
 
 do_compile:append() {
-    if ${@bb.utils.contains_any('DISTRO_FEATURES', 'llce-multihost-primary llce-multihost-secondary', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'llce-can-multihost', 'true', 'false', d)}; then
         echo "Adding LLCE multihif property"
         mailbox_path="$(nativepython3 "${WORKDIR}/scripts/get_node_path.py" "${dtb_name}" --compatible 'nxp,s32g-llce-mailbox')"
         fdtput "${dtb_name}" "${mailbox_path}" "nxp,multi-hif"

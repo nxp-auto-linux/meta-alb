@@ -1,0 +1,37 @@
+From 2b43fa87a339f88bc0f5f05da32dec9ceeb6dfbc Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Fri, 28 Jul 2023 11:29:23 +0300
+Subject: [PATCH] build: Allow CC and prefix to be overriden
+
+Upstream-Status: Pending
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/makefile b/makefile
+index 3e3b8b3..5c1a1f9 100644
+--- a/makefile
++++ b/makefile
+@@ -18,7 +18,7 @@
+ KBUILD_OUTPUT ?=
+ 
+ DEBUG	=
+-CC	= $(CROSS_COMPILE)gcc
++CC	?= $(CROSS_COMPILE)gcc
+ VER     = -DVER=$(version)
+ CFLAGS	= -Wall $(VER) $(incdefs) $(DEBUG) $(EXTRA_CFLAGS)
+ LDLIBS	= -lm -lrt -pthread $(EXTRA_LDFLAGS)
+@@ -43,7 +43,7 @@ incdefs := $(shell $(srcdir)/incdefs.sh)
+ version := $(shell $(srcdir)/version.sh $(srcdir))
+ VPATH	= $(srcdir)
+ 
+-prefix	= /usr/local
++prefix	?= /usr/local
+ sbindir	= $(prefix)/sbin
+ mandir	= $(prefix)/man
+ man8dir	= $(mandir)/man8
+-- 
+2.25.1
+

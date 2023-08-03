@@ -1,5 +1,6 @@
 # Provides the common settings for LS208xA
 
+require conf/machine/include/fsl-github-migrate.inc
 require conf/machine/include/qoriq-atf.inc
 require conf/machine/include/soc-family.inc
 
@@ -13,11 +14,6 @@ HOSTTOOLS += "parted mkfs.vfat mcopy udevadm"
 EXTRA_IMAGECMD:ext4 = "-i 4096 -L ${IMAGE_NAME}"
 
 EXTRA_IMAGEDEPENDS += "mc-utils management-complex ppa"
-
-URL_MIGRATEFROM = "source.codeaurora.org/external/qoriq/qoriq-components"
-URL_MIGRATETO = "github.com/nxp-qoriq"
-INHERIT += "fsl-github-migrate"
-BB_DANGLINGAPPENDS_WARNONLY = "1"
 
 # No better place for this if it should stay in the layer
 PREFERRED_PROVIDER_jpeg ?= "libjpeg-turbo"

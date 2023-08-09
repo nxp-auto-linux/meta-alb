@@ -14,7 +14,6 @@ DEPENDS += "openssl-native"
 DEPENDS += "u-boot-s32"
 DEPENDS += "u-boot-tools-native"
 DEPENDS += "${@ 'u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os', '', d)}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -142,5 +141,6 @@ PACKAGES += "${PN}-scmi-hdrs"
 addtask deploy after do_compile
 
 do_compile[depends] = "virtual/bootloader:do_install"
+do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os:do_deploy', '', d)}"
 
 COMPATIBLE_MACHINE = "s32"

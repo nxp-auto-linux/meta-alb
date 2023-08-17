@@ -69,11 +69,17 @@ do_compile:prepend() {
             bbfatal_log "There is a difference in the SCMI header content between TF-A and the Linux repository (${hdr} vs ${lhdr})."
         fi
     done
+    
+    # DTB might have been changed from an earlier build, see SCMI_DTB_NODE_CHANGE changes.
+    # Clean-up these changes to guarantee an updated DTB.
+	dtb_name="${B}/arch/arm64/boot/dts/${KERNEL_DEVICETREE}"
+	if [ -f ${dtb_name} ]; then
+	    rm ${dtb_name}
+	fi
 }
 
 # Switch from SIUL2 to SCMI drivers if needed
 do_compile:append() {
-	dtb_name="${B}/arch/arm64/boot/dts/${KERNEL_DEVICETREE}"
 	if ${SCMI_DTB_NODE_CHANGE}; then
 		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
 			${dtb_name} \

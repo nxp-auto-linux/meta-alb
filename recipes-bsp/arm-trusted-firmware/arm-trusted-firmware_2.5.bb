@@ -21,6 +21,7 @@ inherit deploy
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
+RSA_PRIV_FIP ?= ""
 
 BUILD_TYPE ?= "release"
 
@@ -39,13 +40,20 @@ XEN_ARGS = " \
 M7BOOT_ARGS = " \
                 FIP_OFFSET_DELTA=0x2000 \
                 "
+
 SCPRT_ARGS = " \
                 S32CC_USE_SCP=1 \
                 FIP_ALIGN=64 \
                 "
+
 HSE_ARGS = " \
               HSE_SUPPORT=1 \
-	      "
+              "
+
+SECBOOT_ARGS = " \
+                 SECBOOT_SUPPORT=1 \
+                 RSA_PRIV_FIP=${RSA_PRIV_FIP} \
+                 "
 
 EXTRA_OEMAKE += " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
@@ -65,6 +73,7 @@ EXTRA_OEMAKE += 'OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/../" \
                  HOSTSTRIP=true'
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'scprt', '${SCPRT_ARGS}', '', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'hse', '${HSE_ARGS}', '', d)}"
+EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '${SECBOOT_ARGS}', '', d)}"
 
 # Switch to SCMI versions for pinctrl and NVMEM if it's the case
 EXTRA_OEMAKE += "S32CC_USE_SCMI_PINCTRL=${SCMI_USE_SCMI_PINCTRL}"

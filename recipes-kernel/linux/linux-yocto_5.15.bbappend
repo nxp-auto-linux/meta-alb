@@ -1,14 +1,21 @@
+# in order for this bbappend to take effect,
+# add the following lines in conf/local.conf:
+#
+# PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"
+# KMACHINE:s32g = "s32g"
+
 COMPATIBLE_MACHINE:s32g = "s32g"
 
-SRC_URI_GITHUB = "git://github.com/nxp-auto-linux/linux.git;name=machine;protocol=https"
-SRCBRANCH_GITHUB = "release/bsp37.0-5.15.96-rt"
-SRCREV_GITHUB = "f2b25660adcf5713afcd24abdae0dbe69b199701"
-
-SRCBRANCH:s32g = "${SRCBRANCH_GITHUB}"
-SRCREV_machine:s32g = "${SRCREV_GITHUB}"
-
+# we do not want to take the linux-yocto from YoctoProject
 SRC_URI:remove:s32g = "git://git.yoctoproject.org/linux-yocto.git;name=machine;branch=${KBRANCH};"
-SRC_URI:append:s32g = " \
-	${SRC_URI_GITHUB};branch=${SRCBRANCH}"
+
+KVER = "5.15.119"
+PV = "${KVER}"
+SRCBRANCH:s32g = "${RELEASE_BASE}-${KVER}-rt"
+SRCREV_machine:s32g = "746f1e948964ddd9fa2c7154e408177a39bd29a6"
+
+# instead, we will take NXP linux project from GitHub
+SRC_URI:append:s32g = "\
+	git://github.com/nxp-auto-linux/linux.git;name=machine;protocol=https;branch=${SRCBRANCH};"
 
 KMACHINE:s32g = "s32g"

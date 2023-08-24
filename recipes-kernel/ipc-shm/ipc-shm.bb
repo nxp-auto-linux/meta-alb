@@ -10,10 +10,11 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 
 inherit module
 
-IPC-SHM_INCLUDE:s32g2  = "ipc-shm-s32g2-defs.inc"
-IPC-SHM_INCLUDE:s32g3  = "ipc-shm-s32g3-defs.inc"
-IPC-SHM_INCLUDE:s32r45 = "ipc-shm-s32r45-defs.inc"
-require recipes-kernel/ipc-shm/${IPC-SHM_INCLUDE}
+IPC-SHM_INCLUDE_PATH = "recipes-kernel/ipc-shm"
+IPC-SHM_INCLUDE:s32g2  = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32g2-defs.inc"
+IPC-SHM_INCLUDE:s32g3  = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32g3-defs.inc"
+IPC-SHM_INCLUDE:s32r45 = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32r45-defs.inc"
+require ${@d.getVar('IPC-SHM_INCLUDE') or ''}
 
 URL ?= "git://github.com/nxp-auto-linux/ipc-shm;protocol=https"
 SRC_URI = "${URL};branch=${BRANCH}"

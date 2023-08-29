@@ -3,7 +3,7 @@
 SRC_URI += "\
     file://build/llce_can.config \
     file://build/llce_logger.config \
-    file://build/llce_linflex.config \
+    file://build/llce_base.config \
     file://scripts/get_node_path.py \
 "
 
@@ -13,11 +13,12 @@ LLCE_FEATURES := "${@bb.utils.contains_any('DISTRO_FEATURES', 'llce-can llce-can
 LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-can-logger', ' logger', '', d)}"
 LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-fw-load', '', ' nofwload', d)}"
 LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-linflex', ' lin', '', d)}"
+LLCE_FEATURES:append := "${@bb.utils.contains('DISTRO_FEATURES', 'llce-lpspi', ' lpspi', '', d)}"
 
 # LLCE config fragments
 DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains('LLCE_FEATURES', 'can', ' llce_can.config', '', d)}"
 DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains('LLCE_FEATURES', 'logger', ' llce_logger.config', '', d)}"
-DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains('LLCE_FEATURES', 'lin', ' llce_linflex.config', '', d)}"
+DELTA_KERNEL_DEFCONFIG:append:s32g := "${@bb.utils.contains_any('LLCE_FEATURES', 'lin lpspi', ' llce_base.config', '', d)}"
 
 # Core
 KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains_any('LLCE_FEATURES', 'can logger lin', ' llce-core', '', d)}"

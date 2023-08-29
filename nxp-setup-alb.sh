@@ -454,8 +454,6 @@ BB_NUMBER_THREADS = "$THREADS"
 PARALLEL_MAKE = "-j $JOBS"
 DL_DIR = "$DOWNLOADS"
 SSTATE_DIR = "$CACHES"
-INHERIT += "own-mirrors"
-SOURCE_MIRROR_URL ?= "http://git.freescale.com/source/"
 # use xz to compress sstate
 SSTATE_PKG_SUFFIX = "txz"
 SSTATE_PKG_TARZIPPROG = "xz"

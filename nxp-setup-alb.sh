@@ -454,9 +454,6 @@ BB_NUMBER_THREADS = "$THREADS"
 PARALLEL_MAKE = "-j $JOBS"
 DL_DIR = "$DOWNLOADS"
 SSTATE_DIR = "$CACHES"
-# use xz to compress sstate
-SSTATE_PKG_SUFFIX = "txz"
-SSTATE_PKG_TARZIPPROG = "xz"
 EOF
 
 for s in $HOME/.oe $HOME/.yocto; do

@@ -2,6 +2,7 @@
 
 require conf/machine/include/fsl-github-migrate.inc
 require conf/machine/include/qoriq-atf.inc
+require conf/machine/include/qoriq-common.inc
 require conf/machine/include/soc-family.inc
 
 SOC_FAMILY = "fsl-lsch3:ls2:ls208xa"

@@ -1,5 +1,5 @@
-HSE_MACHINE = "S32G3"
-HSE_VERSION ?= "0_2_16_1"
+HSE_MACHINE ?= "S32G3XX"
+HSE_VERSION ?= "0_2_22_0"
 HSE_LIC ?= "license.rtf"
-HSE_LIC_MD5 ?= "0474bb8a03b7bc0ac59e9331d5be687f"
+HSE_LIC_MD5 ?= "a1bda359fc5cdcfca04f84834841a5ca"
 HSE_SOC_REV ?= "rev1.0"

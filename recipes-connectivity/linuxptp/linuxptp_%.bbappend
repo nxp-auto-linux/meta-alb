@@ -1,4 +1,4 @@
-PV = "4.0"
+PV = "4.1"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
@@ -7,4 +7,4 @@ SRC_URI = "http://sourceforge.net/projects/linuxptp/files/v${PV}/linuxptp-${PV}.
            file://Use-cross-cpp-in-incdefs.patch \
            "
 
-SRC_URI[sha256sum] = "d27d5ef296bb3d285e22e69f75ae023b4b42a2f4655130d6d390d8afcbc3d933"
+SRC_URI[sha256sum] = "e1743d44f8208897e30895da3579e670ff919b914feb4b5a949f3e421ddde535"

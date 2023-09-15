@@ -1,13 +1,13 @@
 DESCRIPTION = "LibFCI Example: Command line tool for configuration of PFE"
 HOMEPAGE = "https://github.com/nxp-auto-linux/pfeng"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://LICENSE-BSD3.txt;md5=6b674f4e7c2e72a1907ad7a7f03b800c"
+LIC_FILES_CHKSUM = "file://LICENSE-BSD3.txt;md5=a76ce5ba347a9a89c4a886e042668dbb"
 
 PR = "r0"
 
 URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https;nobranch=1"
 SRC_URI = "${URL}"
-SRCREV = "8ccbb151028ea05bede7f0293b4a11234ccb695d"
+SRCREV = "8632fed8452ee3b113edd7704077efec5f6efea9"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/libfci_cli"

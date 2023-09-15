@@ -1,17 +1,16 @@
-Linux: 5.10.41
-Linux-rt: 5.10.41-rt42
-Linux versions: 5.10 5.4
-U-boot: 2020.04
-Ubuntu target: 18.04.5 20.04.1
-Yocto: 3.2.4 "gatesgarth"
-Gcc: 10.2.0
-Glibc: 2.32
-Binutils: 2.35.1
-Xen: 4.14
-Lxc: 4.0.4
-Docker: 18.09.7 19.03.13
-Openssl: 1.1.1k
-ROS: melodic noetic
-GPU: 6.4.0
+Linux: 5.15.119
+Linux-rt: 5.15.119-rt65
+Linux versions: 5.10 5.15
+U-boot: 2020.04 2022.04
+Ubuntu target: 20.04.1 22.04.1
+Yocto: 4.0.10 "kirkstone"
+Gcc: 11.3.0
+Glibc: 2.35
+Binutils: 2.38
+Xen: 4.17
+Lxc: 4.0.12
+Docker: 19.03.13
+Openssl: 3.0.8
+ROS: noetic
 IPCF: 1.0
 Adaptive Autosar: R20-11

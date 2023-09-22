@@ -1,9 +1,7 @@
-From 49d34a85605fc0b42f37b282119d9505e93ee047 Mon Sep 17 00:00:00 2001
+From 0ff6705cde96601543999d1eaf8c0568450b5537 Mon Sep 17 00:00:00 2001
 From: Dan Nica <dan.nica@nxp.com>
 Date: Fri, 2 Oct 2020 20:55:36 +0300
-Subject: [PATCH] s32g274a-rdb2: Add support for S32G-VNP-RDB2
-
-On RDB2, GPIO30 is used to emulate DSPI CS.
+Subject: [PATCH] sja1110_init: fix various issues
 
 This commit also resolves some issues:
 	* The RCNT field of the SPI message was always set to the
@@ -15,13 +13,14 @@ This commit also resolves some issues:
 
 Signed-off-by: Ryder Gong <ryder.gong@nxp.com>
 Signed-off-by: Dan Nica <dan.nica@nxp.com>
+Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
 ---
- sja1110_init.c | 51 ++++++++++++++++++++++++++++++++++++++++++++-------
+ sja1110_init.c | 17 ++++++++++-------
  sja1110_init.h |  5 +++--
- 2 files changed, 47 insertions(+), 9 deletions(-)
+ 2 files changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/sja1110_init.c b/sja1110_init.c
-index b8d4eaf..3b960e4 100644
+index b8d4eaf..fcf4818 100644
 --- a/sja1110_init.c
 +++ b/sja1110_init.c
 @@ -45,7 +45,8 @@
@@ -72,61 +71,6 @@ index b8d4eaf..3b960e4 100644
  		    uc_status.err_code != NO_ERROR) {
  			dev_err(&sja1110->spi->dev,
  				"[%s] Upload error detected in status message %d (status=0x%x,err=0x%x)\n",
-@@ -676,6 +679,13 @@ static int sja1110_init_hw(struct sja1110_priv *sja1110)
- 		goto out_return;
- 	}
- 
-+	if (gpio_is_valid(sja1110->spi->cs_gpio)) {
-+		if (sja1110->spi->mode & SPI_CS_HIGH)
-+			gpio_set_value(sja1110->spi->cs_gpio, 1);
-+		else
-+			gpio_set_value(sja1110->spi->cs_gpio, 0);
-+	}
-+
- 	dev_info(&sja1110->spi->dev, "[%s] loaded fw '%s'\n", __func__,
- 		sja1110->bin_name);
- 
-@@ -702,6 +712,12 @@ static int sja1110_init_hw(struct sja1110_priv *sja1110)
- 
- 
- out_release:
-+	if (gpio_is_valid(sja1110->spi->cs_gpio)) {
-+		if (sja1110->spi->mode & SPI_CS_HIGH)
-+			gpio_set_value(sja1110->spi->cs_gpio, 0);
-+		else
-+			gpio_set_value(sja1110->spi->cs_gpio, 1);
-+	}
- 	release_firmware(fw);
- out_return:
- 	mutex_unlock(&sja1110->lock);
-@@ -1036,6 +1052,27 @@ static int sja1110_probe(struct spi_device *spi)
- 		/* switch static config */
- 		dev_info(&spi->dev, "probing switch\n");
- 
-+		if (gpio_is_valid(spi->cs_gpio)) {
-+			struct gpio_desc *desc = gpio_to_desc(spi->cs_gpio);
-+
-+			if (spi->mode & SPI_CS_HIGH)
-+				ret = gpiod_direction_output_raw(desc, 0);
-+			else
-+				ret = gpiod_direction_output_raw(desc, 1);
-+			if (ret)
-+				dev_err(&spi->dev,
-+					"gpiod_direction_output_raw.ret=%d\n",
-+					ret);
-+		} else {
-+			if (spi->cs_gpio != -ENOENT) {
-+				dev_err(&sja1110->spi->dev,
-+				"[%s] Error: GPIO %d is set but not valid\n",
-+					__func__, sja1110->spi->cs_gpio);
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+		}
-+
- 		strncpy(sja1110->bin_name, config_name, PATH_LEN);
- 		sja1110->bin_name[PATH_LEN - 1] = 0;
- 
 diff --git a/sja1110_init.h b/sja1110_init.h
 index d8f38ec..88d0f1f 100644
 --- a/sja1110_init.h
@@ -151,5 +95,5 @@ index d8f38ec..88d0f1f 100644
  #define RESET_DELAY_US         50
  #define CGU_SPI_BASE_ADDR      (0x1C6400UL)
 -- 
-2.7.4
+2.34.1
 

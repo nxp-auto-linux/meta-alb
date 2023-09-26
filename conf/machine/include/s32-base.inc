@@ -38,7 +38,7 @@ PREFERRED_VERSION_optee-test ?= "3.18.0"
 PREFERRED_VERSION_optee-examples ?= "3.18.0"
 
 PREFERRED_VERSION_rng-tools ?= "5"
-PREFERRED_VERSION_tcpreplay ?= "4.4.2"
+PREFERRED_VERSION_tcpreplay ?= "4.4.4"
 
 # ensure bison is not removed from sysroot, otherwise
 # some build tasks e.g. kernel 'do_merge_delta_config' will fail

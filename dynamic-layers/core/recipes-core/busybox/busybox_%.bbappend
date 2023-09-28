@@ -6,7 +6,7 @@ ALTERNATIVE_PRIORITY[init] = "40"
 
 SRC_URI += " \
     file://externaldhcp.cfg \
-    file://init.cfg \
+    ${@["", " file://init.cfg"][(d.getVar('VIRTUAL-RUNTIME_init_manager') == 'busybox')]} \
     file://enabledhcpcopts.patch \
 "
 

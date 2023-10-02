@@ -131,7 +131,7 @@ do_install:append() {
 	for tag in ${PLAT_HEADERS_TAGS}
 	do
 		# Export SCMI headers
-		for proto in clock reset perf
+		for proto in clock reset perf nvmem
 		do
 			hdr=$(find ${S} -name "*${tag}-*scmi*${proto}.h")
 			if [ -z "${hdr}" ]

@@ -16,7 +16,7 @@ SRC_URI = "${URL};branch=${BRANCH}"
 
 DEPENDS:append = " libgcc dtc-native"
 DEPENDS:append = "${@ ' u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
-DEPENDS:append = " arm-trusted-firmware-scmi-hdrs"
+DEPENDS:append = " arm-trusted-firmware-plat-hdrs"
 
 KERNEL_CC:append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append = " ${TOOLCHAIN_OPTIONS}"
@@ -57,7 +57,7 @@ do_compile:prepend() {
         ln -sf ${STAGING_BINDIR_NATIVE}/dtc ${B}/scripts/dtc/dtc
     fi
 
-    for hdr in ${STAGING_INCDIR}/scmi-hdrs/*; do
+    for hdr in ${STAGING_INCDIR}/plat-hdrs/*; do
         bname="$(basename ${hdr})"
         lhdr=$(find "${S}/include" -name "${bname}")
 
@@ -66,7 +66,7 @@ do_compile:prepend() {
         fi
 
         if ! diff -NZbau "${hdr}" "${lhdr}"; then
-            bbfatal_log "There is a difference in the SCMI header content between TF-A and the Linux repository (${hdr} vs ${lhdr})."
+            bbfatal_log "There is a difference in the platform header content between TF-A and the Linux repository (${hdr} vs ${lhdr})."
         fi
     done
     

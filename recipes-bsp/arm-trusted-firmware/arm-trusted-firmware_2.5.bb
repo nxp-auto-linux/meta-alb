@@ -83,9 +83,9 @@ PINCTRL_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl'
 GPIO_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"
 NVMEM_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_NVMEM', '1', '--nvmem', '--no-nvmem', d)}"
 
-SCMI_HEADERS_TAGS = " s32gen1 s32cc"
-SCMI_HEADERS_TAGS:append:s32g := " s32g"
-SCMI_HEADERS_TAGS:append:s32r := " s32r45"
+PLAT_HEADERS_TAGS = " s32gen1 s32cc"
+PLAT_HEADERS_TAGS:append:s32g := " s32g"
+PLAT_HEADERS_TAGS:append:s32r := " s32r45"
 
 SECBOOT = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'recipes-bsp/arm-trusted-firmware/atf-hse-secboot.inc', '', d)}"
 include ${SECBOOT}
@@ -127,9 +127,10 @@ do_deploy() {
 }
 
 do_install:append() {
-	install -d ${D}${includedir}/scmi-hdrs
-	for tag in ${SCMI_HEADERS_TAGS}
+	install -d ${D}${includedir}/plat-hdrs
+	for tag in ${PLAT_HEADERS_TAGS}
 	do
+		# Export SCMI headers
 		for proto in clock reset perf
 		do
 			hdr=$(find ${S} -name "*${tag}-*scmi*${proto}.h")
@@ -138,14 +139,26 @@ do_install:append() {
 				continue
 			fi
 
-			install -m 0644 "${hdr}" ${D}${includedir}/scmi-hdrs
+			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs
+		done
+
+		# Export other platform headers
+		for name in can-ts
+		do
+			hdr=$(find ${S} -name "*${tag}-*${name}*.h")
+			if [ -z "${hdr}" ]
+			then
+				continue
+			fi
+
+			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs
 		done
 	done
 }
 
-FILES:${PN}-scmi-hdrs = " ${includedir}/scmi-hdrs/*.h "
-PROVIDES += "${PN}-scmi-hdrs"
-PACKAGES += "${PN}-scmi-hdrs"
+FILES:${PN}-plat-hdrs = " ${includedir}/plat-hdrs/*.h "
+PROVIDES += "${PN}-plat-hdrs"
+PACKAGES += "${PN}-plat-hdrs"
 
 addtask deploy after do_compile
 

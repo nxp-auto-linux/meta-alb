@@ -1,4 +1,0 @@
-DISTRO_FEATURES:append = " systemd"
-DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
-VIRTUAL-RUNTIME_init_manager ?= "systemd"
-VIRTUAL-RUNTIME_initscripts ?= "systemd-compat-units"

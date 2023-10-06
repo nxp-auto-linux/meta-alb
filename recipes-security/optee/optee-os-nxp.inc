@@ -17,8 +17,8 @@ PLATFORM_FLAVOR:s32g3 = "s32g3"
 PLATFORM_FLAVOR:s32r45 = "s32r"
 
 HSE_ARGS = " \
-              CFG_CRYPTO_DRIVER=y \
-              HSE_FWDIR=${STAGING_INCDIR}/hse-interface \
+              CFG_NXP_HSE=y \
+              CFG_NXP_HSE_FWDIR=${STAGING_INCDIR}/hse-interface \
 	       "
 XEN_ARGS = " \
               CFG_VIRTUALIZATION=y \

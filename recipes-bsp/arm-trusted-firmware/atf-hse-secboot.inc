@@ -2,12 +2,11 @@
 
 DEPENDS += "arm-trusted-firmware-tools-native"
 
-# Secure boot works only on sdcard
-BOOT_TYPE = "sdcard"
-
 KEYS_DIR = "${WORKDIR}/keys"
 RSA_PRIV_FIP = "${KEYS_DIR}/fip_rsa2048_private.pem"
 RSA_PUB_FIP = "${KEYS_DIR}/fip_rsa2048_public.pem"
+RSA_PUB_FIP_FILE = "fip_rsa2048_public.pem"
+INSTALL_PATH = "/usr/keys"
 
 do_generate_keys () {
 	mkdir -p ${KEYS_DIR}
@@ -22,3 +21,12 @@ do_deploy:append() {
 	cp -vf "${RSA_PRIV_FIP}" ${DEPLOYDIR}
 	cp -vf "${RSA_PUB_FIP}" ${DEPLOYDIR}
 }
+
+do_install:append() {
+       install -d ${D}${INSTALL_PATH}
+       install -m 0666 ${RSA_PUB_FIP} ${D}${INSTALL_PATH}
+}
+
+FILES:${PN}-secboot = " ${INSTALL_PATH}/${RSA_PUB_FIP_FILE} "
+PROVIDES += "${PN}-secboot"
+PACKAGES += "${PN}-secboot"

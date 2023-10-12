@@ -66,3 +66,6 @@ IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '
 
 # Add PKCS11-HSE Library & Examples
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'hse', ' pkcs11-hse', '', d)}"
+
+# Add secboot public key
+IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', ' arm-trusted-firmware-secboot', '', d)}"

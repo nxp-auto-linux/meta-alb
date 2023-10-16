@@ -28,4 +28,5 @@ SRC_URI += " \
 \
     file://0001-pseudo-Added-dup3-support.patch \
     file://0002-pseudo-Fix-fxstatat-calls-for-non-fs-file-handles.patch \
+    file://0001-Fix-undeclared-basename-function.patch \
 "

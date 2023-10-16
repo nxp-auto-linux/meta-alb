@@ -1,0 +1,41 @@
+From 9428debb698dcd31361dcb071ac04e077d56928d Mon Sep 17 00:00:00 2001
+From: Guilherme Melo <guilmelo@amazon.com>
+Date: Wed, 4 Oct 2023 16:25:58 +0000
+Subject: [PATCH] Fix undeclared basename function
+
+This could make pseudo to seg fault in some conditions. The problem is
+two conflicting patches.
+
+This one, that adds support for a custom PSEUDO_CHROOT_XTRANSLATION variable
+which uses the basename function:
+
+https://github.com/nxp-auto-linux/meta-alb/blob/bsp37.0-4.0/dynamic-layers/core/recipes-devtools/pseudo/pseudo/0006-pseudo-Filename-translation-for-exec-path-handling.patch
+
+The basename function is either defined in <strings.h> when _GNU_SOURCE is
+defined or <libgen.h> (POSIX version) when this header is included.
+
+The patch alone would normally work, but this other patch from poky,
+changes to _DEFAULT_SOURCE instead of _GNU_SOURCE:
+
+https://git.yoctoproject.org/poky/commit/meta/recipes-devtools/pseudo/files/glibc238.patch?h=kirkstone&id=4682ae38f285f59b68196289ece5802460805201
+
+So when using both patches the basename function wasn't even declared
+(gcc gave a warning), causing a seg fault. Since when using poky
+_GNU_SOURCE can't be used anymore, the only solution left is to include
+the <libgen.h> header
+---
+ pseudo_client.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pseudo_client.c b/pseudo_client.c
+index 2d30b56..77f72ec 100644
+--- a/pseudo_client.c
++++ b/pseudo_client.c
+@@ -12,6 +12,7 @@
+ #include <signal.h>
+ #include <stdarg.h>
+ #include <stdlib.h>
++#include <libgen.h>
+ #include <string.h>
+ #include <limits.h>
+ #include <time.h>

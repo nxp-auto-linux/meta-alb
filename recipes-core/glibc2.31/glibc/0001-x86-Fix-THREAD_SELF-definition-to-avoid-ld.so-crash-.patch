@@ -1,0 +1,63 @@
+From bd29f35bfe0737b547528597b87a25aaf7f71c9b Mon Sep 17 00:00:00 2001
+From: Jakub Jelinek <jakub@redhat.com>
+Date: Thu, 3 Dec 2020 13:33:44 +0100
+Subject: [PATCH] x86: Fix THREAD_SELF definition to avoid ld.so crash (bug
+ 27004)
+
+The previous definition of THREAD_SELF did not tell the compiler
+that %fs (or %gs) usage is invalid for the !DL_LOOKUP_GSCOPE_LOCK
+case in _dl_lookup_symbol_x.  As a result, ld.so could try to use the
+TCB before it was initialized.
+
+As the comment in tls.h explains, asm volatile is undesirable here.
+Using the __seg_fs (or __seg_gs) namespace does not interfere with
+optimization, and expresses that THREAD_SELF is potentially trapping.
+---
+ sysdeps/i386/nptl/tls.h   | 7 ++++++-
+ sysdeps/x86_64/nptl/tls.h | 7 ++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeps/i386/nptl/tls.h b/sysdeps/i386/nptl/tls.h
+index d1bf90a503..55de6c18a2 100644
+--- a/sysdeps/i386/nptl/tls.h
++++ b/sysdeps/i386/nptl/tls.h
+@@ -241,11 +241,16 @@ tls_fill_user_desc (union user_desc_init *desc,
+    assignments like
+ 	pthread_descr self = thread_self();
+    do not get optimized away.  */
+-# define THREAD_SELF \
++# if __GNUC_PREREQ (6, 0)
++#  define THREAD_SELF \
++  (*(struct pthread *__seg_gs *) offsetof (struct pthread, header.self))
++# else
++#  define THREAD_SELF \
+   ({ struct pthread *__self;						      \
+      asm ("movl %%gs:%c1,%0" : "=r" (__self)				      \
+ 	  : "i" (offsetof (struct pthread, header.self)));		      \
+      __self;})
++# endif
+ 
+ /* Magic for libthread_db to know how to do THREAD_SELF.  */
+ # define DB_THREAD_SELF \
+diff --git a/sysdeps/x86_64/nptl/tls.h b/sysdeps/x86_64/nptl/tls.h
+index e7c1416eec..5d0788c8fe 100644
+--- a/sysdeps/x86_64/nptl/tls.h
++++ b/sysdeps/x86_64/nptl/tls.h
+@@ -186,11 +186,16 @@ _Static_assert (offsetof (tcbhead_t, __glibc_unused2) == 0x80,
+    assignments like
+ 	pthread_descr self = thread_self();
+    do not get optimized away.  */
+-# define THREAD_SELF \
++# if __GNUC_PREREQ (6, 0)
++#  define THREAD_SELF \
++  (*(struct pthread *__seg_fs *) offsetof (struct pthread, header.self))
++# else
++#  define THREAD_SELF \
+   ({ struct pthread *__self;						      \
+      asm ("mov %%fs:%c1,%0" : "=r" (__self)				      \
+ 	  : "i" (offsetof (struct pthread, header.self)));	 	      \
+      __self;})
++# endif
+ 
+ /* Magic for libthread_db to know how to do THREAD_SELF.  */
+ # define DB_THREAD_SELF_INCLUDE  <sys/reg.h> /* For the FS constant.  */

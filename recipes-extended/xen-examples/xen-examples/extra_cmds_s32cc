@@ -1,5 +1,6 @@
 fdt rm /chosen stdout-path
 fdt get value msi_parent0 pci0 msi-parent && fdt rm pci0 msi-parent;
 fdt get value msi_parent1 pci1 msi-parent && fdt rm pci1 msi-parent;
+fdt rm /thermal-zones/a53_cores/cooling-maps
 setenv xen_addr ${host_kernel_addr}
 setenv fdt_addr ${host_fdt_addr}

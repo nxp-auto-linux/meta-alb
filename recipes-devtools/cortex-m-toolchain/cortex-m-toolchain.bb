@@ -10,11 +10,12 @@ LIC_FILES_CHKSUM = "\
 "
 
 BBCLASSEXTEND = "native"
-GCC_NAME = "gcc-arm-none-eabi-10-2020-q4-major"
+GCC_NAME = "gcc-arm-none-eabi-10.3-2021.10"
+GCC_RELEASE = "10.3-2021.10"
 
-SRC_URI = "https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/${GCC_NAME}-x86_64-linux.tar.bz2;"
-SRC_URI[md5sum] = "8312c4c91799885f222f663fc81f9a31"
-SRC_URI[sha256sum] = "21134caa478bbf5352e239fbc6e2da3038f8d2207e089efc96c3b55f1edcd618"
+SRC_URI = "https://developer.arm.com/-/media/Files/downloads/gnu-rm/${GCC_RELEASE}/${GCC_NAME}-x86_64-linux.tar.bz2;"
+SRC_URI[md5sum] = "2383e4eb4ea23f248d33adc70dc3227e"
+SRC_URI[sha256sum] = "97dbb4f019ad1650b732faffcc881689cedc14e2b7ee863d390e0a41ef16c9a3"
 
 S = "${WORKDIR}/${GCC_NAME}"
 do_install:append() {

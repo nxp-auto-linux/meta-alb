@@ -2,8 +2,9 @@
 
 SUMMARY = "Add support for KVASER USB CAN in BB Mini"
 LICENSE = "GPL-2.0-only & BSD"
+
 LIC_FILES_CHKSUM = " \
-    file://COPYING;md5=2cf4d51e36bb1104d17f3f6849f7565e \
+    file://COPYING;md5=df8cdeaa1ac5c05e71624f0446dbec13 \
     file://COPYING.GPL;md5=4cbb77fd75630b4028ece91b3a627eb4 \
     file://COPYING.BSD;md5=6957ddf8dbb77d424a70a509ee99f569 \
 "
@@ -11,12 +12,8 @@ LIC_FILES_CHKSUM = " \
 inherit module
 
 SRC_URI = "https://www.kvaser.com/download/?utm_ean=7330130980754&utm_status=V${PV};downloadfilename=linuxcan.tar.gz"
-SRC_URI[md5sum] = "2eb56959f54bd53e8dc8949630d221ef"
-SRC_URI[sha256sum] = "4fdb4bd8d4a4088f212f5892869a81a01372ef9434430c18b36ff52e2c221c01"
-
-SRC_URI += "\
-	file://kvaser-fix-parallel-build.patch \
-"
+SRC_URI[md5sum] = "2a691eeb9761fa60e6d557cdd33fad56"
+SRC_URI[sha256sum] = "8de633774c259053d431ee8b87fc85a5ccca69041cd83fdba3b8f6dcf708f2cb"
 
 S = "${WORKDIR}/linuxcan"
 
@@ -70,17 +67,13 @@ do_install() {
 
 	mkdir -p "${D}${KVASER_DIR}"
 
-	# deploy main config file
-	cp "${S}/10-kvaser.rules" "${D}${KVASER_DIR}/"
-
 	# deploy modules and dependencies
 	for kvmodule in ${MODULES} ; do
 		mkdir -p "${D}${KVASER_DIR}/$kvmodule/"
 		cd "${S}/$kvmodule"
-		cp *.sh *.ko "${D}${KVASER_DIR}/$kvmodule/"
-		if [ -e "$kvmodule" -a -e "$kvmodule.usermap" ] ; then
-			cp "$kvmodule" "$kvmodule.usermap" "${D}${KVASER_DIR}/$kvmodule/"
-		fi
+		# copy manual install scripts and the corresponding kernel module
+		cp *.sh "${D}${KVASER_DIR}/$kvmodule/"
+		cp $kvmodule.ko "${D}${MODULES_DIR}/usb/misc/"
 	done
 
 	mkdir -p "${D}${LIB_DIR}"
@@ -108,8 +101,14 @@ FILES:${PN} += "${KVASER_DIR}"
 FILES:${PN} += "${EXAMPLES_BASE}"
 FILES:${PN} += "${LIB_DIR}"
 
+module_conf_kvaser_usb = "blacklist kvaser_usb"
+module_conf_leaf = "softdep leaf post: kvcommon"
+KERNEL_MODULE_PROBECONF += "kvcommon ${MODULES}"
+KERNEL_MODULE_AUTOLOAD += "kvcommon ${MODULES}"
+
 FILES:${PN}-dev = ""
 FILES:${PN}-dbg = ""
+FILES:${PN} += "${sysconfdir}/modules-load.d/*"
 
 ALLOW_EMPTY:${PN}-dev = "1"
 ALLOW_EMPTY:${PN}-dbg = "1"

@@ -18,7 +18,6 @@ SRC_URI[sha256sum] = "8de633774c259053d431ee8b87fc85a5ccca69041cd83fdba3b8f6dcf7
 S = "${WORKDIR}/linuxcan"
 
 EXTRA_OEMAKE += 'KDIR="${STAGING_KERNEL_DIR}" V=1'
-TARGET_CC_ARCH += "-Wno-error=maybe-uninitialized"
 
 MODULES = "leaf"
 # The following modules are untested, to be re-added in the future if needed

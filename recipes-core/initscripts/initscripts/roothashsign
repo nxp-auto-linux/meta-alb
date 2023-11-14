@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Copyright 2023 NXP
+#
+
+roothashsign_enabled() {
+    return 0
+}
+
+roothashsign_run() {
+    # Verify the roothash.
+    # If the verification fails, someone tempered with rootfs. Kill init.
+    openssl dgst -sha256 -verify /usr/share/misc/dm-verity-public-key \
+        -signature /usr/share/misc/dm-verity-roothash-signed /usr/share/misc/dm-verity-roothash
+    if [ ! $? -eq 0 ]; then
+        return -1
+    fi
+}

@@ -10,6 +10,9 @@ include ${BASE_CORE_IMAGE}
 DM_VERITY_IMG = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'fsl-dm-verity.inc', '', d)}"
 include ${DM_VERITY_IMG}
 
+ROOT_HASH_SIGN = "${@bb.utils.contains('DISTRO_FEATURES', 'root-hash-sign', 'dm-verity-root-hash-sign', '', d)}"
+inherit ${ROOT_HASH_SIGN}
+
 IMAGE_INSTALL += " \
     kernel-image \
     kernel-modules \

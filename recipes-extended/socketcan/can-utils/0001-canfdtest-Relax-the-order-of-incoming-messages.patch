@@ -1,6 +1,6 @@
-From d793e1033300513d4f25c37ebbcf5e458e97a7e9 Mon Sep 17 00:00:00 2001
-From: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
-Date: Thu, 9 Feb 2023 10:47:10 +0200
+From a27d0dcdd611995bbbfb298c8c9be42133a71ef9 Mon Sep 17 00:00:00 2001
+From: Larisa Grigore <larisa.grigore@nxp.com>
+Date: Tue, 14 Nov 2023 14:42:25 +0200
 Subject: [PATCH] canfdtest: Relax the order of incoming messages
 
 Currently, the canfdtest assumes that the host will receive a message
@@ -35,14 +35,15 @@ canfdtest -vv -g llcecan10 &> log10 &
 In this example, LLCE CAN1 & CAN9 share the same RX/TX FIFOs. The same
 applies to LLCE CAN2 & CAN10.
 
-Issue: ALB-9819
+Issue: ALB-9819, ALB-10677
 Signed-off-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+Signed-off-by: Larisa Grigore <larisa.grigore@nxp.com>
 ---
- canfdtest.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 66 insertions(+), 10 deletions(-)
+ canfdtest.c | 93 ++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 74 insertions(+), 19 deletions(-)
 
 diff --git a/canfdtest.c b/canfdtest.c
-index a5050bc..ee434ce 100644
+index a5050bc..99d66d9 100644
 --- a/canfdtest.c
 +++ b/canfdtest.c
 @@ -46,6 +46,14 @@
@@ -87,7 +88,7 @@ index a5050bc..ee434ce 100644
  			send_pos++;
  			if (send_pos == inflight_count)
  				send_pos = 0;
-@@ -366,35 +382,75 @@ static int can_echo_gen(void)
+@@ -366,35 +382,74 @@ static int can_echo_gen(void)
  				goto out_free;
  			}
  
@@ -124,38 +125,46 @@ index a5050bc..ee434ce 100644
  				recv_tx_pos++;
  				if (recv_tx_pos == inflight_count)
  					recv_tx_pos = 0;
- 				continue;
- 			}
- 
+-				continue;
+-			}
+-
 -			if (!recv_tx[recv_rx_pos]) {
 -				printf("RX before TX!\n");
-+			if (!(recv_tx[recv_rx_pos] & SENT)) {
-+				printf("DUT RX before TX!\n");
- 				print_frame(rx_frame.can_id, rx_frame.data, rx_frame.len, 0);
+-				print_frame(rx_frame.can_id, rx_frame.data, rx_frame.len, 0);
 -				running = 0;
-+				err = -1;
-+				break;
++			} else {
++				if (!(recv_tx[recv_rx_pos] & SENT)) {
++					printf("DUT RX before TX!\n");
++					print_frame(rx_frame.can_id, rx_frame.data, rx_frame.len, 0);
++					err = -1;
++					break;
++				}
++
++				/* compare with expected */
++				err = compare_frame(&tx_frames[recv_rx_pos], &rx_frame, 1);
++				if (!running) {
++					err = -1;
++					break;
++				}
++
++				if (recv_tx[recv_rx_pos] & DUT_RECEIVED) {
++					printf("The DUT received this frame twice:\n");
++					print_frame(rx_frame.can_id, rx_frame.data, rx_frame.len, 0);
++					err = -1;
++					break;
++				}
++
++				recv_tx[recv_rx_pos] |= DUT_RECEIVED;
++				check_rx_pos = recv_rx_pos;
++				recv_rx_pos++;
++				if (recv_rx_pos == inflight_count)
++					recv_rx_pos = 0;
  			}
-+
- 			/* compare with expected */
- 			err = compare_frame(&tx_frames[recv_rx_pos], &rx_frame, 1);
-+			if (!running) {
-+				err = -1;
-+				break;
-+			}
-+
-+			if (recv_tx[recv_rx_pos] & DUT_RECEIVED) {
-+				printf("The DUT received this frame twice:\n");
-+				print_frame(rx_frame.can_id, rx_frame.data, rx_frame.len, 0);
-+				err = -1;
-+				break;
-+			}
-+
-+			recv_tx[recv_rx_pos] |= DUT_RECEIVED;
-+			check_rx_pos = recv_rx_pos;
- 			recv_rx_pos++;
- 			if (recv_rx_pos == inflight_count)
- 				recv_rx_pos = 0;
+-			/* compare with expected */
+-			err = compare_frame(&tx_frames[recv_rx_pos], &rx_frame, 1);
+-			recv_rx_pos++;
+-			if (recv_rx_pos == inflight_count)
+-				recv_rx_pos = 0;
  
 -			loops++;
 -			if (test_loops && loops >= test_loops)

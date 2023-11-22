@@ -4,27 +4,27 @@
 auto lo
 iface lo inet loopback
 
-auto fm1-mac3
-iface fm1-mac3 inet dhcp
+auto eth0
+iface eth0 inet dhcp
 dhcpcd_opts -Gb
 
-auto fm1-mac4
-iface fm1-mac4 inet dhcp
+auto eth1
+iface eth1 inet dhcp
 dhcpcd_opts -Gb
 
-auto fm1-mac5
-iface fm1-mac5 inet dhcp
+auto eth2
+iface eth2 inet dhcp
 dhcpcd_opts -Gb
 
-auto fm1-mac6
-iface fm1-mac6 inet dhcp
+auto eth3
+iface eth3 inet dhcp
 dhcpcd_opts -Gb
 
-auto fm1-mac9
-iface fm1-mac9 inet dhcp
+auto eth4
+iface eth4 inet dhcp
 dhcpcd_opts -Gb
 
-auto fm1-mac10
-iface fm1-mac10 inet dhcp
+auto eth5
+iface eth5 inet dhcp
 dhcpcd_opts -Gb
 

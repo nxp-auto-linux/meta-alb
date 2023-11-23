@@ -16,6 +16,7 @@ IMAGE_INSTALL += " \
     setserial \
     dhcpcd \
     rng-tools \
+    udev-extraconf \
 "
 
 # Add pciutils package

@@ -26,9 +26,7 @@ require recipes-core/images/core-image-minimal.bb
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-#CORE_IMAGE_EXTRA_INSTALL += "udev-extraconf lsb"
-CORE_IMAGE_EXTRA_INSTALL += "udev-extraconf"
-CORE_IMAGE_EXTRA_INSTALL:append:qoriq = " udev-rules-qoriq"
+IMAGE_INSTALL:append = " udev-extraconf"
 
 IMAGE_FSTYPES = "tar.gz ext2.gz ext2.gz.u-boot"
 

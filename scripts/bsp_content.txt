@@ -3,8 +3,7 @@ Linux-rt: 5.15.129-rt67
 Linux versions: 5.10 5.15
 U-boot: 2022.04
 Ubuntu target: 20.04.1 22.04.1
-Yocto: 4.0.10 "kirkstone"
-4.0.12 "kirkstone"
+Yocto: 4.0.12 "kirkstone"
 Gcc: 11.4.0
 Glibc: 2.35
 Binutils: 2.38

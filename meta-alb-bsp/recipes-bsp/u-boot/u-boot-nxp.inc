@@ -42,6 +42,12 @@ SRC_URI:append:s32cc = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'file://build/optee_config.cfg', '', d)} \
 "
 
+# Switch the UART to be used if it is the case
+DELTA_UBOOT_DEFCONFIG:append:s32cc = " ${@ 'serial' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] + '.cfg' }"
+SRC_URI:append:s32cc = " \
+    ${@ 'file://build/serial' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] + '.cfg' } \
+"
+
 # Switch the UART baudrate to be used if it is the case
 S32_BAUDRATE = "${@d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[0] }"
 DELTA_UBOOT_DEFCONFIG:append:s32cc = " serial_configs/baudrate_${S32_BAUDRATE}.cfg"

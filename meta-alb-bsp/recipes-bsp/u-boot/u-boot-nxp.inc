@@ -170,6 +170,12 @@ do_deploy:append:s32cc() {
     done
 }
 
+do_deploy:append:s32n7sim() {
+    install -d "${DEPLOYDIR}/simimage/u-boot"
+    # Deploy the ELF for symbols
+    install -v "${B}/u-boot" "${DEPLOYDIR}/simimage/u-boot/u-boot"
+}
+
 FILES:${PN} += "${ENV_STAGE_DIR}"
 
 COMPATIBLE_MACHINE = "s32|qoriq"

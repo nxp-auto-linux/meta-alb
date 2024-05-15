@@ -251,6 +251,16 @@ do_deploy() {
 	install -d "${DEPLOYDIR}"
 }
 
+do_compile:s32n() {
+	unset LDFLAGS
+	unset CFLAGS
+	unset CPPFLAGS
+
+	oe_runmake -C "${S}" \
+		BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin" \
+		all
+}
+
 do_deploy:append:s32cc() {
 	for suffix in ${BOOT_TYPE}; do
 		cp -vf "${TFA_BINARIES}/bl2_w_dtb.s32-${suffix}" ${DEPLOYDIR}
@@ -283,6 +293,22 @@ do_deploy:append:s32r478() {
 
 		cp -vf "${TFA_BINARIES}/bl2_w_dtb.bin-${suffix}" ${DEPLOYDIR}
 	done
+}
+
+do_deploy:append:s32n7sim() {
+	tfa_deploy_dir="${DEPLOYDIR}/simimage/arm-trusted-firmware"
+
+	install -d "${tfa_deploy_dir}"
+
+	# Save bins
+	install -v "${TFA_BINARIES}/fip.bin" "${tfa_deploy_dir}/"
+	install -v "${TFA_BINARIES}/bl2_w_dtb.bin" "${tfa_deploy_dir}/"
+
+	install -v "${TFA_BINARIES}/fdts/s32n79-simulator.dtb" "${tfa_deploy_dir}/"
+
+	# Save elfs for symbols
+	install -v "${TFA_BINARIES}/bl2/bl2.elf" "${tfa_deploy_dir}/"
+	install -v "${TFA_BINARIES}/bl31/bl31.elf" "${tfa_deploy_dir}/"
 }
 
 do_install:append:s32cc() {

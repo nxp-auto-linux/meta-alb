@@ -194,6 +194,15 @@ do_deploy:append:s32() {
     fi
 }
 
+do_deploy:append:s32n7sim() {
+    kernel_deploy_dir="${DEPLOYDIR}/simimage/kernel"
+
+    install -d "${kernel_deploy_dir}"
+
+    install -v "${B}/arch/${ARCH}/boot/dts/${KERNEL_DEVICETREE}" "${kernel_deploy_dir}/"
+    install -v "arch/${ARCH}/boot/Image" "${kernel_deploy_dir}/"
+}
+
 # run make scripts after the shared work folder is created to prepare further
 # module build. The module's make scripts may have been already executed
 # before linux clean, and thus will not re-trigger again

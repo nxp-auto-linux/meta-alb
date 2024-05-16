@@ -79,3 +79,9 @@ IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '
 
 # Quick-boot image support
 require ${@ 'recipes-fsl/images/fsl-image-quick-boot.inc' if d.getVar('QUICK_BOOT_CONFIG', True) else ''}
+
+require ${@bb.utils.contains('DISTRO_FEATURES', 'quick-boot', 'recipes-fsl/images/fsl-image-quick-boot.inc', '', d)}
+
+DEPLOY_UBOOT_SIM_ROOTFS = ''
+DEPLOY_UBOOT_SIM_ROOTFS:s32n7sim = 'recipes-fsl/images/deploy_sim_rootfs.inc'
+include ${DEPLOY_UBOOT_SIM_ROOTFS}

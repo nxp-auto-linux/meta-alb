@@ -57,7 +57,7 @@ IMAGE_INSTALL:append:fsl-lsch3 = " \
 "
 
 IMAGE_FSTYPES:append = " tar.gz cpio.gz "
-IMAGE_FSTYPES:append:s32n7sim = " cpio "
+IMAGE_FSTYPES:append:s32n7sim = " cpio ext4"
 
 # Populate PFE and PFE FW
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}

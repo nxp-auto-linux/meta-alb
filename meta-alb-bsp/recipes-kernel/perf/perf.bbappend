@@ -3,6 +3,8 @@ EXTRA_OEMAKE += "PKG_CONFIG=pkg-config"
 PACKAGECONFIG += "libtraceevent"
 PACKAGECONFIG[libtraceevent] = ",NO_LIBTRACEEVENT=1,libtraceevent"
 
+RDEPENDS:${PN}-tests += "perl"
+
 PERF_SRC:append = " \
 	arch/arm64/tools \
 "

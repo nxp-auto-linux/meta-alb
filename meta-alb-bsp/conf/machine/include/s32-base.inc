@@ -51,6 +51,9 @@ UBOOT_ENTRYPOINT ?= "80080000"
 # Comment next line to prevent writing the environment to sdcard
 UBOOT_ENV_SDCARD_OFFSET ??= "0x00100000"
 
+# Used when TF-A and Linux have different naming convention for the DTB file
+KERNEL_DEVICETREE_OVERRIDE ?= ""
+
 #s32 has no hardware clock
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 

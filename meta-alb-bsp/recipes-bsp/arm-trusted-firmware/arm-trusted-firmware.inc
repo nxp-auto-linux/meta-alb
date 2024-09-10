@@ -33,6 +33,7 @@ BL33_HANDLE ??= ""
 BUILD_TYPE ?= "release"
 
 ATF_BINARIES = "${B}/${ATF_PLAT}/${BUILD_TYPE}"
+ATF_DTB = "${@'${KERNEL_DEVICETREE}' if d.getVar('KERNEL_DEVICETREE_OVERRIDE') == '' else '${KERNEL_DEVICETREE_OVERRIDE}'}"
 
 OPTEE_ARGS = " \
                 BL32=${DEPLOY_DIR_IMAGE}/optee/tee-header_v2.bin \
@@ -82,7 +83,7 @@ EXTRA_OEMAKE:append = " \
                 ARCH=${TARGET_ARCH} \
                 BUILD_BASE=${B} \
                 PLAT=${ATF_PLAT} \
-                DTB_FILE_NAME=${@os.path.basename(d.getVar('KERNEL_DEVICETREE'))} \
+                DTB_FILE_NAME=${@os.path.basename(d.getVar('ATF_DTB'))} \
                 "
 
 EXTRA_OEMAKE:append = " ${@oe.utils.conditional('BUILD_TYPE', 'debug', 'DEBUG=1', '', d)}"
@@ -137,7 +138,7 @@ do_compile:s32cc() {
 
 	if [ "${SCMI_DTB_NODE_CHANGE}" = "true" ] ; then
 		oe_runmake -C "${S}" dtbs
-		dtb_name="${ATF_BINARIES}/fdts/$(basename ${KERNEL_DEVICETREE})"
+		dtb_name="${ATF_BINARIES}/fdts/$(basename ${ATF_DTB})"
 		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
 			${dtb_name} \
 			${GPIO_OPT} \

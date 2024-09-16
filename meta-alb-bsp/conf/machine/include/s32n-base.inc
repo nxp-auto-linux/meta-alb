@@ -16,3 +16,5 @@ IMAGE_CLASSES += " \
 
 IMAGE_FSTYPES += "ufs"
 UBOOT_SUFFIX_UFS = "${UBOOT_SUFFIX}"
+
+BOOT_TYPE ?= "ddr ufs"

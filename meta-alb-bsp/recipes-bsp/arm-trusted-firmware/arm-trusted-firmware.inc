@@ -50,6 +50,7 @@ BUILD_TYPE ?= "release"
 
 TFA_BINARIES = "${B}/${TFA_PLAT}/${BUILD_TYPE}"
 TFA_DTB = "${@'${KERNEL_DEVICETREE}' if d.getVar('KERNEL_DEVICETREE_OVERRIDE') == '' else '${KERNEL_DEVICETREE_OVERRIDE}'}"
+TFA_OUTPUT = "${B}/${TFA_PLAT}"
 
 OPTEE_ARGS = " \
                 BL32=${DEPLOY_DIR_IMAGE}/optee/tee-header_v2.bin \
@@ -238,9 +239,17 @@ do_compile:s32n() {
 	unset CFLAGS
 	unset CPPFLAGS
 
-	oe_runmake -C "${S}" \
-		BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin" \
-		all
+	for suffix in ${BOOT_TYPE}
+	do
+		oe_runmake -C "${S}" clean
+		oe_runmake -C "${S}" \
+		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}" \
+		    S32N_BOOT_SRC=${suffix} all
+		cp -vf "${TFA_BINARIES}/bl2_w_dtb.bin" "${TFA_OUTPUT}/bl2_w_dtb.bin-${suffix}"
+		cp -vf "${TFA_BINARIES}/bl2/bl2.elf" "${TFA_OUTPUT}/bl2.elf-${suffix}"
+		cp -vf "${TFA_BINARIES}/bl31/bl31.elf" "${TFA_OUTPUT}/bl31.elf-${suffix}"
+		cp -vf "${TFA_BINARIES}/fip.bin" "${TFA_OUTPUT}/fip.bin-${suffix}"
+	done
 }
 
 do_deploy:append:s32cc() {
@@ -282,15 +291,15 @@ do_deploy:append:s32n7sim() {
 
 	install -d "${tfa_deploy_dir}"
 
-	# Save bins
-	install -v "${TFA_BINARIES}/fip.bin" "${tfa_deploy_dir}/"
-	install -v "${TFA_BINARIES}/bl2_w_dtb.bin" "${tfa_deploy_dir}/"
-
+	for suffix in ${BOOT_TYPE}; do
+		# Save bins
+		install -v "${TFA_OUTPUT}/bl2_w_dtb.bin-${suffix}" "${tfa_deploy_dir}/"
+		# Save elfs for symbols
+		install -v "${TFA_OUTPUT}/bl2.elf-${suffix}" "${tfa_deploy_dir}/"
+		install -v "${TFA_OUTPUT}/bl31.elf-${suffix}" "${tfa_deploy_dir}/"
+		install -v "${TFA_OUTPUT}/fip.bin-${suffix}" "${tfa_deploy_dir}/"
+	done
 	install -v "${TFA_BINARIES}/fdts/s32n79-simulator.dtb" "${tfa_deploy_dir}/"
-
-	# Save elfs for symbols
-	install -v "${TFA_BINARIES}/bl2/bl2.elf" "${tfa_deploy_dir}/"
-	install -v "${TFA_BINARIES}/bl31/bl31.elf" "${tfa_deploy_dir}/"
 }
 
 do_install:append:s32cc() {

@@ -177,8 +177,25 @@ do_deploy:append:s32cc() {
 
 do_deploy:append:s32n7sim() {
     install -d "${DEPLOYDIR}/simimage/u-boot"
+
     # Deploy the ELF for symbols
-    install -v "${B}/u-boot" "${DEPLOYDIR}/simimage/u-boot/u-boot"
+    if [ -z "${UBOOT_CONFIG}" ]; then
+        install -v "${B}/u-boot" "${DEPLOYDIR}/simimage/u-boot/u-boot"
+    else
+        unset i
+        for config in ${UBOOT_MACHINE}; do
+            i=`expr $i + 1`;
+            unset j
+            for type in ${UBOOT_CONFIG}; do
+                j=`expr $j + 1`;
+                if [ $j -ne $i ]; then
+                    continue
+                fi
+
+                install -v "${B}/${config}/u-boot" "${DEPLOYDIR}/simimage/u-boot/u-boot-${type}"
+            done
+        done
+    fi
 }
 
 FILES:${PN} += "${ENV_STAGE_DIR}"

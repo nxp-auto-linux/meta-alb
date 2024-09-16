@@ -7,7 +7,7 @@ IMAGE_TYPES += "ufs"
 DEPENDS += "bc-native"
 
 TFA_IMAGE_UFS ?= "arm-trusted-firmware"
-TFA_IMAGE_FILE_UFS = "fip.bin"
+TFA_IMAGE_FILE_UFS = "fip.bin-ufs"
 
 UFS_LUN_DEPLOYDIR = "${IMGDEPLOYDIR}/simimage"
 # set the names for the UFS LUN0 and LUN1 that will be produced
@@ -126,7 +126,7 @@ compute_artifact_size_kib () {
 BL2_PARTITION_NAME = "BL2"
 BL2_START_ADDRESS_SECTOR = "${LUN_FIRST_PARTITION_START_SECTOR}"
 BL2_START_ADDRESS_KIB = "$(convert_sectors_to_kib "${BL2_START_ADDRESS_SECTOR}")"
-BL2_ARTIFACT_LOCATION = "${DEPLOY_DIR_IMAGE}/simimage/arm-trusted-firmware/bl2_w_dtb.bin"
+BL2_ARTIFACT_LOCATION = "${DEPLOY_DIR_IMAGE}/simimage/arm-trusted-firmware/bl2_w_dtb.bin-ufs"
 BL2_ARTIFACT_SIZE_KIB = "$(compute_artifact_size_kib ${BL2_ARTIFACT_LOCATION})"
 # we want the BL2 partition to be of fixed size (512K)
 BL2_PARTITION_SIZE_KIB ?= "512"

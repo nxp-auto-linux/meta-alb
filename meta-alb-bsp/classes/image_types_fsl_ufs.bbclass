@@ -19,12 +19,10 @@ do_image_ufs[depends] += "parted-native:do_populate_sysroot"
 do_image_ufs[depends] += "dosfstools-native:do_populate_sysroot"
 
 do_image_ufs[depends] += "virtual/kernel:do_deploy"
-do_image_ufs[depends] += "${IMAGE_BASENAME}:do_image_ext4"
+do_image_ufs[depends] += "${IMAGE_BASENAME}:do_deploy"
 do_image_ufs[depends] += " \
 	${@d.getVar('TFA_IMAGE_FILE_UFS', True) and d.getVar('TFA_IMAGE_UFS', True) + ':do_deploy' or ''} \
 "
-
-addtask image_ufs before do_image_complete after do_deploy
 
 ########################################################
 # General UFS settings

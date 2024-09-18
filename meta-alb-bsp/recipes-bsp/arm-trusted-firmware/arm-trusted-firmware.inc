@@ -9,7 +9,8 @@ DEPENDS:append = " coreutils-native"
 DEPENDS:append = " binutils-native"
 DEPENDS:append = " dtc-native xxd-native"
 DEPENDS:append = " openssl-native"
-DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'mbedtls hse-firmware', '', d)}"
+DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'hse', 'hse-firmware', '', d)}"
+DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'mbedtls', '', d)}"
 DEPENDS:append = " u-boot-s32"
 DEPENDS:append:s32cc = " u-boot-tools-native"
 DEPENDS:append:s32cc = " ${@ 'u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
@@ -131,6 +132,26 @@ do_configure:append() {
 	oe_runmake -C "${S}" clean
 }
 
+do_configure:append:s32cc() {
+
+	mkdir -p ${WORKDIR}/tools
+
+	# Update the path of 'HSE_FW' in u-boot-s32.cfgout-* to be relative to arm-trusted-firmware's
+	# sysroot. Otherwise, during compilation, arm-trusted-firmware might try to load the hse firmware
+	# binary from a path that does not exist anymore. Do not touch the deployed files, but instead
+	# copy and update them in the current workdir.
+	
+	for suffix in ${BOOT_TYPE}
+	do
+		cp -vf ${DEPLOY_DIR_IMAGE}/tools/u-boot-s32.cfgout-${suffix} ${WORKDIR}/tools
+
+		if ${@bb.utils.contains('DISTRO_FEATURES', 'hse', 'true', 'false', d)}; then
+        		hse_fw=\""${STAGING_BASELIBDIR}/firmware/s32cc_hse_fw.bin\""
+			sed -i "s,\(HSE_FW \).*,\1${hse_fw}," ${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}
+		fi
+	done
+}
+
 do_compile:s32cc() {
 	unset LDFLAGS
 	unset CFLAGS
@@ -152,7 +173,7 @@ do_compile:s32cc() {
 		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}" \
 		    MKIMAGE="mkimage" \
 		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
-		    MKIMAGE_CFG="${DEPLOY_DIR_IMAGE}/tools/u-boot-s32.cfgout-${suffix}" all
+		    MKIMAGE_CFG="${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}" all
 		cp -vf "${ATF_BINARIES}/fip.s32" "${ATF_BINARIES}/fip.s32-${suffix}"
 		cp -vf "${ATF_BINARIES}/fip.bin" "${ATF_BINARIES}/fip.bin-${suffix}"
 	done
@@ -207,7 +228,7 @@ PACKAGES:append:s32cc = " ${PN}-plat-hdrs"
 
 addtask deploy after do_compile
 
-do_compile[depends] = "virtual/bootloader:do_deploy"
+do_configure[depends] = "virtual/bootloader:do_deploy"
 do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os:do_deploy', '', d)}"
 
 COMPATIBLE_MACHINE = "s32"

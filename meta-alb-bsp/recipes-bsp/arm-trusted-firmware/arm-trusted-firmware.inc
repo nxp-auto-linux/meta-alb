@@ -33,8 +33,8 @@ BL33_HANDLE ??= ""
 
 BUILD_TYPE ?= "release"
 
-ATF_BINARIES = "${B}/${ATF_PLAT}/${BUILD_TYPE}"
-ATF_DTB = "${@'${KERNEL_DEVICETREE}' if d.getVar('KERNEL_DEVICETREE_OVERRIDE') == '' else '${KERNEL_DEVICETREE_OVERRIDE}'}"
+TFA_BINARIES = "${B}/${TFA_PLAT}/${BUILD_TYPE}"
+TFA_DTB = "${@'${KERNEL_DEVICETREE}' if d.getVar('KERNEL_DEVICETREE_OVERRIDE') == '' else '${KERNEL_DEVICETREE_OVERRIDE}'}"
 
 OPTEE_ARGS = " \
                 BL32=${DEPLOY_DIR_IMAGE}/optee/tee-header_v2.bin \
@@ -83,8 +83,8 @@ EXTRA_OEMAKE:append = " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
                 ARCH=${TARGET_ARCH} \
                 BUILD_BASE=${B} \
-                PLAT=${ATF_PLAT} \
-                DTB_FILE_NAME=${@os.path.basename(d.getVar('ATF_DTB'))} \
+                PLAT=${TFA_PLAT} \
+                DTB_FILE_NAME=${@os.path.basename(d.getVar('TFA_DTB'))} \
                 "
 
 EXTRA_OEMAKE:append = " ${@oe.utils.conditional('BUILD_TYPE', 'debug', 'DEBUG=1', '', d)}"
@@ -159,7 +159,7 @@ do_compile:s32cc() {
 
 	if [ "${SCMI_DTB_NODE_CHANGE}" = "true" ] ; then
 		oe_runmake -C "${S}" dtbs
-		dtb_name="${ATF_BINARIES}/fdts/$(basename ${ATF_DTB})"
+		dtb_name="${TFA_BINARIES}/fdts/$(basename ${TFA_DTB})"
 		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
 			${dtb_name} \
 			${GPIO_OPT} \
@@ -174,8 +174,8 @@ do_compile:s32cc() {
 		    MKIMAGE="mkimage" \
 		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
 		    MKIMAGE_CFG="${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}" all
-		cp -vf "${ATF_BINARIES}/fip.s32" "${ATF_BINARIES}/fip.s32-${suffix}"
-		cp -vf "${ATF_BINARIES}/fip.bin" "${ATF_BINARIES}/fip.bin-${suffix}"
+		cp -vf "${TFA_BINARIES}/fip.s32" "${TFA_BINARIES}/fip.s32-${suffix}"
+		cp -vf "${TFA_BINARIES}/fip.bin" "${TFA_BINARIES}/fip.bin-${suffix}"
 	done
 }
 
@@ -185,7 +185,7 @@ do_deploy() {
 
 do_deploy:append:s32cc() {
 	for suffix in ${BOOT_TYPE}; do
-		cp -vf "${ATF_BINARIES}/fip.s32-${suffix}" ${DEPLOYDIR}
+		cp -vf "${TFA_BINARIES}/fip.s32-${suffix}" ${DEPLOYDIR}
 	done
 }
 

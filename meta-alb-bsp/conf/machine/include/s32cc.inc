@@ -21,7 +21,7 @@ FLASHIMAGE_DYNAMIC_OFFSETS ?= "1"
 # Enable DM-Verity
 require ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'conf/machine/include/s32cc-dm-verity.inc', '', d)}
 
-# When m7boot is enabled, the needed ATF settings are included from m7-boot.inc
+# When m7boot is enabled, the needed TFA settings are included from m7-boot.inc
 require ${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', 'conf/machine/include/m7-boot.inc', 'conf/machine/include/atf.inc', d)}
 # Enable FIP Authentication
 require ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'conf/machine/include/hse-secboot.inc', '', d)}

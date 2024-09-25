@@ -104,8 +104,8 @@ SDCARD_ROOTFS_EXTRA1_SIZE ?= "0"
 SDCARD_ROOTFS_EXTRA2_FILE ?= ""
 SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
 
-ATF_IMAGE ?= ""
-ATF_IMAGE_FILE ?= ""
+TFA_IMAGE ?= ""
+TFA_IMAGE_FILE ?= ""
 
 SDCARD = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.sdcard"
 
@@ -161,7 +161,7 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA8_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA8', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
 	${@get_extra_pkgs_deploy(d)} \
-	${@d.getVar('ATF_IMAGE_FILE', True) and d.getVar('ATF_IMAGE', True) + ':do_deploy' or ''} \
+	${@d.getVar('TFA_IMAGE_FILE', True) and d.getVar('TFA_IMAGE', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2', True) + ':do_deploy' or ''} \
 "

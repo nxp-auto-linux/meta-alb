@@ -1,13 +1,11 @@
-inherit image_types_fsl
-inherit rawimageutils
-
+inherit gpt_image_utils
 
 IMAGE_TYPES += "ufs"
 
 DEPENDS += "bc-native"
 
 TFA_IMAGE_UFS ?= "arm-trusted-firmware"
-TFA_IMAGE_FILE_UFS = "fip.bin-ufs"
+TFA_IMAGE_FILE_UFS ?= "fip.bin-ufs"
 
 UBOOT_ENV_UFS ?= "u-boot-environment"
 UBOOT_ENV_NAME_UFS ?= "u-boot-flashenv-ufs"
@@ -27,100 +25,6 @@ do_image_ufs[depends] += " \
 	${@d.getVar('UBOOT_ENV_NAME_UFS', True) and d.getVar('UBOOT_ENV_UFS', True) + ':do_deploy' or ''} \
 	${@d.getVar('TFA_IMAGE_FILE_UFS', True) and d.getVar('TFA_IMAGE_UFS', True) + ':do_deploy' or ''} \
 "
-
-########################################################
-# General UFS settings
-########################################################
-
-
-OPTIMAL_ALIGNMENT_KIB = "1024"
-SECTOR_SIZE ?= "4096"
-SECTOR_ALIGNMENT = "$(echo "${OPTIMAL_ALIGNMENT_KIB} * 1024 / ${SECTOR_SIZE}" | bc)"
-
-GPT_HEADER_NUM_SECTORS = "1"
-# the standard size of the partition entry array is 16K,
-# regardless of the SECTOR_SIZE
-PARTITION_ENTRY_ARRAY_NUM_SECTORS = "$(echo "16 * 1024 / ${SECTOR_SIZE}" | bc)"
-
-# compute the size of a GPT Header + Partition Entry Array
-GPT_SIZE_KIB = "$(echo "(${GPT_HEADER_NUM_SECTORS} + ${PARTITION_ENTRY_ARRAY_NUM_SECTORS}) * ${SECTOR_SIZE} / 1024" | bc)"
-
-# for optimal performance, it is recommended that the starting sector 
-# for a partition is a multiple of SECTOR_ALIGNMENT, such that START_SECTOR % SECTOR_ALIGNMENT == 0
-LUN_FIRST_PARTITION_START_SECTOR = "${SECTOR_ALIGNMENT}"
-LUN_FIRST_PARTITION_START_KIB = "$(convert_sectors_to_kib "${LUN_FIRST_PARTITION_START_SECTOR}")"
-
-# create a partition with given name, start address,
-# size and fstype
-create_partition () {
-	LUN_NAME="$1"
-	PARTITION_NAME="$2"
-	PARTITION_START_ADDRESS="$3"
-	PARTITION_SIZE="$4"
-	PARTITION_FSTYPE="$5"
-
-	parted -s "${LUN_NAME}" unit KiB mkpart "${PARTITION_NAME}" "${PARTITION_FSTYPE}" "${PARTITION_START_ADDRESS}" "$(echo "${PARTITION_START_ADDRESS} + ${PARTITION_SIZE}" | bc)"
-
-}
-
-# write an artifact to a partition, at a given offset
-write_partition () {
-	INPUT_ARTIFACT="$1"
-	LUN_NAME="$2"
-	SIZE_KiB="$3"
-	PARTITION_OFFSET="$4"
-	
-	dd if="${INPUT_ARTIFACT}" of="${LUN_NAME}" bs=1KiB count="${SIZE_KiB}" seek="${PARTITION_OFFSET}" conv=fsync,notrunc
-}
-
-# print LUN layout for debugging purposes
-print_lun_layout () {
-	lun_layout=$(parted -s "$1" unit KiB print)
-	bbnote "${lun_layout}"
-}
-
-# function to determine the next GPT partition
-# start sector for optimal alignment,
-# with respect to SECTOR_ALIGNMENT
-compute_next_aligned_gpt_partition_start_sector () {
-	CURRENT_PARTITION_START_SECTOR="$1"
-	CURRENT_PARTITION_SIZE_SECTORS="$2"
-	
-	NEXT_PARTITION_START_SECTOR="$(echo "((${CURRENT_PARTITION_START_SECTOR} + ${CURRENT_PARTITION_SIZE_SECTORS} + (${SECTOR_ALIGNMENT} - 1)) / ${SECTOR_ALIGNMENT}) * ${SECTOR_ALIGNMENT}" | bc)"
-
-	printf "%s" "${NEXT_PARTITION_START_SECTOR}"
-}
-
-# convert KiB to number of sectors
-# with respect to SECTOR_SIZE
-convert_kib_to_sectors () {
-	NUM_KIB="$1"
-
-	NUM_SECTORS="$(echo "${NUM_KIB} / (${SECTOR_SIZE} / 1024)" | bc)"
-	
-	printf "%s" "${NUM_SECTORS}"
-}
-
-# compute a number of sectors to KiB
-# with respect to SECTOR_SIZE
-convert_sectors_to_kib () {
-	NUM_SECTORS="$1"
-
-	NUM_KIB="$(echo "${NUM_SECTORS} * ${SECTOR_SIZE} / 1024" | bc)"
-	
-	printf "%s" "${NUM_KIB}"
-}
-
-# compute the size of an artifact in KiB
-compute_artifact_size_kib () {
-	ARTIFACT_LOCATION="$1"
-
-	ARTIFACT_DIMENSION_BYTES="$(stat -L -c "%s" "${ARTIFACT_LOCATION}")"
-	ARTIFACT_DIMENSION_KIB="$(echo "(${ARTIFACT_DIMENSION_BYTES} + 1023) / 1024" | bc)"
-
-	printf "%s" "${ARTIFACT_DIMENSION_KIB}"
-}
-
 
 ########################################################
 # UFS LUN0 settings
@@ -159,11 +63,7 @@ UBOOT_ENV_SIZE_KIB ?= "16"
 UBOOT_ENV_UFS_FILE ?= "${DEPLOY_DIR_IMAGE}/${@d.getVar('UBOOT_ENV_NAME_UFS', True) and (d.getVar('UBOOT_ENV_NAME_UFS', True) + '-${MACHINE}.bin') or ''}"
 FIRMWARES_PARTITION_EXTRA_SPACE_KIB ?= "256"
 FIRMWARES_PARTITION_SIZE_KIB = "$(echo "${KERNEL_DEVICETREE_SIZE_KIB} + ${UBOOT_ENV_SIZE_KIB} + ${FIRMWARES_PARTITION_EXTRA_SPACE_KIB}" | bc)"
-FIRMWARES_PARTITION_END_ADDRESS = "$(echo "${FIRMWARES_PARTITION_START_ADDRESS_KIB} + ${FIRMWARES_PARTITION_SIZE_KIB}" | bc)"
-
-# when computing the total size of the LUN, we should consider that after the end of the last 
-# partition, there is also the alternate GPT header + table entries
-LUN0_TOTAL_SIZE = "$(echo "${FIRMWARES_PARTITION_END_ADDRESS} + ${GPT_SIZE_KIB}" | bc)"
+FIRMWARES_PARTITION_SIZE_SECTORS = "$(convert_kib_to_sectors ${FIRMWARES_PARTITION_SIZE_KIB})"
 
 generate_nxp_ufs_lun0 () {
 
@@ -172,9 +72,17 @@ generate_nxp_ufs_lun0 () {
 		bbfatal "BL2 artifact size is greater than the partition size! Please increase the size of the BL2 partition (BL2_PARTITION_SIZE_KIB) in your local.conf file!"
 	fi
 
-	if [ "${FIP_ARTIFACT_SIZE_KIB}" -gt "${FIP_PARTITION_SIZE_KIB}"]; then
+	if [ "${FIP_ARTIFACT_SIZE_KIB}" -gt "${FIP_PARTITION_SIZE_KIB}" ]; then
 		bbfatal "FIP artifact size is greater than the partition size! Please increase the size of the FIP partition (FIP_PARTITION_SIZE_KIB) in your local.conf file!"
 	fi
+
+	BL2_ROUND_SIZE_KIB=$(roundup_size_kib ${BL2_PARTITION_SIZE_KIB} ${OPTIMAL_ALIGNMENT_KIB})
+	FIP_ROUND_SIZE_KIB=$(roundup_size_kib ${FIP_PARTITION_SIZE_KIB} ${OPTIMAL_ALIGNMENT_KIB})
+	FIRMWARES_ROUND_SIZE_KIB=$(roundup_size_kib ${FIRMWARES_PARTITION_SIZE_KIB} ${OPTIMAL_ALIGNMENT_KIB})
+
+	# when computing the total size of the LUN, we should consider that after the end of the last 
+	# partition, there is also the alternate GPT header + table entries
+	LUN0_TOTAL_SIZE=$(echo "${LUN_FIRST_PARTITION_START_KIB} + ${BL2_ROUND_SIZE_KIB} + ${FIP_ROUND_SIZE_KIB} + ${FIRMWARES_ROUND_SIZE_KIB} + ${GPT_SIZE_KIB}" | bc)
 
 	dd if=/dev/zero of="${UFS_LUN0_NAME}" bs=1K count="${LUN0_TOTAL_SIZE}"
 
@@ -182,9 +90,9 @@ generate_nxp_ufs_lun0 () {
 	export PARTED_SECTOR_SIZE=${SECTOR_SIZE}
 	parted -s "${UFS_LUN0_NAME}" mklabel gpt
 
-	create_partition ${UFS_LUN0_NAME} ${BL2_PARTITION_NAME} ${BL2_START_ADDRESS_KIB} ${BL2_PARTITION_SIZE_KIB}
-	create_partition ${UFS_LUN0_NAME} ${FIP_PARTITION_NAME} ${FIP_START_ADDRESS_KIB} ${FIP_PARTITION_SIZE_KIB}
-	create_partition ${UFS_LUN0_NAME} ${FIRMWARES_PARTITION_NAME} ${FIRMWARES_PARTITION_START_ADDRESS_KIB} ${FIRMWARES_PARTITION_SIZE_KIB} "fat16"
+	create_partition ${UFS_LUN0_NAME} ${BL2_PARTITION_NAME} ${BL2_PARTITION_SIZE_SECTORS}
+	create_partition ${UFS_LUN0_NAME} ${FIP_PARTITION_NAME} ${FIP_PARTITION_SIZE_SECTORS}
+	create_partition ${UFS_LUN0_NAME} ${FIRMWARES_PARTITION_NAME} ${FIRMWARES_PARTITION_SIZE_SECTORS} "fat16"
 
 	write_partition ${BL2_ARTIFACT_LOCATION} ${UFS_LUN0_NAME} ${BL2_ARTIFACT_SIZE_KIB} ${BL2_START_ADDRESS_KIB}
 	write_partition ${FIP_ARTIFACT_LOCATION} ${UFS_LUN0_NAME} ${FIP_ARTIFACT_SIZE_KIB} ${FIP_START_ADDRESS_KIB}
@@ -197,10 +105,7 @@ generate_nxp_ufs_lun0 () {
 	mcopy -i "${UFS_LUN_DEPLOYDIR}/${FIRMWARES_PARTITION_NAME}.part" -s "${UBOOT_ENV_UFS_FILE}" "::${FIRMWARES_FOLDER_VENDOR}/${MACHINE}/u-boot/env.txt"
 
 	write_partition "${UFS_LUN_DEPLOYDIR}/${FIRMWARES_PARTITION_NAME}.part" "${UFS_LUN0_NAME}" "${FIRMWARES_PARTITION_SIZE_KIB}" "${FIRMWARES_PARTITION_START_ADDRESS_KIB}"
-
 	rm -f "${UFS_LUN_DEPLOYDIR}/${FIRMWARES_PARTITION_NAME}.part"
-
-	print_lun_layout ${UFS_LUN0_NAME}
 }
 
 
@@ -225,21 +130,25 @@ ROOTFS_PARTITION_START_ADDRESS_SECTOR = "$(compute_next_aligned_gpt_partition_st
 ROOTFS_PARTITION_START_ADDRESS = "$(convert_sectors_to_kib ${ROOTFS_PARTITION_START_ADDRESS_SECTOR})"
 ROOTFS_EXT4_ARTIFACT_NAME = "${DEPLOY_DIR_IMAGE}/ufsimage/${IMAGE_BASENAME}-${MACHINE}.ext4"
 ROOTFS_PARTITION_SIZE_KIB = "$(compute_artifact_size_kib "${ROOTFS_EXT4_ARTIFACT_NAME}")"
-ROOTFS_PARTITION_END_ADDRESS = "$(echo "${ROOTFS_PARTITION_START_ADDRESS} + ${ROOTFS_PARTITION_SIZE_KIB}" | bc)"
-
-# when computing the total size of the LUN, we should consider that after the end of the last 
-# partition, there is also the alternate GPT header + partition entry array
-LUN1_TOTAL_SIZE = "$(echo "${ROOTFS_PARTITION_END_ADDRESS} + ${GPT_SIZE_KIB}" | bc)"
+ROOTFS_PARTITION_SIZE_SECTORS = "$(convert_kib_to_sectors "${ROOTFS_PARTITION_SIZE_KIB}")"
 
 generate_nxp_ufs_lun1 () {
+
+	ESP_PARTITION_ROUND_SIZE_KIB=$(roundup_size_kib ${ESP_PARTITION_SIZE_KIB} ${OPTIMAL_ALIGNMENT_KIB})
+	ROOTFS_PARTITION_ROUND_SIZE_KIB=$(roundup_size_kib ${ROOTFS_PARTITION_SIZE_KIB} ${OPTIMAL_ALIGNMENT_KIB})
+
+	# when computing the total size of the LUN, we should consider that after the end of the last 
+	# partition, there is also the alternate GPT header + partition entry array
+	LUN1_TOTAL_SIZE=$(echo "${LUN_FIRST_PARTITION_START_KIB} + ${ESP_PARTITION_ROUND_SIZE_KIB} + ${ROOTFS_PARTITION_ROUND_SIZE_KIB} + ${GPT_SIZE_KIB}" | bc)
+
 	dd if=/dev/zero of="${UFS_LUN1_NAME}" bs=1K count=${LUN1_TOTAL_SIZE}
 
 	export PARTED_SECTOR_SIZE=${SECTOR_SIZE}
 	parted -s "${UFS_LUN1_NAME}" mklabel gpt
 
-	create_partition ${UFS_LUN1_NAME} ${ESP_PARTITION_NAME} ${ESP_PARTITION_START_ADDRESS_KIB} ${ESP_PARTITION_SIZE_KIB} "fat16"
+	create_partition ${UFS_LUN1_NAME} ${ESP_PARTITION_NAME} ${ESP_PARTITION_SIZE_SECTORS} "fat16"
 	parted -s "${UFS_LUN1_NAME}" set 1 esp on
-	create_partition ${UFS_LUN1_NAME} ${ROOTFS_PARTITION_NAME} ${ROOTFS_PARTITION_START_ADDRESS} ${ROOTFS_PARTITION_SIZE_KIB} "ext4"
+	create_partition ${UFS_LUN1_NAME} ${ROOTFS_PARTITION_NAME} ${ROOTFS_PARTITION_SIZE_SECTORS} "ext4"
 
 	# prepare the linux kernel partition
 	rm -f "${UFS_LUN_DEPLOYDIR}/kernel.part"
@@ -250,8 +159,6 @@ generate_nxp_ufs_lun1 () {
 	write_partition ${ROOTFS_EXT4_ARTIFACT_NAME} ${UFS_LUN1_NAME} ${ROOTFS_PARTITION_SIZE_KIB} ${ROOTFS_PARTITION_START_ADDRESS}
 
 	rm -f "${UFS_LUN_DEPLOYDIR}/kernel.part"
-
-	print_lun_layout ${UFS_LUN1_NAME}
 }
 
 generate_nxp_ufs () {

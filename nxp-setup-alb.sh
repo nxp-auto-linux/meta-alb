@@ -260,6 +260,7 @@ META_ALB_LAYER_LIST=" \
 ALB_LAYER_LIST=" \
     $META_ALB_LAYER_LIST \
     meta-alb-dev \
+    meta-alb-url-proxy  \
     meta-aa-integration \
     meta-vnp \
     meta-gvip \

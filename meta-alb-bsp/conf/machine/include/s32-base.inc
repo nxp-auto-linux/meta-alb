@@ -20,7 +20,7 @@ PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-s32"
 
-PREFERRED_VERSION_linux-s32 ?= "6.6.32"
+PREFERRED_VERSION_linux-s32 ?= "6.6.52"
 PREFERRED_VERSION_u-boot-s32 ?= "2022.04"
 PREFERRED_VERSION_u-boot-tools ?= "2022.04"
 PREFERRED_VERSION_u-boot-tools-native ?= "2022.04"

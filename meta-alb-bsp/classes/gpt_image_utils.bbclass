@@ -4,40 +4,68 @@
 ########################################################
 
 OPTIMAL_ALIGNMENT_KIB = "1024"
-SECTOR_SIZE ?= "4096"
-SECTOR_ALIGNMENT = "$(echo "${OPTIMAL_ALIGNMENT_KIB} * 1024 / ${SECTOR_SIZE}" | bc)"
 
+get_sector_alignment () {
+	SECTOR_SIZE="$1"
+	SECTOR_ALIGNMENT=$(echo "${OPTIMAL_ALIGNMENT_KIB} * 1024 / ${SECTOR_SIZE}" | bc)
+
+	printf "%s" "${SECTOR_ALIGNMENT}"
+}
+
+PROTECTIVE_MBR_NUM_SECTORS = "1"
 GPT_HEADER_NUM_SECTORS = "1"
 # the standard size of the partition entry array is 16K,
 # regardless of the SECTOR_SIZE
-PARTITION_ENTRY_ARRAY_NUM_SECTORS = "$(echo "16 * 1024 / ${SECTOR_SIZE}" | bc)"
+get_partition_entry_array_num_sectors () {
+	SECTOR_SIZE="$1"
+	PARTITION_ENTRY_ARRAY_NUM_SECTORS=$(echo "16 * 1024 / ${SECTOR_SIZE}" | bc)
+
+	printf "%s" "${PARTITION_ENTRY_ARRAY_NUM_SECTORS}"
+}
 
 # compute the size of a GPT Header + Partition Entry Array
-GPT_SIZE_KIB = "$(echo "(${GPT_HEADER_NUM_SECTORS} + ${PARTITION_ENTRY_ARRAY_NUM_SECTORS}) * ${SECTOR_SIZE} / 1024" | bc)"
+get_gpt_size_kib () {
+	SECTOR_SIZE="$1"
+	PARTITION_ENTRY_ARRAY_NUM_SECTORS=$(get_partition_entry_array_num_sectors "${SECTOR_SIZE}")
+	GPT_SIZE_KIB="$(echo "(${GPT_HEADER_NUM_SECTORS} + ${PARTITION_ENTRY_ARRAY_NUM_SECTORS}) * ${SECTOR_SIZE} / 1024" | bc)"
+	printf "%s" "${GPT_SIZE_KIB}"
+}
 
 # for optimal performance, it is recommended that the starting sector 
 # for a partition is a multiple of SECTOR_ALIGNMENT, such that START_SECTOR % SECTOR_ALIGNMENT == 0
-LUN_FIRST_PARTITION_START_SECTOR = "${SECTOR_ALIGNMENT}"
-LUN_FIRST_PARTITION_START_KIB = "$(convert_sectors_to_kib "${LUN_FIRST_PARTITION_START_SECTOR}")"
+get_first_partition_start_sector () {
+	SECTOR_SIZE="$1"
+	FIRST_PARTITION_START_SECTOR=$(get_sector_alignment "${SECTOR_SIZE}")
+	printf "%s" "${FIRST_PARTITION_START_SECTOR}"
+}
+
+get_first_partition_start_kib () {
+	SECTOR_SIZE="$1"
+	FIRST_PARTITION_START_SECTOR=$(get_first_partition_start_sector "${SECTOR_SIZE}")
+	FIRST_PARTITION_START_KIB="$(convert_sectors_to_kib "${FIRST_PARTITION_START_SECTOR}" "${SECTOR_SIZE}")"
+	printf "%s" "${FIRST_PARTITION_START_KIB}"
+}
 
 # create a partition with given name,
 # size and fstype
 create_partition () {
 	LUN_NAME="$1"
-	PARTITION_NAME="$2"
-	PARTITION_SIZE_SECTORS="$3"
-	PARTITION_FSTYPE="$4"
+	SECTOR_SIZE="$2"
+	PARTITION_NAME="$3"
+	PARTITION_SIZE_SECTORS="$4"
+	PARTITION_FSTYPE="$5"
 
-    current_table=$(parted -s "${LUN_NAME}" unit s print)
+	current_table=$(parted -s "${LUN_NAME}" unit s print)
 
-    last_partition_start_sector=$(echo "${current_table}" | tail -n 1  | xargs | sed -r 's/\s+/ /g' | cut -d ' ' -f 2 | sed 's/s//g')
-    if [ "${last_partition_start_sector}" = "Start" ]; then
-        parted -s "${LUN_NAME}" unit s mkpart "${PARTITION_NAME}" "${PARTITION_FSTYPE}" "${LUN_FIRST_PARTITION_START_SECTOR}" "$(echo "${LUN_FIRST_PARTITION_START_SECTOR} + ${PARTITION_SIZE_SECTORS} - 1" | bc)"
-    else
-        last_partition_size_sectors=$(echo "${current_table}" | tail -n 1  | xargs | sed -r 's/\s+/ /g' | cut -d ' ' -f 4 | sed 's/s//g')
-        new_partition_start_sector=$(compute_next_aligned_gpt_partition_start_sector "${last_partition_start_sector}" "${last_partition_size_sectors}")
-        parted -s "${LUN_NAME}" unit s mkpart "${PARTITION_NAME}" "${PARTITION_FSTYPE}" "${new_partition_start_sector}" "$(echo "${new_partition_start_sector} + ${PARTITION_SIZE_SECTORS} - 1" | bc)"
-    fi
+	last_partition_start_sector=$(echo "${current_table}" | tail -n 1  | xargs | sed -r 's/\s+/ /g' | cut -d ' ' -f 2 | sed 's/s//g')
+	if [ "${last_partition_start_sector}" = "Start" ]; then
+		FIRST_PARTITION_START_SECTOR=$(get_first_partition_start_sector ${SECTOR_SIZE})
+		parted -s "${LUN_NAME}" unit s mkpart "${PARTITION_NAME}" "${PARTITION_FSTYPE}" "${FIRST_PARTITION_START_SECTOR}" "$(echo "${FIRST_PARTITION_START_SECTOR} + ${PARTITION_SIZE_SECTORS} - 1" | bc)"
+	else
+		last_partition_size_sectors=$(echo "${current_table}" | tail -n 1  | xargs | sed -r 's/\s+/ /g' | cut -d ' ' -f 4 | sed 's/s//g')
+		new_partition_start_sector=$(compute_next_aligned_gpt_partition_start_sector "${last_partition_start_sector}" "${last_partition_size_sectors}" "${SECTOR_SIZE}")
+		parted -s "${LUN_NAME}" unit s mkpart "${PARTITION_NAME}" "${PARTITION_FSTYPE}" "${new_partition_start_sector}" "$(echo "${new_partition_start_sector} + ${PARTITION_SIZE_SECTORS} - 1" | bc)"
+	fi
 }
 
 # write an artifact to a partition, at a given offset
@@ -62,6 +90,8 @@ print_layout () {
 compute_next_aligned_gpt_partition_start_sector () {
 	CURRENT_PARTITION_START_SECTOR="$1"
 	CURRENT_PARTITION_SIZE_SECTORS="$2"
+	SECTOR_SIZE="$3"
+	SECTOR_ALIGNMENT=$(get_sector_alignment ${SECTOR_SIZE})
 	
 	NEXT_PARTITION_START_SECTOR="$(echo "((${CURRENT_PARTITION_START_SECTOR} + ${CURRENT_PARTITION_SIZE_SECTORS} + (${SECTOR_ALIGNMENT} - 1)) / ${SECTOR_ALIGNMENT}) * ${SECTOR_ALIGNMENT}" | bc)"
 
@@ -72,8 +102,9 @@ compute_next_aligned_gpt_partition_start_sector () {
 # with respect to SECTOR_SIZE
 convert_kib_to_sectors () {
 	NUM_KIB="$1"
+	SECTOR_SIZE="$2"
 
-	NUM_SECTORS="$(echo "${NUM_KIB} / (${SECTOR_SIZE} / 1024)" | bc)"
+	NUM_SECTORS="$(echo "(${NUM_KIB} * 1024) / ${SECTOR_SIZE}" | bc)"
 	
 	printf "%s" "${NUM_SECTORS}"
 }
@@ -82,6 +113,7 @@ convert_kib_to_sectors () {
 # with respect to SECTOR_SIZE
 convert_sectors_to_kib () {
 	NUM_SECTORS="$1"
+	SECTOR_SIZE="$2"
 
 	NUM_KIB="$(echo "${NUM_SECTORS} * ${SECTOR_SIZE} / 1024" | bc)"
 	

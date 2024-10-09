@@ -38,6 +38,7 @@ UBOOT_ENV_NAME_MAP:s32cc = " \
 "
 UBOOT_ENV_NAME_MAP:s32n7sim = " \
 	u-boot-flashenv-ufs : ufs; \
+	u-boot-flashenv-sd  : sdcard; \
 "
 
 # We support includes if specified in the machine conf

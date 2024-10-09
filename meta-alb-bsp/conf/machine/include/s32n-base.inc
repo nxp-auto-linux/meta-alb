@@ -12,9 +12,10 @@ KERNEL_DEFCONFIG = "s32n7_defconfig"
 
 IMAGE_CLASSES += " \
 	image_types_fsl_ufs \
+	image_types_fsl_sdcard_s32n \
 "
 
-IMAGE_FSTYPES += "ufs"
+IMAGE_FSTYPES:append = " ufs sdcard_s32n"
 UBOOT_SUFFIX_UFS = "${UBOOT_SUFFIX}"
 
-BOOT_TYPE ?= "ddr ufs"
+BOOT_TYPE ?= "ddr ufs mmc"

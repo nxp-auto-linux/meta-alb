@@ -176,6 +176,10 @@ do_compile:s32cc() {
 		    MKIMAGE_CFG="${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}" all
 		cp -vf "${TFA_BINARIES}/fip.s32" "${TFA_BINARIES}/fip.s32-${suffix}"
 		cp -vf "${TFA_BINARIES}/fip.bin" "${TFA_BINARIES}/fip.bin-${suffix}"
+		# If secure boot is used, copy BL2 signature for each boot type
+		if [ -f "${TFA_BINARIES}/bl2-signature.bin" ]; then
+			cp -vf "${TFA_BINARIES}/bl2-signature.bin" "${TFA_BINARIES}/bl2-signature.bin-${suffix}"
+		fi
 	done
 }
 

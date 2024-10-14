@@ -8,6 +8,9 @@ SECBOOT_SCRIPT = "${SECBOOT_KEYS_DIR}/${SECBOOT_SCRIPT_FILE}"
 SECBOOT_DEVICE = "${@bb.utils.contains('UBOOT_MACHINE', 'qspi', '/dev/mtd0', '/dev/mmcblk0', d)}"
 OP_TEE = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '1', '0', d)}"
 
+BL2_SIGN_FILE = "bl2-signature.bin"
+BL2_SIGN = "${TFA_BINARIES}/${BL2_SIGN_FILE}"
+
 BL2_HANDLE ?= "0x010700"
 BL31_HANDLE ?= "${BL2_HANDLE}"
 BL32_HANDLE ?= "${BL2_HANDLE}"
@@ -75,8 +78,12 @@ do_compile:prepend () {
 	mkdir -p ${SECBOOT_KEYS_DIR}
 }
 
-
 do_deploy:append() {
+	for suffix in ${BOOT_TYPE}
+	do
+		cp -vf ${BL2_SIGN}-${suffix} ${DEPLOYDIR}
+	done
+
 	cp -vf ${RSA_PRIV_KEYS} ${RSA_PUB_KEYS} ${DEPLOYDIR}
 
 	if [ ${OP_TEE} -eq 1 ]; then
@@ -87,6 +94,11 @@ do_deploy:append() {
 do_install:append() {
 	install -d ${D}${INSTALL_PATH_SECBOOT_KEYS}
 
+	for suffix in ${BOOT_TYPE}
+	do
+		install -m 0666 "${BL2_SIGN}-${suffix}" ${D}${INSTALL_PATH_SECBOOT_KEYS}
+	done
+
 	install -m 0666 ${RSA_PUB_KEYS} ${D}${INSTALL_PATH_SECBOOT_KEYS}
 	if [ ${OP_TEE} -eq 1 ]; then
 		install -m 0666 ${RSA_PUB_BL32} ${D}${INSTALL_PATH_SECBOOT_KEYS}
@@ -94,6 +106,7 @@ do_install:append() {
 	install -m 0777 ${SECBOOT_SCRIPT} ${D}${INSTALL_PATH_SECBOOT_KEYS}
 }
 
+FILES:${PN}-secboot += "${INSTALL_PATH_SECBOOT_KEYS}${BL2_SIGN_FILE}-*"
 FILES:${PN}-secboot += "${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL2_FILE}"
 FILES:${PN}-secboot += "${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL31_FILE}"
 FILES:${PN}-secboot += "${@ "${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL32_FILE}" if "${OP_TEE}" == '1' else ''}"

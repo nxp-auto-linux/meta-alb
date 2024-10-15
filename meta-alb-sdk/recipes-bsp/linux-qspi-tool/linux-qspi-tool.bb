@@ -1,4 +1,4 @@
-# Copyright 2022 NXP
+# Copyright 2022,2024 NXP
 
 SUMMARY = "QSPI Flash Linux Script Utilitary"
 LICENSE = "BSD-3-Clause"
@@ -10,7 +10,7 @@ INSTALL_PATH = "/opt/bsp_utils"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
 SRC_URI = "file://${FLASH_SCRIPT_FILE}"
 
-RDEPENDS:${PN} += "bash gawk mtd-utils"
+RDEPENDS:${PN} += "mtd-utils"
 
 do_install() {
 	install -d ${D}${INSTALL_PATH}

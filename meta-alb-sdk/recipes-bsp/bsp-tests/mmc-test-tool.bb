@@ -1,4 +1,4 @@
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 
 SUMMARY = "MMC Linux Script test utilitary"
 LICENSE = "BSD-3-Clause"
@@ -9,8 +9,6 @@ INSTALL_PATH = "/opt/bsp_utils"
 
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
 SRC_URI = "file://${MMC_TEST_SCRIPT_FILE}"
-
-RDEPENDS:${PN} += "bash"
 
 do_install() {
 	install -d ${D}${INSTALL_PATH}

@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 
 # eMMC Script test utilitary based on
 # Linux 'mmc_test.c' kernel module.
@@ -15,8 +15,6 @@ if [ $# -ne 0 ]; then
         exit 1
 fi
 
-set -o pipefail
-
 MMC_DEV="$(ls /sys/bus/mmc/devices)"
 
 # Test if SD/eMMC is available
@@ -30,10 +28,11 @@ MMC_MODULE_NAME="mmc_test"
 MMC_MODULE="mmc_test.ko"
 MMC_MODULE_PATH="/lib/modules/$(uname -r)/kernel/drivers/mmc/core/$MMC_MODULE"
 
-function validate_test_number() {
-        local re='^[0-9]+$'
+validate_test_number() {
+        re='^[0-9]+$'
 
-        if ! [[ "$1" =~ $re ]]; then
+        res=$(echo "$1" | grep -E "$re")
+        if [ -z "$res" ]; then
                 echo "Error: Not a valid number"
                 echo "Please select a number from above listed test cases:"
                 return 1
@@ -42,20 +41,20 @@ function validate_test_number() {
         return 0
 }
 
-function query_and_run_test() {
+query_and_run_test() {
         echo "Enter test case number: "
-        read -p "" test_case_num
+        read -r test_case_num
 
         while ! validate_test_number "$test_case_num"; do
-                read -p "" test_case_num
+                read -r test_case_num
         done
 
         echo "$test_case_num" > /sys/kernel/debug/"$MMC_PART"/"$MMC_DEV"/test
         printf "\n"
 }
 
-function run_other_test() {
-        local text_to_display="Want to run another test? (y/n)"
+run_other_test() {
+        text_to_display="Want to run another test? (y/n)"
 
         while true; do
                 # workaround to force a console flush
@@ -63,7 +62,7 @@ function run_other_test() {
 
                 printf "\n"
                 echo "$text_to_display"
-                read -p "" answer
+                read -r answer
 
                 case "$answer" in
                 "y")

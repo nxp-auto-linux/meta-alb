@@ -107,6 +107,9 @@ SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
 TFA_IMAGE ?= ""
 TFA_IMAGE_FILE ?= ""
 
+TFA_RESET ?= ""
+TFA_RESET_FILE ?= ""
+
 SDCARD = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.sdcard"
 
 # Set default alignment to 4MB [in KiB]
@@ -115,6 +118,7 @@ SDCARD_BINARY_SPACE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
 IMAGE_ROOTFS_ALIGNMENT = "${SDCARD_BINARY_SPACE}"
 
 BOOT_SPACE ??= "0"
+FIRMWARE_SPACE ??= "0"
 
 def get_extra_files_fields(d, findex):
     pkgs = []
@@ -162,6 +166,7 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('SDCARDIMAGE_EXTRA9_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA9', True) + ':do_deploy' or ''} \
 	${@get_extra_pkgs_deploy(d)} \
 	${@d.getVar('TFA_IMAGE_FILE', True) and d.getVar('TFA_IMAGE', True) + ':do_deploy' or ''} \
+	${@d.getVar('TFA_RESET_FILE', True) and d.getVar('TFA_RESET', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA1', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_ROOTFS_EXTRA2', True) + ':do_deploy' or ''} \
 "
@@ -372,6 +377,18 @@ _burn_bootloader() {
 	esac
 }
 
+_burn_firmware() {
+	local fw_part=$1
+
+	if [ -n "${FIRMWARE_NAME_SDCARD}" ]; then
+		fw_offset=$(LC_ALL=C parted -s "${SDCARD}" unit b print \
+			| awk "/ $fw_part / { print substr(\$2, 1, length(\$2 -1)) }")
+	
+		fw_size=$(stat -L -c "%s" "${DEPLOY_DIR_IMAGE}/${FIRMWARE_NAME_SDCARD}")
+		generate_sdcardimage_entry "${FIRMWARE_NAME_SDCARD}" "" ${fw_offset} "" ${fw_size}
+	fi
+}
+
 #
 # Create an image that can by written onto a SD card using dd for use
 # with i.MX, S32, or Layerscape SoC families
@@ -385,27 +402,27 @@ _burn_bootloader() {
 # The disk layout used is:
 #
 #    0                      -> IMAGE_ROOTFS_ALIGNMENT         - reserved to bootloader (not partitioned)
-#    IMAGE_ROOTFS_ALIGNMENT -> BOOT_SPACE                     - kernel and other data
+#    IMAGE_ROOTFS_ALIGNMENT -> FIRMWARE_SPACE                 - reserved to Firmware Image (usually the FIP)
+#    FIRMWARE_SPACE         -> BOOT_SPACE                     - kernel and other data
 #    BOOT_SPACE             -> SDIMG_SIZE                     - rootfs
 #
-#                                                     Default Free space = 1.3x
-#                                                     Use IMAGE_OVERHEAD_FACTOR to add more space
-#                                                     <--------->                                              (optional)
-#            4MiB               8MiB           SDIMG_ROOTFS0                    4MiB                          SDIMG_ROOTFSn                   4MiB
-# <-----------------------> <----------> <----------------------> <----------------------------->       <----------------------> <----------------------------->
-#  ------------------------ ------------ ------------------------ ------------------------------- ..... ------------------------ -------------------------------
-# | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            | BASE_IMAGE_ROOTFS_ALIGNMENT  |       | ROOTFS_SIZE           | BASE_IMAGE_ROOTFS_ALIGNMENT  |
-#  ------------------------ ------------ ------------------------ ------------------------------- ..... ------------------------ -------------------------------
-# ^                        ^            ^                        ^                                      ^                                                      ^
-# |                        |            |                        |                                      |                                                      |
-# 0                      4096     4MiB + 8MiB       4MiB + 8Mib + SDIMG_ROOTFS            12MiB + (SDIMG_ROOTFS + 4MiB) * n                 12MiB + (SDIMG_ROOTFS + 4MiB) * (n + 1)
-#
-#                                       |                                                       |       |                                                      |
-#                                       |                                                       |       |                                                      |
-#                                        <----------------------------------------------------->  .....  <---------------------------------------------------->
-#                                                                   |                                                              |
-#                                                                ROOTFS0                                                        ROOTFSn
-
+#                                                                         Default Free space = 1.3x
+#                                                                         Use IMAGE_OVERHEAD_FACTOR to add more space
+#                                                                         <--------->                                              (optional)
+#            4MiB                 4MiB             8MiB            SDIMG_ROOTFS0                    4MiB                          SDIMG_ROOTFSn                   4MiB
+# <-----------------------> <--------------> <--------------> <----------------------> <----------------------------->       <----------------------> <----------------------------->
+#  ------------------------ ---------------- ---------------- ----------------------- -------------------------------  .....  ----------------------- ------------------------------
+# | IMAGE_ROOTFS_ALIGNMENT | FIRMWARE_SPACE | BOOT_SPACE     | ROOTFS_SIZE            | BASE_IMAGE_ROOTFS_ALIGNMENT  |       | ROOTFS_SIZE           | BASE_IMAGE_ROOTFS_ALIGNMENT  |
+#  ------------------------ ---------------- ---------------- ----------------------- -------------------------------  .....  ----------------------- ------------------------------
+# ^                        ^                ^                ^                        ^                                      ^                                                      ^
+# |                        |                |                |                        |                                      |                                                      |
+# 0                      4096          4MiB + 4MiB   4MiB + 4MiB + 8MiB   4MiB + 4MiB + 8Mib + SDIMG_ROOTFS   16MiB + (SDIMG_ROOTFS + 4MiB) * n                 16MiB + (SDIMG_ROOTFS + 4MiB) * (n + 1)
+#                 
+#                                                            |                                                       |       |                                                      |
+#                                                            |                                                       |       |                                                      |
+#                                                             <----------------------------------------------------->  .....  <---------------------------------------------------->
+#                                                                                        |                                                              |
+#                                                                                     ROOTFS0                                                        ROOTFSn
 generate_nxp_sdcard () {
 	# Get partitions' start offsets passed as parameters
 	SDCARD_ROOTFS_REAL_START="$1"
@@ -414,9 +431,14 @@ generate_nxp_sdcard () {
 
 	# Create partition table
 	parted -s "${SDCARD}" mklabel msdos
-	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
-		parted -s "${SDCARD}" unit KiB mkpart primary fat32 ${IMAGE_ROOTFS_ALIGNMENT} $(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${BOOT_SPACE_ALIGNED} | bc)
+	if [ ${FW_SPACE_ALIGNED} -gt 0 ]; then
+		parted -s "${SDCARD}" unit KiB mkpart primary ${IMAGE_ROOTFS_ALIGNMENT} $(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${FW_SPACE_ALIGNED} | bc)
 	fi
+
+	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
+		parted -s "${SDCARD}" unit KiB mkpart primary fat32 ${BOOT_SPACE_START} $(printf "%u + %u\n" ${BOOT_SPACE_START} ${BOOT_SPACE_ALIGNED} | bc)
+	fi
+
 	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}"
 	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} "${SDCARD_ROOTFS_EXTRA1_FILE}"
 	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} "${SDCARD_ROOTFS_EXTRA2_FILE}"
@@ -429,10 +451,19 @@ generate_nxp_sdcard () {
 
 	_burn_bootloader
 
+	if [ ${FW_SPACE_ALIGNED} -gt 0 ]; then
+		_burn_firmware 1
+	fi
+
 	# Burn Partitions
 	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
-		_generate_boot_image 1
-		generate_sdcardimage_entry_raw "${WORKDIR}/boot.img" "" $(printf "%u * 1024\n" ${IMAGE_ROOTFS_ALIGNMENT} | bc)
+		if [ ${FW_SPACE_ALIGNED} -gt 0 ]; then
+			BOOT_PART=2
+		else
+			BOOT_PART=1
+		fi
+		_generate_boot_image ${BOOT_PART}
+		generate_sdcardimage_entry_raw "${WORKDIR}/boot.img" "" $(printf "%u * 1024\n" ${BOOT_SPACE_START} | bc)
 	fi
 
 	write_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}"
@@ -448,8 +479,9 @@ IMAGE_CMD:sdcard () {
 		UBOOT_BOOTSPACE_OFFSET=$(printf "%u * 512\n" ${UBOOT_BOOTSPACE_SEEK} | bc)
 	fi
 
-	# Align boot partition and calculate total SD card image size
-	# No FAT partition will be created if BOOT_SPACE is 0.
+	# Align firmware & boot partitions and calculate total SD card image size
+	# Their corresponding partitions will not be created if either BOOT_SPACE or FIMWARE_SPACE is 0 .
+	FW_SPACE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${FIRMWARE_SPACE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
 	BOOT_SPACE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${BOOT_SPACE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
 
 	# If the size has not been preset, we default to flash image
@@ -464,7 +496,8 @@ IMAGE_CMD:sdcard () {
 	fi
 
 	# Compute final size of SDCard image and start offset of each rootfs partition
-	SDCARD_SIZE=$(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${BOOT_SPACE_ALIGNED} | bc)
+	BOOT_SPACE_START=$(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${FW_SPACE_ALIGNED} | bc)
+	SDCARD_SIZE=$(printf "%u + %u\n" ${BOOT_SPACE_START} ${BOOT_SPACE_ALIGNED} | bc)
 	if [ -n "${SDCARD_ROOTFS_REAL}" ]; then
 		SDCARD_ROOTFS_REAL_START=${SDCARD_SIZE}
 		SDCARD_SIZE=$(printf "%u + %u + %u\n" ${SDCARD_SIZE} ${ROOTFS_SIZE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
@@ -506,4 +539,3 @@ IMAGE_CMD:sdcard () {
 	generate_nxp_sdcard ${SDCARD_ROOTFS_REAL_START} ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA2_START}
 	cd -
 }
-

@@ -18,6 +18,6 @@ do_make_wic() {
 addtask make_wic after do_image_complete before do_build
 
 do_make_wic[depends] += " \
-	${@d.getVar('TFA_IMAGE_FILE', True) and d.getVar('TFA_IMAGE', True) + ':do_deploy' or ''} \
+	${@d.getVar('TFA_RESET_FILE', True) and d.getVar('TFA_RESET', True) + ':do_deploy' or ''} \
 	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER_RECIPE', True) + ':do_deploy' or ''} \
 "

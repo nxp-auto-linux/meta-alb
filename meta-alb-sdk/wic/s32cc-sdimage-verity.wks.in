@@ -11,5 +11,6 @@
 #
 # This .wks only works with the dm-verity-img class.
 
+part FIP --source rawcopy --sourceparams="file=${TFA_IMAGE_FILE}" --ondisk mmcblk1 --align ${BASE_IMAGE_ROOTFS_ALIGNMENT}
 part /boot --source bootimg-partition --ondisk mmcblk1 --fstype=vfat --label boot --active --align 10240 --size 64 --sourceparams="loader=u-boot" --use-uuid
 part / --source rawcopy --ondisk mmcblk1 --sourceparams="file=${IMGDEPLOYDIR}/${DM_VERITY_IMAGE}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.verity"

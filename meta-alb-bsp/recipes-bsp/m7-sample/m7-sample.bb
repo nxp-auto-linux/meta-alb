@@ -11,7 +11,7 @@ SRCREV ?= "49a1a2b4754c60415f4a181b1c8a91cebe23efd6"
 
 S = "${WORKDIR}/git"
 BUILD = "${WORKDIR}/build"
-IVT_FILE_BASE = "fip.s32"
+IVT_FILE_BASE = "bl2_w_dtb.s32"
 
 do_compile() {
 	for suffix in ${BOOT_TYPE}

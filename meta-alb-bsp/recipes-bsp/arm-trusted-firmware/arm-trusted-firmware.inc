@@ -42,10 +42,6 @@ OPTEE_ARGS = " \
                 SPD=opteed \
                 "
 
-M7BOOT_ARGS = " \
-                FIP_OFFSET_DELTA=0x2000 \
-                "
-
 SCPRT_ARGS = " \
                 S32CC_USE_SCP=1 \
                 FIP_ALIGN=64 \
@@ -89,7 +85,6 @@ EXTRA_OEMAKE:append = " \
 
 EXTRA_OEMAKE:append = " ${@oe.utils.conditional('BUILD_TYPE', 'debug', 'DEBUG=1', '', d)}"
 EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', '${OPTEE_ARGS}', '', d)}"
-EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', '${M7BOOT_ARGS}', '', d)}"
 
 EXTRA_OEMAKE:append = ' HOSTCC="${BUILD_CC} ${BUILD_CPPFLAGS} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
 EXTRA_OEMAKE:append = ' OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/../" \
@@ -172,12 +167,20 @@ do_compile:s32cc() {
 
 	for suffix in ${BOOT_TYPE}
 	do
+		if [ "${suffix}" = "sdcard" ] ; then
+			fip_location="mmc"
+		else
+			fip_location="${suffix}"
+		fi
+
 		oe_runmake -C "${S}" \
 		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}" \
 		    MKIMAGE="mkimage" \
 		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
-		    MKIMAGE_CFG="${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}" all
-		cp -vf "${TFA_BINARIES}/fip.s32" "${TFA_BINARIES}/fip.s32-${suffix}"
+		    MKIMAGE_CFG="${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}" \
+		    FIP_LOCATION="${fip_location}" all
+		cp -vf "${TFA_BINARIES}/bl2_w_dtb.s32" "${TFA_BINARIES}/bl2_w_dtb.s32-${suffix}"
+		cp -vf "${TFA_BINARIES}/bl2_w_dtb.bin" "${TFA_BINARIES}/bl2_w_dtb.bin-${suffix}"
 		cp -vf "${TFA_BINARIES}/fip.bin" "${TFA_BINARIES}/fip.bin-${suffix}"
 		# If secure boot is used, copy BL2 signature for each boot type
 		if [ -f "${TFA_BINARIES}/bl2-signature.bin" ]; then
@@ -192,7 +195,8 @@ do_deploy() {
 
 do_deploy:append:s32cc() {
 	for suffix in ${BOOT_TYPE}; do
-		cp -vf "${TFA_BINARIES}/fip.s32-${suffix}" ${DEPLOYDIR}
+		cp -vf "${TFA_BINARIES}/bl2_w_dtb.s32-${suffix}" ${DEPLOYDIR}
+		cp -vf "${TFA_BINARIES}/fip.bin-${suffix}" ${DEPLOYDIR}
 	done
 }
 

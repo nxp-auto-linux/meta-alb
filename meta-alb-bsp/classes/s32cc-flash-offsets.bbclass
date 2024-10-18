@@ -47,7 +47,8 @@ python update_flash_offsets () {
         raise Exception(qspi_part_node_name + " node not found in file: " + fdt_path)
     flash_part_node = flash_part_list[0]
 
-    flash_map = {'FIP' : 'FLASHIMAGE_FIP_OFFSET',
+    flash_map = {'BL2' : 'FLASHIMAGE_RESET_OFFSET',
+                 'FIP' : 'FLASHIMAGE_FIP_OFFSET',
                  'U-Boot-Env' : 'FLASHIMAGE_UBOOT_ENV_OFFSET',
                  'Kernel' : 'FLASHIMAGE_KERNEL_OFFSET',
                  'DTB' : 'FLASHIMAGE_DTB_OFFSET',

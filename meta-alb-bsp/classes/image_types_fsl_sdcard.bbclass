@@ -104,6 +104,9 @@ SDCARD_ROOTFS_EXTRA1_SIZE ?= "0"
 SDCARD_ROOTFS_EXTRA2_FILE ?= ""
 SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
 
+# Make the two extra rootfs partitions logical
+SDCARD_ROOTFS_LOGICAL_EXTRA ?= "0"
+
 TFA_IMAGE ?= ""
 TFA_IMAGE_FILE ?= ""
 
@@ -214,8 +217,9 @@ create_rootfs_partition () {
 	SDCARD_ROOTFS_START="$1"
 	SDCARD_ROOTFS_SIZE="$2"
 	SDCARD_ROOTFS_NAME="$3"
+	SDCARD_ROOTFS_PART_TYPE="$4"
 	if [ -n "${SDCARD_ROOTFS_NAME}" ]; then
-		parted -s "${SDCARD}" unit KiB mkpart primary ${SDCARD_ROOTFS_START} $(printf "%u + %u\n" ${SDCARD_ROOTFS_START} ${SDCARD_ROOTFS_SIZE} | bc)
+		parted -s "${SDCARD}" unit KiB mkpart ${SDCARD_ROOTFS_PART_TYPE} ${SDCARD_ROOTFS_START} $(printf "%u + %u\n" ${SDCARD_ROOTFS_START} ${SDCARD_ROOTFS_SIZE} | bc)
 	fi
 }
 
@@ -428,6 +432,7 @@ generate_nxp_sdcard () {
 	SDCARD_ROOTFS_REAL_START="$1"
 	SDCARD_ROOTFS_EXTRA1_START="$2"
 	SDCARD_ROOTFS_EXTRA2_START="$3"
+	SDCARD_EXTENDED_PART_START="$4"
 
 	# Create partition table
 	parted -s "${SDCARD}" mklabel msdos
@@ -439,9 +444,20 @@ generate_nxp_sdcard () {
 		parted -s "${SDCARD}" unit KiB mkpart primary fat32 ${BOOT_SPACE_START} $(printf "%u + %u\n" ${BOOT_SPACE_START} ${BOOT_SPACE_ALIGNED} | bc)
 	fi
 
-	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}"
-	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} "${SDCARD_ROOTFS_EXTRA1_FILE}"
-	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} "${SDCARD_ROOTFS_EXTRA2_FILE}"
+	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}" "primary"
+
+	if [ ${SDCARD_ROOTFS_EXTRA1_START} -ne 0 ] && [ ${SDCARD_ROOTFS_EXTRA2_START} -ne 0 ] && [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 0 ]; then
+		bberror "Need to select SDCARD_ROOTFS_LOGICAL_EXTRA=1 when having two extra rootfs partitions"
+	fi
+
+	if [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 1 ]; then
+		rootfs_extra_part_type="logical"
+		parted -s "${SDCARD}" unit KiB mkpart extended ${SDCARD_EXTENDED_PART_START} 100%
+	else
+		rootfs_extra_part_type="primary"
+	fi
+	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} "${SDCARD_ROOTFS_EXTRA1_FILE}" "${rootfs_extra_part_type}"
+	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} "${SDCARD_ROOTFS_EXTRA2_FILE}" "${rootfs_extra_part_type}"
 	parted "${SDCARD}" print
 
 	# Fill optional Layerscape RCW into the boot block
@@ -504,6 +520,14 @@ IMAGE_CMD:sdcard () {
 	else
 		SDCARD_ROOTFS_REAL_START="0"
 	fi
+
+	if [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 1 ]; then
+		SDCARD_EXTENDED_PART_START=${SDCARD_SIZE}
+		SDCARD_SIZE=$(printf "%u + %u\n" ${SDCARD_SIZE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
+	else
+		SDCARD_EXTENDED_PART_START="0"
+	fi
+
 	if [ -n "${SDCARD_ROOTFS_EXTRA1_FILE}" ]; then
 		SDCARD_ROOTFS_EXTRA1_START=${SDCARD_SIZE}
 		SDCARD_SIZE=$(printf "%u + %u + %u\n"  ${SDCARD_SIZE} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
@@ -536,6 +560,6 @@ IMAGE_CMD:sdcard () {
 	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA8_FILE}" "SDCARDIMAGE_EXTRA8_OFFSET" "${SDCARDIMAGE_EXTRA8_OFFSET}"
 	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA9_FILE}" "SDCARDIMAGE_EXTRA9_OFFSET" "${SDCARDIMAGE_EXTRA9_OFFSET}"
 
-	generate_nxp_sdcard ${SDCARD_ROOTFS_REAL_START} ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA2_START}
+	generate_nxp_sdcard ${SDCARD_ROOTFS_REAL_START} ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_EXTENDED_PART_START}
 	cd -
 }

@@ -104,8 +104,11 @@ EXTRA_OEMAKE:append:s32cc = "${@ "${QUICK_BOOT_ARGS}" if d.getVar('QUICK_BOOT_CO
 EXTRA_OEMAKE:append:s32cc = " S32CC_USE_SCMI_PINCTRL=${SCMI_USE_SCMI_PINCTRL}"
 EXTRA_OEMAKE:append:s32cc = " S32CC_USE_SCMI_NVMEM=${SCMI_USE_SCMI_NVMEM}"
 
+# Switch the UART to be used if it is the case
+EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_MODULE=' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] }"
+
 # Switch the UART baudrate to be used if it is the case
-EXTRA_OEMAKE:append = " ${@ 'S32_LINFLEX_BAUDRATE=' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[0] }"
+EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_BAUDRATE=' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[0] }"
 
 PINCTRL_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
 GPIO_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"

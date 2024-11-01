@@ -5,7 +5,6 @@ DEPENDS:append = " arm-trusted-firmware-tools-native"
 SECBOOT_KEYS_DIR = "${WORKDIR}/secboot_keys"
 SECBOOT_SCRIPT_FILE = "secboot_script.sh"
 SECBOOT_SCRIPT = "${SECBOOT_KEYS_DIR}/${SECBOOT_SCRIPT_FILE}"
-SECBOOT_DEVICE = "${@bb.utils.contains('UBOOT_MACHINE', 'qspi', '/dev/mtd0', '/dev/mmcblk0', d)}"
 OP_TEE = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '1', '0', d)}"
 
 BL2_SIGN_FILE = "bl2-signature.bin"
@@ -61,13 +60,15 @@ do_generate_bl_public_keys () {
 }
 
 do_generate_secboot_script() {
-	echo -n "hse-secboot -s -d ${SECBOOT_DEVICE}" > ${SECBOOT_SCRIPT}
+	echo -n "hse-secboot -s -b \$1 -d \$2" > ${SECBOOT_SCRIPT}
 	echo -n " --bl2_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL2_FILE}:${BL2_HANDLE}" >> ${SECBOOT_SCRIPT}
 	echo -n " --bl31_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL31_FILE}:${BL31_HANDLE}" >> ${SECBOOT_SCRIPT}
 	if [ ${OP_TEE} -eq 1 ]; then
 		echo -n " --bl32_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL32_FILE}:${BL32_HANDLE}" >> ${SECBOOT_SCRIPT}
 	fi
-	echo " --bl33_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL33_FILE}:${BL33_HANDLE}" >> ${SECBOOT_SCRIPT}
+	echo -n " --bl33_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL33_FILE}:${BL33_HANDLE}" >> ${SECBOOT_SCRIPT}
+	echo -n " --bl2_bin \$3" >> ${SECBOOT_SCRIPT}
+	echo " --bl2_sign \$4" >> ${SECBOOT_SCRIPT}
 }
 
 do_generate_bl_public_keys[depends] += "openssl-native:do_populate_sysroot"

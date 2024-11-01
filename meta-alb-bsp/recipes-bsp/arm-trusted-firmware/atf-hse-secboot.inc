@@ -10,6 +10,9 @@ OP_TEE = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '1', '0', d)}"
 BL2_SIGN_FILE = "bl2-signature.bin"
 BL2_SIGN = "${TFA_BINARIES}/${BL2_SIGN_FILE}"
 
+BL2_BIN_FILE = "bl2_w_dtb.bin"
+BL2_BIN = "${TFA_BINARIES}/${BL2_BIN_FILE}"
+
 BL2_HANDLE ?= "0x010700"
 BL31_HANDLE ?= "${BL2_HANDLE}"
 BL32_HANDLE ?= "${BL2_HANDLE}"
@@ -83,6 +86,7 @@ do_deploy:append() {
 	for suffix in ${BOOT_TYPE}
 	do
 		cp -vf ${BL2_SIGN}-${suffix} ${DEPLOYDIR}
+		cp -vf ${BL2_BIN}-${suffix} ${DEPLOYDIR}
 	done
 
 	cp -vf ${RSA_PRIV_KEYS} ${RSA_PUB_KEYS} ${DEPLOYDIR}
@@ -98,6 +102,7 @@ do_install:append() {
 	for suffix in ${BOOT_TYPE}
 	do
 		install -m 0666 "${BL2_SIGN}-${suffix}" ${D}${INSTALL_PATH_SECBOOT_KEYS}
+		install -m 0666 "${BL2_BIN}-${suffix}" ${D}${INSTALL_PATH_SECBOOT_KEYS}
 	done
 
 	install -m 0666 ${RSA_PUB_KEYS} ${D}${INSTALL_PATH_SECBOOT_KEYS}
@@ -108,6 +113,7 @@ do_install:append() {
 }
 
 FILES:${PN}-secboot += "${INSTALL_PATH_SECBOOT_KEYS}${BL2_SIGN_FILE}-*"
+FILES:${PN}-secboot += "${INSTALL_PATH_SECBOOT_KEYS}${BL2_BIN_FILE}-*"
 FILES:${PN}-secboot += "${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL2_FILE}"
 FILES:${PN}-secboot += "${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL31_FILE}"
 FILES:${PN}-secboot += "${@ "${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL32_FILE}" if "${OP_TEE}" == '1' else ''}"

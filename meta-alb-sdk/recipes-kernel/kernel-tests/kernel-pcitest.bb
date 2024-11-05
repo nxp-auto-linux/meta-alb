@@ -67,6 +67,5 @@ do_install:append:s32cc() {
 }
 
 FILES:${PN} += "${bindir}"
-RDEPENDS:${PN} += "bash"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

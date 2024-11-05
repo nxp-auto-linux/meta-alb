@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # This script creates an EP function device (func1) and configures it,
 # provided that the EPF support has been enabled in the kernel:
@@ -12,7 +12,7 @@
 set -x
 WORKDIR="${PWD}"
 if [ -d '/sys/kernel/config/pci_ep/' ]; then
-        cd /sys/kernel/config/pci_ep/
+        cd /sys/kernel/config/pci_ep/ || exit
         mkdir -p functions/pci_epf_test/func1
 
         echo 0x1957 > functions/pci_epf_test/func1/vendorid
@@ -20,11 +20,11 @@ if [ -d '/sys/kernel/config/pci_ep/' ]; then
         echo 8 > functions/pci_epf_test/func1/msi_interrupts
         echo 16 > functions/pci_epf_test/func1/msix_interrupts
 
-        for entry in `ls ./controllers/`; do
+        for entry in $(ls ./controllers/); do
                 echo "Linking EPF func1 to ${entry}"
-                ln -s functions/pci_epf_test/func1 controllers/${entry}/
+                ln -s functions/pci_epf_test/func1 "controllers/${entry}/"
                 break
         done
 fi
-cd ${WORKDIR}
+cd "${WORKDIR}" || exit
 set +x

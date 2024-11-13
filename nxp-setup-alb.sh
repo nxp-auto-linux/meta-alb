@@ -53,6 +53,33 @@ YOCTOVERSION="kirkstone"
 # Error codes
 EINVAL=128
 
+# alb-user-extra-layers.sh should be a shell script
+# that defines (only) the alb_user_extra_layers variable
+# which should contain a list of desired layers to be added
+# to the Yocto configuration. Example of script content:
+#
+# #!/bin/sh
+#
+# alb_user_extra_layers="\
+#     meta-userlayer1 \
+#     meta-userlayer2 \
+# "
+#
+ALB_USER_EXTRA_LAYERS_SCRIPT="./alb-user-extra-layers.sh"
+if [ -a "$ALB_USER_EXTRA_LAYERS_SCRIPT" ]; then
+    file_check="$(file --mime-type "$ALB_USER_EXTRA_LAYERS_SCRIPT" | grep "text/x-shellscript")"
+    if [ -n "$file_check" ]; then
+        . "$ALB_USER_EXTRA_LAYERS_SCRIPT"
+    else
+        echo "ERROR: $ALB_USER_EXTRA_LAYERS_SCRIPT is not a shell script!"
+        echo "Please correct this problem or remove $ALB_USER_EXTRA_LAYERS_SCRIPT and rerun $PROGNAME"
+        unset ALB_USER_EXTRA_LAYERS_SCRIPT PROGNAME file_check
+        exit
+    fi
+else
+    alb_user_extra_layers=""
+fi
+
 if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
     echo "ERROR: This script needs to be sourced."
     SCRIPT_PATH=`readlink -f $0`
@@ -147,8 +174,8 @@ clean_up()
          OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES DISTRO \
          setup_flag setup_h setup_j setup_t setup_l setup_builddir \
          setup_download setup_sstate setup_error layer append_layer \
-         extra_layers distro_override MACHINELAYER MACHINEEXCLUSION \
-         ARMMACHINE
+         extra_layers alb_user_extra_layers distro_override \
+         MACHINELAYER MACHINEEXCLUSION ARMMACHINE
 
    unset -f usage prompt_message
 }
@@ -263,9 +290,9 @@ ALB_LAYER_LIST=" \
     meta-alb-url-proxy  \
     meta-aa-integration \
     meta-vnp \
-    meta-gvip \
     \
     $extra_layers \
+    $alb_user_extra_layers \
 "
 
 LAYER_LIST=" \

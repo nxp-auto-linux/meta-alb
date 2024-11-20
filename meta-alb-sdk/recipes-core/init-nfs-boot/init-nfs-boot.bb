@@ -1,4 +1,4 @@
-# Copyright 2017-2020 NXP
+# Copyright 2017-2020, 2024 NXP
 # Copy local init script in rootfs init
 
 LICENSE = "MIT"
@@ -18,5 +18,3 @@ FILES:${PN} += "/init"
 do_install() {
     install -m 755 ${WORKDIR}/${INIT_SCRIPT} ${D}/${base_prefix}/init
 }
-
-RDEPENDS:${PN} += "bash"

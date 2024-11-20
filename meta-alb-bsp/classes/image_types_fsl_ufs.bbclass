@@ -165,7 +165,8 @@ generate_nxp_ufs_lun1 () {
 	# prepare the linux kernel partition
 	rm -f "${UFS_LUN_DEPLOYDIR}/kernel.part"
 	mkfs.vfat -n boot -S ${UFS_SECTOR_SIZE} -C "${UFS_LUN_DEPLOYDIR}/kernel.part" ${ESP_PARTITION_SIZE_KIB}
-	mcopy -i "${UFS_LUN_DEPLOYDIR}/kernel.part" -s "${ESP_ARTIFACT_NAME}" "::/${KERNEL_IMAGETYPE}"
+	mmd -i "${UFS_LUN_DEPLOYDIR}/kernel.part" "::/BOOT" "::/BOOT/linux"
+	mcopy -i "${UFS_LUN_DEPLOYDIR}/kernel.part" -s "${ESP_ARTIFACT_NAME}" "::/BOOT/linux/${KERNEL_IMAGETYPE}"
 
 	write_partition "${UFS_LUN_DEPLOYDIR}/kernel.part" ${UFS_LUN1_NAME} ${ESP_PARTITION_SIZE_KIB} ${ESP_PARTITION_START_ADDRESS_KIB}
 	write_partition ${ROOTFS_EXT4_ARTIFACT_NAME} ${UFS_LUN1_NAME} ${ROOTFS_PARTITION_SIZE_KIB} ${ROOTFS_PARTITION_START_ADDRESS}

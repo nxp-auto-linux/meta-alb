@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Boot Linux from ramdisk, start networking services, insert kernel modules
 # Boot actual rootfs from NFS, as provided by command line parameters
-# Copyright 2018-2022 NXP
+# Copyright 2018-2022, 2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -41,8 +41,8 @@ for i in $(cat /proc/cmdline); do
 			;;
 		nfsroot=*)
 			nfsroot=${i#nfsroot=}
-			nfsrootopts=$(echo $nfsroot | cut -s -f 2- -d ',')
-			nfsroot=$(echo $nfsroot | cut -f 1 -d ',')
+			nfsrootopts=$(echo "$nfsroot" | cut -s -f 2- -d ',')
+			nfsroot=$(echo "$nfsroot" | cut -f 1 -d ',')
 			nfsrootopts=${nfsrootopts:+-o ${nfsrootopts}}
 			;;
 		ro)
@@ -68,7 +68,7 @@ if [ -e "/init-ip-link.sh" ]; then
 	/bin/bash -c "source /init-ip-link.sh"
 else
 	lsmod | grep -q "^nxp\b" > /dev/null ||
-	    insmod /lib/modules/`uname -r`/kernel/drivers/net/phy/nxp/nxp.ko
+	    insmod "/lib/modules/$(uname -r)/kernel/drivers/net/phy/nxp/nxp.ko"
 fi
 
 echo "Starting RPCBind"
@@ -80,18 +80,18 @@ echo "Starting networking"
 if [ "$ip" ] && [ "$device" ]; then
     # Stop DHCP to assign U-BOOT address
     if [ -r "/var/run/udhcpc.$device.pid" ]; then
-        kill -9 $(cat /var/run/udhcpc.$device.pid)
+        kill -9 "$(cat "/var/run/udhcpc.$device.pid")"
     fi
     ifconfig "$device" "$ip" ${netmask:+netmask $netmask}
     if [ "x$gwip" != "x" ]; then
-        ip route add default via $gwip dev $device
+        ip route add default via "$gwip" dev "$device"
     fi
 fi
 
 mkdir $mountpoint
 
-echo -n "Mounting ${nfsroot} on ${mountpoint}... "
-mount.nfs ${readonly} ${nfsrootopts} ${nfsroot} ${mountpoint} 2> /dev/null
+echo "Mounting ${nfsroot} on ${mountpoint}... "
+mount.nfs ${readonly} "${nfsrootopts}" "${nfsroot}" ${mountpoint} 2> /dev/null
 if [ "$?" = "0" ]; then
 	echo "Mounted ${nfsroot}"
 
@@ -113,7 +113,8 @@ echo >> $DEBUG_FILE
 mount >> $DEBUG_FILE
 echo >> $DEBUG_FILE
 
-echo -e "\nError while initializing nfs boot. Verify the debug log: $DEBUG_FILE."
+echo ""
+echo "Error while initializing nfs boot. Verify the debug log: $DEBUG_FILE."
 echo "Switching to minimal rootfs"
 
 exec /sbin/init

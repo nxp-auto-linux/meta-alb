@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=0f00d99239d922ffd13cabef83b33444"
 URL ?= "git://github.com/nxp-auto-linux/m7-sample;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "49a1a2b4754c60415f4a181b1c8a91cebe23efd6"
+SRCREV ?= "84cf69931d26e950d39ed8c01704275a7736effd"
 
 S = "${WORKDIR}/git"
 BUILD = "${WORKDIR}/build"

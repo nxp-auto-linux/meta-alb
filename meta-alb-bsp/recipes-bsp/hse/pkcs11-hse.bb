@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=f03611747c1e7d618ef405a8484ed48d"
 URL ?= "git://github.com/nxp-auto-linux/pkcs11-hse;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
-SRCREV ?= "65fae37f96cae1c04330148fa4aeb3c11e11ee16"
+SRCREV ?= "e8194d795903732fd6bc9a69d0ae678dc9726fa5"
 
 DEPENDS += "libp11 openssl hse-firmware"
 RDEPENDS:${PN} += "hse-firmware openssl-bin"

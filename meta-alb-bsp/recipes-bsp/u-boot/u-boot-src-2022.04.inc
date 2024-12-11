@@ -2,4 +2,4 @@ URL ?= "git://github.com/nxp-auto-linux/u-boot;protocol=https"
 BRANCH ?= "${RELEASE_BASE}-${PV}"
 SRC_URI = "${URL};branch=${BRANCH}"
 
-SRCREV = "1e5a97aa06ea468638c55fad3dcece5272d20276"
+SRCREV = "fcc77f4295eb9085b2728ed059508c824aed929f"

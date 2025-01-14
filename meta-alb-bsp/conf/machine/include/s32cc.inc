@@ -5,6 +5,12 @@ INIT_MANAGER ?= "systemd"
 
 IMAGE_FSTYPES += "ext4"
 
+IMAGE_CLASSES += "\
+	image_types_fsl_flashimage \
+	image_types_fsl_sdcard \
+	image_types_fsl_itb \
+"
+
 BOOT_TYPE ?= "sdcard qspi"
 
 # Specific definitions for .sdcard image generation

@@ -13,3 +13,10 @@ PREFERRED_VERSION_linux-flash ?= "${PREFERRED_VERSION_linux-qoriq}"
 # We don't want the QorIQ Ethernet naming rewrites
 # This affects all images not only based on core-image-minimal
 MACHINE_EXTRA_RRECOMMENDS:remove = "udev-rules-qoriq"
+
+# Artifact types for QorIQ machines
+IMAGE_CLASSES += "\
+	image_types_fsl_flashimage \
+	image_types_fsl_sdcard \
+	image_types_fsl_itb \
+"

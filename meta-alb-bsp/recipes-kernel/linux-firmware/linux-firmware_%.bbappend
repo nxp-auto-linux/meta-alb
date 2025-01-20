@@ -1,4 +1,11 @@
-# Copyright 2021 NXP
+# Copyright 2021,2025 NXP
+
+LICENSE:append = " & NXP-S32-PLATFORM-SOFTWARE \
+"
+LIC_FILES_CHKSUM:append = " \
+	file://license-llce.rtf;md5=97a0abc6fb5eb52a8cd1e99205caa71b \
+"
+NO_GENERIC_LICENSE[NXP-S32-PLATFORM-SOFTWARE] = "license-llce.rtf"
 
 NXP_FIRMWARE_LOCAL_DIR ?= "."
 
@@ -11,6 +18,7 @@ SRC_URI:append:s32 = " \
 		file://${NXP_FIRMWARE_LOCAL_DIR}/frpe.bin \
 		file://${NXP_FIRMWARE_LOCAL_DIR}/ppe_tx.bin \
 		file://${NXP_FIRMWARE_LOCAL_DIR}/ppe_rx.bin \
+		file://${NXP_FIRMWARE_LOCAL_DIR}/license-llce.rtf \
 	', '', d)} \
 "
 
@@ -21,6 +29,14 @@ do_install:append () {
 		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_tx.bin ${D}/${base_libdir}/firmware/ppe_tx.bin
 		install -m 0644 ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/ppe_rx.bin ${D}/${base_libdir}/firmware/ppe_rx.bin
 	fi
+}
+
+do_unpack_license() {
+	cp -vf ${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}/license-llce.rtf ${WORKDIR}/${BPN}-${PV}/
+}
+
+python do_unpack:append() {
+    bb.build.exec_func('do_unpack_license', d)
 }
 
 PACKAGES =+ "${PN}-llce"

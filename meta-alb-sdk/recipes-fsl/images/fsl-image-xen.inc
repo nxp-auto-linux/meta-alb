@@ -18,3 +18,5 @@ IMAGE_ROOTFS_IMAGELIST = " \
 
 # Install binaries needed by xen example on EXT partition
 IMAGE_INSTALL += "${XEN_EXAMPLE}"
+
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'virtio', ' vhost-device-i2c xen-vhost-frontend', '', d)}"

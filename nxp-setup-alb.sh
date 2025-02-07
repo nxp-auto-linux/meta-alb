@@ -310,6 +310,7 @@ LAYER_LIST=" \
     meta-security \
     \
     meta-freescale \
+    meta-rust-bin \
 "
 
 LSLAYERS=" \

@@ -1,4 +1,4 @@
-# Copyright 2019-2022, 2024 NXP
+# Copyright 2019-2022, 2024-2025 NXP
 
 DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause"
@@ -53,6 +53,11 @@ HSE_ARGS = " \
               HSE_SUPPORT=1 \
               "
 
+S32R47_ARGS = " \
+                BL2_BASE=0x90000000 \
+                BL2_LIMIT=0x91000000 \
+                "
+
 SECBOOT_ARGS = " \
                  SECBOOT_SUPPORT=1 \
                  BL2_KEY=${RSA_PRIV_BL2} \
@@ -104,6 +109,10 @@ EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_MODULE=' + d.getVar("SERIAL_CONSO
 
 # Switch the UART baudrate to be used if it is the case
 EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_BAUDRATE=' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[0] }"
+
+EXTRA_OEMAKE:append:s32r478 = " ${S32R47_ARGS}"
+EXTRA_OEMAKE:append:s32r478 = " ${@bb.utils.contains('VALIDATION_HW', 'S32R47_W_S32R45', 'S32R47_W_S32R45=1', '', d)}"
+EXTRA_OEMAKE:append:s32r478 = " ${@bb.utils.contains('VALIDATION_HW', 'S32R47_W_S32G2', 'S32R47_W_S32G2=1', '', d)}"
 
 PINCTRL_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
 GPIO_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"

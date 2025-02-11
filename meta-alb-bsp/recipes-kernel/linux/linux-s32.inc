@@ -171,6 +171,12 @@ do_shared_workdir:append () {
 
 FILES:${KERNEL_PACKAGE_NAME}-image += "/boot/zImage*"
 
+FILES:${KERNEL_PACKAGE_NAME}-image += "\
+    ${sysconfdir} \
+    ${sysconfdir}/modules-load.d \
+    ${sysconfdir}/modprobe.d \
+"
+
 KERNEL_MODULE_AUTOLOAD:s32g274aevb += "\
     nxp \
 "

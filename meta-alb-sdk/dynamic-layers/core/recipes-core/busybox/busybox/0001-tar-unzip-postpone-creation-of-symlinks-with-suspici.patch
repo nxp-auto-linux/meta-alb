@@ -27,6 +27,8 @@ unsafe_symlink_target                                147       -    -147
 ------------------------------------------------------------------------------
 (add/remove: 2/1 grow/shrink: 1/2 up/down: 162/-248)          Total: -86 bytes
 
+Upstream-Status: Pending
+
 Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
 Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
 ---

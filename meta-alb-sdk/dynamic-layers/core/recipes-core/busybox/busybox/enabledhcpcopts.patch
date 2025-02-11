@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 diff --git a/networking/ifupdown.c b/networking/ifupdown.c
 index 7ca7ad8..2c2725b 100644
 --- a/networking/ifupdown.c

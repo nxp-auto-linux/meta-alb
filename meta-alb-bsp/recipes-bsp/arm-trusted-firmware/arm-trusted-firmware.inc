@@ -22,6 +22,8 @@ inherit deploy
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
+TFA_BUILD_ARTIFACTS_DIR = "TFA_Build_Artifacts"
+
 RSA_PRIV_BL2 ??= ""
 RSA_PRIV_BL31 ??= ""
 RSA_PRIV_BL32 ??= ""
@@ -207,6 +209,21 @@ do_deploy:append:s32cc() {
 		cp -vf "${TFA_BINARIES}/bl2_w_dtb.s32-${suffix}" ${DEPLOYDIR}
 		cp -vf "${TFA_BINARIES}/fip.bin-${suffix}" ${DEPLOYDIR}
 	done
+}
+
+do_deploy:append:s32r478() {
+	file="bl2_build_artifacts"
+	tfa_compile_log="${WORKDIR}/temp/log.do_compile"
+
+	install -d "${DEPLOYDIR}/${TFA_BUILD_ARTIFACTS_DIR}"
+	printf "TFA BL2 SW Build Time Info:\n\n" > "${file}"
+	printf "QuadSPI BL2 Flash offset: ${TFA_RESET_OFFSET}\n" >> "${file}"
+	printf "QuadSPI BL2 Flash partition size: ${TFA_RESET_SIZE}\n" >> "${file}"
+	grep "Boot Core:" "${tfa_compile_log}" >> "${file}"
+	grep "IVT Location:" "${tfa_compile_log}" >> "${file}"
+	grep "Load address:" "${tfa_compile_log}" >> "${file}"
+	grep "Entry point:" "${tfa_compile_log}" >> "${file}"
+	cp -vf "${file}" "${DEPLOYDIR}/${TFA_BUILD_ARTIFACTS_DIR}"
 }
 
 do_install:append:s32cc() {

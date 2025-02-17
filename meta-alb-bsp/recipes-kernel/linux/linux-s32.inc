@@ -254,6 +254,8 @@ require vnet-s32.inc
 require llce.inc
 require ${@bb.utils.contains('DISTRO_FEATURES', 'verifiedboot', 'recipes-kernel/linux/verifiedboot.inc', '', d)}
 
+RDEPENDS:kernel-base:append = "${@bb.utils.contains('DISTRO_FEATURES', 'carvnet-fw-load', ' linux-firmware-carvnet', '', d)}"
+
 # Since Kernel version 4.19, task 'do_merge_delta_config' requires that the cross
 # compiler is available in recipe's sysroot. In order to avoid any erros/warnings
 # at build time of the Linux Kernel version 5.4, we add this dependency.

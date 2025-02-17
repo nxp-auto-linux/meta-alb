@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # Add support for extra syscalls and better chroot to support apt-get
 # use inside pseudo for target rootfs setups
-SRC_URI += " \
+SRC_URI:ubuntu += " \
     file://0001-pseudo-Enabled-utimensat-ftimens.patch \
     file://0002-pseudo-The-stat-v-fs-functions-were-not-wrapped-prop.patch \
     file://0003-pseudo-proper-compile-of-f-stat-v-fs-wrappers.patch \

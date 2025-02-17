@@ -1,0 +1,85 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+/*
+ * Copyright 2025 NXP
+ */
+
+/dts-v1/;
+#include "s32n79-simulator.dtsi"
+
+/delete-node/ &gic;
+/delete-node/ &uart0;
+/delete-node/ &scmi_tx_buf;
+/delete-node/ &irqsteer_coss;
+/delete-node/ &memory;
+/delete-node/ &cpu2;
+/delete-node/ &cpu3;
+/delete-node/ &cpu4;
+/delete-node/ &cpu5;
+/delete-node/ &cpu6;
+/delete-node/ &cpu7;
+/ {
+	memory@880000000 {
+		device_type = "memory";
+		reg = <0x8 0x80000000 0 0x80000000>;
+	};
+
+	reserved-memory {
+		scmi_tx_buf: shm@8d0000000 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x8 0xd0000000 0x0 0x80>;
+			no-map;
+		};
+	};
+
+	cis_subsys {
+		gic: interrupt-controller@4f400000 {
+			compatible = "arm,gic-v3";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			#interrupt-cells = <3>;
+			interrupt-controller;
+			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0x4f400000 0x10000>, /* GIC Dist */
+			      <0x4f460000 0x100000>; /* GICR (RD_base + SGI_base) */
+			ranges;
+
+			its: msi-controller@4f440000 {
+				compatible = "arm,gic-v3-its";
+				reg = <0x4f440000 0x20000>;
+				msi-controller;
+				status = "disabled";
+			};
+		};
+	};
+
+	coss_subsys {
+		uart0: serial@4a040000 {
+			compatible = "arm,pl011", "arm,primecell";
+			reg = <0x4a040000 0x1000>;
+			clocks = <&sys_clk>, <&sys_clk>;
+			clock-names = "uartclk", "apb_pclk";
+			interrupt-parent = <&irqsteer_coss>;
+			interrupts = <265>;
+		};
+
+		irqsteer_coss: interrupt-controller@4ed10000 {
+			compatible = "nxp,s32n7-irqsteer";
+			reg = <0x4ed10000 0x10000>;
+			interrupts = <GIC_SPI 563 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 564 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 565 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 566 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 567 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 568 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 569 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 570 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-controller;
+			interrupt-parent = <&gic>;
+			#interrupt-cells = <1>;
+			clocks = <&sys_clk>;
+			clock-names = "ipg";
+			fsl,channel = <0>;
+			fsl,num-irqs = <512>;
+		};
+	};
+};

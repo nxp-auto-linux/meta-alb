@@ -313,6 +313,14 @@ _generate_boot_image() {
 			else if [ -e "${DEPLOY_DIR_IMAGE}/${DTS_BASE_NAME}.dtb" ]; then
 					DTB_PATH="${DEPLOY_DIR_IMAGE}/${DTS_BASE_NAME}.dtb"
 					kernel_bin_for_dtb="`readlink $DTB_PATH | sed "s,$DTS_BASE_NAME,${KERNEL_IMAGETYPE},;s,\.dtb$,.bin,g"`"
+
+					# in case "${kernel_bin_for_dtb}" is empty, it means that $DTB_PATH is not a symlink, but the dtb file itself
+					# this can happen in certain situations, like the default behavior starting 
+					# with Yocto 4.3, if the default behavior from kernel-devicetree class is not overridden
+					if [ -z "${kernel_bin_for_dtb}" ]; then
+						kernel_bin_timestamp="`echo ${kernel_bin} | sed -e "s/^Image--//" -e "s/.bin//"`"
+						kernel_bin_for_dtb="`find ${DEPLOY_DIR_IMAGE} -maxdepth 1 -type l -exec basename {} \; | grep "${kernel_bin_timestamp}.dtb" | sed "s,$DTS_BASE_NAME,${KERNEL_IMAGETYPE},;s,\.dtb$,.bin,g"`"
+					fi
 				fi
 			fi
 			if [ -n "$DTB_PATH" ]; then

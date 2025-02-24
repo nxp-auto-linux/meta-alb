@@ -17,6 +17,9 @@ BOOT_TYPE ?= "sdcard qspi"
 IMAGE_FSTYPES += "sdcard"
 SDCARD_ROOTFS = "ext4"
 
+# remove the ".rootfs" that is added in the image output file names
+IMAGE_NAME_SUFFIX = ""
+
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 
 UBOOT_ENV_SDCARD_OFFSET ?= "0x00280000"

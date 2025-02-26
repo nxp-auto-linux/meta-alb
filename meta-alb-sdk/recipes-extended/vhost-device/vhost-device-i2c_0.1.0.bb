@@ -10,6 +10,8 @@ LIC_FILES_CHKSUM = " \
 SRC_URI += "crate://crates.io/vhost-device-i2c/0.1.0"
 SRC_URI[vhost-device-i2c-0.1.0.sha256sum] = "a77923a4f161887ca2a19ead2d2f2271d62d1268e774265c42c277367f019a3f"
 
+EXTRA_CARGO_FLAGS:append = " --features xen"
+
 inherit cargo
 inherit cargo-update-recipe-crates
 

@@ -12,7 +12,7 @@ SRC_URI[vhost-device-i2c-0.1.0.sha256sum] = "a77923a4f161887ca2a19ead2d2f2271d62
 
 EXTRA_CARGO_FLAGS:append = " --features xen"
 
-inherit cargo
+inherit cargo_bin
 inherit cargo-update-recipe-crates
 
 include vhost-device-i2c-crates.inc

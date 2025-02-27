@@ -122,7 +122,7 @@ echo
 
 # rescue relevant user files
 # We just rescue some, and some are rescued and restored automagically
-FILES2RESCUEANDRESTORE="/etc/hosts /etc/hostname /etc/sudoers /etc/default/locale /home/root/.bashrc /home/bluebox/.bashrc /etc/yum/repos.d"
+FILES2RESCUEANDRESTORE="/etc/hosts /etc/hostname /etc/sudoers /etc/default/locale /root/.bashrc /home/bluebox/.bashrc /etc/yum/repos.d"
 FILES2RESCUE="${FILES2RESCUEANDRESTORE} /etc/network/interfaces"
 currentdate=`date +%Y%m%d%H%M%S`
 RESCUEPATH="/rescuedfiles"

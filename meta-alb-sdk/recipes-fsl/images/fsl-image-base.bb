@@ -48,6 +48,8 @@ IMAGE_INSTALL:append:s32 = " linux-qspi-tool "
 # To be used with 'fsl-image-flash' image
 IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'bsp-utils', ' mmc-test-tool', '', d)}"
 
+IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'rpsecboot', ' mmc-utils', '', d)}"
+
 # We want to have an itb to boot from in the /boot directory to be flexible
 # about U-Boot behavior
 IMAGE_INSTALL:append:fsl-lsch3 = " \

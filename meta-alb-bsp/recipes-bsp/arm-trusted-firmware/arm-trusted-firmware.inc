@@ -25,6 +25,15 @@ B = "${WORKDIR}/build"
 
 TFA_BUILD_ARTIFACTS_DIR = "TFA_Build_Artifacts"
 
+HSE_CNT_TABLE_ADDR ??= ""
+
+BL2_VERS ??= ""
+
+BL31_NVCTR ??= ""
+BL32_NVCTR ??= ""
+BL33_NVCTR ??= ""
+DDRFW_NVCTR ??= ""
+
 RSA_PRIV_BL2 ??= ""
 RSA_PRIV_BL31 ??= ""
 RSA_PRIV_BL32 ??= ""
@@ -35,6 +44,7 @@ BL31_HANDLE ??= ""
 BL32_HANDLE ??= ""
 BL33_HANDLE ??= ""
 DDRFW_HANDLE ??= ""
+RPMB_HANDLE ??= ""
 
 BUILD_TYPE ?= "release"
 
@@ -76,6 +86,18 @@ SECBOOT_ARGS = " \
                  MBEDTLS_DIR=${RECIPE_SYSROOT}/usr/share/mbedtls-source \
                  "
 
+RP_SECBOOT_ARGS = " \
+                    MMC_RPMB_SUPPORT=1 \
+                    BL2_VERSION=${BL2_VERS} \
+                    TFW_NVCTR_VAL=${BL31_NVCTR} \
+                    TOS_NVCTR_VAL=${BL32_NVCTR} \
+                    NTFW_NVCTR_VAL=${BL33_NVCTR} \
+                    DDRFW_NVCTR_VAL=${DDRFW_NVCTR} \
+                    S32CC_MONOTONIC_CNT_SUPPORT=1 \
+                    RPMB_KEY_HSE_KEYHANDLE=${RPMB_HANDLE} \
+                    RPMB_MONOTONIC_CNT_ADDR=${HSE_CNT_TABLE_ADDR} \
+                    "
+
 QUICK_BOOT_ARGS = " \
               S32CC_COMPILE_FLAG=-Ofast \
               LOG_LEVEL=20 \
@@ -102,6 +124,7 @@ EXTRA_OEMAKE:append = ' OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/../" \
 EXTRA_OEMAKE:append:s32g = " ${@bb.utils.contains('DISTRO_FEATURES', 'scprt', '${SCPRT_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'hse', '${HSE_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '${SECBOOT_ARGS}', '', d)}"
+EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'rpsecboot', '${RP_SECBOOT_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'nodramecc', '${NO_DRAM_ECC_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = "${@ "${QUICK_BOOT_ARGS}" if d.getVar('QUICK_BOOT_CONFIG', True) else ''}"
 #

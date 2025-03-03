@@ -6,6 +6,7 @@ SECBOOT_KEYS_DIR = "${WORKDIR}/secboot_keys"
 SECBOOT_SCRIPT_FILE = "secboot_script.sh"
 SECBOOT_SCRIPT = "${SECBOOT_KEYS_DIR}/${SECBOOT_SCRIPT_FILE}"
 OP_TEE = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '1', '0', d)}"
+RP_SECBOOT = "${@bb.utils.contains('DISTRO_FEATURES', 'rpsecboot', '1', '0', d)}"
 
 BL2_SIGN_FILE = "bl2-signature.bin"
 BL2_SIGN = "${TFA_BINARIES}/${BL2_SIGN_FILE}"
@@ -13,11 +14,20 @@ BL2_SIGN = "${TFA_BINARIES}/${BL2_SIGN_FILE}"
 BL2_BIN_FILE = "bl2_w_dtb.bin"
 BL2_BIN = "${TFA_BINARIES}/${BL2_BIN_FILE}"
 
+BL31_NVCTR ?= "0"
+BL32_NVCTR ?= "0"
+BL33_NVCTR ?= "0"
+DDRFW_NVCTR ?= "0"
+
+HSE_CNT_TABLE_ADDR ?= "0x0"
+
 BL2_HANDLE ?= "0x010700"
 BL31_HANDLE ?= "${BL2_HANDLE}"
 BL32_HANDLE ?= "${BL2_HANDLE}"
 BL33_HANDLE ?= "${BL2_HANDLE}"
 DDRFW_HANDLE ?= "${BL2_HANDLE}"
+
+RPMB_HANDLE ?= "0x010200"
 
 RSA_PRIV_BL2_FILE ?= "bl2_rsa2048_private.pem"
 
@@ -79,7 +89,16 @@ do_generate_secboot_script() {
 	fi
 	echo -n " --bl33_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL33_FILE}:${BL33_HANDLE}" >> ${SECBOOT_SCRIPT}
 	echo -n " --bl2_bin \$3" >> ${SECBOOT_SCRIPT}
-	echo " --bl2_sign \$4" >> ${SECBOOT_SCRIPT}
+	echo -n " --bl2_sign \$4" >> ${SECBOOT_SCRIPT}
+
+	if [ ${RP_SECBOOT} -eq 1 ]; then
+		echo " --rpmb_key \$5:${RPMB_HANDLE}" >> ${SECBOOT_SCRIPT}
+		echo -n "dd if=/dev/zero bs=1 count=\$((256-\$(stat --printf="%s" ${INSTALL_PATH_SECBOOT_KEYS}hse_cnt_table.bin)))" >> ${SECBOOT_SCRIPT}
+		echo " >> ${INSTALL_PATH_SECBOOT_KEYS}hse_cnt_table.bin" >> ${SECBOOT_SCRIPT}
+		echo -n "mmc rpmb write-block \$2rpmb ${HSE_CNT_TABLE_ADDR} ${INSTALL_PATH_SECBOOT_KEYS}hse_cnt_table.bin \$5" >> ${SECBOOT_SCRIPT}
+	fi
+
+	echo "" >> ${SECBOOT_SCRIPT}
 }
 
 do_generate_bl_public_keys[depends] += "openssl-native:do_populate_sysroot"

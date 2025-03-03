@@ -28,10 +28,12 @@ RSA_PRIV_BL2 ??= ""
 RSA_PRIV_BL31 ??= ""
 RSA_PRIV_BL32 ??= ""
 RSA_PRIV_BL33 ??= ""
+RSA_PRIV_DDRFW ??= ""
 BL2_HANDLE ??= ""
 BL31_HANDLE ??= ""
 BL32_HANDLE ??= ""
 BL33_HANDLE ??= ""
+DDRFW_HANDLE ??= ""
 
 BUILD_TYPE ?= "release"
 

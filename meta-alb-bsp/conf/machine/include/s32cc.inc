@@ -32,6 +32,8 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'conf/machine/inclu
 
 # When m7boot is enabled, the needed TFA settings are included from m7-boot.inc
 require ${@bb.utils.contains('DISTRO_FEATURES', 'm7boot', 'conf/machine/include/m7-boot.inc', 'conf/machine/include/atf.inc', d)}
+# Enable Rollback Protection for FIP
+require ${@bb.utils.contains('DISTRO_FEATURES', 'rpsecboot', 'conf/machine/include/hse-rp-secboot.inc', '', d)}
 # Enable FIP Authentication
 require ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'conf/machine/include/hse-secboot.inc', '', d)}
 # Enable Kernel Authentication

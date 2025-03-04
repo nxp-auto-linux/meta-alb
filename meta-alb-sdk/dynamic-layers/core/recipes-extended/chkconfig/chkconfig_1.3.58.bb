@@ -19,7 +19,7 @@ PR = "r7"
 
 S = "${WORKDIR}/${BPN}-${BPN}-${PV}"
 
-SRC_URI = "git://github.com/fedora-sysv/chkconfig.git \
+SRC_URI = "git://github.com/fedora-sysv/chkconfig.git;protocol=https;nobranch=1 \
            file://replace_caddr_t.patch \
           "
 

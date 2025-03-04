@@ -9,7 +9,7 @@ DEPENDS = "libgfortran"
 
 PV = "0.2.18"
 
-SRC_URI = "git://github.com/xianyi/OpenBLAS.git \
+SRC_URI = "git://github.com/xianyi/OpenBLAS.git;protocol=https;nobranch=1 \
     file://fixlibnameforyocto.patch \
 "
 SRCREV = "12ab1804b6ebcd38b26960d65d254314d8bc33d6"

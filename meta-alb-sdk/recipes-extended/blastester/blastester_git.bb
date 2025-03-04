@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=a64fe8ed738f87b3d87660bcb20f659e"
 
 DEPENDS = "libopenblas"
 
-SRC_URI = "git://github.com/xianyi/BLAS-Tester.git \
+SRC_URI = "git://github.com/xianyi/BLAS-Tester.git;protocol=https;nobranch=1 \
     file://0001-Fix-Makefile-assignment.patch \
 "
 SRCREV = "8e1f62468ef377c4621dc9dee49f3a4b17134652"

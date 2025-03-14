@@ -1,11 +1,9 @@
-Linux: 6.6.52
-Linux-rt: 6.6.52-rt43
-Linux versions: 6.6  5.15
+Linux: 6.6.85
+Linux versions: 6.6
 U-boot: 2022.04
-Ubuntu target: 20.04.1 22.04.1
-Yocto: 4.0.21 "kirkstone"
-Gcc: 11.4.0
-Glibc: 2.35
+Yocto: 5.0.6 "scarthgap"
+Gcc: 13.3.0
+Glibc: 2.39
 Binutils: 2.38
 Xen: 4.18
 Lxc: 4.0.12

@@ -108,6 +108,10 @@ NO_DRAM_ECC_ARGS = " \
               S32GEN1_DRAM_INLINE_ECC=0 \
               "
 
+FSS_ARGS = " \
+	S32N_USE_FSS=1 \
+	"
+
 EXTRA_OEMAKE:append = " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
                 ARCH=${TARGET_ARCH} \
@@ -145,6 +149,7 @@ EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_BAUDRATE=' + d.getVar("SERIAL_CON
 EXTRA_OEMAKE:append:s32r478 = " ${S32R47_ARGS}"
 EXTRA_OEMAKE:append:s32r478 = " ${@bb.utils.contains('VALIDATION_HW', 'S32R47_W_S32R45', 'S32R47_W_S32R45=1', '', d)}"
 EXTRA_OEMAKE:append:s32r478 = " ${@bb.utils.contains('VALIDATION_HW', 'S32R47_W_S32G2', 'S32R47_W_S32G2=1', '', d)}"
+EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'fss', '${FSS_ARGS}', '', d)}"
 
 PINCTRL_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
 GPIO_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"

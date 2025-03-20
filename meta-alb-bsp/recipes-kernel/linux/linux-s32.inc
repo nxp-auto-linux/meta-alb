@@ -43,6 +43,11 @@ do_merge_delta_config() {
         elif [ -f "${S}/arch/${ARCH}/configs/${deltacfg}" ]; then
             ${S}/scripts/kconfig/merge_config.sh -m .config \
                 ${S}/arch/${ARCH}/configs/${deltacfg}
+        elif [ -f "${WORKDIR}/recipe-sysroot/kcfg/${deltacfg}" ]; then
+            ${S}/scripts/kconfig/merge_config.sh -m .config \
+                ${WORKDIR}/recipe-sysroot/kcfg/${deltacfg}
+        else
+            bbwarn "${deltacfg} not found!"
         fi
     done
     # copy .config to defconfig as required by fsl-kernel-localversion
@@ -216,17 +221,16 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'verifiedboot', 'recipes-kernel/
 # at build time of the Linux Kernel version 5.4, we add this dependency.
 do_merge_delta_config[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
 
-DEPENDS = "flex-native bison-native bc-native"
+DEPENDS = "flex-native bison-native bc-native yocto-cfg-fragments"
 
 # Enable Xen booting
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-kernel/linux/linux-yocto_virtualization.inc', '', d)}
 DELTA_KERNEL_DEFCONFIG:append = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen.cfg', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'xen_s32.cfg', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'cfg/xen.cfg', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen virtio', 'xen_virtio.cfg', '', d)} \
     "
 SRC_URI += "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://xen.cfg', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_s32.cfg', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen virtio', 'file://build/xen_virtio.cfg', '', d)} \
     "

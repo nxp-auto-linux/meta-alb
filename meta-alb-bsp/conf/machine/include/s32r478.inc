@@ -7,7 +7,7 @@ UBOOT_CONFIG:remove = "sdcard"
 
 # Following BL2 info should be kept in sync with S32R478 DTS flashmap
 TFA_IMAGE_FILE = "fip.bin-qspi"
-TFA_RESET_FILE = "bl2_w_dtb.s32-qspi"
+TFA_RESET_FILE = "bl2_w_dtb.bin-qspi"
 
 TFA_RESET_OFFSET ??= "0x1360000"
 TFA_RESET_SIZE ??= "0xc0000"

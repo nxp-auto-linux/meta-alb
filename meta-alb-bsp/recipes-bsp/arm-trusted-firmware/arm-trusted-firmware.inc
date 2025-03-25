@@ -224,6 +224,10 @@ do_deploy:append:s32r478() {
 	grep "Load address:" "${tfa_compile_log}" >> "${file}"
 	grep "Entry point:" "${tfa_compile_log}" >> "${file}"
 	cp -vf "${file}" "${DEPLOYDIR}/${TFA_BUILD_ARTIFACTS_DIR}"
+
+	for suffix in ${BOOT_TYPE}; do
+		cp -vf "${TFA_BINARIES}/bl2_w_dtb.bin-${suffix}" ${DEPLOYDIR}
+	done
 }
 
 do_install:append:s32cc() {

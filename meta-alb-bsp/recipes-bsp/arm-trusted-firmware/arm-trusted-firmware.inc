@@ -226,6 +226,14 @@ do_deploy:append:s32r478() {
 	cp -vf "${file}" "${DEPLOYDIR}/${TFA_BUILD_ARTIFACTS_DIR}"
 
 	for suffix in ${BOOT_TYPE}; do
+		bl2_size=$(stat -c %s "${TFA_BINARIES}/bl2_w_dtb.bin-${suffix}")
+		reminder=$(expr "$bl2_size" % 8)
+
+		if [ "$reminder" -ne 0 ]; then
+			padding=$(expr 8 - "$reminder")
+			dd if=/dev/zero of="${TFA_BINARIES}/bl2_w_dtb.bin-${suffix}" bs=1 count="$padding" seek="$bl2_size"
+		fi
+
 		cp -vf "${TFA_BINARIES}/bl2_w_dtb.bin-${suffix}" ${DEPLOYDIR}
 	done
 }

@@ -67,3 +67,6 @@ IMAGE_INSTALL:append = " demo-samples"
 
 # add cpufrequtils package 
 IMAGE_INSTALL:append = " cpufrequtils"
+
+# Add docker
+IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'docker', ' docker-moby', '', d)}"

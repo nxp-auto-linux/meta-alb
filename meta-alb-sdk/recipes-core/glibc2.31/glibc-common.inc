@@ -23,3 +23,5 @@ ARM_INSTRUCTION_SET:armv6 = "arm"
 COMPATIBLE_HOST:libc-musl:class-target = "null"
 
 PV = "2.31"
+
+COMPATIBLE_MACHINE = "ubuntu"

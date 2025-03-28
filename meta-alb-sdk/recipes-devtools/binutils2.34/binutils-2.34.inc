@@ -45,3 +45,5 @@ SRC_URI = "\
      file://CVE-2020-0551.patch \
 "
 S  = "${WORKDIR}/git"
+
+COMPATIBLE_MACHINE = "ubuntu"

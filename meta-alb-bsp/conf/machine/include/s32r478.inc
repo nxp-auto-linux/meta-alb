@@ -13,6 +13,12 @@ TFA_RESET_OFFSET ??= "0x1360000"
 TFA_RESET_SIZE ??= "0xc0000"
 
 FLASHIMAGE_RESET_FILE = "bl2_w_dtb.bin-qspi"
+FLASHIMAGE_UBOOT_OFFSET = "0x1420000"
+FLASHIMAGE_END_OFFSET = "0x3A40000"
+
+# Enabling the following variable will remove the M7 Bootloader and the
+# TF-A BL2 image from the flashimage
+FLASHIMAGE_TRIM_BOOTLOADER = "1"
 
 SCMI_USE_SCMI_PINCTRL = "0"
 SCMI_USE_SCMI_GPIO = "0"

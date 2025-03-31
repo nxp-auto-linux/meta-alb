@@ -125,6 +125,32 @@ generate_flashimage() {
         generate_flashimage_entry "${FLASHIMAGE_EXTRA9_FILE}" "FLASHIMAGE_EXTRA9_OFFSET" "${FLASHIMAGE_EXTRA9_OFFSET}"
 }
 
+trim_flashimage_bootloader() {
+	flashimage="$1"
+	start_offset=$(printf "%d" "$2")
+
+	if [ -z "${flashimage}" ]; then
+		bberror "${flashimage} is undefined"
+		exit 1
+	fi
+
+	if [ -z "${start_offset}" -o "${start_offset}" -eq 0 ]; then
+		bberror "${start_offset} is unset or it starts from 0x0"
+		exit 1
+	fi
+
+	end_offset=$(printf "%d" "${FLASHIMAGE_END_OFFSET}")
+	if [ -z "${end_offset}" -o "${end_offset}" -lt ${start_offset} ]; then
+		bberror "${end_offset} is unset or it's less than the start_offset: ${start_offset}"
+		exit 1
+	fi
+
+	trimmed_size=$(expr "${end_offset}" - "${start_offset}")
+	cp "${flashimage}" "${tmp}" || (bberror "Failed to create temporary copy of flashimage" && exit 1)
+	dd if="${tmp}" of="${flashimage}" bs=1 skip="${start_offset}" count="${trimmed_size}"
+	rm -f "${tmp}" || exit 1
+}
+
 IMAGE_CMD:flashimage () {
         # we expect image size in MiB
         FLASH_IBS="1048576"
@@ -150,6 +176,10 @@ IMAGE_CMD:flashimage () {
         ln -sf "${FLASHIMAGE}" "${IMAGE_LINK_NAME}.flashimage"
 
         generate_flashimage
+
+        if [ "${FLASHIMAGE_TRIM_BOOTLOADER}" = "1" ]; then
+            trim_flashimage_bootloader "${FLASHIMAGE}" "${FLASHIMAGE_FIP_OFFSET}"
+        fi
 
         cd -
 }

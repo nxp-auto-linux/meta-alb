@@ -1,4 +1,4 @@
-From 516ae4e3b8f654103b54bc7e1dc04bf8eff097aa Mon Sep 17 00:00:00 2001
+From 17e3e7cd01f12044e18b7b459bc9fb30abb36dc7 Mon Sep 17 00:00:00 2001
 From: Andrei Botila <andrei.botila@nxp.com>
 Date: Tue, 18 Mar 2025 09:39:57 +0200
 Subject: [PATCH] spi: sja1110: add resume operation for reloading the firmware
@@ -11,11 +11,11 @@ Issue: ALBSP-40
 
 Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
 ---
- sja1110_init.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ sja1110_init.c | 51 +++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 46 insertions(+), 5 deletions(-)
 
 diff --git a/sja1110_init.c b/sja1110_init.c
-index 4f93fc7..d907869 100644
+index 4f93fc7..5820df9 100644
 --- a/sja1110_init.c
 +++ b/sja1110_init.c
 @@ -33,6 +33,7 @@
@@ -26,7 +26,46 @@ index 4f93fc7..d907869 100644
  #include <linux/spi/spi.h>
  #include <linux/of.h>
  #include <linux/of_device.h>
-@@ -1115,6 +1116,29 @@ sja1110_remove(struct spi_device *spi)
+@@ -206,11 +207,17 @@ static int sja1110_check_device_id(u32 reg_val)
+ static int sja1110_pre_switch_upload(struct sja1110_priv *sja1110,
+ 				     const u8 *cfg_data, int cfg_size)
+ {
+-	int dev_id_idx, ret = -EINVAL;
++	int dev_id_idx, ret = -EINVAL, count = 0;
+ 	u32 regval, cfg_device_id;
+ 
+-	/* read the device id */
+-	regval = sja1110_read_reg(sja1110, D_ID_ADDR);
++	/* Read the DEV_ID register when the device is up. */
++	while (count++ < 30) {
++		regval = sja1110_read_reg(sja1110, D_ID_ADDR);
++		if (sja1110_check_device_id(regval) >= 0) {
++			break;
++		}
++	}
++
+ 	dev_id_idx = sja1110_check_device_id(regval);
+ 	if (dev_id_idx < 0) {
+ 		dev_err(&sja1110->spi->dev,
+@@ -472,7 +479,7 @@ static int sja1110_uc_read_status(struct sja1110_priv *sja1110,
+ {
+ 	int ret;
+ 	u8 dummy_bytes[4] = {0};
+-	u8 status_resp[4];
++	u8 status_resp[4] = {0};
+ 
+ 	BUG_ON(sja1110->devtype != SJA1110_UC);
+ 
+@@ -535,7 +542,7 @@ static int sja1110_pre_uc_upload(struct sja1110_priv *sja1110,
+ 		"[%s] firmware appears to be valid\n", __func__);
+ 
+ 	/* Verify that µC is ready to receive data */
+-	retry = 10;
++	retry = 100;
+ 	while (retry > 0) {
+ 		ret = sja1110_uc_read_status(sja1110, &uc_status);
+ 		if (ret) {
+@@ -1115,6 +1122,39 @@ sja1110_remove(struct spi_device *spi)
  #endif
  }
  
@@ -40,6 +79,16 @@ index 4f93fc7..d907869 100644
 +	struct spi_device *spi = container_of(dev, struct spi_device, dev);
 +	struct sja1110_priv *sja1110 = spi_get_drvdata(spi);
 +
++	if (sja1110->devtype != SJA1110_SWITCH)
++		return 0;
++
++	sja1110 = g_state.sja1110[SJA1110_SWITCH];
++	if (sja1110_init_hw(sja1110))
++		dev_err(&sja1110->spi->dev,
++			"Could not initialize hw (type=%d)\n",
++			sja1110->devtype);
++
++	sja1110 = g_state.sja1110[SJA1110_UC];
 +	if (sja1110_init_hw(sja1110))
 +		dev_err(&sja1110->spi->dev,
 +			"Could not initialize hw (type=%d)\n",
@@ -56,7 +105,7 @@ index 4f93fc7..d907869 100644
  static const struct of_device_id sja1110_dt_ids[] = {
  	{ .compatible = "nxp,sja1110-switch", .data = (const void*)SJA1110_SWITCH },
  	{ .compatible = "nxp,sja1110-uc", .data = (const void*)SJA1110_UC },
-@@ -1128,6 +1152,7 @@ static struct spi_driver sja1110_driver = {
+@@ -1128,6 +1168,7 @@ static struct spi_driver sja1110_driver = {
  	.driver = {
  		.name = "sja1110",
  		.owner = THIS_MODULE,

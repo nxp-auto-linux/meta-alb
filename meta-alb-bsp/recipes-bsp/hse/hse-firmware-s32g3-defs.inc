@@ -1,5 +1,5 @@
 HSE_MACHINE ?= "S32G3XX"
-HSE_VERSION ?= "0_2_51_0"
+HSE_VERSION ?= "0_2_64_0"
 HSE_LIC ?= "license.rtf"
-HSE_LIC_MD5 ?= "cc5fb8fd09eb58b9e39127149404a283"
-HSE_SOC_REV ?= "rev1.1"
+HSE_LIC_MD5 ?= "bafc2fc12f6ba76334b95f6ea4844b01"
+HSE_SOC_REV ?= ""

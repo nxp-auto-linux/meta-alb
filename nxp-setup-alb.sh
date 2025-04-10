@@ -48,7 +48,7 @@ BBLSMACHINE=".+bbmini|.+bluebox.+|ls.+|lx.+"
 UBUNTUMACHINE=".+ubuntu"
 
 # Supported yocto version
-YOCTOVERSION="kirkstone"
+YOCTOVERSION="scarthgap"
 
 # Error codes
 EINVAL=128

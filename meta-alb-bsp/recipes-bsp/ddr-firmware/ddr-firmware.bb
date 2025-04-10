@@ -13,9 +13,9 @@ DDR_FW_BIN_ECC_OFF ?= "ddr_fw_ecc_off.bin"
 DDR_FW_BIN_ECC_ON ?= "ddr_fw_ecc_on.bin"
 
 SRC_URI = " \
-    ${@f"""file://${DDR_FW_DIR}/${DDR_FW_BIN_ECC_OFF}""" if os.path.exists(f"""file://${DDR_FW_DIR}/${DDR_FW_BIN_ECC_OFF}""") else ''} \
-    ${@f"""file://${DDR_FW_DIR}/${DDR_FW_BIN_ECC_ON}""" if os.path.exists(f"""file://${DDR_FW_DIR}/${DDR_FW_BIN_ECC_ON}""") else ''} \
-    ${@f"""file://${DDR_LICENSE_FILE}""" if os.path.exists(f"""file://${DDR_LICENSE_FILE}""") else ''} \
+    file://${DDR_FW_DIR}/${DDR_FW_BIN_ECC_OFF} \
+    file://${DDR_FW_DIR}/${DDR_FW_BIN_ECC_ON} \
+    file://${DDR_LICENSE_FILE} \
 "
 
 S = "${WORKDIR}"

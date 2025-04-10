@@ -14,6 +14,7 @@ DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'mbedtls',
 DEPENDS:append = " u-boot-s32"
 DEPENDS:append:s32cc = " u-boot-tools-native"
 DEPENDS:append:s32cc = " ${@ 'u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
+DEPENDS:append:s32cc = " ddr-firmware"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -105,6 +106,9 @@ EXTRA_OEMAKE:append:s32cc = "${@ "${QUICK_BOOT_ARGS}" if d.getVar('QUICK_BOOT_CO
 # Switch to SCMI versions for pinctrl and NVMEM if it's the case
 EXTRA_OEMAKE:append:s32cc = " S32CC_USE_SCMI_PINCTRL=${SCMI_USE_SCMI_PINCTRL}"
 EXTRA_OEMAKE:append:s32cc = " S32CC_USE_SCMI_NVMEM=${SCMI_USE_SCMI_NVMEM}"
+
+# Provide path for the platform specific DDR firmware binary
+EXTRA_OEMAKE:append:s32cc = " DDR_FW_BIN_PATH=${STAGING_BASELIBDIR}/ddr-firmware/ddr_fw_ecc_off.bin"
 
 # Switch the UART to be used if it is the case
 EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_MODULE=' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] }"

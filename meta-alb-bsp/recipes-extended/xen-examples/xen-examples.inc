@@ -23,6 +23,7 @@ FILES:${PN} = "${BIN_PREPEND_PATH}/${BOOT_SCRIPT} ${BIN_PREPEND_PATH}/${BOOT_SOU
 EXTRA_CMDS_FILE ?= ""
 CFG_NAME ?= ""
 EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
+EXTRA_CMDS_FILE:s32n7sim = "extra_cmds_s32n7"
 SRC_URI = "file://${EXTRA_CMDS_FILE}"
 
 do_configure() {

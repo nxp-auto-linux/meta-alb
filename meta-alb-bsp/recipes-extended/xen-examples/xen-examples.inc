@@ -15,9 +15,13 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/xen-examples:"
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"
 
-FILES:${PN} = "/boot/boot.scr /boot/boot.source"
+BIN_PREPEND_PATH = "/boot"
+BOOT_SCRIPT = "boot.scr"
+BOOT_SOURCE = "boot.source"
+FILES:${PN} = "${BIN_PREPEND_PATH}/${BOOT_SCRIPT} ${BIN_PREPEND_PATH}/${BOOT_SOURCE}"
 
-EXTRA_CMDS_FILE = "extra_cmds_s32cc"
+CFG_NAME ?= ""
+EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
 SRC_URI = "file://${EXTRA_CMDS_FILE}"
 
 do_configure() {
@@ -51,7 +55,7 @@ do_configure() {
 do_compile() {
     UBOOT_DIR="${DEPLOY_DIR_IMAGE}"
     IMAGEBUILDER_CONFIG="${CFG_NAME}"
-    PREPEND_PATH="/boot"
+    PREPEND_PATH="${BIN_PREPEND_PATH}"
 
     # Run Imagebuilder script
     uboot-script-gen -c ${IMAGEBUILDER_CONFIG} \
@@ -59,21 +63,21 @@ do_compile() {
         -p "${PREPEND_PATH}" \
         -s
 
-    mv ${UBOOT_DIR}/boot.scr ${UBOOT_DIR}/boot.source ${B}/
+    mv ${UBOOT_DIR}/${BOOT_SCRIPT} ${UBOOT_DIR}/${BOOT_SOURCE} ${B}/
 }
 
 do_install() {
-    install -d ${D}/boot
-    install -m 0755 boot.scr ${D}/boot/
-    install -m 0755 boot.source ${D}/boot/
+    install -d ${D}${BIN_PREPEND_PATH}
+    install -m 0755 ${BOOT_SCRIPT} ${D}${BIN_PREPEND_PATH}
+    install -m 0755 ${BOOT_SOURCE} ${D}${BIN_PREPEND_PATH}
 }
 
 do_deploy() {
-    install -m 0755 ${B}/boot.scr ${DEPLOYDIR}/
-    install -m 0755 ${B}/boot.source ${DEPLOYDIR}/
+    install -m 0755 ${D}${BIN_PREPEND_PATH}/${BOOT_SCRIPT} ${DEPLOYDIR}/
+    install -m 0755 ${D}${BIN_PREPEND_PATH}/${BOOT_SOURCE} ${DEPLOYDIR}/
 }
 
-addtask do_deploy after do_compile
+addtask do_deploy after do_install
 do_compile[depends] += " \
     virtual/kernel:do_deploy \
     xen:do_deploy \

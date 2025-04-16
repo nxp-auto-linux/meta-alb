@@ -24,6 +24,7 @@ BOOT_SOURCE = "boot.source"
 EXTRA_CMDS_FILE ?= ""
 CFG_NAME ?= ""
 EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
+EXTRA_CMDS_FILE:s32n7sim = "extra_cmds_s32n7"
 
 modify_imagebuilder_config() {
     CFG_FILE="$1"

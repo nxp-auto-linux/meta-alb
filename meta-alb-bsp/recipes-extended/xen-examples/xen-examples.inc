@@ -1,4 +1,4 @@
-# Copyright 2021,2023 NXP
+# Copyright 2021,2023,2025 NXP
 #
 # Recipe to configure a complete Xen boot flow on various use-cases
 inherit deploy
@@ -49,7 +49,6 @@ do_configure() {
 }
 
 do_compile() {
-    LOAD_CMD='ext4load mmc ${mmcdev}:${mmcpart_ext}'
     UBOOT_DIR="${DEPLOY_DIR_IMAGE}"
     IMAGEBUILDER_CONFIG="${CFG_NAME}"
     PREPEND_PATH="/boot"
@@ -57,7 +56,6 @@ do_compile() {
     # Run Imagebuilder script
     uboot-script-gen -c ${IMAGEBUILDER_CONFIG} \
         -d "${UBOOT_DIR}" \
-        -t "${LOAD_CMD}" \
         -p "${PREPEND_PATH}" \
         -s
 

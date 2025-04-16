@@ -1,4 +1,4 @@
-# Copyright 2021-2024 NXP
+# Copyright 2021-2025 NXP
 
 MEMORY_START="0x85200000"
 MEMORY_END="0xFFFFFFFF"
@@ -13,3 +13,4 @@ NUM_DOMUS=0
 UBOOT_SOURCE="boot.source"
 UBOOT_SCRIPT="boot.scr"
 BOOT_CMD="none"
+LOAD_CMD='ext4load mmc ${mmcdev}:${mmcpart_ext}'

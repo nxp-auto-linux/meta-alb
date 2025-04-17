@@ -1,4 +1,4 @@
-PV = "6.6.63"
+PV = "6.6.85"
 
 require recipes-kernel/linux/linux-s32.inc
 

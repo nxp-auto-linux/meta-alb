@@ -248,10 +248,15 @@ do_compile:s32n() {
 
 	for suffix in ${BOOT_TYPE}
 	do
+		if [ "${suffix}" = "sdcard" ] ; then
+			s32n_boot_src="mmc"
+		else
+			s32n_boot_src="${suffix}"
+		fi
 		oe_runmake -C "${S}" clean
 		oe_runmake -C "${S}" \
 		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}" \
-		    S32N_BOOT_SRC=${suffix} all
+		    S32N_BOOT_SRC=${s32n_boot_src} all
 		cp -vf "${TFA_BINARIES}/bl2_w_dtb.bin" "${TFA_OUTPUT}/bl2_w_dtb.bin-${suffix}"
 		cp -vf "${TFA_BINARIES}/bl2/bl2.elf" "${TFA_OUTPUT}/bl2.elf-${suffix}"
 		cp -vf "${TFA_BINARIES}/bl31/bl31.elf" "${TFA_OUTPUT}/bl31.elf-${suffix}"

@@ -18,4 +18,4 @@ IMAGE_CLASSES += " \
 IMAGE_FSTYPES:append = " ufs sdcard_s32n"
 UBOOT_SUFFIX_UFS = "${UBOOT_SUFFIX}"
 
-BOOT_TYPE ?= "ddr ufs mmc"
+BOOT_TYPE ?= "ddr ufs sdcard"

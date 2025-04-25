@@ -21,6 +21,7 @@ BIN_PREPEND_PATH = "/boot"
 BOOT_SCRIPT = "boot.scr"
 BOOT_SOURCE = "boot.source"
 
+EXTRA_CMDS_FILE ?= ""
 CFG_NAME ?= ""
 EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
 

@@ -20,6 +20,7 @@ BOOT_SCRIPT = "boot.scr"
 BOOT_SOURCE = "boot.source"
 FILES:${PN} = "${BIN_PREPEND_PATH}/${BOOT_SCRIPT} ${BIN_PREPEND_PATH}/${BOOT_SOURCE}"
 
+EXTRA_CMDS_FILE ?= ""
 CFG_NAME ?= ""
 EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
 SRC_URI = "file://${EXTRA_CMDS_FILE}"

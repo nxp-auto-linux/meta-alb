@@ -35,4 +35,4 @@ KERNEL_MODULE_PROBECONF += "ipc-sample-multi-instance"
 module_conf_ipc-sample-multi-instance = "blacklist ipc-sample-multi-instance"
 FILES:${PN} += "${sysconfdir}/modprobe.d/*"
 
-COMPATIBLE_MACHINE = "^(s32g|s32r)$"
+COMPATIBLE_MACHINE = "^(s32g|s32r45)$"

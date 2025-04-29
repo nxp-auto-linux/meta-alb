@@ -6,7 +6,7 @@ SOC_FAMILY:append = ":s32n"
 
 DEFAULTTUNE:s32n ?= "cortexa78ae"
 
-PREFERRED_VERSION_linux-s32:s32n = "6.6%"
+PREFERRED_VERSION_linux-s32:s32n = "6.12%"
 
 KERNEL_DEFCONFIG = "s32n7_defconfig"
 

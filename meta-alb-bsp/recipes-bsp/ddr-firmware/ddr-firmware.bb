@@ -30,4 +30,4 @@ do_install() {
 
 FILES:${PN} += "${base_libdir}/ddr-firmware"
 
-COMPATIBLE_MACHINE = "s32cc"
+COMPATIBLE_MACHINE = "s32g|s32r45"

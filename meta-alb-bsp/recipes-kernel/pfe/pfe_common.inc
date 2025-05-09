@@ -1,4 +1,4 @@
-# Copyright 2019-2024 NXP
+# Copyright 2019-2025 NXP
 #
 # PFE common recipe for Master/Slave
 
@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE-GPL2.txt;md5=5dcdfe25f21119aa5435eab9d0256af7
 URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https;nobranch=1"
 SRC_URI = "${URL}"
 
-SRCREV ?= "93ea8e6e71eb790549c8a15d0761606045e88399"
+SRCREV ?= "37394d70a9f7f93958a94a8b779d12a2a437d165"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"

@@ -18,9 +18,9 @@ HSE_PKG = "HSE_FW_${HSE_MACHINE}_${HSE_VERSION}"
 
 HSE_LOCAL_DIR ?= "${NXP_FIRMWARE_LOCAL_DIR}/${HSE_PKG}"
 SRC_URI = " \
-	file://${HSE_LOCAL_DIR}/hse/bin/ \
-	file://${HSE_LOCAL_DIR}/interface/ \
-	file://${HSE_LOCAL_DIR}/${HSE_LIC} \
+	${@f"""file://{d.getVar('HSE_LOCAL_DIR')}/hse/bin/ """ if os.path.exists(f"""{d.getVar('HSE_LOCAL_DIR')}/hse/bin/""") else ''} \
+	${@f"""file://{d.getVar('HSE_LOCAL_DIR')}/interface/ """ if os.path.exists(f"""{d.getVar('HSE_LOCAL_DIR')}/interface/""") else ''} \
+	${@f"""file://{d.getVar('HSE_LOCAL_DIR')}/{d.getVar('HSE_LIC')} """ if os.path.exists(f"""{d.getVar('HSE_LOCAL_DIR')}/{d.getVar('HSE_LIC')}""") else ''} \
 	"
 
 S = "${WORKDIR}/${NXP_FIRMWARE_LOCAL_DIR}"

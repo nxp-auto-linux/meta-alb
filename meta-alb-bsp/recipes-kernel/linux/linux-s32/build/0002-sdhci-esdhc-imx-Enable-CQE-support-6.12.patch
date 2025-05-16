@@ -1,0 +1,26 @@
+From 07f704d2618d81c95ddfccafe75f8328a6cf484c Mon Sep 17 00:00:00 2001
+From: Radu Daia <radu.daia@nxp.com>
+Date: Fri, 16 May 2025 15:27:18 +0300
+Subject: [PATCH] sdhci-esdhc-imx: Enable CQE support for kernel 6.12
+
+Signed-off-by: Radu Daia <radu.daia@nxp.com>
+---
+ drivers/mmc/host/sdhci-esdhc-imx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+Upstream-Status: Pending
+diff --git a/drivers/mmc/host/sdhci-esdhc-imx.c b/drivers/mmc/host/sdhci-esdhc-imx.c
+index 43bbacf02687..33c667565c8c 100644
+--- a/drivers/mmc/host/sdhci-esdhc-imx.c
++++ b/drivers/mmc/host/sdhci-esdhc-imx.c
+@@ -314,7 +314,7 @@ static struct esdhc_soc_data usdhc_s32g2_data = {
+ 	.flags = ESDHC_FLAG_USDHC | ESDHC_FLAG_MAN_TUNING
+ 			| ESDHC_FLAG_HAVE_CAP1 | ESDHC_FLAG_HS200
+ 			| ESDHC_FLAG_HS400 | ESDHC_FLAG_HS400_ES
+-			| ESDHC_FLAG_SKIP_ERR004536 | ESDHC_FLAG_SKIP_CD_WAKE
++			| ESDHC_FLAG_CQHCI | ESDHC_FLAG_SKIP_ERR004536 | ESDHC_FLAG_SKIP_CD_WAKE
+ 			| ESDHC_FLAG_BROKEN_SDR104,
+ 	.quirks = SDHCI_QUIRK_NO_LED,
+ };
+-- 
+2.25.1
+

@@ -11,9 +11,9 @@ PFE_UTIL_FILE = "s32g_pfe_util.fw"
 PFE_LICENSE_FILE = "license.rtf"
 
 SRC_URI = " \
-    ${@f"""file://{d.getVar('PFE_CLASS_FILE')} """ if os.path.exists(f"""{d.getVar('PFE_CLASS_FILE')}""") else ''} \
-    ${@f"""file://{d.getVar('PFE_UTIL_FILE')} """ if os.path.exists(f"""{d.getVar('PFE_UTIL_FILE')}""") else ''} \
-    ${@f"""file://{d.getVar('PFE_LICENSE_FILE')} """ if os.path.exists(f"""{d.getVar('PFE_LICENSE_FILE')}""") else ''} \
+    ${@f"""file://{d.getVar('PFE_CLASS_FILE')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/{d.getVar('PFE_CLASS_FILE')}""") else ''} \
+    ${@f"""file://{d.getVar('PFE_UTIL_FILE')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/{d.getVar('PFE_UTIL_FILE')}""") else ''} \
+    ${@f"""file://{d.getVar('PFE_LICENSE_FILE')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/{d.getVar('PFE_LICENSE_FILE')}""") else ''} \
 "
 
 inherit deploy

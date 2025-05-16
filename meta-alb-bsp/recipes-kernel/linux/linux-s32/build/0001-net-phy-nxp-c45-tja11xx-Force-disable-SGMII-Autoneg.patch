@@ -1,0 +1,41 @@
+From b5e2a74b0253654782ffdcf0239b8e18679c3b9e Mon Sep 17 00:00:00 2001
+From: Alexandru-Catalin Ionita <alexandru-catalin.ionita@nxp.com>
+Date: Fri, 16 May 2025 16:09:04 +0300
+Subject: [PATCH] net: phy: nxp-c45-tja11xx: Force disable SGMII Autoneg
+Content-Type: text/plain; charset=UTF-8
+
+This is a workaround for S32R47 SoC, where the TJA1120B works with Autoneg
+support disabled. Hence fixed speed @1Gbps is being used.
+
+Issue: ALBSP-316
+Signed-off-by: Alexandru-Catalin Ionita <alexandru-catalin.ionita@nxp.com>
+Signed-off-by: Andrei Stefanescu <andrei.stefanescu@nxp.com>
+Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+---
+ drivers/net/phy/nxp-c45-tja11xx.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+index cccb61b8ff8c..c3936e750862 100644
+--- a/drivers/net/phy/nxp-c45-tja11xx.c
++++ b/drivers/net/phy/nxp-c45-tja11xx.c
+@@ -118,6 +118,7 @@
+ 
+ #define VEND1_SGMII_BASIC_STATUS	0xB001
+ #define SGMII_AN_ABILITY		BIT(3)
++#define SGMII_AN		BIT(12)
+ 
+ #define VEND1_SGMII_EXT_ABILITY	0xB00F
+ #define EXT_ABILITY_1000BASE_X_FULL	BIT(15)
+@@ -1794,6 +1795,8 @@ static int nxp_c45_probe(struct phy_device *phydev)
+ 	}
+ 
+ no_macsec_support:
++	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_SGMII_BASIC_CONTROL,
++			SGMII_AN);
+ 
+ 	return ret;
+ }
+-- 
+2.45.2
+

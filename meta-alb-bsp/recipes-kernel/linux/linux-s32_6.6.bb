@@ -29,3 +29,6 @@ SRC_URI:append:s32cc = "${@ '${VERIFIED_QUICK_BOOT}' if d.getVar('QUICK_BOOT_CON
 SRC_URI:append:s32g = " \
     ${@bb.utils.contains('EMMC_FEATURES', 'cqe', 'file://build/0002-sdhci-esdhc-imx-Enable-CQE-support-${PV_MAJ_VER}.patch', '', d)} \
 "
+
+# Add quirks for S32R478A-EVB Ethernet enablement
+SRC_URI:append:s32r478 = " file://build/0001-net-phy-nxp-c45-tja11xx-Force-disable-SGMII-Autoneg.patch"

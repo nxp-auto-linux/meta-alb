@@ -3,6 +3,16 @@ inherit rawimageutils
 
 IMAGE_TYPES += "sdcard"
 
+SDCARD_PARTITIONING_SCHEME ??= "msdos"
+
+SDCARD_SECTOR_SIZE ??= "512"
+
+SDCARD_FIP_PARTITION_NAME ??= "primary"
+
+SDCARD_FAT_PARTITION_NAME ??= "primary"
+
+SDCARD_ROOTFS_PARTITION_NAME ??= "primary"
+
 DEPENDS += "bc-native"
 
 # Boot partition volume id
@@ -116,7 +126,7 @@ TFA_RESET_FILE ?= ""
 SDCARD = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.sdcard"
 
 # Set default alignment to 4MB [in KiB]
-BASE_IMAGE_ROOTFS_ALIGNMENT ?= "4096"
+BASE_IMAGE_ROOTFS_ALIGNMENT ??= "4096"
 SDCARD_BINARY_SPACE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
 IMAGE_ROOTFS_ALIGNMENT = "${SDCARD_BINARY_SPACE}"
 
@@ -443,16 +453,22 @@ generate_nxp_sdcard () {
 	SDCARD_EXTENDED_PART_START="$4"
 
 	# Create partition table
-	parted -s "${SDCARD}" mklabel msdos
+	export PARTED_SECTOR_SIZE=${SDCARD_SECTOR_SIZE}
+	parted -s "${SDCARD}" mklabel "${SDCARD_PARTITIONING_SCHEME}"
 	if [ ${FW_SPACE_ALIGNED} -gt 0 ]; then
-		parted -s "${SDCARD}" unit KiB mkpart primary ${IMAGE_ROOTFS_ALIGNMENT} $(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${FW_SPACE_ALIGNED} | bc)
+		parted -s "${SDCARD}" unit KiB mkpart "${SDCARD_FIP_PARTITION_NAME}" \
+										${IMAGE_ROOTFS_ALIGNMENT} \
+										$(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${FW_SPACE_ALIGNED} | bc)
 	fi
 
 	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
-		parted -s "${SDCARD}" unit KiB mkpart primary fat32 ${BOOT_SPACE_START} $(printf "%u + %u\n" ${BOOT_SPACE_START} ${BOOT_SPACE_ALIGNED} | bc)
+		parted -s "${SDCARD}" unit KiB mkpart "${SDCARD_FAT_PARTITION_NAME}" \
+										fat32 \
+										${BOOT_SPACE_START} \
+										$(printf "%u + %u\n" ${BOOT_SPACE_START} ${BOOT_SPACE_ALIGNED} | bc)
 	fi
 
-	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}" "primary"
+	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}" "${SDCARD_ROOTFS_PARTITION_NAME}"
 
 	if [ ${SDCARD_ROOTFS_EXTRA1_START} -ne 0 ] && [ ${SDCARD_ROOTFS_EXTRA2_START} -ne 0 ] && [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 0 ]; then
 		bberror "Need to select SDCARD_ROOTFS_LOGICAL_EXTRA=1 when having two extra rootfs partitions"

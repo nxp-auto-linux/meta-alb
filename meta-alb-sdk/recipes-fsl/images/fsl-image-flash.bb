@@ -19,9 +19,3 @@ do_prepare_recipe_sysroot[depends] += "${@bb.utils.contains('DISTRO_FEATURES', '
 
 # Userspace support for QSPI Flash under Linux for S32CC platforms
 IMAGE_INSTALL:append:s32cc = " mtd-utils"
-
-# Userspace support for managing Network interfaces
-IMAGE_INSTALL:append:s32r478 = " net-tools phytool"
-
-# sysfs gpio interface is deprecated, include gpiod tools, lib and headers
-IMAGE_INSTALL:append:s32r478 = " libgpiod libgpiod-tools libgpiod-dev"

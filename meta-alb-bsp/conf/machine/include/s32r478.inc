@@ -13,8 +13,10 @@ TFA_RESET_OFFSET ??= "0x1360000"
 TFA_RESET_SIZE ??= "0xc0000"
 
 FLASHIMAGE_RESET_FILE = "bl2_w_dtb.bin-qspi"
-FLASHIMAGE_UBOOT_OFFSET = "0x1420000"
-FLASHIMAGE_END_OFFSET = "0x3A40000"
+
+# Following offset should be kept in sync with the FIP QSPI partition
+FLASHIMAGE_UBOOT_OFFSET = "0x1360000"
+FLASHIMAGE_END_OFFSET = "0x3F00000"
 
 # Enabling the following variable will remove the M7 Bootloader and the
 # TF-A BL2 image from the flashimage

@@ -1,0 +1,32 @@
+From 52de7f694a9aa939824c3b733d2b0d9e0a3b0a4e Mon Sep 17 00:00:00 2001
+From: Andrei Botila <andrei.botila@nxp.com>
+Date: Mon, 2 Jun 2025 15:00:51 +0300
+Subject: [PATCH] spi: sja1110: add firmware parse COMPLETED case
+
+The firmware parse doesn't take into consideration the case
+where the status returned is COMPLETED and has NO_ERROR code.
+
+Issue: ALBSP-700
+
+Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
+---
+ sja1110_init.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/sja1110_init.c b/sja1110_init.c
+index 5820df9..8b45b66 100644
+--- a/sja1110_init.c
++++ b/sja1110_init.c
+@@ -453,6 +453,9 @@ static int sja1110_uc_parse_status_many(struct sja1110_priv *sja1110,
+ 			goto out;
+ 		}
+ 
++		if (uc_status.status == COMPLETED)
++			goto out;
++
+ 		if ((uc_status.status != DOWNLOADING &&
+ 		     uc_status.status != VALIDATING_IMG_META_DATA) ||
+ 		    uc_status.err_code != NO_ERROR) {
+-- 
+2.49.0
+

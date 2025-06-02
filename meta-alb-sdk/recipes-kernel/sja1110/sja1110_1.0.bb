@@ -11,6 +11,7 @@ SRC_URI += "\
 	file://0001-sja1110_init-fix-various-issues.patch \
 	file://0001-sja1110-Add-Linux-kernel-v6.1-rt-compatibility-patch.patch \
 	file://0001-spi-sja1110-add-resume-operation-for-reloading-the-f.patch \
+	file://0001-spi-sja1110-add-firmware-parse-COMPLETED-case.patch \
 "
 SRCREV = "ac06f130d512e75edcf98d1a8304edd90055e525"
 

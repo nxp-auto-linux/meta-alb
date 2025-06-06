@@ -23,7 +23,7 @@ FLASHIMAGE_UBOOT_TYPE = "qspi"
 # the *_SUFFIX and *_FILE for safety
 FLASHIMAGE_SIZE="64"
 FLASHIMAGE_UBOOT_SUFFIX = "${UBOOT_SUFFIX}"
-FLASHIMAGE_KERNEL_FILE = "${@bb.utils.contains('DISTRO_FEATURES', 'verifiedboot', 'kernel.itb', '${KERNEL_IMAGETYPE}', d)}"
+FLASHIMAGE_KERNEL_FILE = "${@bb.utils.contains('DISTRO_FEATURES', 'verifiedboot', 'Image-kernel-signed.itb', '${KERNEL_IMAGETYPE}', d)}"
 FLASHIMAGE_DTB_SUFFIX = "dtb"
 FLASHIMAGE_DTB = "linux-s32"
 FLASHIMAGE_ROOTFS = "fsl-image-base"

@@ -1,3 +1,3 @@
-# Copyright 2023-2024 NXP
+# Copyright 2023-2025 NXP
 
-SDCARDIMAGE_BOOT_EXTRA_FILES:append = " linux-s32:kernel.itb"
+SDCARDIMAGE_BOOT_EXTRA_FILES:append = " linux-s32:Image-kernel-signed.itb"

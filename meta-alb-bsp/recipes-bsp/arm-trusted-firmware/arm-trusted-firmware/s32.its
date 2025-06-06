@@ -1,4 +1,4 @@
-/* Copyright 2023,2024 NXP */
+/* Copyright 2023,2025 NXP */
 
 /dts-v1/;
 / {
@@ -12,8 +12,8 @@
                 arch = "arm64";
                 os = "linux";
                 compression = "none";
-                load = <0x82000000>;
-                entry = <0x82000000>;
+                load = <0x93000000>;
+                entry = <0x93000000>;
                 kernel-version = <1>;
                 hash-1 {
                     algo = "sha1";
@@ -25,7 +25,7 @@
                 type = "flat_dt";
                 arch = "arm64";
                 compression = "none";
-                load = <0x84000000>;
+                load = <0x96000000>;
                 fdt-version = <1>;
                 hash-1 {
                     algo = "sha1";

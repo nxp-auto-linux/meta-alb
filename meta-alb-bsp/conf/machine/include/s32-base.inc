@@ -55,6 +55,10 @@ UBOOT_ENV_SDCARD_OFFSET ??= "0x00100000"
 # Used when TF-A and Linux have different naming convention for the DTB file
 KERNEL_DEVICETREE_OVERRIDE ?= ""
 
+TFA_DEVICETREE = "${@os.path.basename(d.getVar('KERNEL_DEVICETREE').split()[0] \
+		if d.getVar('KERNEL_DEVICETREE_OVERRIDE') == '' \
+		else d.getVar('KERNEL_DEVICETREE_OVERRIDE'))}"
+
 #s32 has no hardware clock
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 

@@ -327,7 +327,7 @@ do_deploy:append:s32n7sim() {
 		install -v "${TFA_OUTPUT}/bl31.elf-${suffix}" "${tfa_deploy_dir}/"
 		install -v "${TFA_OUTPUT}/fip.bin-${suffix}" "${tfa_deploy_dir}/"
 	done
-	install -v "${TFA_BINARIES}/fdts/s32n79-simulator.dtb" "${tfa_deploy_dir}/"
+	install -v "${TFA_BINARIES}/fdts/${TFA_DEVICETREE}" "${tfa_deploy_dir}/"
 }
 
 do_install:append:s32cc() {

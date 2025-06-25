@@ -19,7 +19,7 @@
 #
 # Add options for the script
 # Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
-# Copyright 2016-2018, 2020, 2024 NXP
+# Copyright 2016-2018, 2020, 2024-2025 NXP
 #  Modifications by:
 #          Heinz Wrobel <heinz.wrobel@nxp.com>
 #          Ionut Vicovan <ionut.vicovan@nxp.com>
@@ -106,7 +106,8 @@ else
 fi
 
 SOURCESDIR="sources"
-ALBROOTDIR=${ROOTDIR}/${SOURCESDIR}/meta-alb
+ALBROOTDIR="${ROOTDIR}/${SOURCESDIR}/meta-alb"
+HWPARTROOTDIR="${ALBROOTDIR}/hw-partitions"
 
 # Validate by size that this file is (the same as) the original one in meta-alb
 ORIGINALFILE="`find \"$ALBROOTDIR\" -name $PROGNAME`"
@@ -173,15 +174,58 @@ clean_up()
          EULA EULA_FILE LAYER_LIST MACHINE FSLDISTRO \
          OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES DISTRO \
          setup_flag setup_h setup_j setup_t setup_l setup_builddir \
-         setup_download setup_sstate setup_error layer append_layer \
+         setup_download setup_sstate setup_error setup_hwpart layer append_layer \
          extra_layers alb_user_extra_layers distro_override \
          DEFAULT_DISTRO COMPANY BBLSMACHINE UBUNTUMACHINE YOCTOVERSION EINVAL \
          ALB_USER_EXTRA_LAYERS_SCRIPT SOURCESDIR ALBROOTDIR ORIGINALFILE \
          PROGSIZE ORIGINALSIZE OPTIND META_ALB_LAYER_LIST ALB_LAYER_LIST \
          LSLAYERS USAGE_LIST PARAM_LAYER_LIST PARAM_MACHINE_LIST \
-         MACHINELAYER MACHINEEXCLUSION ARMMACHINE
+         MACHINELAYER MACHINEEXCLUSION ARMMACHINE HWPART_LAYERS HWPARTROOTDIR \
+         machine_hwparts
 
    unset -f usage prompt_message
+}
+
+print_all_machines()
+{
+    local layer
+    for layer in $(eval echo $USAGE_LIST); do
+        local conf_dir="${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine"
+        if [ -d "${conf_dir}" ]; then
+            find ${conf_dir} -maxdepth 1 -name "*.conf" -printf "%f\n" | \
+            grep -Ev "${MACHINEEXCLUSION}" | \
+            sed 's/\.conf$//g' | tr '\n' ' '
+        fi
+    done
+}
+
+print_hwparts()
+{
+    local local_machine=$1
+    local hwpart_layers
+
+    hwpart_layers=$(find ${HWPARTROOTDIR} -type d \
+        -name "meta-alb-*" 2>/dev/null | \
+        sed "s|.*${SOURCESDIR}/||")
+
+    for layer in "${hwpart_layers[@]}"; do
+        local extra_conf="${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine/${local_machine}-extra.conf"
+        if [ -z "${local_machine}" ] || [ -e "${extra_conf}" ]; then
+            echo -n " "
+            echo -n $(basename $layer) | sed 's|^meta-alb-||'
+        fi
+    done
+    echo -n -e "\n"
+}
+
+print_all_hwparts()
+{
+    print_hwparts
+}
+
+print_machine_hwparts()
+{
+    print_hwparts ${MACHINE}
 }
 
 usage() {
@@ -190,19 +234,18 @@ usage() {
 
     if [ $? -eq 0 ]; then
         echo -n -e "\n    Supported machines: "
-        for layer in $(eval echo $USAGE_LIST); do
-            if [ -d ${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine ]; then
-                echo -n -e "`ls ${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine | grep "\.conf" \
-                   | egrep -v "^${MACHINEEXCLUSION}" | sed s/\.conf//g | xargs echo` "
-            fi
-        done
-        echo ""
+        print_all_machines
+
+        echo -n -e "\n\n    Supported hw partitions:"
+        print_all_hwparts
+        echo -n -e "\n"
     else
         echo "    ERROR: no available machine conf file is found. "
     fi
 
     echo "    Optional parameters:
     * [-m machine]: the target machine to be built.
+    * [-p hwpart]:  the target hw partition to be built.
     * [-b path]:    non-default path of project build folder.
     * [-e layers]:  extra layer names
     * [-D distro]:  override the default distro selection ($DEFAULT_DISTRO)
@@ -246,6 +289,20 @@ add_layers_for_machines()
     fi
 }
 
+add_layers_for_hwpart()
+{
+    # add the layer specified by setup_hwpart
+    local hwpart_layers=$(find ${HWPARTROOTDIR} -type d \
+        -name "meta-alb-$setup_hwpart" 2>/dev/null | \
+        sed "s|.*${SOURCESDIR}/||")
+
+    for layer in "${hwpart_layers[@]}"; do
+        HWPART_LAYERS="$HWPART_LAYERS \
+        $layer \
+    "
+    done
+}
+
 is_not_ubuntu_machine()
 {
     echo ${MACHINE} | egrep -q "${UBUNTUMACHINE}"
@@ -254,10 +311,12 @@ is_not_ubuntu_machine()
 
 # parse the parameters
 OLD_OPTIND=$OPTIND
-while getopts "m:j:t:b:d:e:D:c:lh" setup_flag
+while getopts "m:j:t:b:d:e:D:c:p:lh" setup_flag
 do
     case $setup_flag in
         m) MACHINE="$OPTARG";
+           ;;
+        p) setup_hwpart="$OPTARG";
            ;;
         j) setup_j="$OPTARG";
            ;;
@@ -338,6 +397,25 @@ if [ $? -eq 0 ]; then
     "
 fi
  
+if [ -n "$setup_hwpart" ]; then
+    unset HWPART_LAYERS
+
+    machine_hwparts=$(print_machine_hwparts)
+    if [ -z "${machine_hwparts}" ]; then
+        echo -n -e "\nThe \$MACHINE you have specified ($MACHINE) doesn't support hardware partitioning.\n"
+        clean_up && return $EINVAL
+    fi
+
+    if [[ " $machine_hwparts " != *" $setup_hwpart "* ]]; then
+        echo -n -e "\nInvalid hwpart parameter provided!\nPossible options for the \$MACHINE you have specified ($MACHINE) are:$machine_hwparts\n"
+        clean_up && return $EINVAL
+    fi
+
+    add_layers_for_hwpart
+    LAYER_LIST="$LAYER_LIST \
+        $HWPART_LAYERS \
+    "
+fi
 
 EULA_FILE="$ALBROOTDIR/EULA"
 
@@ -398,7 +476,11 @@ if [ -n "$setup_builddir" ]; then
         PROJECT_DIR="`pwd`/${setup_builddir}"
     fi
 else
-    PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
+    if [ -n "$setup_hwpart" ]; then
+        PROJECT_DIR=${ROOTDIR}/build_${MACHINE}_${setup_hwpart}
+    else
+        PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
+    fi
 fi
 mkdir -p $PROJECT_DIR
 

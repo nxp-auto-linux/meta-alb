@@ -50,7 +50,6 @@ RPMB_HANDLE ??= ""
 BUILD_TYPE ?= "release"
 
 TFA_BINARIES = "${B}/${TFA_PLAT}/${BUILD_TYPE}"
-TFA_DTB = "${@'${KERNEL_DEVICETREE}' if d.getVar('KERNEL_DEVICETREE_OVERRIDE') == '' else '${KERNEL_DEVICETREE_OVERRIDE}'}"
 TFA_OUTPUT = "${B}/${TFA_PLAT}"
 
 OPTEE_ARGS = " \
@@ -118,7 +117,7 @@ EXTRA_OEMAKE:append = " \
                 ARCH=${TARGET_ARCH} \
                 BUILD_BASE=${B} \
                 PLAT=${TFA_PLAT} \
-                DTB_FILE_NAME=${@os.path.basename(d.getVar('TFA_DTB'))} \
+                DTB_FILE_NAME=${TFA_DEVICETREE} \
                 "
 
 EXTRA_OEMAKE:append = " ${@oe.utils.conditional('BUILD_TYPE', 'debug', 'DEBUG=1', '', d)}"
@@ -203,7 +202,7 @@ do_compile:s32cc() {
 
 	if [ "${SCMI_DTB_NODE_CHANGE}" = "true" ] ; then
 		oe_runmake -C "${S}" dtbs
-		dtb_name="${TFA_BINARIES}/fdts/$(basename ${TFA_DTB})"
+		dtb_name="${TFA_BINARIES}/fdts/${TFA_DEVICETREE}"
 		nativepython3 ${STAGING_BINDIR_NATIVE}/scmi_dtb_node_change.py \
 			${dtb_name} \
 			${GPIO_OPT} \

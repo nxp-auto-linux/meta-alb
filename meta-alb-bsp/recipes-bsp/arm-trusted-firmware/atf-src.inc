@@ -1,6 +1,6 @@
 # Copyright 2024 NXP
 
 require recipes-bsp/arm-trusted-firmware/atf-url.inc
-SRCREV ?= "7db14f8be0b4cf6a2ee2eecdf69b5e9d24eaf4fb"
+SRCREV ?= "62439d53cf814e4733e2048b1d63b30de2dfbeb2"
 
 FOLLOWER_RB = "1"

@@ -27,6 +27,9 @@ NVMEM_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_NVMEM', '1', '--nvmem', '--n
 
 S = "${WORKDIR}/git"
 
+
+require ${@'recipes-kernel/linux/linux-s32-ext-dts.inc' if d.getVar('KERNEL_DEVICETREE_EXT') else ''}
+
 do_merge_delta_config[dirs] = "${B}"
 do_merge_delta_config() {
 #    # copy desired defconfig so we pick it up for the real kernel_do_configure

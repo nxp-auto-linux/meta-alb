@@ -25,14 +25,13 @@ EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
 SRC_URI = "file://${EXTRA_CMDS_FILE}"
 
 do_configure() {
-    DTB_NAME="$(basename ${KERNEL_DEVICETREE})"
     CFG_FILE="${B}/${CFG_NAME}"
 
     cp -vf "${S}/${CFG_NAME}" "${CFG_FILE}"
     cp -vf "${S}/${EXTRA_CMDS_FILE}" "${B}/${EXTRA_CMDS_FILE}"
 
     # Append machine-specific linux .dtb file name
-    echo "DEVICE_TREE=\"${DTB_NAME}\"" >> "${CFG_FILE}"
+    echo "DEVICE_TREE=\"${KERNEL_DEVICETREE_BASENAME}\"" >> "${CFG_FILE}"
 
     # Append ramdisk image name for each DomU
     NUM_DOMUS=$(grep "^NUM_DOMUS=[0-9]" ${CFG_FILE} | cut -d '=' -f2 | head -n1)

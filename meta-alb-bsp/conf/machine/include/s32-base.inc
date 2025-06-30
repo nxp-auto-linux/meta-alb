@@ -55,6 +55,9 @@ UBOOT_ENV_SDCARD_OFFSET ??= "0x00100000"
 # Used when TF-A and Linux have different naming convention for the DTB file
 KERNEL_DEVICETREE_OVERRIDE ?= ""
 
+# Used for out-of-tree Linux DTB
+KERNEL_DEVICETREE_EXT ?= ""
+
 TFA_DEVICETREE = "${@os.path.basename(d.getVar('KERNEL_DEVICETREE').split()[0] \
 		if d.getVar('KERNEL_DEVICETREE_OVERRIDE') == '' \
 		else d.getVar('KERNEL_DEVICETREE_OVERRIDE'))}"
@@ -94,3 +97,8 @@ XEN_EXAMPLE ?= "xen-examples-default"
 # Disable NFS server service
 DISTRO_FEATURES:remove = " nfs"
 IMAGE_INSTALL:remove = " packagegroup-core-nfs-server"
+
+KERNEL_DEVICETREE_BASENAME = "${@os.path.basename( \
+		d.getVar('KERNEL_DEVICETREE').split()[0] \
+		if d.getVar('KERNEL_DEVICETREE_EXT') == '' \
+		else d.getVar('KERNEL_DEVICETREE_EXT'))}"

@@ -1,4 +1,4 @@
-# Copyright 2021 NXP
+# Copyright 2021, 2025 NXP
 #
 # Recipe to compile partial device trees used for Xen passthrough
 inherit deploy
@@ -46,9 +46,8 @@ do_compile() {
     dtc -O dtb -o ${B}/${TEMPLATE_DTB} ${TEMPLATE_DTS}
 
     # Generate passthrough dts file
-    LINUX_DTB_NAME="$(basename ${KERNEL_DEVICETREE})"
     nativepython3 ${STAGING_BINDIR_NATIVE}/${PARTIAL_DTB_GEN_DIR}/${PARTIAL_DTB_GEN} \
-        -i "${DEPLOY_DIR_IMAGE}/${LINUX_DTB_NAME}" \
+        -i "${DEPLOY_DIR_IMAGE}/${KERNEL_DEVICETREE_BASENAME}" \
         -t "${B}/${TEMPLATE_DTB}" \
         -n "${PASSTHROUGH_NODE}"
 

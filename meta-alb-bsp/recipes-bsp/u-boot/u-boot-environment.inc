@@ -85,7 +85,7 @@ do_compile () {
 		cd "${S}"
 		gcc -E -undef -x c -fdollars-in-identifiers -P \
 			-D"\$MACHINE=${MACHINE}" \
-			-D"\$KERNEL_DEVICETREE=$(basename `echo ${KERNEL_DEVICETREE} | awk '{ print $1 }'`)" \
+			-D"\$KERNEL_DEVICETREE=$(KERNEL_DEVICETREE_BASENAME)" \
 			-D"\$UBOOT_KERNEL_IMAGETYPE=${UBOOT_KERNEL_IMAGETYPE}" \
 			-D"\$TARGET_ARCH=${TARGET_ARCH}" \
 			${S}/${envname}.inc >${S}/${envname}.work

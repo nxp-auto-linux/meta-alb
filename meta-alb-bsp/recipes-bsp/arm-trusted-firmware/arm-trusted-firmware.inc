@@ -50,6 +50,7 @@ RPMB_HANDLE ??= ""
 BUILD_TYPE ?= "release"
 
 TFA_BINARIES = "${B}/${TFA_PLAT}/${BUILD_TYPE}"
+TFA_DTS = "${@os.path.splitext(d.getVar('TFA_DEVICETREE') or '')[0] + '.dts'}"
 TFA_OUTPUT = "${B}/${TFA_PLAT}"
 
 OPTEE_ARGS = " \
@@ -120,6 +121,8 @@ EXTRA_OEMAKE:append = " \
                 DTB_FILE_NAME=${TFA_DEVICETREE} \
                 "
 
+# Use the FDT_SOURCES variable to define the path to the out-of-tree TFA device tree source.
+EXTRA_OEMAKE:append:s32n = " ${@oe.utils.conditional('TFA_DTB_EXT', '1', 'FDT_SOURCES=${WORKDIR}/${TFA_DTS}', '', d)}"
 EXTRA_OEMAKE:append = " ${@oe.utils.conditional('BUILD_TYPE', 'debug', 'DEBUG=1', '', d)}"
 EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', '${OPTEE_ARGS}', '', d)}"
 

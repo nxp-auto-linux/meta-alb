@@ -19,3 +19,7 @@ IMAGE_FSTYPES:append = " ufs sdcard_s32n"
 UBOOT_SUFFIX_UFS = "${UBOOT_SUFFIX}"
 
 BOOT_TYPE ?= "ddr ufs sdcard"
+
+# Set to "1" when using an out-of-tree DTB for TF-A. The device tree source is expected to
+# be found in the TF-A ${WORKDIR}.
+TFA_DTB_EXT ?= "0"

@@ -175,6 +175,10 @@ clean_up()
          setup_flag setup_h setup_j setup_t setup_l setup_builddir \
          setup_download setup_sstate setup_error layer append_layer \
          extra_layers alb_user_extra_layers distro_override \
+         DEFAULT_DISTRO COMPANY BBLSMACHINE UBUNTUMACHINE YOCTOVERSION EINVAL \
+         ALB_USER_EXTRA_LAYERS_SCRIPT SOURCESDIR ALBROOTDIR ORIGINALFILE \
+         PROGSIZE ORIGINALSIZE OPTIND META_ALB_LAYER_LIST ALB_LAYER_LIST \
+         LSLAYERS USAGE_LIST PARAM_LAYER_LIST PARAM_MACHINE_LIST \
          MACHINELAYER MACHINEEXCLUSION ARMMACHINE
 
    unset -f usage prompt_message

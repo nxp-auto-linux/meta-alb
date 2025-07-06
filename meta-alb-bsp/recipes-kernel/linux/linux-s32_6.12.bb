@@ -3,7 +3,7 @@ PV = "6.12.19"
 require recipes-kernel/linux/linux-s32.inc
 
 BRANCH ?= "${RELEASE_BASE}-${PV}"
-SRCREV = "f96d3be5bc22b2a4dddf4bcaf9979dfb1e554e0f"
+SRCREV = "a8b164a4ca88aa04d858666b0cae9baea892bfe7"
 FOLLOWER_RB = "1"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"

@@ -121,6 +121,11 @@ FSS_ARGS = " \
 	S32N_USE_FSS=1 \
 	"
 
+S32N_LINUX_KERNEL_AS_BL33_ARGS = " \
+              S32N_FIP_SIZE=0xF00000 \
+			  S32N_LINUX_KERNEL_AS_BL33=1 \
+              "
+
 EXTRA_OEMAKE:append = " \
                 CROSS_COMPILE=${TARGET_PREFIX} \
                 ARCH=${TARGET_ARCH} \
@@ -164,6 +169,7 @@ EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboo
 
 EXTRA_OEMAKE:append:s32r478 = " ${S32R47_ARGS}"
 EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'fss', '${FSS_ARGS}', '', d)}"
+EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '${S32N_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
 
 PINCTRL_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
 GPIO_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"
@@ -272,9 +278,16 @@ do_compile:s32n() {
 		else
 			s32n_boot_src="${suffix}"
 		fi
+
+		if [ "${LINUX_KERNEL_AS_BL33}" = "1" ] ; then
+			BL33="${DEPLOY_DIR_IMAGE}/Image"
+		else
+			BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}"
+		fi
+
 		oe_runmake -C "${S}" clean
 		oe_runmake -C "${S}" \
-		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}" \
+		    BL33="${BL33}" \
 		    S32N_BOOT_SRC=${s32n_boot_src} all
 		cp -vf "${TFA_BINARIES}/bl2_w_dtb.bin" "${TFA_OUTPUT}/bl2_w_dtb.bin-${suffix}"
 		cp -vf "${TFA_BINARIES}/bl2/bl2.elf" "${TFA_OUTPUT}/bl2.elf-${suffix}"

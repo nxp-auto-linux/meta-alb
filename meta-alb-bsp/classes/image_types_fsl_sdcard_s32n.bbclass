@@ -43,7 +43,9 @@ EMMC_FIP_START_ADDRESS_KIB = "$(convert_sectors_to_kib ${EMMC_FIP_START_ADDRESS_
 EMMC_FIP_ARTIFACT_LOCATION = "${DEPLOY_DIR_IMAGE}/simimage/arm-trusted-firmware/${TFA_IMAGE_FILE_EMMC}"
 EMMC_FIP_ARTIFACT_SIZE_KIB = "$(compute_artifact_size_kib ${EMMC_FIP_ARTIFACT_LOCATION})"
 # we want the FIP partition to be of fixed size (1M)
-EMMC_FIP_PARTITION_SIZE_KIB ?= "1024"
+# to accommodate a large BL33 image such as the Linux Kernel, the FIP partition must be increased
+EMMC_FIP_PARTITION_SIZE_KIB = "${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '15360', '1024', d)}"
+
 EMMC_FIP_PARTITION_SIZE_SECTORS = "$(convert_kib_to_sectors "${EMMC_FIP_PARTITION_SIZE_KIB}" "${EMMC_SECTOR_SIZE}")"
 
 # FAT partition

@@ -1,7 +1,13 @@
+# Copyright 2025 NXP
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/linux-s32:"
+
+# Determine the device tree source name.
+KERNEL_DTS_FILE = "${@ (d.getVar('KERNEL_DEVICETREE_EXT') or '').replace('.dtb', '.dts') }"
 
 SRC_URI:append = "\
     file://freescale/local.mk \
+    file://${KERNEL_DTS_FILE} \
     "
 
 KERNEL_EXTRA_ARGS += " EXTERNAL_DTBS_MK=${WORKDIR}/freescale/local.mk"

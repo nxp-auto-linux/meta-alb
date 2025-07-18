@@ -30,7 +30,7 @@ do_generate_fit_keys () {
         sed -e "s/<kernel_image>/empty_image/g;s/<dtb_blob>/empty_image/g" ${WORKDIR}/${ITS} > ${WORKDIR}/s32_updated.its
 
         # updating atf dtb with public key. This will be used at boot by bootloader to verify kernel signature
-        mkimage -f ${WORKDIR}/s32_updated.its  -K ${TFA_BINARIES}/fdts/$(TFA_DEVICETREE)  -k ${FIT_KEYS_DIR}  -r ${WORKDIR}/dummy_output
+        mkimage -f ${WORKDIR}/s32_updated.its  -K ${TFA_BINARIES}/fdts/${TFA_DEVICETREE}  -k ${FIT_KEYS_DIR}  -r ${WORKDIR}/dummy_output
 }
 
 do_generate_fit_keys[depends] += "openssl-native:do_populate_sysroot"

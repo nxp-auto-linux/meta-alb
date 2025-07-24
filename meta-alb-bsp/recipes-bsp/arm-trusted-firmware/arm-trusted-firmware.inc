@@ -11,7 +11,7 @@ DEPENDS:append = " dtc-native xxd-native"
 DEPENDS:append = " openssl-native"
 DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'hse', 'hse-firmware', '', d)}"
 DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'mbedtls', '', d)}"
-DEPENDS:append = " u-boot-s32"
+DEPENDS:append = " u-boot-s32 linux-s32"
 DEPENDS:append:s32cc = " u-boot-tools-native"
 DEPENDS:append:s32cc = " ${@ 'u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
 DEPENDS:append:s32g = " ddr-firmware"
@@ -103,6 +103,12 @@ QUICK_BOOT_ARGS = " \
               LOG_LEVEL=20 \
               "
 
+S32CC_LINUX_KERNEL_AS_BL33_ARGS = " \
+              BL33_ENTRYPOINT=0x81000000 \
+              S32_BL33_IMAGE_SIZE=0x01000000 \
+			  S32_LINUX_KERNEL_AS_BL33=1 \
+              "
+
 NO_DRAM_ECC_ARGS = " \
               S32GEN1_DRAM_INLINE_ECC=0 \
               "
@@ -141,6 +147,10 @@ EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_MODULE=' + d.getVar("SERIAL_CONSO
 
 # Switch the UART baudrate to be used if it is the case
 EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_BAUDRATE=' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[0] }"
+
+# Use the Linux Kernel Image as BL33 and skip U-boot entirely
+LINUX_KERNEL_AS_BL33 = "${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '1', '0', d)}"
+EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '${S32CC_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
 
 EXTRA_OEMAKE:append:s32r478 = " ${S32R47_ARGS}"
 
@@ -213,8 +223,14 @@ do_compile:s32cc() {
 			fip_location="${suffix}"
 		fi
 
+		if [ "${LINUX_KERNEL_AS_BL33}" = "1" ] ; then
+			BL33="${DEPLOY_DIR_IMAGE}/Image"
+		else
+			BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}"
+		fi
+
 		oe_runmake -C "${S}" \
-		    BL33="${DEPLOY_DIR_IMAGE}/u-boot-nodtb.bin-${suffix}" \
+			BL33="${BL33}" \
 		    MKIMAGE="mkimage" \
 		    BL33DIR="${DEPLOY_DIR_IMAGE}/tools/" \
 		    MKIMAGE_CFG="${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}" \
@@ -307,6 +323,7 @@ addtask deploy after do_compile
 
 do_configure[depends] = "virtual/bootloader:do_deploy"
 do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os:do_deploy', '', d)}"
+do_compile[depends] += "linux-s32:do_deploy"
 
 SRC_URI:append:s32g = "${@ ' file://0001-tf-a-s32g-Update-dtsi-to-configure-UART1-on-EVB3.patch' if '1' in d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] else ''}"
 

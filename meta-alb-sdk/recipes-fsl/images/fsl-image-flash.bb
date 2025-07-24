@@ -19,3 +19,6 @@ do_prepare_recipe_sysroot[depends] += "${@bb.utils.contains('DISTRO_FEATURES', '
 
 # Userspace support for QSPI Flash under Linux for S32CC platforms
 IMAGE_INSTALL:append:s32cc = " mtd-utils"
+
+# Checker for header file differences between TF-A and Linux
+EXTRA_IMAGEDEPENDS:append:s32cc = " plat-hdrs-checker"

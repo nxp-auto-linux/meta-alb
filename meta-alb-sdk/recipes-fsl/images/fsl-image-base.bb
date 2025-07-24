@@ -44,6 +44,9 @@ IMAGE_INSTALL:append:s32g = " util-linux-rtcwake "
 # Export QSPI FLash script
 IMAGE_INSTALL:append:s32 = " linux-qspi-tool "
 
+# Checker for header file differences between TF-A and Linux
+EXTRA_IMAGEDEPENDS:append:s32cc = " plat-hdrs-checker"
+
 # Export MMC Linux Script test utilitary
 # To be used with 'fsl-image-flash' image
 IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'bsp-utils', ' mmc-test-tool', '', d)}"

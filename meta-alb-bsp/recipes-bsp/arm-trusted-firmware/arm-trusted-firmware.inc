@@ -149,8 +149,9 @@ GPIO_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '
 NVMEM_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_NVMEM', '1', '--nvmem', '--no-nvmem', d)}"
 
 PLAT_HEADERS_TAGS:s32cc = " s32gen1 s32cc"
-PLAT_HEADERS_TAGS:append:s32g := " s32g"
-PLAT_HEADERS_TAGS:append:s32r := " s32r45"
+PLAT_HEADERS_TAGS:append:s32g = " s32g"
+PLAT_HEADERS_TAGS:append:s32r45 = " s32r45"
+PLAT_HEADERS_TAGS:append:s32r478 = " s32r478"
 
 SECBOOT_INC = ""
 VERIFIEDBOOT_INC = ""
@@ -267,31 +268,30 @@ do_deploy:append:s32r478() {
 }
 
 do_install:append:s32cc() {
-	install -d ${D}${includedir}/plat-hdrs
+	install -d ${D}${includedir}/plat-hdrs/tf-a
+
 	for tag in ${PLAT_HEADERS_TAGS}
 	do
 		# Export SCMI headers
 		for proto in clock reset perf nvmem
 		do
 			hdr=$(find ${S} -name "*${tag}-*scmi*${proto}.h")
-			if [ -z "${hdr}" ]
-			then
+			if [ -z "${hdr}" ]; then
 				continue
 			fi
 
-			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs
+			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs/tf-a
 		done
 
 		# Export other platform headers
 		for name in can-ts
 		do
 			hdr=$(find ${S} -name "*${tag}-*${name}*.h")
-			if [ -z "${hdr}" ]
-			then
+			if [ -z "${hdr}" ]; then
 				continue
 			fi
 
-			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs
+			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs/tf-a
 		done
 	done
 }
@@ -299,7 +299,7 @@ do_install:append:s32cc() {
 FILES:${PN} = ""
 ALLOW_EMPTY:${PN} = "1"
 
-FILES:${PN}-plat-hdrs = " ${includedir}/plat-hdrs/*.h "
+FILES:${PN}-plat-hdrs = " ${includedir}/plat-hdrs/tf-a "
 PROVIDES:append:s32cc = " ${PN}-plat-hdrs"
 PACKAGES:append:s32cc = " ${PN}-plat-hdrs"
 

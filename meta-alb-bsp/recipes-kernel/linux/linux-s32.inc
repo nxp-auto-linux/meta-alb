@@ -16,7 +16,6 @@ SRC_URI = "${URL};branch=${BRANCH}"
 
 DEPENDS:append = " libgcc dtc-native"
 DEPENDS:append:s32cc = "${@ ' u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
-DEPENDS:append:s32cc = " arm-trusted-firmware-plat-hdrs"
 
 KERNEL_CC:append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append = " ${TOOLCHAIN_OPTIONS}"
@@ -24,6 +23,14 @@ KERNEL_LD:append = " ${TOOLCHAIN_OPTIONS}"
 PINCTRL_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
 GPIO_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"
 NVMEM_OPT = "${@oe.utils.conditional('SCMI_USE_SCMI_NVMEM', '1', '--nvmem', '--no-nvmem', d)}"
+
+PLAT_HEADERS_TAGS:s32cc = " s32gen1 s32cc"
+PLAT_HEADERS_TAGS:append:s32g = " s32g"
+PLAT_HEADERS_TAGS:append:s32r45 = " s32r45"
+PLAT_HEADERS_TAGS:append:s32r478 = " s32r478"
+
+# Update SYSROOT_DIRS when installing to non-standard paths, otherwise files won't be staged
+SYSROOT_DIRS:append = " ${includedir}/plat-hdrs/linux"
 
 S = "${WORKDIR}/git"
 
@@ -71,21 +78,6 @@ do_compile:prepend() {
 	if [ -f ${dtb_name} ]; then
 	    rm ${dtb_name}
 	fi
-}
-
-do_compile:prepend:s32cc() {
-    for hdr in ${STAGING_INCDIR}/plat-hdrs/*; do
-        bname="$(basename ${hdr})"
-        lhdr=$(find "${S}/include" -name "${bname}")
-
-        if [ -z "${lhdr}" ]; then
-            bbfatal_log "Failed to locate ${bname} header file"
-        fi
-
-        if ! diff -NZbau "${hdr}" "${lhdr}"; then
-            bbfatal_log "There is a difference in the platform header content between TF-A and the Linux repository (${hdr} vs ${lhdr})."
-        fi
-    done
 }
 
 # Switch from SIUL2 to SCMI drivers if needed
@@ -159,6 +151,39 @@ do_install:append:s32() {
         ln -sf  zImage-${KERNEL_VERSION} ${D}/boot/zImage
     fi
 }
+
+do_install:append:s32cc() {
+	install -d ${D}${includedir}/plat-hdrs/linux
+
+	for tag in ${PLAT_HEADERS_TAGS}
+	do
+		# Export SCMI headers
+		for proto in clock reset perf nvmem
+		do
+			hdr=$(find ${S}/include -name "*${tag}-*scmi*${proto}.h")
+			if [ -z "${hdr}" ]; then
+				continue
+			fi
+
+			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs/linux
+		done
+
+		# Export other platform headers
+		for name in can-ts
+		do
+			hdr=$(find ${S}/include -name "*${tag}-*${name}*.h")
+			if [ -z "${hdr}" ]; then
+				continue
+			fi
+
+			install -m 0644 "${hdr}" ${D}${includedir}/plat-hdrs/linux
+		done
+	done
+}
+
+FILES:${PN}-plat-hdrs = " ${includedir}/plat-hdrs/linux "
+PROVIDES:append:s32cc = " ${PN}-plat-hdrs"
+PACKAGES:append:s32cc = " ${PN}-plat-hdrs"
 
 do_deploy:append:s32() {
     if [ -f "arch/${ARCH}/boot/zImage" ]; then

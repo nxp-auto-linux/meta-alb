@@ -1,0 +1,3 @@
+PLATFORM_FLAVOR = "s32n7"
+BRANCH ?= "release/SW32N_IPCF_0.6.4"
+SRCREV ?= "ff4906bdc81aa95fff2b02b67d5db4d36bd53df3"

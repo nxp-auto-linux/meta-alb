@@ -434,6 +434,15 @@ _burn_bl2() {
 	generate_sdcardimage_entry "${BL2_NAME_SDCARD}" "" ${bl2_offset} "" ${bl2_size}
 }
 
+_burn_fip() {
+	local fip_part="$1"
+
+	local fip_offset=$(LC_ALL=C parted -s "${SDCARD}" unit b print \
+		| awk "/ $fip_part / { print substr(\$2, 1, length(\$2 -1)) }")
+
+	generate_sdcardimage_entry "${FIRMWARE_NAME_SDCARD}" "" ${fip_offset} "" ${SD_FIP_SIZE}
+}
+
 # External variables needed:
 #   ${SDCARD_ROOTFS}    - the rootfs image type to incorporate, e.g., ext3
 #   ${SDCARD_ROOTFS_EXTRA1_*} - Optional additional partition definition
@@ -519,9 +528,11 @@ generate_nxp_sdcard () {
 
 	_burn_bootloader
 
-	if [ ${FW_SPACE_ALIGNED} -gt 0 ]; then
-		_burn_firmware 1
-	fi
+	if [ ${SD_FIP_SIZE_ALIGNED} -gt 0 ]; then
+		if [ -n "${SD_FIP_BURN_PART_INDEX}" ]; then
+			_burn_fip ${SD_FIP_BURN_PART_INDEX}
+		fi
+    fi
 
 	# Burn Partitions
 	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then

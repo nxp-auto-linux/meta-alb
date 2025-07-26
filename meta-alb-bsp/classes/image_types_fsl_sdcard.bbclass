@@ -384,7 +384,9 @@ _generate_boot_image() {
 #
 # A single function to burn the bootloader on any type of SD card
 _burn_bootloader() {
-	# This class supports different types of boot loaders
+	if [ "${SD_INCLUDE_BL2_PART}" = "1" ]; then
+		_burn_bl2
+	fi
 	case "${IMAGE_BOOTLOADER}" in
 		imx-bootlets)
 		bberror "The imx-bootlets is not supported for i.MX based machines"
@@ -423,16 +425,13 @@ _burn_bootloader() {
 	esac
 }
 
-_burn_firmware() {
-	local fw_part=$1
+_burn_bl2() {
 
-	if [ -n "${FIRMWARE_NAME_SDCARD}" ]; then
-		fw_offset=$(LC_ALL=C parted -s "${SDCARD}" unit b print \
-			| awk "/ $fw_part / { print substr(\$2, 1, length(\$2 -1)) }")
-	
-		fw_size=$(stat -L -c "%s" "${DEPLOY_DIR_IMAGE}/${FIRMWARE_NAME_SDCARD}")
-		generate_sdcardimage_entry "${FIRMWARE_NAME_SDCARD}" "" ${fw_offset} "" ${fw_size}
-	fi
+	local bl2_offset=$(LC_ALL=C parted -s "${SDCARD}" unit b print \
+		| awk '/ 1 / { print substr($2, 1, length($2)-1) }')
+
+	local bl2_size=$(stat -L -c "%s" "${SD_BL2_PATH}")
+	generate_sdcardimage_entry "${BL2_NAME_SDCARD}" "" ${bl2_offset} "" ${bl2_size}
 }
 
 # External variables needed:

@@ -37,6 +37,7 @@ SDCARD_FAT_PARTITION_NAME ??= ""
 SDCARD_ROOTFS_PARTITION_NAME ??= ""
 
 DEPENDS += "bc-native"
+DEPENDS:append = "${@' gptfdisk-native' if d.getVar('SDCARD_PARTITIONING_SCHEME') == 'gpt' else ''}"
 
 # Boot partition volume id
 BOOTDD_VOLUME_ID ?= "boot_${MACHINE}"
@@ -648,4 +649,8 @@ IMAGE_CMD:sdcard () {
 
 	generate_nxp_sdcard ${SDCARD_ROOTFS_REAL_START} ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_EXTENDED_PART_START}
 	cd -
+
+	if [ "${SDCARD_PARTITIONING_SCHEME}" = "gpt" ]; then
+		sgdisk -e "${SDCARD}"
+	fi
 }

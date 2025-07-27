@@ -553,15 +553,18 @@ generate_nxp_sdcard () {
     fi
 
 	# Burn Partitions
-	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
-		if [ ${FW_SPACE_ALIGNED} -gt 0 ]; then
-			BOOT_PART=2
+	if [ ${SD_FIP_SIZE_ALIGNED} -gt 0 ]; then
+		# If the dedicated partition for BL2 is added, the boot partition will now be the 3rd one
+		if [ ${SD_BL2_SIZE_ALIGNED} -gt 0 ]; then
+			FAT_PART_IDX=3
 		else
-			BOOT_PART=1
+			FAT_PART_IDX=2
 		fi
-		_generate_boot_image ${BOOT_PART}
-		generate_sdcardimage_entry_raw "${WORKDIR}/boot.img" "" $(printf "%u * 1024\n" ${BOOT_SPACE_START} | bc)
+	else
+		FAT_PART_IDX=1
 	fi
+	_generate_boot_image ${FAT_PART_IDX}
+	generate_sdcardimage_entry_raw "${WORKDIR}/boot.img" "" $(printf "%u * 1024\n" ${SD_FAT_START_OFFSET} | bc)
 
 	write_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}"
 	write_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} "${SDCARD_ROOTFS_EXTRA1_FILE}"

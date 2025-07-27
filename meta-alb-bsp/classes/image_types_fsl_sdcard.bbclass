@@ -302,6 +302,18 @@ write_rootfs_partition () {
 	fi
 }
 
+_create_fat_subdirs() {
+	local subdir="$1"
+	local current_path=""
+
+	if [ -n "${subdir}" ]; then
+		for dir in $(echo "${subdir}" | tr '/' ' '); do
+			current_path="${current_path}/${dir}"
+			mmd -i "${WORKDIR}/boot.img" "::${current_path}"
+		done
+	fi
+}
+
 #
 # Generate the boot image with the boot scripts and required Device Tree
 # files
@@ -323,7 +335,12 @@ _generate_boot_image() {
 	bvid="`echo ${BOOTDD_VOLUME_ID} | head -c 10`"
 	mkfs.vfat -n "$bvid" -S 512 ${FATSIZE} -C "${WORKDIR}/boot.img" $BOOT_BLOCKS
 
-	mcopy -i "${WORKDIR}/boot.img" -s "${DEPLOY_DIR_IMAGE}/${UBOOT_KERNEL_IMAGETYPE}-${MACHINE}.bin" "::/${UBOOT_KERNEL_IMAGETYPE}"
+	_create_fat_subdirs "${SD_FAT_BOOT_DIR}"
+	_create_fat_subdirs "${SD_FAT_DTB_DIR}"
+
+	FAT_BOOT_DEST="::/${SD_FAT_BOOT_DIR}/${UBOOT_KERNEL_IMAGETYPE}"
+
+	mcopy -i "${WORKDIR}/boot.img" -s "${DEPLOY_DIR_IMAGE}/${UBOOT_KERNEL_IMAGETYPE}-${MACHINE}.bin" "${FAT_BOOT_DEST}"
 
 	# Copy boot scripts
 	for item in ${BOOT_SCRIPTS}; do

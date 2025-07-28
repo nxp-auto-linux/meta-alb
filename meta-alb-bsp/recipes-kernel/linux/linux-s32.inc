@@ -53,9 +53,10 @@ do_merge_delta_config() {
         elif [ -f "${S}/arch/${ARCH}/configs/${deltacfg}" ]; then
             ${S}/scripts/kconfig/merge_config.sh -m .config \
                 ${S}/arch/${ARCH}/configs/${deltacfg}
-        elif [ -f "${WORKDIR}/recipe-sysroot/kcfg/${deltacfg}" ]; then
+        # look for config fragments from yocto-cfg-fragments-native
+        elif [ -f "${WORKDIR}/recipe-sysroot-native/kcfg/${deltacfg}" ]; then
             ${S}/scripts/kconfig/merge_config.sh -m .config \
-                ${WORKDIR}/recipe-sysroot/kcfg/${deltacfg}
+                ${WORKDIR}/recipe-sysroot-native/kcfg/${deltacfg}
         else
             bbwarn "${deltacfg} not found!"
         fi
@@ -260,7 +261,12 @@ RDEPENDS:kernel-base:append = "${@bb.utils.contains('DISTRO_FEATURES', 'carvnet-
 # at build time of the Linux Kernel version 5.4, we add this dependency.
 do_merge_delta_config[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
 
-DEPENDS = "flex-native bison-native bc-native yocto-cfg-fragments"
+# Config fragments from 'yocto-kernel-cache' repo are provided by
+# the 'yocto-cfg-fragments-native' recipe. We need them by the time the
+# 'do_merge_delta_config' task runs, which is before 'do_configure'.
+do_merge_delta_config[depends] += "yocto-cfg-fragments-native:do_populate_sysroot"
+
+DEPENDS = "flex-native bison-native bc-native"
 
 # Enable Xen booting
 require ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'recipes-kernel/linux/linux-yocto_virtualization.inc', '', d)}

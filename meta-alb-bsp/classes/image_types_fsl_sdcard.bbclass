@@ -31,6 +31,7 @@ SD_BL2_PATH ??= ""
 
 SDCARD_PARTITIONING_SCHEME ??= ""
 
+SDCARD_BL2_PARTITION_NAME ??= ""
 SDCARD_FIP_PARTITION_NAME ??= ""
 SDCARD_FAT_PARTITION_NAME ??= ""
 SDCARD_ROOTFS_PARTITION_NAME ??= ""
@@ -476,6 +477,13 @@ generate_nxp_sdcard () {
 	# Create partition table
 	export PARTED_SECTOR_SIZE=${SDCARD_SECTOR_SIZE}
 	parted -s "${SDCARD}" mklabel "${SDCARD_PARTITIONING_SCHEME}"
+
+	if [ ${SD_BL2_SIZE_ALIGNED} -gt 0 ]; then
+		parted -s "${SDCARD}" unit KiB mkpart ${SDCARD_BL2_PARTITION_NAME} \
+										${INITIAL_PADDING_SIZE} \
+										$(printf "%u + %u\n" ${INITIAL_PADDING_SIZE} ${SD_BL2_SIZE_ALIGNED} | bc)
+	fi
+
 	if [ ${SD_FIP_SIZE_ALIGNED} -gt 0 ]; then
 		parted -s "${SDCARD}" unit KiB mkpart "${SDCARD_FIP_PARTITION_NAME}" \
 										${SD_FIP_START_OFFSET} \
@@ -545,6 +553,7 @@ IMAGE_CMD:sdcard () {
 
 	# Align bootloader, firmware & boot partitions and calculate total SD card image size
 	# Their corresponding partitions will not be created if either SD_BL2_SIZE, SD_FAT_SIZE or SD_FIP_SIZE is 0 .
+	SD_BL2_SIZE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${SD_BL2_SIZE} ${ALIGNMENT_SIZE} | bc)
 	SD_FIP_SIZE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${SD_FIP_SIZE} ${ALIGNMENT_SIZE} | bc)
 	SD_FAT_SIZE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${SD_FAT_SIZE} ${ALIGNMENT_SIZE} | bc)
 

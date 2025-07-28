@@ -493,6 +493,31 @@ _burn_fip() {
 #                                                             <----------------------------------------------------->  .....  <---------------------------------------------------->
 #                                                                                        |                                                              |
 #                                                                                     ROOTFS0                                                        ROOTFSn
+# With the BL2 dedicated partition, the disk layout used is:
+#
+#    0                                                              -> INITIAL_PADDING SIZE                                                         - reserved to bootloader (not partitioned)
+#    INITIAL_PADDING_SIZE                                           -> INITIAL_PADDING_SIZE + SD_BL2_SIZE                                           - reserved to BL2
+#    INITIAL_PADDING_SIZE + SD_BL2_SIZE                             -> INITIAL_PADDING_SIZE + SD_BL2_SIZE + SD_FIP_SIZE                             - reserved to FIP
+#    INITIAL_PADDING_SIZE + SD_BL2_SIZE + SD_FIP_SIZE               -> INITIAL_PADDING_SIZE + SD_BL2_SIZE + SD_FIP_SIZE + SD_FAT_SIZE               - kernel and other data
+#    NITIAL_PADDING_SIZE + SD_BL2_SIZE + SD_FIP_SIZE + SD_FAT_SIZE  -> NITIAL_PADDING_SIZE + SD_BL2_SIZE + SD_FIP_SIZE + SD_FAT_SIZE + ROOTFS_SIZE  - rootfs
+#
+# The numerical values used in the visual representation below are illustrative examples based on current default values.
+#
+#                                                             		Default Free space = 1.3x
+#                                                             		Use IMAGE_OVERHEAD_FACTOR to add more space
+#                                                             		<--------->                                              (optional)
+#          1Mib                   512K                 1MiB                  8MiB            SDIMG_ROOTFS0                1MiB                        SDIMG_ROOTFSn                1Mib
+# <-----------------------> <--------------> <-----------------------> <--------------> <----------------------> <----------------------->  ...  <----------------------> <----------------------->
+# |  INITIAL_PADDING_SIZE  |   SD_BL2_SIZE  |       SD_FIP_SIZE       |   SD_FAT_SIZE  |     ROOTFS_SIZE        |      ALIGNMENT_SIZE      |...|     ROOTFS_SIZE         |      ALIGNMENT_SIZE    |
+# ^                        ^                ^                         ^                ^                        ^                                                        ^                        ^
+# |                        |                |                         |                |                        |                                                        |                        |
+# 0                      1024       1MiB + 512K      1MiB + 512K + 1MiB 1MiB + 512K + 1MiB + 8MiB 1MiB + 512K + 1MiB + 8MiB + SDIMG_ROOTFS|      |          9.5MiB + (SDIMG_ROOTFS + 1MiB) * n    9.5MiB + (SDIMG_ROOTFS + 1MiB) * (n + 1)
+#
+#                                                                                      |                                                  |      |                                                |
+#                                                                                      |                                                  |      |                                                |
+#                                                                                       <-----------------------------------------------> |  ... | <---------------------------------------------->
+#                                                                                                          |                                                              |
+#                                                                                                       ROOTFS0                                                        ROOTFSn
 generate_nxp_sdcard () {
 	# Get partitions' start offsets passed as parameters
 	SDCARD_ROOTFS_REAL_START="$1"

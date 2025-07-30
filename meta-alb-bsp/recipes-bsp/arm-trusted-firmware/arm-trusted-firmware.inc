@@ -12,7 +12,7 @@ DEPENDS:append = " openssl-native"
 DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'hse', 'hse-firmware', '', d)}"
 DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'mbedtls', '', d)}"
 DEPENDS:append = " u-boot-s32"
-DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', 'linux-s32', '', d)}"
+DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', 'linux-s32', '', d)}"
 DEPENDS:append:s32cc = " u-boot-tools-native"
 DEPENDS:append:s32cc = " ${@ 'u-boot-tools-scmi-native' if d.getVar('SCMI_DTB_NODE_CHANGE') else ''}"
 DEPENDS:append:s32g = " ddr-firmware"
@@ -150,8 +150,8 @@ EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_MODULE=' + d.getVar("SERIAL_CONSO
 EXTRA_OEMAKE:append:s32cc = " ${@ 'S32_LINFLEX_BAUDRATE=' + d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[0] }"
 
 # Use the Linux Kernel Image as BL33 and skip U-boot entirely
-LINUX_KERNEL_AS_BL33 = "${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '1', '0', d)}"
-EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '${S32CC_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
+LINUX_KERNEL_AS_BL33 = "${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', '1', '0', d)}"
+EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', '${S32CC_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
 
 EXTRA_OEMAKE:append:s32r478 = " ${S32R47_ARGS}"
 
@@ -324,7 +324,7 @@ addtask deploy after do_compile
 
 do_configure[depends] = "virtual/bootloader:do_deploy"
 do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os:do_deploy', '', d)}"
-do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', 'linux-s32:do_deploy', '', d)}"
+do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', 'linux-s32:do_deploy', '', d)}"
 
 SRC_URI:append:s32g = "${@ ' file://0001-tf-a-s32g-Update-dtsi-to-configure-UART1-on-EVB3.patch' if '1' in d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] else ''}"
 

@@ -3,15 +3,37 @@ inherit rawimageutils
 
 IMAGE_TYPES += "sdcard"
 
-SDCARD_PARTITIONING_SCHEME ??= "msdos"
-
 SDCARD_SECTOR_SIZE ??= "512"
 
-SDCARD_FIP_PARTITION_NAME ??= "primary"
+# The variables below have the corresponding values assigned in conf/machine/include .inc files
+# Path to boot files (e.g. Image) for the FAT partition
+SD_FAT_BOOT_DIR ??= ""
 
-SDCARD_FAT_PARTITION_NAME ??= "primary"
+# Path to device tree blob for the FAT partition
+SD_FAT_DTB_DIR ??= ""
 
-SDCARD_ROOTFS_PARTITION_NAME ??= "primary"
+# Decide whether to include the BL2 partition or not (0 or 1)
+SD_INCLUDE_BL2_PART ??= "0"
+
+# Index of partition where FIP image will be written (1 or 2)
+SD_FIP_BURN_PART_INDEX ??= "0"
+
+# Size of the FIP partition on the SDCard (in KB)
+SD_FW_SIZE_ALIGNED ??= "0"
+
+# Path to the FIP artifact location
+SD_FIP_PATH ??= ""
+
+BL2_NAME_SDCARD ??= ""
+
+# Path to the BL2 artifact location
+SD_BL2_PATH ??= ""
+
+SDCARD_PARTITIONING_SCHEME ??= ""
+
+SDCARD_FIP_PARTITION_NAME ??= ""
+SDCARD_FAT_PARTITION_NAME ??= ""
+SDCARD_ROOTFS_PARTITION_NAME ??= ""
 
 DEPENDS += "bc-native"
 
@@ -68,6 +90,7 @@ SDCARD_ROOTFS_PKG ?= "${PN}"
 # variables as for the flash class. This permits using one set of
 # variables in the machine definition mostly for different types of
 # booting.
+FLASHIMAGE_SIZE ??= "0"
 FLASHIMAGE_EXTRA1_FILE ?= ""
 FLASHIMAGE_EXTRA2_FILE ?= ""
 FLASHIMAGE_EXTRA3_FILE ?= ""
@@ -125,10 +148,9 @@ TFA_RESET_FILE ?= ""
 
 SDCARD = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.sdcard"
 
-# Set default alignment to 4MB [in KiB]
-BASE_IMAGE_ROOTFS_ALIGNMENT ??= "4096"
-SDCARD_BINARY_SPACE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
-IMAGE_ROOTFS_ALIGNMENT = "${SDCARD_BINARY_SPACE}"
+# Set default alignment and padding to 4MB [in KiB]
+INITIAL_PADDING_SIZE ?= "${IMAGE_ROOTFS_ALIGNMENT}"
+ALIGNMENT_SIZE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
 
 BOOT_SPACE ??= "0"
 FIRMWARE_SPACE ??= "0"
@@ -512,6 +534,9 @@ generate_nxp_sdcard () {
 }
 
 IMAGE_CMD:sdcard () {
+
+	local sd_size="0"
+	SD_FIP_SIZE=$(du -k "${SD_FIP_PATH}" | cut -f1)
 
 	if [ -n "${UBOOT_BOOTSPACE_OFFSET}" ]; then
 		UBOOT_BOOTSPACE_OFFSET=$(printf "%u" ${UBOOT_BOOTSPACE_OFFSET})

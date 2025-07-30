@@ -11,7 +11,6 @@ SOC_FAMILY = "s32"
 KERNEL_IMAGETYPE ?= "Image"
 
 BOOT_SPACE ?= "65536"
-FIRMWARE_SPACE ?= "4096"
 
 # required for u-boot
 HOSTTOOLS += "comm"

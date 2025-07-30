@@ -168,7 +168,7 @@ EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'linux-ker
 
 EXTRA_OEMAKE:append:s32r478 = " ${S32R47_ARGS}"
 EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'fss', '${FSS_ARGS}', '', d)}"
-EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '${S32N_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
+EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', '${S32N_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
 
 PINCTRL_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"
 GPIO_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_GPIO', '1', '--gpio', '--no-gpio', d)}"

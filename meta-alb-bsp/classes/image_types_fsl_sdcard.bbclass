@@ -152,8 +152,8 @@ SDCARD = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.sdcard"
 INITIAL_PADDING_SIZE ?= "${IMAGE_ROOTFS_ALIGNMENT}"
 ALIGNMENT_SIZE ?= "${BASE_IMAGE_ROOTFS_ALIGNMENT}"
 
-BOOT_SPACE ??= "0"
-FIRMWARE_SPACE ??= "0"
+SD_BL2_SIZE ?= "${EMMC_BL2_PARTITION_SIZE_KIB}"
+SD_FAT_SIZE ?= "${BOOT_SPACE}"
 
 def get_extra_files_fields(d, findex):
     pkgs = []
@@ -305,11 +305,11 @@ write_rootfs_partition () {
 # Generate the boot image with the boot scripts and required Device Tree
 # files
 _generate_boot_image() {
-	local boot_part=$1
+	local fat_part_idx=$1
 
 	# Create boot partition image
 	BOOT_BLOCKS=$(LC_ALL=C parted -s "${SDCARD}" unit b print \
-		| awk "/ $boot_part / { print substr(\$4, 1, length(\$4 -1)) / 1024 }")
+		| awk "/ $fat_part_idx / { print substr(\$4, 1, length(\$4 -1)) / 1024 }")
 
 	# mkdosfs will sometimes use FAT16 when it is not appropriate,
 	# resulting in a boot failure from SYSLINUX. Use FAT32 for
@@ -335,33 +335,34 @@ _generate_boot_image() {
 	# Copy device tree file
 	if test -n "${KERNEL_DEVICETREE}"; then
 		kernel_bin="`readlink ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.bin`"
-		for DTS_FILE in ${KERNEL_DEVICETREE}; do
-			DTS_BASE_NAME="`basename ${DTS_FILE} | awk -F "." '{print $1}'`"
+		for DTB_FILE in ${KERNEL_DEVICETREE}; do
+			DTB_BASE_NAME="`basename ${DTB_FILE} | awk -F "." '{print $1}'`"
 			DTB_PATH=""
 			kernel_bin_for_dtb=""
-			if [ -e "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb" ]; then
-				DTB_PATH="${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb"
-				kernel_bin_for_dtb="`readlink $DTB_PATH | sed "s,$DTS_BASE_NAME,${MACHINE},;s,\.dtb$,.bin,g"`"
-			else if [ -e "${DEPLOY_DIR_IMAGE}/${DTS_BASE_NAME}.dtb" ]; then
-					DTB_PATH="${DEPLOY_DIR_IMAGE}/${DTS_BASE_NAME}.dtb"
-					kernel_bin_for_dtb="`readlink $DTB_PATH | sed "s,$DTS_BASE_NAME,${KERNEL_IMAGETYPE},;s,\.dtb$,.bin,g"`"
+			if [ -e "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTB_BASE_NAME}.dtb" ]; then
+				DTB_PATH="${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTB_BASE_NAME}.dtb"
+				kernel_bin_for_dtb="`readlink $DTB_PATH | sed "s,$DTB_BASE_NAME,${MACHINE},;s,\.dtb$,.bin,g"`"
+			else if [ -e "${DEPLOY_DIR_IMAGE}/${DTB_BASE_NAME}.dtb" ]; then
+					DTB_PATH="${DEPLOY_DIR_IMAGE}/${DTB_BASE_NAME}.dtb"
+					kernel_bin_for_dtb="`readlink $DTB_PATH | sed "s,$DTB_BASE_NAME,${KERNEL_IMAGETYPE},;s,\.dtb$,.bin,g"`"
 
 					# in case "${kernel_bin_for_dtb}" is empty, it means that $DTB_PATH is not a symlink, but the dtb file itself
 					# this can happen in certain situations, like the default behavior starting 
 					# with Yocto 4.3, if the default behavior from kernel-devicetree class is not overridden
 					if [ -z "${kernel_bin_for_dtb}" ]; then
 						kernel_bin_timestamp="`echo ${kernel_bin} | sed -e "s/^Image--//" -e "s/.bin//"`"
-						kernel_bin_for_dtb="`find ${DEPLOY_DIR_IMAGE} -maxdepth 1 -type l -exec basename {} \; | grep "${kernel_bin_timestamp}.dtb" | sed "s,$DTS_BASE_NAME,${KERNEL_IMAGETYPE},;s,\.dtb$,.bin,g"`"
+						kernel_bin_for_dtb="`find ${DEPLOY_DIR_IMAGE} -maxdepth 1 -type l -exec basename {} \; | grep "${kernel_bin_timestamp}.dtb" | sed "s,$DTB_BASE_NAME,${KERNEL_IMAGETYPE},;s,\.dtb$,.bin,g"`"
 					fi
 				fi
 			fi
-			if [ -n "$DTB_PATH" ]; then
+			if [ -n "${DTB_PATH}" ]; then
 				# match dtb and kernel image by timestamp
-				if [ "$kernel_bin" = "$kernel_bin_for_dtb" ]; then
-					mcopy -i "${WORKDIR}/boot.img" -s "$DTB_PATH" "::/${DTS_BASE_NAME}.dtb"
+				if [ "${kernel_bin}" = "${kernel_bin_for_dtb}" ]; then
+					FAT_DTB_DEST="::/${SD_FAT_DTB_DIR}/${DTB_BASE_NAME}.dtb"
+					mcopy -i "${WORKDIR}/boot.img" -s "${DTB_PATH}" "${FAT_DTB_DEST}"
 				fi
 			else
-				bbfatal "${DTS_FILE} does not exist."
+				bbfatal "${DTB_FILE} does not exist."
 			fi
 		done
 	fi
@@ -433,31 +434,29 @@ _burn_firmware() {
 	fi
 }
 
-#
-# Create an image that can by written onto a SD card using dd for use
-# with i.MX, S32, or Layerscape SoC families
-#
 # External variables needed:
 #   ${SDCARD_ROOTFS}    - the rootfs image type to incorporate, e.g., ext3
 #   ${SDCARD_ROOTFS_EXTRA1_*} - Optional additional partition definition
 #   ${SDCARD_RCW_NAME}  - RCW for Layerscape devices
 #   ${IMAGE_BOOTLOADER} - bootloader to use {u-boot, barebox}
 #
-# The disk layout used is:
+# Without the BL2 dedicated partition, the disk layout used is:
 #
-#    0                      -> IMAGE_ROOTFS_ALIGNMENT         - reserved to bootloader (not partitioned)
-#    IMAGE_ROOTFS_ALIGNMENT -> FIRMWARE_SPACE                 - reserved to Firmware Image (usually the FIP)
-#    FIRMWARE_SPACE         -> BOOT_SPACE                     - kernel and other data
-#    BOOT_SPACE             -> SDIMG_SIZE                     - rootfs
+#    0                                                  -> INITIAL_PADDING SIZE                                             - reserved to bootloader (not partitioned)
+#    INITIAL_PADDING_SIZE                               -> INITIAL_PADDING SIZE + SD_FIP_SIZE                               - reserved to FIP
+#    INITIAL_PADDING SIZE + SD_FIP_SIZE                 -> INITIAL_PADDING SIZE + SD_FIP_SIZE + SD_FAT_SIZE                 - kernel and other data
+#    INITIAL_PADDING SIZE + SD_FIP_SIZE + SD_FAT_SIZE   -> INITIAL_PADDING SIZE + SD_FIP_SIZE + SD_FAT_SIZE + ROOTFS_SIZE   - rootfs
 #
-#                                                                         Default Free space = 1.3x
-#                                                                         Use IMAGE_OVERHEAD_FACTOR to add more space
-#                                                                         <--------->                                              (optional)
+# The numerical values used in the visual representation below are illustrative examples based on current default values.
+#
+#                                                       Default Free space = 1.3x
+#                                                       Use IMAGE_OVERHEAD_FACTOR to add more space
+#                                                       <--------->                                              (optional)
 #            4MiB                 4MiB             8MiB            SDIMG_ROOTFS0                    4MiB                          SDIMG_ROOTFSn                   4MiB
 # <-----------------------> <--------------> <--------------> <----------------------> <----------------------------->       <----------------------> <----------------------------->
-#  ------------------------ ---------------- ---------------- ----------------------- -------------------------------  .....  ----------------------- ------------------------------
-# | IMAGE_ROOTFS_ALIGNMENT | FIRMWARE_SPACE | BOOT_SPACE     | ROOTFS_SIZE            | BASE_IMAGE_ROOTFS_ALIGNMENT  |       | ROOTFS_SIZE           | BASE_IMAGE_ROOTFS_ALIGNMENT  |
-#  ------------------------ ---------------- ---------------- ----------------------- -------------------------------  .....  ----------------------- ------------------------------
+#  ------------------------ ---------------- ---------------- -----------------------  -------------------------------  ....  ----------------------- ------------------------------
+# |  INITIAL_PADDING_SIZE  |   SD_FIP_SIZE  |   SD_FAT_SIZE  |      ROOTFS_SIZE       |         ALIGNMENT_SIZE         |    |      ROOTFS_SIZE       |        ALIGNMENT_SIZE        |
+#  ------------------------ ---------------- ---------------- ----------------------- -------------------------------   ....  ----------------------- ------------------------------
 # ^                        ^                ^                ^                        ^                                      ^                                                      ^
 # |                        |                |                |                        |                                      |                                                      |
 # 0                      4096          4MiB + 4MiB   4MiB + 4MiB + 8MiB   4MiB + 4MiB + 8Mib + SDIMG_ROOTFS   16MiB + (SDIMG_ROOTFS + 4MiB) * n                 16MiB + (SDIMG_ROOTFS + 4MiB) * (n + 1)
@@ -477,17 +476,17 @@ generate_nxp_sdcard () {
 	# Create partition table
 	export PARTED_SECTOR_SIZE=${SDCARD_SECTOR_SIZE}
 	parted -s "${SDCARD}" mklabel "${SDCARD_PARTITIONING_SCHEME}"
-	if [ ${FW_SPACE_ALIGNED} -gt 0 ]; then
+	if [ ${SD_FIP_SIZE_ALIGNED} -gt 0 ]; then
 		parted -s "${SDCARD}" unit KiB mkpart "${SDCARD_FIP_PARTITION_NAME}" \
-										${IMAGE_ROOTFS_ALIGNMENT} \
-										$(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${FW_SPACE_ALIGNED} | bc)
+										${SD_FIP_START_OFFSET} \
+										$(printf "%u + %u\n" ${SD_FIP_START_OFFSET} ${SD_FIP_SIZE_ALIGNED} | bc)
 	fi
 
-	if [ ${BOOT_SPACE_ALIGNED} -gt 0 ]; then
+	if [ ${SD_FAT_SIZE_ALIGNED} -gt 0 ]; then
 		parted -s "${SDCARD}" unit KiB mkpart "${SDCARD_FAT_PARTITION_NAME}" \
 										fat32 \
-										${BOOT_SPACE_START} \
-										$(printf "%u + %u\n" ${BOOT_SPACE_START} ${BOOT_SPACE_ALIGNED} | bc)
+										${SD_FAT_START_OFFSET} \
+										$(printf "%u + %u\n" ${SD_FAT_START_OFFSET} ${SD_FAT_SIZE_ALIGNED} | bc)
 	fi
 
 	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}" "${SDCARD_ROOTFS_PARTITION_NAME}"
@@ -544,48 +543,50 @@ IMAGE_CMD:sdcard () {
 		UBOOT_BOOTSPACE_OFFSET=$(printf "%u * 512\n" ${UBOOT_BOOTSPACE_SEEK} | bc)
 	fi
 
-	# Align firmware & boot partitions and calculate total SD card image size
-	# Their corresponding partitions will not be created if either BOOT_SPACE or FIMWARE_SPACE is 0 .
-	FW_SPACE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${FIRMWARE_SPACE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
-	BOOT_SPACE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${BOOT_SPACE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
+	# Align bootloader, firmware & boot partitions and calculate total SD card image size
+	# Their corresponding partitions will not be created if either SD_BL2_SIZE, SD_FAT_SIZE or SD_FIP_SIZE is 0 .
+	SD_FIP_SIZE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${SD_FIP_SIZE} ${ALIGNMENT_SIZE} | bc)
+	SD_FAT_SIZE_ALIGNED=$(printf "s=%u;a=%u;x=s+a-1;x-x%%a\n" ${SD_FAT_SIZE} ${ALIGNMENT_SIZE} | bc)
 
 	# If the size has not been preset, we default to flash image
-	# sizes if available turned into [KiB] or to a hardcoded mini
+	# sizes if available turned into [KiB] or to a hardcoded minimum
 	# default of 4MB.
-	if [ -z "${IMAGE_ROOTFS_ALIGNMENT}" ]; then
+	if [ -z "${INITIAL_PADDING_SIZE}" ]; then
 		if [ -n "${FLASHIMAGE_SIZE}" ]; then
-			IMAGE_ROOTFS_ALIGNMENT=$(printf "%u * 1024\n" ${FLASHIMAGE_SIZE} | bc)
+			INITIAL_PADDING_SIZE=$(printf "%u * 1024\n" ${FLASHIMAGE_SIZE} | bc)
 		else
-			IMAGE_ROOTFS_ALIGNMENT=${BASE_IMAGE_ROOTFS_ALIGNMENT}
+			INITIAL_PADDING_SIZE=${ALIGNMENT_SIZE}
 		fi
 	fi
 
 	# Compute final size of SDCard image and start offset of each rootfs partition
-	BOOT_SPACE_START=$(printf "%u + %u\n" ${IMAGE_ROOTFS_ALIGNMENT} ${FW_SPACE_ALIGNED} | bc)
-	SDCARD_SIZE=$(printf "%u + %u\n" ${BOOT_SPACE_START} ${BOOT_SPACE_ALIGNED} | bc)
+	SD_FIP_START_OFFSET=$(printf "%u + %u\n" ${INITIAL_PADDING_SIZE} ${SD_FW_SIZE_ALIGNED} | bc)
+	SD_FAT_START_OFFSET=$(printf "%u + %u\n" ${SD_FIP_START_OFFSET} ${SD_FIP_SIZE_ALIGNED} | bc)
+	sd_size=$(printf "%u + %u\n" ${SD_FAT_START_OFFSET} ${SD_FAT_SIZE_ALIGNED} | bc)
+
 	if [ -n "${SDCARD_ROOTFS_REAL}" ]; then
-		SDCARD_ROOTFS_REAL_START=${SDCARD_SIZE}
-		SDCARD_SIZE=$(printf "%u + %u + %u\n" ${SDCARD_SIZE} ${ROOTFS_SIZE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
+		SDCARD_ROOTFS_REAL_START=${sd_size}
+		sd_size=$(printf "%u + %u + %u\n" ${sd_size} ${ROOTFS_SIZE} ${ALIGNMENT_SIZE} | bc)
 	else
 		SDCARD_ROOTFS_REAL_START="0"
 	fi
 
 	if [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 1 ]; then
-		SDCARD_EXTENDED_PART_START=${SDCARD_SIZE}
-		SDCARD_SIZE=$(printf "%u + %u\n" ${SDCARD_SIZE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
+		SDCARD_EXTENDED_PART_START=${sd_size}
+		sd_size=$(printf "%u + %u\n" ${sd_size} ${ALIGNMENT_SIZE} | bc)
 	else
 		SDCARD_EXTENDED_PART_START="0"
 	fi
 
 	if [ -n "${SDCARD_ROOTFS_EXTRA1_FILE}" ]; then
-		SDCARD_ROOTFS_EXTRA1_START=${SDCARD_SIZE}
-		SDCARD_SIZE=$(printf "%u + %u + %u\n"  ${SDCARD_SIZE} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
+		SDCARD_ROOTFS_EXTRA1_START=${sd_size}
+		sd_size=$(printf "%u + %u + %u\n"  ${sd_size} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${ALIGNMENT_SIZE} | bc)
 	else
 		SDCARD_ROOTFS_EXTRA1_START="0"
 	fi
 	if [ -n "${SDCARD_ROOTFS_EXTRA2_FILE}" ]; then
-		SDCARD_ROOTFS_EXTRA2_START=${SDCARD_SIZE}
-		SDCARD_SIZE=$(printf "%u + %u + %u\n"  ${SDCARD_SIZE} ${SDCARD_ROOTFS_EXTRA2_SIZE} ${BASE_IMAGE_ROOTFS_ALIGNMENT} | bc)
+		SDCARD_ROOTFS_EXTRA2_START=${sd_size}
+		sd_size=$(printf "%u + %u + %u\n"  ${sd_size} ${SDCARD_ROOTFS_EXTRA2_SIZE} ${ALIGNMENT_SIZE} | bc)
 	else
 		SDCARD_ROOTFS_EXTRA2_START="0"
 	fi
@@ -593,7 +594,7 @@ IMAGE_CMD:sdcard () {
 	cd "${IMGDEPLOYDIR}"
 
 	# Initialize a sparse file
-	SDIMAGE_SIZE_D=$(printf "%u * 1024\n" ${SDCARD_SIZE} | bc)
+	SDIMAGE_SIZE_D=$(printf "%u * 1024\n" ${sd_size} | bc)
 	dd if=/dev/zero "of=${SDCARD}" bs=1 count=0 oflag=seek_bytes seek=${SDIMAGE_SIZE_D}
 
 	rawimage_initutils "SD card/eMMC image" "no" ${SDIMAGE_SIZE_D};

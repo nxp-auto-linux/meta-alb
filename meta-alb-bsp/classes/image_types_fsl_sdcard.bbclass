@@ -185,32 +185,32 @@ do_image_sdcard[depends] += " \
 "
 
 generate_sdcardimage_entry_raw() {
-        GSDE_IMAGE_FILE="$1"
+	GSDE_IMAGE_FILE="$1"
 
-        if [ -n "${GSDE_IMAGE_FILE}" ]; then
-                bbnote "Generating sdcard entry at 0x$(printf "%x" $3) for ${GSDE_IMAGE_FILE}"
-                rawimage_generate_entry "${GSDE_IMAGE_FILE}" "${SDCARD}" "$2" "$3" "$4" "$5"
-        fi
+	if [ -n "${GSDE_IMAGE_FILE}" ]; then
+		bbnote "Generating sdcard entry at 0x$(printf "%x" $3) for ${GSDE_IMAGE_FILE}"
+		rawimage_generate_entry "${GSDE_IMAGE_FILE}" "${SDCARD}" "$2" "$3" "$4" "$5"
+	fi
 }
 
 generate_sdcardimage_entry() {
-        file="$1"
+	file="$1"
 
-        # For SD card, we don't flash firmwares inside the image.
-        if echo "$file" | grep -q ".fw"; then
-            return
-        fi
+	# For SD card, we don't flash firmwares inside the image.
+	if echo "$file" | grep -q ".fw"; then
+		return
+	fi
 
-        if [ -n "${file}" ]; then
-                file="${DEPLOY_DIR_IMAGE}/${file}"
+	if [ -n "${file}" ]; then
+		file="${DEPLOY_DIR_IMAGE}/${file}"
 
-                if [ -z "$3" ]; then
-                        # Don't break the build. Just don't add the firmware to the image if the offset is not set.
-                        bbwarn "$2 is undefined. To use the 'sdcard' image it needs to be defined as byte offset."
-                        return
-                fi
-                generate_sdcardimage_entry_raw "${file}" "$2" "$3" "$4" "$5"
-        fi
+		if [ -z "$3" ]; then
+			# Don't break the build. Just don't add the firmware to the image if the offset is not set.
+			bbwarn "$2 is undefined. To use the 'sdcard' image it needs to be defined as byte offset."
+			return
+		fi
+		generate_sdcardimage_entry_raw "${file}" "$2" "$3" "$4" "$5"
+	fi
 }
 
 # Add extra images in the boot partition
@@ -287,7 +287,7 @@ _generate_boot_image() {
 
 	# Create boot partition image
 	BOOT_BLOCKS=$(LC_ALL=C parted -s "${SDCARD}" unit b print \
-	                  | awk "/ $boot_part / { print substr(\$4, 1, length(\$4 -1)) / 1024 }")
+		| awk "/ $boot_part / { print substr(\$4, 1, length(\$4 -1)) / 1024 }")
 
 	# mkdosfs will sometimes use FAT16 when it is not appropriate,
 	# resulting in a boot failure from SYSLINUX. Use FAT32 for
@@ -486,7 +486,7 @@ generate_nxp_sdcard () {
 
 	# Fill optional Layerscape RCW into the boot block
 	if [ -n "${SDCARD_RCW_NAME}" ]; then
-	        generate_sdcardimage_entry "${SDCARD_RCW_NAME}" "" 0x00001000
+		generate_sdcardimage_entry "${SDCARD_RCW_NAME}" "" 0x00001000
 	fi
 
 	_burn_bootloader

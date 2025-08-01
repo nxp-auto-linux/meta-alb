@@ -36,8 +36,8 @@ KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', 'can
 # Logger
 KERNEL_MODULE_AUTOLOAD:append:s32g = "${@bb.utils.contains('LLCE_FEATURES', 'logger', ' llce_logger', '', d)}"
 
-RDEPENDS:kernel-base:append = "${@bb.utils.contains('LLCE_FEATURES', 'can', ' iproute2-devlink', '', d)}"
-RDEPENDS:kernel-base:append = "${@bb.utils.contains('LLCE_FEATURES', 'nofwload', '', ' linux-firmware-llce', d)}"
+RDEPENDS:kernel-modules:append = "${@bb.utils.contains('LLCE_FEATURES', 'can', ' iproute2-devlink', '', d)}"
+RDEPENDS:kernel-modules:append = "${@bb.utils.contains('LLCE_FEATURES', 'nofwload', '', ' llce-firmware', d)}"
 
 python () {
     mh = bb.utils.contains('DISTRO_FEATURES', 'llce-can-multihost', True, False, d)

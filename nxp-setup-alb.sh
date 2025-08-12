@@ -208,7 +208,7 @@ print_hwparts()
         -name "meta-alb-*" 2>/dev/null | \
         sed "s|.*${SOURCESDIR}/||")
 
-    for layer in "${hwpart_layers[@]}"; do
+    for layer in ${hwpart_layers}; do
         local extra_conf="${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine/${local_machine}-extra.conf"
         if [ -z "${local_machine}" ] || [ -e "${extra_conf}" ]; then
             echo -n " "
@@ -296,7 +296,7 @@ add_layers_for_hwpart()
         -name "meta-alb-$setup_hwpart" 2>/dev/null | \
         sed "s|.*${SOURCESDIR}/||")
 
-    for layer in "${hwpart_layers[@]}"; do
+    for layer in ${hwpart_layers}; do
         HWPART_LAYERS="$HWPART_LAYERS \
         $layer \
     "

@@ -2,6 +2,7 @@
 require conf/machine/include/s32-base.inc
 require conf/machine/include/arm/armv8-2a/tune-cortexa78ae.inc
 require conf/machine/include/s32n-image.inc
+include conf/machine/include/s32n-extra.inc
 
 SOC_FAMILY:append = ":s32n"
 

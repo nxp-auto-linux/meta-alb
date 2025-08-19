@@ -30,9 +30,3 @@ SRC_URI:append:s32cc = "${@ '${VERIFIED_QUICK_BOOT}' if d.getVar('QUICK_BOOT_CON
 SRC_URI:append:s32g = " \
     ${@bb.utils.contains('EMMC_FEATURES', 'cqe', 'file://build/0002-sdhci-esdhc-imx-Enable-CQE-support-${PV_MAJ_VER}.patch', '', d)} \
 "
-
-warning_kernel_version() {
-    bbwarn "Kernel 6.12 is experimental! Some features may not work on this version!"
-}
-
-do_fetch[prefuncs] += "warning_kernel_version"

@@ -52,7 +52,7 @@ FIP_ARTIFACT_LOCATION = "${DEPLOY_DIR_IMAGE}/simimage/arm-trusted-firmware/${TFA
 FIP_ARTIFACT_SIZE_KIB = "$(compute_artifact_size_kib ${FIP_ARTIFACT_LOCATION})"
 # we want the FIP partition to be of fixed size (1M)
 # to accommodate a large BL33 image such as the Linux Kernel, the FIP partition must be increased
-FIP_PARTITION_SIZE_KIB ?= "${@bb.utils.contains('DISTRO_FEATURES', 'linux-kernel-as-bl33', '15360', '1024', d)}"
+FIP_PARTITION_SIZE_KIB ?= "${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', '15360', '1024', d)}"
 
 FIP_PARTITION_SIZE_SECTORS = "$(convert_kib_to_sectors "${FIP_PARTITION_SIZE_KIB}" "${UFS_SECTOR_SIZE}")"
 

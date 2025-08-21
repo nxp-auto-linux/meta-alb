@@ -22,8 +22,8 @@ FW_INSTALL_DEPLOY  = "nxp_fw/S32N7_CARVNET_FDK/"
 BB_STRICT_CHECKSUM = "0"
 
 SRC_URI = " \
-    file://${CARVNET_SRCDIR} \
-    file://${CARVNET_LICENSE_FILE} \
+    ${@f"""file://{d.getVar('CARVNET_SRCDIR')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/S32N7_CARVNET_FDK/{d.getVar('CARVNET_SRCDIR')}""") else ''} \
+    ${@f"""file://{d.getVar('CARVNET_LICENSE_FILE')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/S32N7_CARVNET_FDK/{d.getVar('CARVNET_LICENSE_FILE')}""") else ''} \
 "
 
 S = "${WORKDIR}"

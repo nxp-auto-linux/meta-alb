@@ -1,5 +1,6 @@
 SD_FAT_BOOT_DIR = ""
 SD_FAT_DTB_DIR = ""
+SD_FAT_ENV_DIR = ""
 
 SD_INCLUDE_BL2_PART = "0"
 

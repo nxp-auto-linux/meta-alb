@@ -36,6 +36,8 @@ SDCARD_FIP_PARTITION_NAME ??= ""
 SDCARD_FAT_PARTITION_NAME ??= ""
 SDCARD_ROOTFS_PARTITION_NAME ??= ""
 
+SD_FAT_ENV_DIR ??= ""
+
 DEPENDS += "bc-native"
 DEPENDS:append = "${@' gptfdisk-native' if d.getVar('SDCARD_PARTITIONING_SCHEME') == 'gpt' else ''}"
 
@@ -397,6 +399,13 @@ _generate_boot_image() {
 	do
 		add_extra_boot_img "${file}" "${WORKDIR}/boot.img"
 	done
+
+	if [ "${SDCARD_PARTITIONING_SCHEME}" = "gpt" ]; then
+        mmd -i "${WORKDIR}/boot.img" "::/${SD_FAT_ENV_DIR}"
+        mcopy -i "${WORKDIR}/boot.img" \
+            -s "${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE}" \
+            "::${SD_FAT_ENV_DIR}/env.txt"
+	fi
 }
 
 #

@@ -26,11 +26,13 @@ EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
 EXTRA_CMDS_FILE:s32n7sim = "extra_cmds_s32n7"
 SRC_URI = "file://${EXTRA_CMDS_FILE}"
 
-do_configure() {
-    CFG_FILE="${B}/${CFG_NAME}"
+modify_imagebuilder_config() {
+    CFG_FILE="$1"
 
-    cp -vf "${S}/${CFG_NAME}" "${CFG_FILE}"
-    cp -vf "${S}/${EXTRA_CMDS_FILE}" "${B}/${EXTRA_CMDS_FILE}"
+    if [ ! -f "$CFG_FILE" ]; then
+        bberror "$CFG_FILE cannot be found."
+        exit 1
+    fi
 
     # Append machine-specific linux .dtb file name
     echo "DEVICE_TREE=\"${KERNEL_DEVICETREE_BASENAME}\"" >> "${CFG_FILE}"
@@ -53,7 +55,16 @@ do_configure() {
     fi
 }
 
-do_compile() {
+do_configure:s32cc() {
+    CFG_FILE="${B}/${CFG_NAME}"
+
+    cp -vf "${S}/${CFG_NAME}" "${CFG_FILE}"
+    cp -vf "${S}/${EXTRA_CMDS_FILE}" "${B}/${EXTRA_CMDS_FILE}"
+
+    modify_imagebuilder_config "${CFG_FILE}"
+}
+
+do_compile:s32cc() {
     UBOOT_DIR="${DEPLOY_DIR_IMAGE}"
     IMAGEBUILDER_CONFIG="${CFG_NAME}"
     PREPEND_PATH="${BIN_PREPEND_PATH}"
@@ -67,18 +78,23 @@ do_compile() {
     mv ${UBOOT_DIR}/${BOOT_SCRIPT} ${UBOOT_DIR}/${BOOT_SOURCE} ${B}/
 }
 
-do_install() {
+do_install:s32cc() {
     install -d ${D}${BIN_PREPEND_PATH}
     install -m 0755 ${BOOT_SCRIPT} ${D}${BIN_PREPEND_PATH}
     install -m 0755 ${BOOT_SOURCE} ${D}${BIN_PREPEND_PATH}
 }
 
 do_deploy() {
+    install -d ${DEPLOYDIR}
+}
+
+do_deploy:append:s32cc() {
     install -m 0755 ${D}${BIN_PREPEND_PATH}/${BOOT_SCRIPT} ${DEPLOYDIR}/
     install -m 0755 ${D}${BIN_PREPEND_PATH}/${BOOT_SOURCE} ${DEPLOYDIR}/
 }
 
-addtask do_deploy after do_install
+addtask deploy after do_install before do_build
+
 do_compile[depends] += " \
     virtual/kernel:do_deploy \
     xen:do_deploy \

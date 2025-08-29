@@ -10,7 +10,7 @@ DOM0_CMD="console=ttyAMA0,115200 earlycon=xen earlyprintk=xen root=/dev/sdb2 roo
 
 NUM_DOMUS=0
 
-UBOOT_SOURCE="boot.source"
-UBOOT_SCRIPT="boot.scr"
+UBOOT_SOURCE="boot.source-ufs"
+UBOOT_SCRIPT="boot.scr-ufs"
 BOOT_CMD="none"
 LOAD_CMD='ext4load scsi ${scsi_part_rootfs}'

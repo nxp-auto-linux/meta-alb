@@ -2,8 +2,6 @@ require recipes-extended/xen-examples/xen-examples-dom0less.inc
 
 CFG_NAME:s32cc = "config_s32cc_dom0less_passthrough_pfe"
 
-SRC_URI += "file://${CFG_NAME}"
-
 RDEPENDS:${PN} += " xen-passthrough-dts pfe-slave"
 
 do_compile[depends] += " \

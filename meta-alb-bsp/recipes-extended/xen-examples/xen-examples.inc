@@ -10,21 +10,21 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 DEPENDS += " imagebuilder-native"
 RDEPENDS:${PN} += " xen kernel-devicetree"
-FILESEXTRAPATHS:prepend := "${THISDIR}/xen-examples:"
+FILESEXTRAPATHS:prepend := "${THISDIR}:"
+
+SRC_URI = "file://xen-examples"
 
 S = "${WORKDIR}"
-B = "${WORKDIR}/build"
+XEN_EXAMPLES_DIR = "${S}/xen-examples"
 
 BIN_PREPEND_PATH = "/boot"
 BOOT_SCRIPT = "boot.scr"
 BOOT_SOURCE = "boot.source"
-FILES:${PN} = "${BIN_PREPEND_PATH}/${BOOT_SCRIPT} ${BIN_PREPEND_PATH}/${BOOT_SOURCE}"
 
 EXTRA_CMDS_FILE ?= ""
 CFG_NAME ?= ""
 EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
 EXTRA_CMDS_FILE:s32n7sim = "extra_cmds_s32n7"
-SRC_URI = "file://${EXTRA_CMDS_FILE}"
 
 modify_imagebuilder_config() {
     CFG_FILE="$1"
@@ -51,22 +51,18 @@ modify_imagebuilder_config() {
 
     # Append file name with extra commands to be added in boot script
     if [ -n "${EXTRA_CMDS_FILE}" ]; then
-        echo "APPEND_EXTRA_CMDS=\"${B}/${EXTRA_CMDS_FILE}\"" >> "${CFG_FILE}"
+        echo "APPEND_EXTRA_CMDS=\"${XEN_EXAMPLES_DIR}/${EXTRA_CMDS_FILE}\"" >> "${CFG_FILE}"
     fi
 }
 
 do_configure:s32cc() {
-    CFG_FILE="${B}/${CFG_NAME}"
-
-    cp -vf "${S}/${CFG_NAME}" "${CFG_FILE}"
-    cp -vf "${S}/${EXTRA_CMDS_FILE}" "${B}/${EXTRA_CMDS_FILE}"
-
+    CFG_FILE="${XEN_EXAMPLES_DIR}/${CFG_NAME}"
     modify_imagebuilder_config "${CFG_FILE}"
 }
 
 do_compile:s32cc() {
     UBOOT_DIR="${DEPLOY_DIR_IMAGE}"
-    IMAGEBUILDER_CONFIG="${CFG_NAME}"
+    IMAGEBUILDER_CONFIG="${XEN_EXAMPLES_DIR}/${CFG_NAME}"
     PREPEND_PATH="${BIN_PREPEND_PATH}"
 
     # Run Imagebuilder script
@@ -94,6 +90,7 @@ do_deploy:append:s32cc() {
 }
 
 addtask deploy after do_install before do_build
+FILES:${PN} = "${BIN_PREPEND_PATH}/*"
 
 do_compile[depends] += " \
     virtual/kernel:do_deploy \

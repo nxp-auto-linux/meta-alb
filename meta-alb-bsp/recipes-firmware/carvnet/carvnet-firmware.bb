@@ -1,29 +1,29 @@
 # Copyright 2025 NXP
 
 SUMMARY = "Firmware binaries for CAR-V-NET"
-LICENSE = "NXP-S32-PLATFORM-SOFTWARE"
-LIC_FILES_CHKSUM = "file://license.rtf;md5=bafc2fc12f6ba76334b95f6ea4844b01"
-NO_GENERIC_LICENSE[NXP-S32-PLATFORM-SOFTWARE] = "license.rtf"
-FILESEXTRAPATHS:prepend := "${NXP_FIRMWARE_LOCAL_DIR}/S32N7_CARVNET_FDK:"
+LICENSE = "LA-OPT-NXP-SOFTWARE-LICENSE-V63"
+LIC_FILES_CHKSUM = "file://license.txt;md5=fbe3148475a26169db99fb9aaad5fe93"
+NO_GENERIC_LICENSE[LA-OPT-NXP-SOFTWARE-LICENSE-V63] = "license.txt"
+FILESEXTRAPATHS:prepend := "${NXP_FIRMWARE_LOCAL_DIR}/SW32N7_CARVNET:"
 
 #
-# This recipe installs all precompiled CARVNET firmware examples from the CARVNET FDK release package.
-# It expects content of the CARVNET FDK release package in the folder $NXP_FIRMWARE_LOCAL_DIR/S32N7_CARVNET_FDK/ .
+# This recipe installs all precompiled CARVNET firmware examples from the CARVNET installer.
+# It expects content of the CARVNET installer in the folder $NXP_FIRMWARE_LOCAL_DIR/SW32N7_CARVNET/ .
 # Based on the value of CARVNET_FW_SET_USED, one firmware example can be selected as the 'actively used' CARVNET firmware.
 #
 CARVNET_FW_SET_USED ?= "netc_reflector"
 
-CARVNET_LICENSE_FILE = "license.rtf"
+CARVNET_LICENSE_FILE = "license.txt"
 CARVNET_FW_FILE = "s32n7-carvnet.fw"
-CARVNET_SRCDIR = "firmware"
-CARVNET_INSTALL_DIR = "${base_libdir}/${CARVNET_SRCDIR}"
+CARVNET_SRCDIR = "carvnet_fdk/firmware"
+CARVNET_INSTALL_DIR = "${base_libdir}/firmware"
 CARVNET_MORE_FW_DIR = "${CARVNET_INSTALL_DIR}/carvnet_firmware_examples"
-FW_INSTALL_DEPLOY  = "nxp_fw/S32N7_CARVNET_FDK/"
+FW_INSTALL_DEPLOY  = "nxp_fw/SW32N7_CARVNET/"
 BB_STRICT_CHECKSUM = "0"
 
 SRC_URI = " \
-    ${@f"""file://{d.getVar('CARVNET_SRCDIR')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/S32N7_CARVNET_FDK/{d.getVar('CARVNET_SRCDIR')}""") else ''} \
-    ${@f"""file://{d.getVar('CARVNET_LICENSE_FILE')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/S32N7_CARVNET_FDK/{d.getVar('CARVNET_LICENSE_FILE')}""") else ''} \
+    ${@f"""file://{d.getVar('CARVNET_SRCDIR')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/SW32N7_CARVNET/{d.getVar('CARVNET_SRCDIR')}""") else ''} \
+    ${@f"""file://{d.getVar('CARVNET_LICENSE_FILE')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/SW32N7_CARVNET/{d.getVar('CARVNET_LICENSE_FILE')}""") else ''} \
 "
 
 S = "${WORKDIR}"

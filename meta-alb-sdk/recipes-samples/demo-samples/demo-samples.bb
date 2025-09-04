@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=d1fe458e57ae72e9abc9aff2684690d0"
 URL ?= "git://github.com/nxp-auto-linux/alb-demos;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
+FOLLOWER_RB = "1"
 
 S = "${WORKDIR}/git"
 SRCREV = "201e93f6ac2dc98c4c4f1d3dee94097f7004b756"

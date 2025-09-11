@@ -1,7 +1,7 @@
 # Copyright 2017,2022 NXP
 
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=d1fe458e57ae72e9abc9aff2684690d0"
+LIC_FILES_CHKSUM = "file://networking/LICENSE;md5=d1fe458e57ae72e9abc9aff2684690d0"
 
 URL ?= "git://github.com/nxp-auto-linux/alb-demos;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"

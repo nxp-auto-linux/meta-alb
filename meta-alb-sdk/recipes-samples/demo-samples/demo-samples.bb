@@ -9,7 +9,7 @@ SRC_URI = "${URL};branch=${BRANCH}"
 FOLLOWER_RB = "1"
 
 S = "${WORKDIR}/git"
-SRCREV = "201e93f6ac2dc98c4c4f1d3dee94097f7004b756"
+SRCREV = "582a7f832c26e43d363f261460b81b7dedccabfc"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 

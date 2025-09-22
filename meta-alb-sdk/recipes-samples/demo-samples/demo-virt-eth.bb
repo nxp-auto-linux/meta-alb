@@ -8,7 +8,7 @@ BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
 
 S = "${WORKDIR}/git"
-SRCREV = "201e93f6ac2dc98c4c4f1d3dee94097f7004b756"
+SRCREV = "582a7f832c26e43d363f261460b81b7dedccabfc"
 SAMPLESDIR = "/opt/samples"
 DESTDIR = "${D}${SAMPLESDIR}"
 

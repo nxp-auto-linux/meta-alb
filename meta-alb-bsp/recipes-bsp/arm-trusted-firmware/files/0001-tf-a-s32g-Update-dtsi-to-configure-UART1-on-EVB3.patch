@@ -1,4 +1,4 @@
-From 0857aef044221a976395068a108c36a9a503fae2 Mon Sep 17 00:00:00 2001
+From 6b2fc10c80618d76eeb16a23cac356a5e4dedd94 Mon Sep 17 00:00:00 2001
 From: Khristine Andreea Barbulescu <khristineandreea.barbulescu@nxp.com>
 Date: Wed, 13 Nov 2024 14:51:55 +0200
 Subject: [PATCH] tf-a: s32cc: Update dtsi to configure UART1 on EVB3
@@ -10,10 +10,10 @@ Signed-off-by: Khristine Andreea Barbulescu <khristineandreea.barbulescu@nxp.com
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fdts/s32gxxxa-evb.dtsi b/fdts/s32gxxxa-evb.dtsi
-index d1924996d..5577b35f3 100644
+index 78a2661f1..6fbc0a7eb 100644
 --- a/fdts/s32gxxxa-evb.dtsi
 +++ b/fdts/s32gxxxa-evb.dtsi
-@@ -158,7 +158,7 @@
+@@ -100,7 +100,7 @@
  	pinctrl-1 = <&i2c0_gpio_pins>;
  	scl-gpios = <&gpio 17 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
  	sda-gpios = <&gpio 16 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
@@ -22,7 +22,7 @@ index d1924996d..5577b35f3 100644
  };
  
  /* Platform board PCI X16 EXPRESS - I2C_SCL_S0, I2C_SDA_S0  */
-@@ -500,7 +500,7 @@
+@@ -441,7 +441,7 @@
  &uart1 {
  	pinctrl-0 = <&uart1_pins>;
  	pinctrl-names = "default";
@@ -30,7 +30,4 @@ index d1924996d..5577b35f3 100644
 +	status = "okay";
  };
  
- &pfe_mac0_rmii {
--- 
-2.25.1
-
+ &usbmisc {

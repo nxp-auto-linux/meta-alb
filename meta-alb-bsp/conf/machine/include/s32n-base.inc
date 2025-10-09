@@ -10,6 +10,9 @@ DEFAULTTUNE:s32n ?= "cortexa78ae"
 
 PREFERRED_VERSION_linux-s32:s32n = "6.12%"
 
+# For the FCONF layer in TF-A
+HOSTTOOLS += "gdb"
+
 KERNEL_DEFCONFIG = "s32n7_defconfig"
 
 IMAGE_CLASSES += " \

@@ -12,7 +12,7 @@ PKGS=" curl gawk wget git-core diffstat unzip texinfo \
      libsdl1.2-dev xterm libncurses5-dev lz4 zstd"
 # pkgs required for fsl use
 PKGS="$PKGS make vim-common tofrodos libstring-crc32-perl screen parted \
-     dosfstools mtools udev"
+     dosfstools mtools udev gdb"
 
 if [ "$distro" = "Ubuntu" ]; then
 	if [ "$release" = "16.04" -o "$release" = "18.04" ]; then

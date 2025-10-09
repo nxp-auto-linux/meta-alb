@@ -10,7 +10,7 @@ PKGS="curl python gcc gcc-c++ git chrpath make wget python-xml \
      python3-pexpect xz which libSDL-devel xterm ncurses-devel lz4 zstd"
 
 # pkgs required for fsl iamges
-PKGS="$PKGS parted dosfstools mtools udev"
+PKGS="$PKGS parted dosfstools mtools udev gdb"
 
 echo "Now we're going to install all the other development packages needed to build Yocto, please wait"
 

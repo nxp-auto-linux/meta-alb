@@ -16,7 +16,7 @@ if [ "Fedora" = "$distro" ]; then
 fi
 # pkgs required for fsl use
 PKGS="$PKGS vim-common redhat-lsb xz perl-String-CRC32 dos2unix screen parted \
-     dosfstools mtools udev"
+     dosfstools mtools udev gdb"
 
 # Extra Packages for Enterprise Linux (i.e. epel-release) is a collection
 # of packages from Fedora built on RHEL/CentOS for easy installation of

@@ -36,7 +36,7 @@ UFS_SECTOR_SIZE = "4096"
 BL2_PARTITION_NAME = "BL2"
 BL2_START_ADDRESS_SECTOR = "$(get_first_partition_start_sector "${UFS_SECTOR_SIZE}")"
 BL2_START_ADDRESS_KIB = "$(convert_sectors_to_kib "${BL2_START_ADDRESS_SECTOR}" "${UFS_SECTOR_SIZE}")"
-BL2_ARTIFACT_LOCATION = "${DEPLOY_DIR_IMAGE}/simimage/arm-trusted-firmware/bl2_w_dtb.bin-ufs"
+BL2_ARTIFACT_LOCATION = "${DEPLOY_DIR_IMAGE}/simimage/arm-trusted-firmware/bl2.bin-ufs"
 BL2_ARTIFACT_SIZE_KIB = "$(compute_artifact_size_kib ${BL2_ARTIFACT_LOCATION})"
 # we want the BL2 partition to be of fixed size (512K)
 BL2_PARTITION_SIZE_KIB ?= "512"

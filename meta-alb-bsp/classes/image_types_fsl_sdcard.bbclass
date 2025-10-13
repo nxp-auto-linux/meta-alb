@@ -353,11 +353,17 @@ _generate_boot_image() {
 		mcopy -i "${WORKDIR}/boot.img" -s "${DEPLOY_DIR_IMAGE}/$src" "::/$dst"
 	done
 
+	if [ -n "${KERNEL_DEVICETREE_EXT}" ]; then
+	    KERNEL_DEVICETREE_IN_USE="${KERNEL_DEVICETREE_EXT}"
+	else
+	    KERNEL_DEVICETREE_IN_USE="${KERNEL_DEVICETREE}"
+	fi
+
 	# Copy device tree file
-	if test -n "${KERNEL_DEVICETREE}"; then
+	if test -n "${KERNEL_DEVICETREE_IN_USE}"; then
 		kernel_bin="`readlink ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.bin`"
-		for DTB_FILE in ${KERNEL_DEVICETREE}; do
-			DTB_BASE_NAME="`basename ${DTB_FILE} | awk -F "." '{print $1}'`"
+		for DTB_FILE in ${KERNEL_DEVICETREE_IN_USE}; do
+			DTB_BASE_NAME="$(basename -- "${DTB_FILE}" .dtb)"
 			DTB_PATH=""
 			kernel_bin_for_dtb=""
 			if [ -e "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTB_BASE_NAME}.dtb" ]; then

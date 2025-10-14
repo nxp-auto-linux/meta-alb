@@ -66,7 +66,7 @@ EINVAL=128
 # "
 #
 ALB_USER_EXTRA_LAYERS_SCRIPT="./alb-user-extra-layers.sh"
-if [ -a "$ALB_USER_EXTRA_LAYERS_SCRIPT" ]; then
+if [ -e "$ALB_USER_EXTRA_LAYERS_SCRIPT" ]; then
     file_check="$(file --mime-type "$ALB_USER_EXTRA_LAYERS_SCRIPT" | grep "text/x-shellscript")"
     if [ -n "$file_check" ]; then
         . "$ALB_USER_EXTRA_LAYERS_SCRIPT"

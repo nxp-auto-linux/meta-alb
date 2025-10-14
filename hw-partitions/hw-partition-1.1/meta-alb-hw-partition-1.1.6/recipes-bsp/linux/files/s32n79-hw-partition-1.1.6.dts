@@ -1,0 +1,180 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+/*
+ * Copyright 2025 NXP
+ */
+
+/dts-v1/;
+#include "s32n79-simulator.dtsi"
+
+/delete-node/ &gic;
+/delete-node/ &cpu4;
+/delete-node/ &cpu5;
+/delete-node/ &cpu6;
+/delete-node/ &cpu7;
+/delete-node/ &irqsteer_coss;
+/delete-node/ &irqsteer_rcu;
+/delete-node/ &edma_coss;
+/delete-node/ &edma_rcu;
+
+/ {
+	chosen {
+		stdout-path = "serial7:115200n8";
+	};
+
+	cpus {
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&cpu0>;
+				};
+
+				core1 {
+					cpu = <&cpu1>;
+				};
+			};
+
+			cluster1 {
+				core0 {
+					cpu = <&cpu2>;
+				};
+
+				core1 {
+					cpu = <&cpu3>;
+				};
+			};
+		};
+	};
+
+	memory@9c000000 {
+		device_type = "memory";
+		reg = <0x0 0x9c000000 0 0x1c000000>;
+	};
+
+	memory@89c0000000 {
+		device_type = "memory";
+		reg = <0x89 0xc0000000 0x1 0xc0000000>;
+	};
+
+	memory@c1c0000000 {
+		device_type = "memory";
+		reg = <0xc1 0xc0000000 0x1 0xc0000000>;
+	};
+
+	reserved-memory {
+		scmi_tx_buf: shm@af000000 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x0 0xaf000000 0x0 0x80>;
+			no-map;
+		};
+
+		hse_rmem0: shm@ac000000 {
+			compatible = "nxp,s32n-hse-rmem";
+			reg = <0x0 0xac000000 0x0 0x1000000>; /* 16 MB */
+			no-map;
+		};
+
+		hse_rmem1: shm@ad000000 {
+			compatible = "nxp,s32n-hse-rmem";
+			reg = <0x0 0xad000000 0x0 0x1000000>; /* 16 MB */
+			no-map;
+		};
+	};
+
+	cis_subsys {
+		gic: interrupt-controller@4f600000 {
+			compatible = "arm,gic-v3";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			#interrupt-cells = <3>;
+			interrupt-controller;
+			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0x4f600000 0x10000>, /* GIC Dist */
+			      <0x4f660000 0x100000>; /* GICR (RD_base + SGI_base) */
+			ranges;
+
+			its: msi-controller@4f640000 {
+				compatible = "arm,gic-v3-its";
+				reg = <0x4f640000 0x20000>;
+				msi-controller;
+			};
+		};
+	};
+
+	coss_subsys {
+		edma_coss: dma-controller@4ea70000 {
+			compatible = "nxp,s32n79-coss-edma5";
+			reg = <0x4ea70000 0x201000>,
+			      <0x4ea60000 0x1000>,
+			      <0x4ea64000 0x1000>,
+			      <0x4ea68000 0x1000>,
+			      <0x4ea6c000 0x1000>;
+			#dma-cells = <2>;
+			dma-channels = <32>;
+			interrupt-parent = <&irqsteer_coss>;
+			/* Two DMA channels share the same interrupt. */
+			interrupts = <192>, <192>, <193>, <193>,
+				     <194>, <194>, <195>, <195>,
+				     <196>, <196>, <197>, <197>,
+				     <198>, <198>, <199>, <199>,
+				     <200>, <200>, <201>, <201>,
+				     <202>, <202>, <203>, <203>,
+				     <204>, <204>, <205>, <205>,
+				     <206>, <206>, <207>, <207>,
+				     <454>;
+			clocks = <&sys_clk>, <&sys_clk>, <&sys_clk>, <&sys_clk>;
+			clock-names = "dmamux0", "dmamux1", "dmamux2", "dmamux3";
+		};
+
+		irqsteer_coss: interrupt-controller@4ed60000 {
+			compatible = "nxp,s32n7-irqsteer";
+			reg = <0x4ed60000 0x10000>;
+			interrupts = <GIC_SPI 575 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 576 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 577 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 578 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 579 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 580 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 581 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 582 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-controller;
+			interrupt-parent = <&gic>;
+			#interrupt-cells = <1>;
+			clocks = <&sys_clk>;
+			clock-names = "ipg";
+			fsl,channel = <0>;
+			fsl,num-irqs = <512>;
+		};
+	};
+
+	rcu_subsys {
+		irqsteer_rcu: interrupt-controller@55161000 {
+			compatible = "nxp,s32n7-irqsteer";
+			reg = <0x55161000 0x1000>;
+			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 139 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 140 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-controller;
+			interrupt-parent = <&gic>;
+			#interrupt-cells = <1>;
+			clocks = <&sys_clk>;
+			clock-names = "ipg";
+			fsl,channel = <0>;
+			fsl,num-irqs = <512>;
+		};
+
+		edma_rcu: edma-rcu-dummy {
+			#dma-cells = <2>;
+			dma-channels = <16>;
+		};
+	};
+};
+
+&uart7 {
+	status = "okay";
+};
+

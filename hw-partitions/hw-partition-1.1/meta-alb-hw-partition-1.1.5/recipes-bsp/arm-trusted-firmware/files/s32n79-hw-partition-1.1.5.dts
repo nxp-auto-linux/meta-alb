@@ -1,0 +1,214 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+/*
+ * Copyright 2024-2025 NXP
+ */
+
+/dts-v1/;
+#include "s32n79-simulator.dtsi"
+
+/delete-node/ &cpu4;
+/delete-node/ &cpu5;
+/delete-node/ &cpu6;
+/delete-node/ &cpu7;
+/delete-node/ &irqsteer_coss;
+/delete-node/ &irqsteer_rcu;
+/delete-node/ &edma_coss;
+/delete-node/ &edma_rcu;
+
+/ {
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	cpus {
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&cpu0>;
+				};
+
+				core1 {
+					cpu = <&cpu1>;
+				};
+			};
+
+			cluster1 {
+				core0 {
+					cpu = <&cpu2>;
+				};
+
+				core1 {
+					cpu = <&cpu3>;
+				};
+			};
+		};
+	};
+
+	memory@800000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x1c000000>;
+	};
+
+	memory@8800000000 {
+		device_type = "memory";
+		reg = <0x88 0x00000000 0x1 0xc0000000>;
+	};
+
+	memory@c000000000 {
+		device_type = "memory";
+		reg = <0xc0 0x00000000 0x1 0xc0000000>;
+	};
+
+	reserved-memory {
+		scmi_shbuf: shm@93000000 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x0 0x93000000 0x0 0x80>;
+			no-map;
+		};
+
+		hse_rmem0: shm@90000000 {
+			compatible = "nxp,s32n-hse-rmem";
+			reg = <0x0 0x90000000 0x0 0x1000000>; /* 16 MB */
+			no-map;
+		};
+
+		hse_rmem1: shm@91000000 {
+			compatible = "nxp,s32n-hse-rmem";
+			reg = <0x0 0x91000000 0x0 0x1000000>; /* 16 MB */
+			no-map;
+		};
+	};
+
+	coss_subsys {
+		edma_coss: dma-controller@4e820000 {
+			compatible = "nxp,s32n79-coss-edma5";
+			reg = <0x4e820000 0x201000>,
+			      <0x4e810000 0x1000>,
+			      <0x4e814000 0x1000>,
+			      <0x4e818000 0x1000>,
+			      <0x4e81c000 0x1000>;
+			#dma-cells = <2>;
+			dma-channels = <32>;
+			interrupt-parent = <&irqsteer_coss>;
+			/* Two DMA channels share the same interrupt. */
+			interrupts = <144>, <144>, <145>, <145>,
+				     <146>, <146>, <147>, <147>,
+				     <148>, <148>, <149>, <149>,
+				     <150>, <150>, <151>, <151>,
+				     <252>, <252>, <253>, <253>,
+				     <254>, <254>, <255>, <255>,
+				     <256>, <256>, <257>, <257>,
+				     <258>, <258>, <259>, <259>,
+				     <453>;
+			clocks = <&sys_clk>, <&sys_clk>, <&sys_clk>, <&sys_clk>;
+			clock-names = "dmamux0", "dmamux1", "dmamux2", "dmamux3";
+		};
+
+		irqsteer_coss: interrupt-controller@4ed50000 {
+			compatible = "nxp,s32n7-irqsteer";
+			reg = <0x4ed50000 0x10000>;
+			interrupts = <GIC_SPI 567 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 568 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 569 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 570 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 571 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 572 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 573 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 574 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-controller;
+			interrupt-parent = <&gic>;
+			#interrupt-cells = <1>;
+			clocks = <&sys_clk>;
+			clock-names = "ipg";
+			fsl,channel = <0>;
+			fsl,num-irqs = <512>;
+		};
+	};
+
+	rcu_subsys {
+		irqsteer_rcu: interrupt-controller@55151000 {
+			compatible = "nxp,s32n7-irqsteer";
+			reg = <0x55151000 0x1000>;
+			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 128 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-controller;
+			interrupt-parent = <&gic>;
+			#interrupt-cells = <1>;
+			clocks = <&sys_clk>;
+			clock-names = "ipg";
+			fsl,channel = <0>;
+			fsl,num-irqs = <512>;
+		};
+
+		edma_rcu: dma-controller@569d0000 {
+			compatible = "nxp,s32n79-rcu-edma5";
+			reg = <0x569d0000 0x101000>,
+				<0x568b2000 0x1000>,
+				<0x568b3000 0x1000>;
+			#dma-cells = <2>;
+			dma-channels = <16>;
+			interrupt-parent = <&irqsteer_rcu>;
+			interrupts = <336>, <337>, <338>, <339>,
+				     <340>, <341>, <342>, <343>,
+				     <344>, <345>, <346>, <347>,
+				     <348>, <349>, <350>, <351>,
+				     <393>;
+			clocks = <&sys_clk>, <&sys_clk>;
+			clock-names = "dmamux0", "dmamux1";
+		};
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart5 {
+	status = "okay";
+};
+
+&uart6 {
+	status = "okay";
+};
+
+&linflex28 {
+	status = "okay";
+};
+
+&linflex29 {
+	status = "okay";
+};
+
+&usdhc0 {
+	status = "okay";
+};
+
+&can22 {
+	status = "okay";
+};
+
+&can23 {
+	status = "okay";
+};
+
+&can46 {
+	status = "okay";
+};
+
+&can47 {
+	status = "okay";
+};
+
+&lpi2c2 {
+	status = "okay";
+};
+
+&spi5 {
+	status = "okay";
+};

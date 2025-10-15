@@ -1,0 +1,29 @@
+Yocto BSP layer for UC1.1
+==========================================================================
+
+hw-partition-1.1 contains two cohort layers:
+* meta-alb-hw-partition-1.1.5 - generates Linux images for Cohort 5 which:
+  - boots from uSDHC,
+  - owns SMMU,
+  - uses UART0 as console.
+* meta-alb-hw-partition-1.1.6 - generates Linux images for Cohort 6 which:
+  - boots from UFS,
+  - uses UART7 as console.
+
+Low Memory Layout:
+--------------------------------------------------------------------------
+Each cohort has 0x1c000000 assigned space in Low memory, split as follows
+
+0x00000000 – 0x10000000: to be used for Linux CMA (256MB)
+0x10000000 – 0x12000000: reserved for HSE (32MB)
+0x13000000 - 0x13001000: reserved for SCMI firmware shared memory
+0x13002000 - 0x13200000: Linux device tree
+0x13200000 - 0x16000000: Kernel Image
+0x16000000 - 0x16000000: RootFS
+...
+BL33_DTB
+BL33_ENTRYPOINT
+BL2_BASE
+BL31_BASE
+...
+0x1bFFFFFF: DDR_END

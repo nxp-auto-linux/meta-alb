@@ -15,6 +15,8 @@
 /delete-node/ &irqsteer_rcu;
 /delete-node/ &edma_coss;
 /delete-node/ &edma_rcu;
+/delete-node/ &netc_iep14;
+/delete-node/ &netc_iep18;
 
 / {
 	chosen {
@@ -175,6 +177,10 @@
 };
 
 &uart7 {
+	status = "okay";
+};
+
+&netc_iep19 {
 	status = "okay";
 };
 

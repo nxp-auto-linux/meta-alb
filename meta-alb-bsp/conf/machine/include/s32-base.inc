@@ -87,6 +87,10 @@ BBMASK += "u-boot-qoriq linux-qoriq"
 DOM0LESS_ROOTFS ?= "fsl-image-dom0less"
 XEN_EXAMPLE ?= "xen-examples-default"
 
+# Xen Rootfs Partitions support
+SDCARD_ROOTFS_EXTRA1_FILE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}', '', d)}"
+SDCARD_ROOTFS_EXTRA1_SIZE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${ROOTFS_SIZE}', '0', d)}"
+
 # Disable NFS server service
 DISTRO_FEATURES:remove = " nfs"
 IMAGE_INSTALL:remove = " packagegroup-core-nfs-server"

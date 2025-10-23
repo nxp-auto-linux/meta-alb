@@ -4,7 +4,7 @@ MEMORY_START="0x85200000"
 MEMORY_END="0xFFFFFFFF"
 
 XEN="xen"
-XEN_CMD="console=dtuart dtuart=serial0 dom0_mem=512M dom0_max_vcpus=1 bootscrub=0 vwfi=native sched=null"
+XEN_CMD="console=dtuart dtuart=serial0 dom0_mem=512M dom0_max_vcpus=1 bootscrub=0 vwfi=native sched=null swiotlb=force"
 DOM0_KERNEL="Image"
 DOM0_CMD="console=hvc0 earlycon=xen earlyprintk=xen root=/dev/mmcblk0p3 rootwait rw clk_ignore_unused"
 

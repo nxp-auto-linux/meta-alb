@@ -19,6 +19,9 @@
 /delete-node/ &netc_iep18;
 
 / {
+	model = "NXP S32N79-SIM";
+	compatible = "nxp,s32n79-sim", "nxp,s32n79";
+
 	chosen {
 		stdout-path = "serial7:115200n8";
 	};

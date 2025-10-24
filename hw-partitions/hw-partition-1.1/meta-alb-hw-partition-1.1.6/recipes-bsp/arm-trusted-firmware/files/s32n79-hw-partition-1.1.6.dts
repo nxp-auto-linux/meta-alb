@@ -17,6 +17,8 @@
 /delete-node/ &cpu7;
 
 / {
+	model = "NXP S32N79-SIM";
+
 	chosen {
 		stdout-path = "serial7:115200n8";
 	};

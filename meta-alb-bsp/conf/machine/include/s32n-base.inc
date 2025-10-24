@@ -20,6 +20,7 @@ IMAGE_CLASSES += " \
 	image_types_fsl_sdcard \
 "
 
+IMAGE_FSTYPES:remove = "flashimage"
 IMAGE_FSTYPES:append = " ufs sdcard"
 UBOOT_SUFFIX_UFS = "${UBOOT_SUFFIX}"
 

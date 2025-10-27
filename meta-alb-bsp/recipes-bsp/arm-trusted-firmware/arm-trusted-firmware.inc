@@ -117,10 +117,6 @@ NO_DRAM_ECC_ARGS = " \
               S32GEN1_DRAM_INLINE_ECC=0 \
               "
 
-FSS_ARGS = " \
-	S32N_USE_FSS=1 \
-	"
-
 S32N_LINUX_KERNEL_AS_BL33_ARGS = " \
               S32N_FIP_SIZE=0xF00000 \
 			  S32N_LINUX_KERNEL_AS_BL33=1 \
@@ -168,7 +164,6 @@ LINUX_KERNEL_AS_BL33 = "${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', '1
 EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', '${S32CC_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
 
 EXTRA_OEMAKE:append:s32r478 = " ${S32R47_ARGS}"
-EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'fss', '${FSS_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32n = " ${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', '${S32N_LINUX_KERNEL_AS_BL33_ARGS}', '', d)}"
 
 PINCTRL_OPT:s32cc = "${@oe.utils.conditional('SCMI_USE_SCMI_PINCTRL', '1', '--pinctrl', '--no-pinctrl', d)}"

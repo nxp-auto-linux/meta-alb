@@ -1,5 +1,5 @@
 LICENSE = "GPL-2.0-or-later"
-LIC_FILES_CHKSUM = "file://pcie_virt_eth/LICENSE;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
+LIC_FILES_CHKSUM = "file://pcie_shared_mem/LICENSE;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
 
 URL ?= "git://github.com/nxp-auto-linux/alb-demos;protocol=https"
 BRANCH ?= "${RELEASE_BASE}"

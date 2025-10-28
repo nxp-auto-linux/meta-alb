@@ -16,6 +16,6 @@ SRC_URI:append:s32cc = " \
 			${@bb.utils.contains('DISTRO_FEATURES', 'virtio', 'file://xen_virtio.cfg', '', d)} \
 			"
 
-SRC_URI:append:s32n7sim = " \
+SRC_URI:append:s32n = " \
 			file://xen_s32n7.cfg \
 			"

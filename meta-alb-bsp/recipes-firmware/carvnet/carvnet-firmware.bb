@@ -40,5 +40,5 @@ FILES:${PN} = " \
 "
 
 INSANE_SKIP:${PN} += "arch already-stripped"
-COMPATIBLE_MACHINE = "s32n7sim"
+COMPATIBLE_MACHINE = "s32n"
 

@@ -24,9 +24,9 @@ BOOT_SOURCE = "boot.source"
 EXTRA_CMDS_FILE ?= ""
 CFG_NAME ?= ""
 EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
-EXTRA_CMDS_FILE:s32n7sim = "extra_cmds_s32n7"
+EXTRA_CMDS_FILE:s32n = "extra_cmds_s32n7"
 
-SUPPORTED_BOOT_TYPES:s32n7sim = "ufs sdcard"
+SUPPORTED_BOOT_TYPES:s32n = "ufs sdcard"
 
 modify_imagebuilder_config() {
     CFG_FILE="$1"
@@ -62,7 +62,7 @@ do_configure:s32cc() {
     modify_imagebuilder_config "${CFG_FILE}"
 }
 
-do_configure:s32n7sim() {
+do_configure:s32n() {
     for suffix in ${SUPPORTED_BOOT_TYPES}; do
         CFG_FILE="${XEN_EXAMPLES_DIR}/${CFG_NAME}-${suffix}"
         modify_imagebuilder_config "${CFG_FILE}"
@@ -83,7 +83,7 @@ do_compile:s32cc() {
     mv ${UBOOT_DIR}/${BOOT_SCRIPT} ${UBOOT_DIR}/${BOOT_SOURCE} ${B}/
 }
 
-do_compile:s32n7sim() {
+do_compile:s32n() {
     UBOOT_DIR="${DEPLOY_DIR_IMAGE}"
     IMAGEBUILDER_CONFIG="${XEN_EXAMPLES_DIR}/${CFG_NAME}"
     PREPEND_PATH="${BIN_PREPEND_PATH}"
@@ -105,7 +105,7 @@ do_install:s32cc() {
     install -m 0755 ${BOOT_SOURCE} ${D}${BIN_PREPEND_PATH}
 }
 
-do_install:s32n7sim() {
+do_install:s32n() {
     install -d ${D}${BIN_PREPEND_PATH}
     for suffix in ${SUPPORTED_BOOT_TYPES}; do
         install -m 0755 ${BOOT_SCRIPT}-${suffix} ${D}${BIN_PREPEND_PATH}
@@ -122,7 +122,7 @@ do_deploy:append:s32cc() {
     install -m 0755 ${D}${BIN_PREPEND_PATH}/${BOOT_SOURCE} ${DEPLOYDIR}/
 }
 
-do_deploy:append:s32n7sim() {
+do_deploy:append:s32n() {
     for suffix in ${SUPPORTED_BOOT_TYPES}; do
         install -m 0755 ${D}${BIN_PREPEND_PATH}/${BOOT_SCRIPT}-${suffix} ${DEPLOYDIR}/
         install -m 0755 ${D}${BIN_PREPEND_PATH}/${BOOT_SOURCE}-${suffix} ${DEPLOYDIR}/

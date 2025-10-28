@@ -30,13 +30,13 @@ DEFAULT_ENV_PATH:s32 ??= "${STAGING_DIR_TARGET}${datadir}/env/"
 # environment and the u-boot config (qspi, sdcard) as defined in the
 # UBOOT_CONFIG variable
 UBOOT_ENV_NAME:append:s32cc = " u-boot-flashenv-sd"
-UBOOT_ENV_NAME:append:s32n7sim = " u-boot-flashenv-ufs u-boot-flashenv-sd"
+UBOOT_ENV_NAME:append:s32n = " u-boot-flashenv-ufs u-boot-flashenv-sd"
 UBOOT_ENV_NAME_MAP ??= ""
 UBOOT_ENV_NAME_MAP:s32cc = " \
 	u-boot-flashenv    : qspi; \
 	u-boot-flashenv-sd : sdcard; \
 "
-UBOOT_ENV_NAME_MAP:s32n7sim = " \
+UBOOT_ENV_NAME_MAP:s32n = " \
 	u-boot-flashenv-ufs : ufs; \
 	u-boot-flashenv-sd  : sdcard; \
 "

@@ -1,6 +1,3 @@
-# Deploy TF-A
-DEPENDS:append = " arm-trusted-firmware"
-
 inherit deploy
 
 do_deploy() {

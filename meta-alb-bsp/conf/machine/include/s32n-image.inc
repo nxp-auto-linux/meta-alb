@@ -24,6 +24,8 @@ SDCARD_ROOTFS = "ext4"
 UBOOT_BOOTSPACE_OFFSET = "1024"
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 
+TFA_IMAGE = "arm-trusted-firmware"
+TFA_IMAGE_FILE ?= "fip.bin-sdcard"
 TFA_ARTIFACTS_DIR ?= "arm-trusted-firmware"
 
 BL2_IMAGE_FILE_SDCARD = "bl2.bin-sdcard"

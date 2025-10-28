@@ -340,6 +340,13 @@ do_deploy:append:s32n7sim() {
 	install -v "${TFA_BINARIES}/fdts/${TFA_DEVICETREE}" "${tfa_deploy_dir}/"
 }
 
+do_deploy:append:s32n() {
+	for suffix in ${BOOT_TYPE}; do
+		install -v "${TFA_OUTPUT}/bl2.bin-${suffix}" ${DEPLOYDIR}
+		install -v "${TFA_OUTPUT}/fip.bin-${suffix}" ${DEPLOYDIR}
+	done
+}
+
 do_install:append:s32cc() {
 	install -d ${D}${includedir}/plat-hdrs/tf-a
 

@@ -20,7 +20,7 @@ do_image_ufs[depends] += "parted-native:do_populate_sysroot"
 do_image_ufs[depends] += "dosfstools-native:do_populate_sysroot"
 
 do_image_ufs[depends] += "virtual/kernel:do_deploy"
-do_image_ufs[depends] += "${IMAGE_BASENAME}:do_deploy"
+do_image_ufs:s32n7sim[depends] += "${IMAGE_BASENAME}:do_deploy"
 do_image_ufs[depends] += " \
 	${@d.getVar('UBOOT_ENV_NAME_UFS', True) and d.getVar('UBOOT_ENV_UFS', True) + ':do_deploy' or ''} \
 	${@d.getVar('TFA_IMAGE_FILE_UFS', True) and d.getVar('TFA_IMAGE_UFS', True) + ':do_deploy' or ''} \

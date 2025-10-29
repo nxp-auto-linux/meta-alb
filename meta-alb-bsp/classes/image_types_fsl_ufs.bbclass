@@ -10,7 +10,7 @@ TFA_IMAGE_FILE_UFS ?= "fip.bin-ufs"
 UBOOT_ENV_UFS ?= "u-boot-environment"
 UBOOT_ENV_NAME_UFS ?= "u-boot-flashenv-ufs"
 
-UFS_LUN_DEPLOYDIR = "${IMGDEPLOYDIR}/simimage"
+UFS_LUN_DEPLOYDIR = "${IMGDEPLOYDIR}"
 # set the names for the UFS LUN0 and LUN1 that will be produced
 UFS_LUN0_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.lun0.ufs"
 UFS_LUN1_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.lun1.ufs"

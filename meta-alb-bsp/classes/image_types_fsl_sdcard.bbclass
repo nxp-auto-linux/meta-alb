@@ -193,7 +193,7 @@ do_image_sdcard[depends] += " \
 	${@d.getVar('IMAGE_BOOTLOADER', True) and d.getVar('IMAGE_BOOTLOADER_RECIPE', True) + ':do_deploy' or ''} \
 	${@d.getVar('INITRAMFS_IMAGE', True) and d.getVar('INITRAMFS_IMAGE', True) + ':do_image_complete' or ''} \
 	${@d.getVar('SDCARD_ROOTFS_EXT', True) and d.getVar('SDCARD_ROOTFS_PKG', True) + ':do_image_${SDCARD_ROOTFS_EXT}' or ''} \
-	${@d.getVar('UBOOT_ENV_SDCARD_OFFSET', True) and d.getVar('UBOOT_ENV_SDCARD', True) + ':do_deploy' or ''} \
+	${@d.getVar('UBOOT_ENV_SDCARD_FILE', True) and d.getVar('UBOOT_ENV_SDCARD', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA1_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA1', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA2_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA2', True) + ':do_deploy' or ''} \
 	${@d.getVar('SDCARDIMAGE_EXTRA3_FILE', True) and d.getVar('SDCARDIMAGE_EXTRA3', True) + ':do_deploy' or ''} \
@@ -406,11 +406,15 @@ _generate_boot_image() {
 		add_extra_boot_img "${file}" "${WORKDIR}/boot.img"
 	done
 
-	if [ "${SDCARD_PARTITIONING_SCHEME}" = "gpt" ]; then
+	if [ "${SDCARD_PARTITIONING_SCHEME}" = "gpt" ] && [ -n "${UBOOT_ENV_SDCARD_FILE}" ]; then
         mmd -i "${WORKDIR}/boot.img" "::/${SD_FAT_ENV_DIR}"
-        mcopy -i "${WORKDIR}/boot.img" \
+		if [ -e "${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE}" ]; then
+            mcopy -i "${WORKDIR}/boot.img" \
             -s "${DEPLOY_DIR_IMAGE}/${UBOOT_ENV_SDCARD_FILE}" \
-            "::${SD_FAT_ENV_DIR}/env.txt"
+        	"::${SD_FAT_ENV_DIR}/env.txt"
+        else
+            bbfatal "U-Boot environment file ${UBOOT_ENV_SDCARD_FILE} not found in ${DEPLOY_DIR_IMAGE}"
+        fi
 	fi
 }
 

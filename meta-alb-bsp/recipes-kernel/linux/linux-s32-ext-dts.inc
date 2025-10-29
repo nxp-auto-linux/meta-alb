@@ -7,9 +7,10 @@ KERNEL_DTS_FILE = "${@ (d.getVar('KERNEL_DEVICETREE_EXT') or '').replace('.dtb',
 
 SRC_URI:append = "\
     file://freescale/local.mk \
-    file://${KERNEL_DTS_FILE} \
+    file://${DT_SOURCE_SUBDIR}/${KERNEL_DTS_FILE} \
     "
 
+DT_SOURCE_SUBDIR ?= "dts"
 KERNEL_EXTRA_ARGS += " EXTERNAL_DTBS_MK=${WORKDIR}/freescale/local.mk"
 
 # Use realpath to replace the symbol links.
@@ -25,8 +26,13 @@ KERNEL_DEVICETREE = "freescale/../${@os.path.relpath(d.getVar('EXT_DTB_PATH'), \
 # Copy the device tree source into STAGING_KERNEL_BUILDDIR to make sure the resulting
 # dtb is removed during do_clean task.
 do_compile:prepend() {
-    dtb_basename="$(basename ${KERNEL_DEVICETREE_EXT})"
     dtb_dirname="$(dirname ${KERNEL_DEVICETREE_EXT})"
-    dts_name="${dtb_basename%.*}.dts"
-    cp -vf ${WORKDIR}/${dtb_dirname}/${dts_name} $(dirname ${EXT_DTB_PATH})
+    src_dir="${WORKDIR}/${DT_SOURCE_SUBDIR}/${dtb_dirname}/"
+
+    set -- "${src_dir}/"*
+    if [ -f "$1" ]; then
+        cp -vf "$@" "${STAGING_KERNEL_BUILDDIR}/"
+    else
+        bbwarn "Nothing found in ${src_dir}"
+    fi
 }

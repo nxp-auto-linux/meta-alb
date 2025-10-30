@@ -4,9 +4,6 @@ IMAGE_TYPES += "ufs"
 
 DEPENDS += "bc-native"
 
-TFA_IMAGE_UFS ?= "arm-trusted-firmware"
-TFA_IMAGE_FILE_UFS ?= "fip.bin-ufs"
-
 UBOOT_ENV_UFS ?= "u-boot-environment"
 UBOOT_ENV_NAME_UFS ?= "u-boot-flashenv-ufs"
 
@@ -23,7 +20,7 @@ do_image_ufs[depends] += "virtual/kernel:do_deploy"
 do_image_ufs:s32n7sim[depends] += "${IMAGE_BASENAME}:do_deploy"
 do_image_ufs[depends] += " \
 	${@d.getVar('UBOOT_ENV_NAME_UFS', True) and d.getVar('UBOOT_ENV_UFS', True) + ':do_deploy' or ''} \
-	${@d.getVar('TFA_IMAGE_FILE_UFS', True) and d.getVar('TFA_IMAGE_UFS', True) + ':do_deploy' or ''} \
+	${@d.getVar('TFA_IMAGE_FILE_UFS', True) and d.getVar('TFA_IMAGE', True) + ':do_deploy' or ''} \
 "
 
 UFS_SECTOR_SIZE = "4096"

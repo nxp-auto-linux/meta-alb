@@ -36,6 +36,8 @@ FIP_IMAGE_FILE_SDCARD = "fip.bin-sdcard"
 FIRMWARE_NAME_SDCARD = "${FIP_IMAGE_FILE_SDCARD}"
 SD_FIP_PATH = "${DEPLOY_DIR_IMAGE}/${FIRMWARE_NAME_SDCARD}"
 
+TFA_IMAGE_FILE_UFS ?= "fip.bin-ufs"
+
 IMAGE_CMD:sdcard:append:s32n7sim () {
 	# at the end, put the .sdcard artifact in the simimage folder
 	cp -vf ${SDCARD} ${SDCARD_SIMIMAGE}

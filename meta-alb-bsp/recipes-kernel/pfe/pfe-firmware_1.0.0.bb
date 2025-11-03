@@ -1,14 +1,14 @@
 # Copyright 2025 NXP
 
 SUMMARY = "Firmware binaries for PFE"
-LICENSE = "NXP-S32-PLATFORM-SOFTWARE"
-LIC_FILES_CHKSUM = "file://license.rtf;md5=bafc2fc12f6ba76334b95f6ea4844b01"
-NO_GENERIC_LICENSE[NXP-S32-PLATFORM-SOFTWARE] = "license.rtf"
+LICENSE = "LA-OPT-NXP-SOFTWARE-LICENSE-V63"
+LIC_FILES_CHKSUM = "file://license.htm;md5=9c3803b44b756957ff4239ea19861288"
+NO_GENERIC_LICENSE[LA-OPT-NXP-SOFTWARE-LICENSE-V63] = "license.htm"
 FILESEXTRAPATHS:prepend := "${NXP_FIRMWARE_LOCAL_DIR}:"
 
 PFE_CLASS_FILE = "s32g_pfe_class.fw"
 PFE_UTIL_FILE = "s32g_pfe_util.fw"
-PFE_LICENSE_FILE = "license.rtf"
+PFE_LICENSE_FILE = "license.htm"
 
 SRC_URI = " \
     ${@f"""file://{d.getVar('PFE_CLASS_FILE')} """ if os.path.exists(f"""{d.getVar('NXP_FIRMWARE_LOCAL_DIR')}/{d.getVar('PFE_CLASS_FILE')}""") else ''} \

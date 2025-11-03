@@ -33,7 +33,6 @@ PREFERRED_VERSION_optee-client ?= "4.0.0"
 PREFERRED_VERSION_optee-test ?= "4.0.0"
 PREFERRED_VERSION_optee-examples ?= "4.0.0"
 
-PREFERRED_VERSION_mbedtls ?= "3.6.3"
 PREFERRED_VERSION_arm-trusted-firmware ?= "2.10.25"
 PREFERRED_VERSION_arm-trusted-firmware-tools ?= "2.10.25"
 

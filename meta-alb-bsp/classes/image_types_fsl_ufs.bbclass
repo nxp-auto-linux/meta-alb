@@ -12,6 +12,9 @@ UFS_LUN_DEPLOYDIR = "${IMGDEPLOYDIR}"
 UFS_LUN0_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.lun0.ufs"
 UFS_LUN1_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.lun1.ufs"
 
+UFS_ROOTFS_EXT ?= "${@d.getVar('UFS_ROOTFS', 1).split('.')[-1]}"
+UFS_ROOTFS_PKG ?= "${PN}"
+
 do_image_ufs[depends] += "mtools-native:do_populate_sysroot"
 do_image_ufs[depends] += "parted-native:do_populate_sysroot"
 do_image_ufs[depends] += "dosfstools-native:do_populate_sysroot"
@@ -21,6 +24,7 @@ do_image_ufs:s32n7sim[depends] += "${IMAGE_BASENAME}:do_deploy"
 do_image_ufs[depends] += " \
 	${@d.getVar('UBOOT_ENV_NAME_UFS', True) and d.getVar('UBOOT_ENV_UFS', True) + ':do_deploy' or ''} \
 	${@d.getVar('TFA_IMAGE_FILE_UFS', True) and d.getVar('TFA_IMAGE', True) + ':do_deploy' or ''} \
+	${@d.getVar('UFS_ROOTFS_EXT', True) and d.getVar('UFS_ROOTFS_PKG', True) + ':do_image_${UFS_ROOTFS_EXT}' or ''} \
 "
 
 UFS_SECTOR_SIZE = "4096"
@@ -136,7 +140,7 @@ ROOTFS_PARTITION_START_ADDRESS_SECTOR = "$(compute_next_aligned_gpt_partition_st
 ROOTFS_PARTITION_START_ADDRESS = "$(convert_sectors_to_kib ${ROOTFS_PARTITION_START_ADDRESS_SECTOR} ${UFS_SECTOR_SIZE})"
 # Same comment as in SDCARD image case, we need to ensure that we pull the rootfs
 # from the IMGDEPLOYDIR and not from DEPLOY_DIR_IMAGE
-ROOTFS_EXT4_ARTIFACT_NAME = "${IMGDEPLOYDIR}/${IMAGE_NAME}.ext4"
+ROOTFS_EXT4_ARTIFACT_NAME = "${IMGDEPLOYDIR}/${IMAGE_NAME}.${UFS_ROOTFS_EXT}"
 ROOTFS_PARTITION_SIZE_KIB = "$(compute_artifact_size_kib "${ROOTFS_EXT4_ARTIFACT_NAME}")"
 ROOTFS_PARTITION_SIZE_SECTORS = "$(convert_kib_to_sectors "${ROOTFS_PARTITION_SIZE_KIB}" "${UFS_SECTOR_SIZE}")"
 
@@ -160,7 +164,7 @@ generate_nxp_ufs_lun1 () {
 
 	create_partition ${UFS_LUN1_NAME} ${UFS_SECTOR_SIZE} ${ESP_PARTITION_NAME} ${ESP_PARTITION_SIZE_SECTORS} "fat16"
 	parted -s "${UFS_LUN1_NAME}" set 1 esp on
-	create_partition ${UFS_LUN1_NAME} ${UFS_SECTOR_SIZE} ${ROOTFS_PARTITION_NAME} ${ROOTFS_PARTITION_SIZE_SECTORS} "ext4"
+	create_partition ${UFS_LUN1_NAME} ${UFS_SECTOR_SIZE} ${ROOTFS_PARTITION_NAME} ${ROOTFS_PARTITION_SIZE_SECTORS} "${UFS_ROOTFS_EXT}"
 
 	# prepare the linux kernel partition
 	rm -f "${UFS_LUN_DEPLOYDIR}/kernel.part"

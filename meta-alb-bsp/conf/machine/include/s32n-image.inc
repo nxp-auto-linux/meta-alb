@@ -25,6 +25,9 @@ UFS_ROOTFS = "ext4"
 UBOOT_BOOTSPACE_OFFSET = "1024"
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
 
+# remove the ".rootfs" that is added in the image output file names
+IMAGE_NAME_SUFFIX = ""
+
 TFA_IMAGE = "arm-trusted-firmware"
 TFA_IMAGE_FILE ?= "fip.bin-sdcard"
 TFA_ARTIFACTS_DIR ?= "arm-trusted-firmware"

@@ -18,7 +18,7 @@ Each cohort has 0x1c000000 bytes assigned space in Low memory, split as follows:
 |----------------------------|----------------------------------|----------------------------------|-----------------------------------|
 | DDR_START                  | 0x00000000                       |                                  |                                   |
 | Linux CMA                  | 0x00000000                       | 0x0FFFFFFF                       | 256 MB                            |
-| HSE Reserved               | 0x10000000                       | 0x11FFFFFF                       | 32 MB                             |
+| HSE Reserved               | 0x10000000                       | 0x12FFFFFF                       | 48 MB                             |
 | SCMI Shared Memory         | 0x13000000                       | 0x13000FFF                       | 4 KB                              |
 | Linux Device Tree          | 0x13100000                       | 0x131FFFFF                       | ~2 MB                             |
 | Kernel Image               | 0x13200000                       |                                  |                                   |

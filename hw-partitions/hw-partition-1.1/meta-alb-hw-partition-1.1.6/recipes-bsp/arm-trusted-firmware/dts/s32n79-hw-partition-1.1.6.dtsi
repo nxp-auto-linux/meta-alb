@@ -65,14 +65,14 @@
 		};
 
 		hse_rmem0: shm@ac000000 {
-			compatible = "nxp,s32n-hse-rmem";
-			reg = <0x0 0xac000000 0x0 0x1000000>; /* 16 MB */
+			compatible = "nxp,s32n79-hse-rmem";
+			reg = <0x0 0xac000000 0x0 0x2000000>; /* 32 MB */
 			no-map;
 		};
 
-		hse_rmem1: shm@ad000000 {
-			compatible = "nxp,s32n-hse-rmem";
-			reg = <0x0 0xad000000 0x0 0x1000000>; /* 16 MB */
+		hse_rmem1: shm@ae000000 {
+			compatible = "nxp,s32n79-hse-rmem";
+			reg = <0x0 0xae000000 0x0 0x1000000>; /* 16 MB */
 			no-map;
 		};
 	};
@@ -180,3 +180,10 @@
 	status = "okay";
 };
 
+&hse_mu12a {
+	secure-status = "okay";
+};
+
+&hse_mu13a {
+	status = "okay";
+};

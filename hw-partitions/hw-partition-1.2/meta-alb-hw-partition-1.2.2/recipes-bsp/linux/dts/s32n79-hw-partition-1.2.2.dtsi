@@ -82,15 +82,19 @@
 		};
 
 		hse_rmem0: shm@90000000 {
-			compatible = "nxp,s32n-hse-rmem";
-			reg = <0x0 0x90000000 0x0 0x1000000>; /* 16 MB */
+			compatible = "nxp,s32n79-hse-rmem";
+			reg = <0x0 0x90000000 0x0 0x2000000>; /* 32 MB */
 			no-map;
+			status = "disabled";
+			secure-status = "okay";
 		};
 
-		hse_rmem1: shm@91000000 {
-			compatible = "nxp,s32n-hse-rmem";
+		hse_rmem1: shm@92000000 {
+			compatible = "nxp,s32n79-hse-rmem";
 			reg = <0x0 0x91000000 0x0 0x1000000>; /* 16 MB */
 			no-map;
+			status = "okay";
+			secure-status = "disabled";
 		};
 	};
 

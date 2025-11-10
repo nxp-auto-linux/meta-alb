@@ -20,7 +20,7 @@ Each cohort has 0x1c000000 bytes assigned space in Low memory, split as follows:
 | Linux CMA                  | 0x00000000                       | 0x0FFFFFFF                       | 256 MB                            |
 | HSE Reserved               | 0x10000000                       | 0x11FFFFFF                       | 32 MB                             |
 | SCMI Shared Memory         | 0x13000000                       | 0x13000FFF                       | 4 KB                              |
-| Linux Device Tree          | 0x13002000                       | 0x131FFFFF                       | ~2 MB                             |
+| Linux Device Tree          | 0x13100000                       | 0x131FFFFF                       | ~2 MB                             |
 | Kernel Image               | 0x13200000                       |                                  |                                   |
 | RootFS (optional)          | 0x16000000                       |                                  |                                   |
 | BL2 I/O Temp Buffer        | BL33_DTB - 0x100000              | BL33_DTB - 1                     | S32N_IO_BUFFER_SIZE = 0x100000;   |

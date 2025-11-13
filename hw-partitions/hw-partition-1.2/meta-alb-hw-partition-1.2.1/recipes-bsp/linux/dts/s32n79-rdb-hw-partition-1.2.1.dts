@@ -5,7 +5,7 @@
 
 /dts-v1/;
 #include "s32n79-rdb.dtsi"
-#include "s32n79-hw-partition-1.2.2.dtsi"
+#include "s32n79-hw-partition-1.2.1.dtsi"
 
 / {
 	model = "NXP S32N79-RDB";

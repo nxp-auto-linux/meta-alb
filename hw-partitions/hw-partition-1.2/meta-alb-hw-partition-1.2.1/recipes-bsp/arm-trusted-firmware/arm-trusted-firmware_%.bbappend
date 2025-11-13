@@ -5,7 +5,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/dts:"
 TFA_DTS_FILE = "${@ (d.getVar('KERNEL_DEVICETREE_OVERRIDE') or '').replace('.dtb', '.dts') }"
 
 SRC_URI:append = "\
-    file://s32n79-hw-partition-1.2.2.dtsi \
+    file://s32n79-hw-partition-1.2.1.dtsi \
     file://${TFA_DTS_FILE} \
     "
 

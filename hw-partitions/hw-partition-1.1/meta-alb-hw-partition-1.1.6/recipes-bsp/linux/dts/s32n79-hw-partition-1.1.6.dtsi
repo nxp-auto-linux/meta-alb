@@ -184,3 +184,67 @@
 &netc_iep19 {
 	status = "okay";
 };
+
+&aps2_mru0 {
+	status = "okay";
+};
+
+&aps2_mru1 {
+	status = "okay";
+};
+
+&aps2_mru2 {
+	status = "okay";
+};
+
+&aps2_mru3 {
+	status = "okay";
+};
+
+&aps2_mru4 {
+	status = "okay";
+};
+
+&aps2_mru5 {
+	status = "okay";
+};
+
+&aps2_mru6 {
+	status = "okay";
+};
+
+&aps2_mru7 {
+	status = "okay";
+};
+
+&aps3_mru0 {
+	status = "okay";
+};
+
+&aps3_mru1 {
+	status = "okay";
+};
+
+&aps3_mru2 {
+	status = "okay";
+};
+
+&aps3_mru3 {
+	status = "okay";
+};
+
+&aps3_mru4 {
+	status = "okay";
+};
+
+&aps3_mru5 {
+	status = "okay";
+};
+
+&aps3_mru6 {
+	status = "okay";
+};
+
+&aps3_mru7 {
+	status = "okay";
+};

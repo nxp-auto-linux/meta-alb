@@ -32,8 +32,11 @@ do_install() {
 	install -d ${HSE_FW_DIR}
 	install -d ${HSE_INT_DIR}
 
-	install -m 0644 ${S}/${HSE_PKG}/hse/bin/${HSE_SOC_REV}*.bin.pink ${HSE_FW_DIR}/s32cc_hse_fw.bin
 	cp -r ${S}/${HSE_PKG}/interface/ ${HSE_INT_DIR}
+}
+
+do_install:append:s32cc() {
+	install -m 0644 ${S}/${HSE_PKG}/hse/bin/${HSE_SOC_REV}*.bin.pink ${HSE_FW_DIR}/s32cc_hse_fw.bin
 }
 
 FILES:${PN} += "${base_libdir}/firmware"

@@ -97,7 +97,7 @@ RP_SECBOOT_ARGS = " \
                     TOS_NVCTR_VAL=${BL32_NVCTR} \
                     NTFW_NVCTR_VAL=${BL33_NVCTR} \
                     DDRFW_NVCTR_VAL=${DDRFW_NVCTR} \
-                    S32CC_MONOTONIC_CNT_SUPPORT=1 \
+                    S32_MONOTONIC_CNT_SUPPORT=1 \
                     RPMB_KEY_HSE_KEYHANDLE=${RPMB_HANDLE} \
                     RPMB_MONOTONIC_CNT_ADDR=${HSE_CNT_TABLE_ADDR} \
                     "

@@ -139,7 +139,7 @@ EXTRA_OEMAKE:append = ' OPENSSL_DIR="${STAGING_LIBDIR_NATIVE}/../" \
                  HOSTSTRIP=true '
 EXTRA_OEMAKE:append:s32g = " ${@bb.utils.contains('DISTRO_FEATURES', 'scprt', '${SCPRT_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'hse', '${HSE_ARGS}', '', d)}"
-EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '${SECBOOT_ARGS}', '', d)}"
+EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '${SECBOOT_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'rpsecboot', '${RP_SECBOOT_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'nodramecc', '${NO_DRAM_ECC_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = "${@ "${QUICK_BOOT_ARGS}" if d.getVar('QUICK_BOOT_CONFIG', True) else ''}"
@@ -177,7 +177,7 @@ PLAT_HEADERS_TAGS:append:s32r478 = " s32r478"
 SECBOOT_INC = ""
 VERIFIEDBOOT_INC = ""
 
-SECBOOT_INC:s32cc = 'recipes-bsp/arm-trusted-firmware/atf-hse-secboot.inc'
+SECBOOT_INC = 'recipes-bsp/arm-trusted-firmware/atf-hse-secboot.inc'
 VERIFIEDBOOT_INC:s32cc = 'recipes-bsp/arm-trusted-firmware/atf-hse-verifiedboot.inc'
 
 include ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '${SECBOOT_INC}', '', d)}
@@ -205,7 +205,7 @@ do_configure:append:s32cc() {
 		cp -vf ${DEPLOY_DIR_IMAGE}/tools/u-boot-s32.cfgout-${suffix} ${WORKDIR}/tools
 
 		if ${@bb.utils.contains('DISTRO_FEATURES', 'hse', 'true', 'false', d)}; then
-        		hse_fw=\""${STAGING_BASELIBDIR}/firmware/s32cc_hse_fw.bin\""
+			hse_fw=\""${STAGING_BASELIBDIR}/firmware/s32cc_hse_fw.bin\""
 			sed -i "s,\(HSE_FW \).*,\1${hse_fw}," ${WORKDIR}/tools/u-boot-s32.cfgout-${suffix}
 		fi
 	done

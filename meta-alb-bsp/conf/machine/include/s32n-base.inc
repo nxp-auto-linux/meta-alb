@@ -39,3 +39,6 @@ SERIAL_CONSOLES_CHECK ?= "ttyAMA0:ttyAMA0 ttyAMA1:ttyAMA1 ttyAMA2:ttyAMA2 " \
 # Set to "1" when using an out-of-tree DTB for TF-A. The device tree source is expected to
 # be found in the TF-A ${WORKDIR}.
 TFA_DTB_EXT ?= "0"
+
+# Enable FIP Authentication
+require ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'conf/machine/include/hse-secboot.inc', '', d)}

@@ -6,12 +6,13 @@ LICENSE = "NXP-S32-PLATFORM-SOFTWARE"
 LIC_FILES_CHKSUM = "file://${S}/${HSE_PKG}/${HSE_LIC};md5=${HSE_LIC_MD5}"
 NO_GENERIC_LICENSE[NXP-S32-PLATFORM-SOFTWARE] = "${HSE_PKG}/${HSE_LIC}"
 
-COMPATIBLE_MACHINE = "s32cc"
+COMPATIBLE_MACHINE = "s32cc|s32n"
 
 HSE_INCLUDE_PATH = "recipes-bsp/hse"
 HSE_INCLUDE:s32g2 = "${HSE_INCLUDE_PATH}/hse-firmware-s32g2-defs.inc"
 HSE_INCLUDE:s32g3 = "${HSE_INCLUDE_PATH}/hse-firmware-s32g3-defs.inc"
 HSE_INCLUDE:s32r45 = "${HSE_INCLUDE_PATH}/hse-firmware-s32r45-defs.inc"
+HSE_INCLUDE:s32n = "${HSE_INCLUDE_PATH}/hse-firmware-s32n7-defs.inc"
 require ${@d.getVar('HSE_INCLUDE') or ''}
 
 HSE_PKG = "HSE_FW_${HSE_MACHINE}_${HSE_VERSION}"

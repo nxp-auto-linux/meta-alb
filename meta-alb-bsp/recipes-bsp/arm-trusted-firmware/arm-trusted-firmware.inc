@@ -288,6 +288,10 @@ do_compile:s32n() {
 		cp -vf "${TFA_BINARIES}/bl2/bl2.elf" "${TFA_OUTPUT}/bl2.elf-${suffix}"
 		cp -vf "${TFA_BINARIES}/bl31/bl31.elf" "${TFA_OUTPUT}/bl31.elf-${suffix}"
 		cp -vf "${TFA_BINARIES}/fip.bin" "${TFA_OUTPUT}/fip.bin-${suffix}"
+		# If secure boot is used, copy BL2 signature for each boot type
+		if [ -f "${TFA_BINARIES}/bl2-signature.bin" ]; then
+			cp -vf "${TFA_BINARIES}/bl2-signature.bin" "${TFA_OUTPUT}/bl2-signature.bin-${suffix}"
+		fi
 	done
 }
 
@@ -333,6 +337,9 @@ do_deploy:append:s32n7sim() {
 	for suffix in ${BOOT_TYPE}; do
 		# Save bins
 		install -v "${TFA_OUTPUT}/bl2.bin-${suffix}" "${tfa_deploy_dir}/"
+		if [ -f "${TFA_OUTPUT}/bl2-signature.bin-${suffix}" ]; then
+			install -v "${TFA_OUTPUT}/bl2-signature.bin-${suffix}" "${tfa_deploy_dir}/"
+		fi
 		# Save elfs for symbols
 		install -v "${TFA_OUTPUT}/bl2.elf-${suffix}" "${tfa_deploy_dir}/"
 		install -v "${TFA_OUTPUT}/bl31.elf-${suffix}" "${tfa_deploy_dir}/"

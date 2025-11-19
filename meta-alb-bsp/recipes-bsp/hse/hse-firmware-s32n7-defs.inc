@@ -1,0 +1,5 @@
+HSE_MACHINE ?= "S32N7"
+HSE_VERSION ?= "1_0_25_0"
+HSE_LIC ?= "license.rtf"
+HSE_LIC_MD5 ?= "bafc2fc12f6ba76334b95f6ea4844b01"
+HSE_SOC_REV ?= ""

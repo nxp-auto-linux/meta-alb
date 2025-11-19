@@ -10,9 +10,12 @@ RP_SECBOOT = "${@bb.utils.contains('DISTRO_FEATURES', 'rpsecboot', '1', '0', d)}
 
 BL2_SIGN_FILE = "bl2-signature.bin"
 BL2_SIGN:s32cc = "${TFA_BINARIES}/${BL2_SIGN_FILE}"
+BL2_SIGN:s32n = "${TFA_OUTPUT}/${BL2_SIGN_FILE}"
 
 BL2_BIN_FILE:s32cc = "bl2_w_dtb.bin"
+BL2_BIN_FILE:s32n = "bl2.bin"
 BL2_BIN:s32cc = "${TFA_BINARIES}/${BL2_BIN_FILE}"
+BL2_BIN:s32n = "${TFA_OUTPUT}/${BL2_BIN_FILE}"
 
 BL31_NVCTR ?= "0"
 BL32_NVCTR ?= "0"

@@ -49,16 +49,6 @@
 		reg = <0x0 0x9c000000 0 0x1c000000>;
 	};
 
-	memory@89c0000000 {
-		device_type = "memory";
-		reg = <0x89 0xc0000000 0x1 0xc0000000>;
-	};
-
-	memory@c1c0000000 {
-		device_type = "memory";
-		reg = <0xc1 0xc0000000 0x1 0xc0000000>;
-	};
-
 	reserved-memory {
 		scmi_tx_buf: shm@af000000 {
 			compatible = "arm,scmi-shmem";

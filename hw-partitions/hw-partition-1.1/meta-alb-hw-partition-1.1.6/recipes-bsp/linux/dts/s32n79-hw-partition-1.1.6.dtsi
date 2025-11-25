@@ -238,3 +238,7 @@
 &aps3_mru7 {
 	status = "okay";
 };
+
+&ufshci3 {
+	status = "okay";
+};

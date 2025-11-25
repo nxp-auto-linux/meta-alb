@@ -7,6 +7,8 @@
 #include "s32n79-rdb.dtsi"
 #include "s32n79-hw-partition-1.1.5.dtsi"
 
+/delete-node/ &ufshc;
+
 / {
 	model = "NXP S32N79-RDB";
 	compatible = "nxp,s32n79-rdb", "nxp,s32n79";

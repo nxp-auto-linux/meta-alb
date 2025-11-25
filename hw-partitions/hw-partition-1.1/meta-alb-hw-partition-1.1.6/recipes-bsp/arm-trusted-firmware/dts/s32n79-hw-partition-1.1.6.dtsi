@@ -162,7 +162,7 @@
 	};
 };
 
-&ufshc {
+&ufshci3 {
 	status = "okay";
 };
 

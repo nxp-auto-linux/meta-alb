@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=5dcdfe25f21119aa5435eab9d0256af7"
 URL ?= "git://github.com/nxp-auto-linux/pfeng;protocol=https;nobranch=1"
 SRC_URI = "${URL}"
 
-SRCREV ?= "d41ea8bcbadd1e6ee8ab4b4dc9ae6b11c617a92d"
+SRCREV ?= "27cabe3e3a28044eba110b28f0f3e2d33b9a3058"
 
 S = "${WORKDIR}/git"
 MDIR = "${S}/sw/linux-pfeng"

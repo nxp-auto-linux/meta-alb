@@ -238,10 +238,6 @@
 	status = "okay";
 };
 
-&pcie2 {
-	status = "okay";
-};
-
 &aps0_mru0 {
 	status = "okay";
 };

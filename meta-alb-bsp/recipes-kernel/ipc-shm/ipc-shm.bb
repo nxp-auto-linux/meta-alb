@@ -15,7 +15,8 @@ IPC-SHM_INCLUDE:s32g2  = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32g2-defs.inc"
 IPC-SHM_INCLUDE:s32g3  = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32g3-defs.inc"
 IPC-SHM_INCLUDE:s32r45 = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32r45-defs.inc"
 IPC-SHM_INCLUDE:s32r478 = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32r478-defs.inc"
-IPC-SHM_INCLUDE:s32n7sim = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32n7sim-defs.inc"
+IPC-SHM_INCLUDE:s32n7sim = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32n7-defs.inc"
+IPC-SHM_INCLUDE:s32n79rdb = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32n7-defs.inc"
 require ${@d.getVar('IPC-SHM_INCLUDE') or ''}
 
 URL ?= "git://github.com/nxp-auto-linux/ipc-shm;protocol=https"
@@ -68,5 +69,4 @@ module_conf_ipc-sample-multi-instance = "blacklist ipc-sample-multi-instance"
 FILES:${PN} += "${sysconfdir}/modprobe.d/* ${bindir}/*"
 
 # Supported platforms
-COMPATIBLE_MACHINE = "^(s32g|s32r45|s32r478|s32n7sim)$"
-
+COMPATIBLE_MACHINE = "^(s32g|s32r45|s32r478|s32n7sim|s32n79rdb)$"

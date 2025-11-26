@@ -109,7 +109,8 @@
 				     <204>, <204>, <205>, <205>,
 				     <206>, <206>, <207>, <207>,
 				     <454>;
-			clocks = <&sys_clk>, <&sys_clk>, <&sys_clk>, <&sys_clk>;
+			clocks = <&clks 0x90>, <&clks 0x9a>,
+				<&clks 0x90>, <&clks 0x9a>;
 			clock-names = "dmamux0", "dmamux1", "dmamux2", "dmamux3";
 		};
 
@@ -127,7 +128,7 @@
 			interrupt-controller;
 			interrupt-parent = <&gic>;
 			#interrupt-cells = <1>;
-			clocks = <&sys_clk>;
+			clocks = <&clks 0x9a>;
 			clock-names = "ipg";
 			fsl,channel = <0>;
 			fsl,num-irqs = <512>;
@@ -149,7 +150,7 @@
 			interrupt-controller;
 			interrupt-parent = <&gic>;
 			#interrupt-cells = <1>;
-			clocks = <&sys_clk>;
+			clocks = <&clks 0xf9>;
 			clock-names = "ipg";
 			fsl,channel = <0>;
 			fsl,num-irqs = <512>;

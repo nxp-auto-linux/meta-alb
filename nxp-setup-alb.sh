@@ -202,17 +202,14 @@ print_all_machines()
 print_hwparts()
 {
     local local_machine=$1
-    local hwpart_layers
 
-    hwpart_layers=$(find ${HWPARTROOTDIR} -type d \
-        -name "meta-alb-*" 2>/dev/null | \
-        sed "s|.*${SOURCESDIR}/||")
-
-    for layer in ${hwpart_layers}; do
-        local extra_conf="${ROOTDIR}/${SOURCESDIR}/${layer}/conf/machine/${local_machine}-extra.conf"
+    find ${HWPARTROOTDIR} -type d -name "meta-alb-*" -print0 2>/dev/null | \
+    while IFS= read -r -d '' layer; do
+        local rel_layer="${layer#*${SOURCESDIR}/}"
+        local extra_conf="${ROOTDIR}/${SOURCESDIR}/${rel_layer}/conf/machine/${local_machine}-extra.conf"
         if [ -z "${local_machine}" ] || [ -e "${extra_conf}" ]; then
             echo -n " "
-            echo -n $(basename $layer) | sed 's|^meta-alb-||'
+            echo -n "$(basename $rel_layer)" | sed 's|^meta-alb-||'
         fi
     done
     echo -n -e "\n"

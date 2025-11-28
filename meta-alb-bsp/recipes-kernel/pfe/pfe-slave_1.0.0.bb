@@ -1,4 +1,4 @@
-# Copyright 2019-2022 NXP
+# Copyright 2019-2022,2025 NXP
 #
 # This is the PFE Slave driver for Linux kernel 5.4 and 5.10
 # This driver can be used only in PFE Master/Slave configuration.
@@ -14,4 +14,4 @@ module_do_install() {
 
 FILES:${PN} += "${sysconfdir}/modules-load.d/*"
 
-COMPATIBLE_MACHINE = "(s32g399ardb3)"
+COMPATIBLE_MACHINE = "(s32g274ardb2|s32g399ardb3)"

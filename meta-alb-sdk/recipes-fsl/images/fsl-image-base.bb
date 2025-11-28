@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017-2023 NXP
+# Copyright 2017-2023,2025 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -65,6 +65,7 @@ IMAGE_FSTYPES:append = " tar.gz cpio.gz "
 require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe', 'recipes-fsl/images/fsl-image-pfe.inc', '', d)}
 
 # Populate PFE slave driver
+IMAGE_INSTALL:append:s32g274ardb2 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
 IMAGE_INSTALL:append:s32g399ardb3 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
 
 # Enable Xen and add Xen Packages

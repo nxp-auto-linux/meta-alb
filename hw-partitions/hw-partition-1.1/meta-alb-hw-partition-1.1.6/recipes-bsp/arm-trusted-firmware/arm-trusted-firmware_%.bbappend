@@ -1,4 +1,4 @@
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/dts:"
 
@@ -14,5 +14,4 @@ EXTRA_OEMAKE:append = " \
     DDR_END=0xB7FFFFFF \
     S32N_PL011_MODULE=7 \
     PLATFORM_CLUSTER_COUNT=2 \
-    S32N_SCMI_MBX=2 \
     "

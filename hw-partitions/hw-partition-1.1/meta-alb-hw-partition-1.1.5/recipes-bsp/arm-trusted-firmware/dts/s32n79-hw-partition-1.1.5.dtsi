@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 
 /delete-node/ &cpu4;
@@ -47,6 +47,25 @@
 	};
 
 	reserved-memory {
+		scmi_remote_handshake: shm@2483a000 {
+			compatible = "nxp,s32n79-scmi-fss-remote";
+			reg = <0x0 0x2483a000 0x0 0x40>;
+			no-map;
+		};
+
+		scmi_local_handshake: shm@2483a040 {
+			compatible = "nxp,s32n79-scmi-fss-local";
+			reg = <0x0 0x2483a040 0x0 0x40>;
+			no-map;
+		};
+
+		/* FSS SCMI mailbox */
+		scmi_fss_tx: shm@2483a100 {
+			compatible = "nxp,s32n79-scmi-fss-tx";
+			reg = <0x0 0x2483a100 0x0 0x80>;
+			no-map;
+		};
+
 		scmi_shbuf: shm@93000000 {
 			compatible = "arm,scmi-shmem";
 			reg = <0x0 0x93000000 0x0 0x80>;
@@ -67,6 +86,13 @@
 			no-map;
 			status = "okay";
 			secure-status = "disabled";
+		};
+	};
+
+	firmware {
+		scmi {
+			/* mru instance, chan, mailbox, tx */
+			mboxes = <&fss_mru0 3 0 0>;
 		};
 	};
 
@@ -190,6 +216,10 @@
 };
 
 &hse_mu11a {
+	status = "okay";
+};
+
+&fss_mru0 {
 	status = "okay";
 };
 

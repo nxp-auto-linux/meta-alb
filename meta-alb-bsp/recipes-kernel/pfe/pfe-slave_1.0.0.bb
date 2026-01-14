@@ -14,4 +14,4 @@ module_do_install() {
 
 FILES:${PN} += "${sysconfdir}/modules-load.d/*"
 
-COMPATIBLE_MACHINE = "(s32g274ardb2|s32g399ardb3)"
+COMPATIBLE_MACHINE = "(s32g)"

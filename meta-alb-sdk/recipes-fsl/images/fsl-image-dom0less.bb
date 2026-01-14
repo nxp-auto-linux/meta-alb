@@ -19,8 +19,7 @@ IMAGE_INSTALL += " \
 "
 
 # Install PFE Slave module
-IMAGE_INSTALL:append:s32g274ardb2 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
-IMAGE_INSTALL:append:s32g399ardb3 = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
+IMAGE_INSTALL:append:s32g = "${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', ' pfe-slave', '', d)}"
 
 # Add getty spawn on ttyAMA0 in Dom0less DomUs' rootfs
 fix_inittab() {

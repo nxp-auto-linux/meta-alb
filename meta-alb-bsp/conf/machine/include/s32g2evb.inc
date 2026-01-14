@@ -10,3 +10,5 @@ UBOOT_FLASH_DEFCONFIG = "s32g2xxaevb_qspi_defconfig"
 
 KERNEL_DEVICETREE ??= "freescale/s32g2xxa-evb.dtb"
 FLASHIMAGE_DTB_FILE = "s32g2xxa-evb.${FLASHIMAGE_DTB_SUFFIX}"
+
+require ${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', 'conf/machine/include/s32g-pfems.inc', '', d)}

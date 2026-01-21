@@ -9,8 +9,8 @@ UBOOT_ENV_NAME_UFS ?= "u-boot-flashenv-ufs"
 
 UFS_LUN_DEPLOYDIR = "${IMGDEPLOYDIR}"
 # set the names for the UFS LUN0 and LUN1 that will be produced
-UFS_LUN0_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.lun0.ufs"
-UFS_LUN1_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.lun1.ufs"
+UFS_LUN0_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.lun0.ufs"
+UFS_LUN1_NAME = "${UFS_LUN_DEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.lun1.ufs"
 
 UFS_ROOTFS_EXT ?= "${@d.getVar('UFS_ROOTFS', 1).split('.')[-1]}"
 UFS_ROOTFS_PKG ?= "${PN}"
@@ -187,5 +187,29 @@ generate_nxp_ufs () {
 IMAGE_CMD:ufs () {
 	cd "${IMGDEPLOYDIR}"
 	generate_nxp_ufs
+	cd -
+}
+
+do_image_complete[postfuncs] += "ufs_create_symlinks"
+
+ufs_create_symlinks() {
+	cd "${IMGDEPLOYDIR}"
+
+	for lun in lun0 lun1; do
+		src="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${lun}.ufs"
+		dst="${IMAGE_LINK_NAME}.${lun}.ufs"
+
+		if [ -L "${dst}" ]; then
+		    rm -f "${dst}"
+		fi
+
+		if [ -e "${src}" ]; then
+			bbnote "Creating symlink: ${dst} ${src}"
+		    ln -s "${src}" "${dst}"
+		else
+		    bbnote "Skipping symlink, source does not exist: ${dst} ${src}"
+		fi
+	done
+
 	cd -
 }

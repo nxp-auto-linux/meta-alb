@@ -49,6 +49,6 @@ IMAGE_CMD:sdcard:append:s32n7sim () {
 
 IMAGE_CMD:ufs:append:s32n7sim () {
 	# at the end, put the UFS artifact in the simimage folder
-	cp -vf ${UFS_LUN0_NAME} "${DEPLOY_DIR_IMAGE}/simimage/"
-	cp -vf ${UFS_LUN1_NAME} "${DEPLOY_DIR_IMAGE}/simimage/"
+	cp -vf ${UFS_LUN0_NAME} ${UFS_LUN0_SIMIMAGE}
+	cp -vf ${UFS_LUN1_NAME} ${UFS_LUN1_SIMIMAGE}
 }

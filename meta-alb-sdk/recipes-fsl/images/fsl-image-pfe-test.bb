@@ -7,6 +7,7 @@ require recipes-fsl/images/fsl-image-core-common.inc
 include recipes-fsl/images/fsl-image-s32-common.inc
 
 IMAGE_INSTALL += " \
+    iperf2 \
     iperf3 \
     nano \
     ncftp \

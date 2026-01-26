@@ -113,9 +113,13 @@
 	};
 
 	firmware {
-		scmi {
-			/* mru instance, chan, mailbox, tx */
-			mboxes = <&fss_mru0 3 0 0>;
+		fss-scmi {
+			/*
+			 * mru instance, chan, mailbox, tx/rx
+			 * type: SCMI_TX -> 0
+			 * type: SCMI_RX -> 1
+			 */
+			mboxes = <&fss_mru0 3 0 0>, <&aps0_mru0 1 0 1>;
 		};
 	};
 
@@ -243,6 +247,10 @@
 };
 
 &hse_mu11a {
+	status = "okay";
+};
+
+&aps0_mru0 {
 	status = "okay";
 };
 

@@ -59,10 +59,17 @@
 			no-map;
 		};
 
-		/* FSS SCMI mailbox */
+		/* FSS SCMI TX Mailbox */
 		scmi_fss_tx: shm@2483a100 {
-			compatible = "nxp,s32n79-scmi-fss-tx";
+			compatible = "arm,scmi-shmem";
 			reg = <0x0 0x2483a100 0x0 0x80>;
+			no-map;
+		};
+
+		/* FSS SCMI RX Mailbox */
+		scmi_fss_rx: shm@2483a200 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x0 0x2483a200 0x0 0x80>;
 			no-map;
 		};
 

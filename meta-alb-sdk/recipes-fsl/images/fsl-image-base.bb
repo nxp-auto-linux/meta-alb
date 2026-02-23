@@ -1,5 +1,5 @@
 # Copyright 2014-2016 Freescale
-# Copyright 2017-2023,2025 NXP
+# Copyright 2017-2026 NXP
 #
 # The minimal rootfs with basic packages for boot up
 #
@@ -35,8 +35,8 @@ IMAGE_INSTALL:append:fsl-lsch3 = " \
 "
 
 # Support for SJA1110 swich under Linux
-IMAGE_INSTALL:append:s32g274ardb2 = " sja1110 "
-IMAGE_INSTALL:append:s32g399ardb3 = " sja1110 "
+IMAGE_INSTALL:append:s32g274ardb2 = "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-s32', ' sja1110 ', '', d)}"
+IMAGE_INSTALL:append:s32g399ardb3 = "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-s32', ' sja1110 ', '', d)}"
 
 # Support for STR (Suspend to RAM) -- rtcwake
 IMAGE_INSTALL:append:s32g = " util-linux-rtcwake "
@@ -45,7 +45,7 @@ IMAGE_INSTALL:append:s32g = " util-linux-rtcwake "
 IMAGE_INSTALL:append:s32 = " linux-qspi-tool "
 
 # Checker for header file differences between TF-A and Linux
-EXTRA_IMAGEDEPENDS:append:s32cc = " plat-hdrs-checker"
+EXTRA_IMAGEDEPENDS:append:s32cc = "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-s32', ' plat-hdrs-checker', '', d)}"
 
 # Export MMC Linux Script test utilitary
 # To be used with 'fsl-image-flash' image

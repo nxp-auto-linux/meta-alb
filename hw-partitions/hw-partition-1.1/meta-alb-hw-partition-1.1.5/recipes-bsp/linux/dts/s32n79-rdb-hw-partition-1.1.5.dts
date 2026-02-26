@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 /*
- * Copyright 2025 NXP
+ * Copyright 2025-2026 NXP
  */
 
 /dts-v1/;
 #include "s32n79-rdb.dtsi"
 #include "s32n79-hw-partition-1.1.5.dtsi"
-
-/delete-node/ &ufshc;
 
 / {
 	model = "NXP S32N79-RDB";

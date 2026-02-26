@@ -7,11 +7,15 @@
 /delete-node/ &cpu4;
 /delete-node/ &cpu5;
 /delete-node/ &cpu6;
+/delete-node/ &cpu7;
 /delete-node/ &irqsteer_coss;
 /delete-node/ &irqsteer_rcu;
 /delete-node/ &edma_coss;
 /delete-node/ &edma_rcu;
-/delete-node/ &cpu7;
+/delete-node/ &ufshc;
+/delete-node/ &ufshci0;
+/delete-node/ &ufshci1;
+/delete-node/ &ufshci2;
 
 / {
 	chosen {

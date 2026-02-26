@@ -11,6 +11,10 @@
 /delete-node/ &irqsteer_rcu;
 /delete-node/ &edma_coss;
 /delete-node/ &edma_rcu;
+/delete-node/ &ufshc;
+/delete-node/ &ufshci0;
+/delete-node/ &ufshci1;
+/delete-node/ &ufshci3;
 
 / {
 	chosen {

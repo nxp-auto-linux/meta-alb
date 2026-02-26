@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 
 /delete-node/ &cpu4;
@@ -13,6 +13,10 @@
 /delete-node/ &edma_rcu;
 /delete-node/ &netc_iep14;
 /delete-node/ &netc_iep19;
+/delete-node/ &ufshc;
+/delete-node/ &ufshci0;
+/delete-node/ &ufshci1;
+/delete-node/ &ufshci3;
 
 / {
 	chosen {

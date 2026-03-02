@@ -54,12 +54,6 @@
 	};
 
 	reserved-memory {
-		scmi_tx_buf: shm@af000000 {
-			compatible = "arm,scmi-shmem";
-			reg = <0x0 0xaf000000 0x0 0x80>;
-			no-map;
-		};
-
 		hse_rmem0: shm@ac000000 {
 			compatible = "nxp,s32n79-hse-rmem";
 			reg = <0x0 0xac000000 0x0 0x2000000>; /* 32 MB */
@@ -74,6 +68,18 @@
 			no-map;
 			status = "okay";
 			secure-status = "disabled";
+		};
+
+		scmi_tx_buf: shm@af000000 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x0 0xaf000000 0x0 0x80>;
+			no-map;
+		};
+
+		tlv_shbuf: shm@af002000 {
+			compatible = "nxp,s32n79-tlv";
+			reg = <0x0 0xaf002000 0x0 0x2000>;
+			no-map;
 		};
 	};
 

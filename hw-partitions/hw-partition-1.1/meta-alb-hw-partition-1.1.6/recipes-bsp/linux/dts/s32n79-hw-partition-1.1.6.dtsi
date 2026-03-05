@@ -180,6 +180,10 @@
 	status = "okay";
 };
 
+&mru_msi_controller {
+	status = "okay";
+};
+
 &aps2_mru0 {
 	status = "okay";
 };

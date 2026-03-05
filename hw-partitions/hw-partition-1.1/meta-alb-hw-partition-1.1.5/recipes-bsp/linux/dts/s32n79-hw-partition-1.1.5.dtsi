@@ -169,10 +169,6 @@
 	};
 };
 
-&smmu {
-	status = "okay";
-};
-
 &uart0 {
 	status = "okay";
 };
@@ -250,6 +246,10 @@
 };
 
 &netc_iep18 {
+	status = "okay";
+};
+
+&mru_msi_controller {
 	status = "okay";
 };
 

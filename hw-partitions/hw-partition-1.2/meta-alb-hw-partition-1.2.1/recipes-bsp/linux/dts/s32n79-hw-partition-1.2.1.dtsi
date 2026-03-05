@@ -87,7 +87,7 @@
 
 		hse_rmem1: shm@92000000 {
 			compatible = "nxp,s32n79-hse-rmem";
-			reg = <0x0 0x91000000 0x0 0x1000000>; /* 16 MB */
+			reg = <0x0 0x92000000 0x0 0x1000000>; /* 16 MB */
 			no-map;
 			status = "okay";
 			secure-status = "disabled";

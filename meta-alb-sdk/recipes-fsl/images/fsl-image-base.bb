@@ -83,3 +83,6 @@ IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '
 
 # Quick-boot image support
 require ${@ 'recipes-fsl/images/fsl-image-quick-boot.inc' if d.getVar('QUICK_BOOT_CONFIG', True) else ''}
+
+# Do not add /boot/Image to root filesystem for s32r478aevb
+IMAGE_INSTALL:remove:s32r478aevb = "kernel-image"

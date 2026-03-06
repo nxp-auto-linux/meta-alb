@@ -1,4 +1,4 @@
-# Copyright 2023 NXP
+# Copyright 2023, 2026 NXP
 #
 
 SUMMARY = "NXP HSE PKCS#11 Module"
@@ -33,3 +33,4 @@ do_install() {
 }
 
 include ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'recipes-bsp/hse/pkcs11-hse-tz-kp.inc', '', d)}
+include ${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'recipes-bsp/hse/pkcs11-hse-secboot-optee.inc', '', d)}

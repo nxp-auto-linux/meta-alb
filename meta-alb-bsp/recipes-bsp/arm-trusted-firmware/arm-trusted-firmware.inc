@@ -1,4 +1,4 @@
-# Copyright 2019-2022, 2024-2025 NXP
+# Copyright 2019-2022, 2024-2026 NXP
 
 DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause"
@@ -80,6 +80,7 @@ SECBOOT_ARGS = " \
                  BL31_KEY=${RSA_PRIV_BL31} \
                  BL32_KEY=${RSA_PRIV_BL32} \
                  BL33_KEY=${RSA_PRIV_BL33} \
+                 DDR_HSE_KEYHANDLE=${BL2_HANDLE} \
                  BL31_HSE_KEYHANDLE=${BL31_HANDLE} \
                  BL32_HSE_KEYHANDLE=${BL32_HANDLE} \
                  BL33_HSE_KEYHANDLE=${BL33_HANDLE} \

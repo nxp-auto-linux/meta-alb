@@ -12,6 +12,8 @@
 /delete-node/ &irqsteer_rcu;
 /delete-node/ &edma_coss;
 /delete-node/ &edma_rcu;
+/delete-node/ &netc_iep14;
+/delete-node/ &netc_iep18;
 /delete-node/ &ufshc;
 /delete-node/ &ufshci0;
 /delete-node/ &ufshci1;
@@ -224,5 +226,9 @@
 };
 
 &fss_mru0 {
+	status = "okay";
+};
+
+&netc_iep19 {
 	status = "okay";
 };

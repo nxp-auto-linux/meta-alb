@@ -18,6 +18,7 @@
 /delete-node/ &ufshci0;
 /delete-node/ &ufshci1;
 /delete-node/ &ufshci2;
+/delete-node/ &ufshci3;
 
 / {
 	chosen {
@@ -205,7 +206,7 @@
 	};
 };
 
-&ufshci3 {
+&ufshc {
 	status = "okay";
 };
 

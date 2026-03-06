@@ -14,10 +14,10 @@
 /delete-node/ &edma_rcu;
 /delete-node/ &netc_iep14;
 /delete-node/ &netc_iep18;
-/delete-node/ &ufshc;
 /delete-node/ &ufshci0;
 /delete-node/ &ufshci1;
 /delete-node/ &ufshci2;
+/delete-node/ &ufshci3;
 
 / {
 	chosen {
@@ -248,6 +248,6 @@
 	status = "okay";
 };
 
-&ufshci3 {
+&ufshc {
 	status = "okay";
 };

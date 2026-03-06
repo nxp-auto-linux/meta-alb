@@ -1,4 +1,4 @@
-# Copyright 2023,2024-2025 NXP
+# Copyright 2023,2024-2026 NXP
 
 DEPENDS:append = " arm-trusted-firmware-tools-native"
 
@@ -21,7 +21,7 @@ DDRFW_NVCTR ?= "0"
 
 HSE_CNT_TABLE_ADDR ?= "0x0"
 
-BL2_HANDLE ?= "0x010700"
+BL2_HANDLE ?= "0x010000"
 BL31_HANDLE ?= "${BL2_HANDLE}"
 BL32_HANDLE ?= "${BL2_HANDLE}"
 BL33_HANDLE ?= "${BL2_HANDLE}"
@@ -80,7 +80,20 @@ do_generate_bl_public_keys () {
 }
 
 do_generate_secboot_script() {
-	echo -n "hse-secboot -s -b \$1 -d \$2" > ${SECBOOT_SCRIPT}
+	# Generate the target-side script with optional executable name as first argument.
+	# If the first argument is one of the known tools (hse-secboot / optee-hse-secboot),
+	# the script uses it and shifts the rest of the arguments.
+	# Otherwise, hse-secboot is used as the default tool.
+
+	echo '# Optional exec name (default hse-secboot)' >> ${SECBOOT_SCRIPT}
+	echo 'if [ "$1" = "hse-secboot" ] || [ "$1" = "optee-hse-secboot" ]; then' >> ${SECBOOT_SCRIPT}
+	echo '    TOOL="$1"' >> ${SECBOOT_SCRIPT}
+	echo '    shift' >> ${SECBOOT_SCRIPT}
+	echo 'else' >> ${SECBOOT_SCRIPT}
+	echo '    TOOL="hse-secboot"' >> ${SECBOOT_SCRIPT}
+	echo 'fi' >> ${SECBOOT_SCRIPT}
+
+	echo -n '$TOOL -s -b $1 -d $2' >> ${SECBOOT_SCRIPT}
 	echo -n " --ddrfw_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_DDRFW_FILE}:${DDRFW_HANDLE}" >> ${SECBOOT_SCRIPT}
 	echo -n " --bl2_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL2_FILE}:${BL2_HANDLE}" >> ${SECBOOT_SCRIPT}
 	echo -n " --bl31_key ${INSTALL_PATH_SECBOOT_KEYS}${RSA_PUB_BL31_FILE}:${BL31_HANDLE}" >> ${SECBOOT_SCRIPT}

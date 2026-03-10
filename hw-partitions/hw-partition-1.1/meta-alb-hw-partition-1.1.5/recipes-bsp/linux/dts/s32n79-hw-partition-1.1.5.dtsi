@@ -250,26 +250,14 @@
 };
 
 &mru_msi_controller {
-	status = "okay";
-};
-
-&aps0_mru0 {
-	status = "okay";
-};
-
-&aps0_mru1 {
-	status = "okay";
-};
-
-&aps0_mru2 {
-	status = "okay";
-};
-
-&aps0_mru3 {
-	status = "okay";
-};
-
-&aps0_mru4 {
+	reg = <0x40a40000 0x40000>,
+	      <0x40a80000 0x40000>,
+	      <0x40ac0000 0x40000>,
+	      <0x40b00000 0x40000>;
+	interrupts = <GIC_SPI 705 IRQ_TYPE_LEVEL_HIGH>,
+		     <GIC_SPI 706 IRQ_TYPE_LEVEL_HIGH>,
+		     <GIC_SPI 707 IRQ_TYPE_LEVEL_HIGH>,
+		     <GIC_SPI 708 IRQ_TYPE_LEVEL_HIGH>;
 	status = "okay";
 };
 
@@ -282,10 +270,6 @@
 };
 
 &aps0_mru7 {
-	status = "okay";
-};
-
-&aps1_mru0 {
 	status = "okay";
 };
 

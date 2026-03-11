@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 
 /delete-node/ &irqsteer_coss;
@@ -159,8 +159,8 @@
 		edma_rcu: dma-controller@569d0000 {
 			compatible = "nxp,s32n79-rcu-edma5";
 			reg = <0x569d0000 0x101000>,
-				<0x568b2000 0x1000>,
-				<0x568b3000 0x1000>;
+				<0x568b3000 0x1000>,
+				<0x568b2000 0x1000>;
 			#dma-cells = <2>;
 			dma-channels = <16>;
 			interrupt-parent = <&irqsteer_rcu>;

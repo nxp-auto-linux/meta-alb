@@ -1,3 +1,3 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-require qemu-patches.inc
+include ${@'qemu-patches.inc' if 'ubuntu' in (d.getVar('MACHINEOVERRIDES') or '') else ''}

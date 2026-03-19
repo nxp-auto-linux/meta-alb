@@ -38,7 +38,7 @@ PREFERRED_VERSION_arm-trusted-firmware-tools ?= "2.10.25"
 
 PREFERRED_VERSION_rng-tools ?= "5"
 PREFERRED_VERSION_tcpreplay ?= "4.4.4"
-PREFERRED_VERSION_qemu ?= "8.2.1"
+PREFERRED_VERSION_qemu ?= "8.2.7"
 
 # ensure bison is not removed from sysroot, otherwise
 # some build tasks e.g. kernel 'do_merge_delta_config' will fail

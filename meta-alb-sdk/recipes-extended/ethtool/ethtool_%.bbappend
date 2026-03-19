@@ -2,9 +2,9 @@
 # that is changed with each Yocto version, we want to 
 # use the same version as the Linux BSP kernel
 
-PV = "6.6"
+PV = "6.11"
 
-SRC_URI[sha256sum] = "d4cdb4f7498781fb516e2b3d0eadab28691da3fd3e3445954e82d745de95fb96"
+SRC_URI[sha256sum] = "a8bee475d991939cad182b7dbcf3a1f139aeed8cb0add73d72084cd71d43282b"
 
 # we remove the ptests in order to avoid the patch application fuzz
 # and also because they are not a mandatory part of our process

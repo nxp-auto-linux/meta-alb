@@ -300,3 +300,7 @@
 &aps1_mru7 {
 	status = "okay";
 };
+
+&pcie2 {
+	status = "okay";
+};

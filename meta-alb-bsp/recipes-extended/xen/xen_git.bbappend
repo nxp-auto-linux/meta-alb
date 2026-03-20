@@ -1,6 +1,11 @@
-# Copyright 2022-2023,2025 NXP
+# Copyright 2022-2023,2025-2026 NXP
 
 require xen-nxp_git.inc
+
+SRC_URI:append = " \
+	file://0001-menuconfig-mconf-cfg-Allow-specification-of-ncurses-location.patch \
+	file://0001-libxl_nocpuid-fix-build-error.patch \
+"
 
 # move to SDK
 RDEPENDS:${PN} += " ${@bb.utils.contains('DISTRO_FEATURES', 'virtio', 'virtio-disk', '', d)}"

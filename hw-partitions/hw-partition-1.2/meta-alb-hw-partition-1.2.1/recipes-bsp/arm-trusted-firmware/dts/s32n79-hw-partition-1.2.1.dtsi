@@ -9,6 +9,8 @@
 /delete-node/ &edma_rcu;
 /delete-node/ &netc_iep14;
 /delete-node/ &netc_iep19;
+/delete-node/ &sec_jr0;
+/delete-node/ &sec_jr8;
 
 / {
 	chosen {
@@ -268,6 +270,10 @@
 
 &hse_mu11a {
 	status = "okay";
+};
+
+&sec_jr3 {
+	secure-status = "okay";
 };
 
 &aps0_mru0 {

@@ -305,3 +305,7 @@
 &netc_iep18 {
 	status = "okay";
 };
+
+&pcie2 {
+	status = "okay";
+};

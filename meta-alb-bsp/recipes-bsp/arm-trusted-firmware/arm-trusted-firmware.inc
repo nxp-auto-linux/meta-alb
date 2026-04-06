@@ -111,6 +111,7 @@ S32CC_LINUX_KERNEL_AS_BL33_ARGS = " \
               BL33_ENTRYPOINT=0x81000000 \
               S32_BL33_IMAGE_SIZE=0x01000000 \
 			  S32_LINUX_KERNEL_AS_BL33=1 \
+			  BL33_DTB=${DEPLOY_DIR_IMAGE}/${KERNEL_DEVICETREE_BASENAME} \
               "
 
 NO_DRAM_ECC_ARGS = " \
@@ -394,6 +395,7 @@ PACKAGES:append:s32cc = " ${PN}-plat-hdrs"
 addtask deploy after do_compile
 
 do_configure[depends] = "virtual/bootloader:do_deploy"
+do_configure[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', 'virtual/kernel:do_deploy', '', d)}"
 do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'optee', 'optee-os:do_deploy', '', d)}"
 do_compile[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'skip-uboot', 'linux-s32:do_deploy', '', d)}"
 

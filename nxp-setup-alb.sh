@@ -50,6 +50,10 @@ UBUNTUMACHINE=".+ubuntu"
 # Supported yocto version
 YOCTOVERSION="scarthgap"
 
+# Default hw-partition for specific machines
+HW_PART_MACHINES_RE="s32n79rdb|s32n79sim"
+DEFAULT_HWPART_NAME="hw-partition-1.2.1"
+
 # Error codes
 EINVAL=128
 
@@ -181,7 +185,7 @@ clean_up()
          PROGSIZE ORIGINALSIZE OPTIND META_ALB_LAYER_LIST ALB_LAYER_LIST \
          LSLAYERS USAGE_LIST PARAM_LAYER_LIST PARAM_MACHINE_LIST \
          MACHINELAYER MACHINEEXCLUSION ARMMACHINE HWPART_LAYERS HWPARTROOTDIR \
-         machine_hwparts
+         HW_PART_MACHINES_RE DEFAULT_HWPART_NAME machine_hwparts
 
    unset -f usage prompt_message
 }
@@ -392,6 +396,14 @@ if [ $? -eq 0 ]; then
     LAYER_LIST="$LAYER_LIST \
     $ALB_LAYER_LIST \
     "
+fi
+
+# If user did not provide -p explicitly, enforce default hw-partition for S32N79
+if [ -z "${setup_hwpart}" ]; then
+	if echo "${MACHINE}" | egrep -q "^(${HW_PART_MACHINES_RE})$"; then
+		setup_hwpart="${DEFAULT_HWPART_NAME}"
+		echo "INFO: '-p' not provided; using default hw-partition '${setup_hwpart}' for MACHINE='${MACHINE}'."
+	fi
 fi
  
 if [ -n "$setup_hwpart" ]; then

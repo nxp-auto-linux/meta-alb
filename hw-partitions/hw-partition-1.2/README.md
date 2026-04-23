@@ -26,3 +26,11 @@ hw-partition-1.2 contains one cohort layer:
 | BL2                        | 0xFFF00000                       | 0xFFF3FFFF                       | 256 KB                            |
 | BL31                       | 0xFFF41000                       | 0xFFFFFFFF                       | ~782 KB                           |
 | DDR_END                    |                                  | 0xFFFFFFFF                       |                                   |
+
+## High Memory Layout:
+> **NOTE:** The DDR ranges listed below are dynamically initialized at runtime through the Linux kernel memory hotplug functionality
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x8800000000                     | 0x8B3FFFFFFF                     | 13 GB                             |
+| Region 1                   | 0xC000000000                     | 0xC33FFFFFFF                     | 13 GB                             |
+ 

@@ -64,6 +64,18 @@
 		reg = <0x0 0x80000000 0x0 0x80000000>;
 	};
 
+	ddr_high0: memory@8800000000 {
+		device_type = "memory";
+		reg = <0x88 0x00000000 0x3 0x40000000>; /* 13GB */
+		status = "disabled";
+	};
+
+	ddr_high1: memory@c000000000 {
+		device_type = "memory";
+		reg = <0xc0 0x00000000 0x3 0x40000000>; /* 13GB */
+		status = "disabled";
+	};
+
 	reserved-memory {
 		hse_rmem0: shm@90000000 {
 			compatible = "nxp,s32n79-hse-rmem";
@@ -179,6 +191,10 @@
 			clock-names = "dmamux0", "dmamux1";
 		};
 	};
+};
+
+&nxp_misc {
+	nxp,ddr-regions = <&ddr_high0>, <&ddr_high1>;
 };
 
 &uart0 {

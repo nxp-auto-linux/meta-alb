@@ -30,3 +30,18 @@ Each cohort has 0x1c000000 bytes assigned space in Low memory, split as follows:
 | BL2                        | 0x1BF00000                       | 0x1BF3FFFF                       | 256 KB                            |
 | BL31                       | 0x1BF41000                       | 0x1BFFFFFF                       | ~782 KB                           |
 | DDR_END                    |                                  | 0x1BFFFFFF                       |                                   |
+
+## High Memory Layout:
+> **NOTE:** The DDR ranges listed below are dynamically initialized at runtime through the Linux kernel memory hotplug functionality
+
+### Cohort 5 (hw-partition-1.1.5):
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x8800000000                     | 0x89BFFFFFFF                     | 7 GB                              |
+| Region 1                   | 0xC000000000                     | 0xC1BFFFFFFF                     | 7 GB                              |
+
+### Cohort 6 (hw-partition-1.1.6):
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x89C0000000                     | 0x8B3FFFFFFF                     | 6 GB                              |
+| Region 1                   | 0xC1C0000000                     | 0xC33FFFFFFF                     | 6 GB                              |

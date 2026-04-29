@@ -53,6 +53,18 @@
 		reg = <0x0 0x9c000000 0 0x1c000000>;
 	};
 
+	ddr_high0: memory@89c0000000 {
+		device_type = "memory";
+		reg = <0x89 0xc0000000 0x1 0x80000000>; /* 6GB */
+		status = "disabled";
+	};
+
+	ddr_high1: memory@c1c0000000 {
+		device_type = "memory";
+		reg = <0xc1 0xc0000000 0x1 0x80000000>; /* 6GB */
+		status = "disabled";
+	};
+
 	reserved-memory {
 		scmi_remote_handshake: shm@2483c000 {
 			compatible = "nxp,s32n79-scmi-fss-remote";
@@ -209,6 +221,10 @@
 			dma-channels = <16>;
 		};
 	};
+};
+
+&misc_scmi {
+	nxp,ddr-regions = <&ddr_high0>, <&ddr_high1>;
 };
 
 &ufshc {

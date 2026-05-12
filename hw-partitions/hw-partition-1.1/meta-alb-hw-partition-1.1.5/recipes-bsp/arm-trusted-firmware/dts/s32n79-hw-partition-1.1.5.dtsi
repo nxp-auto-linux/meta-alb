@@ -318,7 +318,3 @@
 &pcie2 {
 	status = "okay";
 };
-
-&hscs_cdma_iep {
-	status = "okay";
-};

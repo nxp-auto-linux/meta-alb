@@ -1,5 +1,5 @@
-Linux: 6.6.99
-Linux versions: 6.6
+Linux: 6.12.19
+Linux versions: 6.12
 U-boot: 2022.04
 Yocto: 5.0.6 "scarthgap"
 Gcc: 13.3.0

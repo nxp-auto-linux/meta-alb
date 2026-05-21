@@ -241,6 +241,10 @@ DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', 
 # MMC test configuration
 DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'bsp-utils', ' mmc_test.cfg', '', d)}"
 
+# CDMA Demo configuration
+DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', ' cdma.cfg', '', d)}"
+SRC_URI += "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', 'file://build/cdma.cfg', '', d)} "
 
 SRC_URI += "\
     file://build/containers.config \

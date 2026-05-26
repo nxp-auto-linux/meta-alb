@@ -4,28 +4,20 @@ require fsl-image-ubuntu-base.bb
 # At this time x2go is not available for all versions, so we
 # also show how to do a VNC alternative.
 APTGET_EXTRA_PPA += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
     "unsupportedubuntuversion" \
-    , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "python-dev python-mode python-bluez x11vnc", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "python-dev-is-python3 x2goserver x2goserver-xsession", \
     "unsupportedubuntuversion" \
-    , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
     "unsupportedubuntuversion" \
-    , d) \
     , d)}'
 IMAGE_INSTALL += '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "x11vnc-init", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
     "unsupportedubuntuversion" \
-    , d) \
     , d)}'
 
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
@@ -131,10 +123,8 @@ APTGET_EXTRA_PACKAGES += " \
 # Installing Java is a bit of loaded topic because it is version
 # dependent. We default to the Java version based on the Ubuntu version
 JAVAVERSION = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "11", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "11", \
    "unknownjavaversion" \
-    , d) \
     , d)}'
 JAVALIBPATHSUFFIX = '${@ \
     oe.utils.conditional("JAVAVERSION", "8", "jre/lib/${TRANSLATED_TARGET_ARCH}/jli", \

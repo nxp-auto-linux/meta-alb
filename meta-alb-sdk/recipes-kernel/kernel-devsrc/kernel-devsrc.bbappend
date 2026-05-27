@@ -7,8 +7,8 @@ KERNEL_SOURCE_DIR:ubuntu = "${KERNEL_VERSION}"
 KERNEL_SRC_PATH:ubuntu = "/usr/src/kernel"
 
 UBUNTUGCCVERSION = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "20.04", "10", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "10", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "13", \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'

@@ -51,10 +51,14 @@ fakeroot do_make_x2go_safe() {
 
 require kernel-source-debian.inc
 
-# The chroot+qemu precompile of kernel scripts/modules_prepare trips on
-# uapi-asm-generic under scarthgap. Defer it to a systemd oneshot at first
-# boot — same end result, runs natively on the target.
-KERNEL_DEVSRC_DEFER_TO_SYSTEMD = "1"
+# Yocto's kernel-devsrc for kernel 6.12 / arm64 is missing several generated
+# files needed by on-target 'make modules_prepare' (UAPI wrappers,
+# cpucap-defs.h, sysreg-defs.h, vgetrandom.o, etc.). Closing that gap is a
+# moving target across kernel versions. Out-of-tree modules are instead
+# expected to be cross-compiled on the build host against
+# ${STAGING_KERNEL_BUILDDIR}, then copied to the target. The kernel source
+# tree is still shipped on the rootfs for browsing and reference.
+KERNEL_DEVSRC_DEFER_TO_SYSTEMD = "skip"
 
 APTGET_EXTRA_PACKAGES += " \
     libssl-dev \

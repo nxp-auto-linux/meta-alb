@@ -62,10 +62,10 @@ APTGET_EXTRA_SOURCE_PACKAGES += "\
 	iproute2 \
 "
 
-# Add user bluebox with password bluebox and default shell bash
+# Add user ubuntu with password ubuntu and default shell bash
 USER_SHELL_BASH = "/bin/bash"
-USER_PASSWD_BLUEBOX = "SNSRrmx0usMiI"
-APTGET_ADD_USERS = "bluebox:${USER_PASSWD_BLUEBOX}:${USER_SHELL_BASH}"
+USER_PASSWD_UBUNTU = "ubR3Twh1k5PQE"
+APTGET_ADD_USERS = "ubuntu:${USER_PASSWD_UBUNTU}:${USER_SHELL_BASH}"
 
 HOST_NAME = "ubuntu-${MACHINE_ARCH}"
 

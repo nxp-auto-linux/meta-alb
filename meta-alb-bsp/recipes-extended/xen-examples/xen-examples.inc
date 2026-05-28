@@ -26,7 +26,7 @@ CFG_NAME ?= ""
 EXTRA_CMDS_FILE:s32cc = "extra_cmds_s32cc"
 EXTRA_CMDS_FILE:s32n = "extra_cmds_s32n7"
 
-SUPPORTED_BOOT_TYPES:s32n = "ufs sdcard"
+SUPPORTED_BOOT_TYPES:s32n = "${BOOT_TYPE}"
 
 modify_imagebuilder_config() {
     CFG_FILE="$1"

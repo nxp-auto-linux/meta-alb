@@ -1,0 +1,16 @@
+# Copyright 2026 NXP
+
+MEMORY_START="0x80000000"
+MEMORY_END="0xFFFFFFFF"
+
+XEN="xen"
+XEN_CMD="console=dtuart dtuart=serial0 dom0_mem=512M dom0_max_vcpus=2 bootscrub=0"
+DOM0_KERNEL="Image"
+DOM0_CMD="console=ttyAMA0,115200 root=/dev/sdb2 rootwait rw clk_ignore_unused arm64.nopauth swiotlb=force"
+
+NUM_DOMUS=0
+
+UBOOT_SOURCE="boot.source-ufs"
+UBOOT_SCRIPT="boot.scr-ufs"
+BOOT_CMD="none"
+LOAD_CMD='ext4load scsi ${scsi_part_rootfs}'

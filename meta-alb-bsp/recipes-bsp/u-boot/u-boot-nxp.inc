@@ -72,6 +72,11 @@ SRC_URI:append:s32g399ardb3 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', 'file://build/pfe-slave_config.cfg', '', d)} \
 "
 
+DELTA_UBOOT_DEFCONFIG:append:s32g399ardb3 = "${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', ' cdma.cfg', '', d)}"
+SRC_URI:append:s32g399ardb3 = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', 'file://build/cdma.cfg', '', d)} \
+"
+
 # FIXME: Allow linking of 'tools' binaries with native libraries
 #        used for generating the boot logo and other tools used
 #        during the build process.

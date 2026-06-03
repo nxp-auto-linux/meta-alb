@@ -78,6 +78,10 @@
 	};
 
 	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
 		scmi_remote_handshake: shm@2483c000 {
 			compatible = "nxp,s32n79-scmi-fss-remote";
 			reg = <0x0 0x2483c000 0x0 0x40>;

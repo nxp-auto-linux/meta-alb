@@ -66,6 +66,10 @@
 	};
 
 	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
 		hse_rmem0: shm@ac000000 {
 			compatible = "nxp,s32n79-hse-rmem";
 			reg = <0x0 0xac000000 0x0 0x2000000>; /* 32 MB */

@@ -2,7 +2,7 @@
 
 DEPENDS:append = " arm-trusted-firmware-tools-native"
 
-SECBOOT_KEYS_DIR = "${WORKDIR}/secboot_keys"
+SECBOOT_KEYS_DIR ??= "${WORKDIR}/secboot_keys"
 SECBOOT_SCRIPT_FILE = "secboot_script.sh"
 SECBOOT_SCRIPT = "${SECBOOT_KEYS_DIR}/${SECBOOT_SCRIPT_FILE}"
 OP_TEE = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', '1', '0', d)}"

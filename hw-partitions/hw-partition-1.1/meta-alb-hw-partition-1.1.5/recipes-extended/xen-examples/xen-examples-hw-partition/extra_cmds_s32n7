@@ -1,0 +1,7 @@
+fdt rm /chosen stdout-path
+setenv xen_addr ${host_kernel_addr}
+setenv fdt_addr ${host_fdt_addr}
+ddr_init 0x8800000000 7G
+ddr_init 0xC000000000 7G
+fdt set /memory@8800000000 status "okay"
+fdt set /memory@c000000000 status "okay"

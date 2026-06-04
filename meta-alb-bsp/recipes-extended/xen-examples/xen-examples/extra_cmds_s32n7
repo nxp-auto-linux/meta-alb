@@ -1,3 +1,0 @@
-fdt rm /chosen stdout-path
-setenv xen_addr ${host_kernel_addr}
-setenv fdt_addr ${host_fdt_addr}

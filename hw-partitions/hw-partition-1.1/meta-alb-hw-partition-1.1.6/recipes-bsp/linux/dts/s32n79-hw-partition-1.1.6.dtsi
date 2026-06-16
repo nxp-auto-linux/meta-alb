@@ -18,6 +18,7 @@
 /delete-node/ &ufshci1;
 /delete-node/ &ufshci2;
 /delete-node/ &ufshci3;
+/delete-node/ &dma_pool;
 
 / {
 	chosen {
@@ -69,6 +70,12 @@
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
+
+		dma_pool: dma-pool@9c000000 {
+			compatible = "shared-dma-pool";
+			reg = <0x0 0x9c000000 0x0 0x80000>;
+			no-map;
+		};
 
 		hse_rmem0: shm@ac000000 {
 			compatible = "nxp,s32n79-hse-rmem";

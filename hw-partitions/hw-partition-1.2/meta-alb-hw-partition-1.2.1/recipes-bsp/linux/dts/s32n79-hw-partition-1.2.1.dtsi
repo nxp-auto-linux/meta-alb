@@ -9,6 +9,7 @@
 /delete-node/ &edma_rcu;
 /delete-node/ &netc_iep14;
 /delete-node/ &netc_iep19;
+/delete-node/ &dma_pool;
 
 / {
 	chosen {
@@ -80,6 +81,12 @@
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
+
+		dma_pool: dma-pool@80000000 {
+			compatible = "shared-dma-pool";
+			reg = <0x0 0x80000000 0x0 0x80000>;
+			no-map;
+		};
 
 		hse_rmem0: shm@90000000 {
 			compatible = "nxp,s32n79-hse-rmem";

@@ -1,10 +1,10 @@
 # LLCE support
 
 SRC_URI += "\
-    file://build/llce_can.config \
-    file://build/llce_logger.config \
-    file://build/llce_base.config \
-    file://scripts/get_node_path.py \
+    file://llce_can.config \
+    file://llce_logger.config \
+    file://llce_base.config \
+    file://get_node_path.py \
 "
 
 DEPENDS:append = " python-fdt-native"
@@ -50,7 +50,7 @@ python () {
 do_compile:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'llce-can-multihost', 'true', 'false', d)}; then
         echo "Adding LLCE multihif property"
-        mailbox_path="$(nativepython3 "${WORKDIR}/scripts/get_node_path.py" "${dtb_name}" --compatible 'nxp,s32g-llce-mailbox')"
+        mailbox_path="$(nativepython3 "${WORKDIR}/get_node_path.py" "${dtb_name}" --compatible 'nxp,s32g-llce-mailbox')"
         fdtput "${dtb_name}" "${mailbox_path}" "nxp,multi-hif"
     fi
 }

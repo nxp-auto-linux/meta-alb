@@ -2,6 +2,10 @@ DESCRIPTION = "Linux kernel for S32 platforms"
 SECTION = "kernel"
 LICENSE = "GPL-2.0-only"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-s32/build:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-s32/freescale:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-s32/scripts:"
+
 inherit kernel
 
 inherit fsl-kernel-localversion
@@ -233,7 +237,7 @@ DELTA_KERNEL_DEFCONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virti
 # Docker configuration
 DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'docker', ' docker.config', '', d)}"
 SRC_URI += "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'file://build/docker.config', '', d)} "
+    ${@bb.utils.contains('DISTRO_FEATURES', 'docker', 'file://docker.config', '', d)} "
 
 # GPU configuration
 DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'gpu', ' gpu.config', '', d)}"
@@ -244,13 +248,13 @@ DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'bsp-ut
 # CDMA Demo configuration
 DELTA_KERNEL_DEFCONFIG:append = "${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', ' cdma.cfg', '', d)}"
 SRC_URI += "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', 'file://build/cdma.cfg', '', d)} "
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', 'file://cdma.cfg', '', d)} "
 
 SRC_URI += "\
-    file://build/containers.config \
-    file://build/virtio \
-    file://build/gpu.config \
-    file://build/mmc_test.cfg \
+    file://containers.config \
+    file://virtio \
+    file://gpu.config \
+    file://mmc_test.cfg \
 "
 
 require quick-boot.inc
@@ -278,23 +282,23 @@ DELTA_KERNEL_DEFCONFIG:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen virtio', 'xen_virtio.cfg', '', d)} \
     "
 SRC_URI += "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://build/xen_s32.cfg', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'xen virtio', 'file://build/xen_virtio.cfg', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', 'file://xen_s32.cfg', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen virtio', 'file://xen_virtio.cfg', '', d)} \
     "
 
 # Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
 DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee.cfg', '', d)}"
-SRC_URI:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' file://build/optee.cfg', '', d)}"
+SRC_URI:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' file://optee.cfg', '', d)}"
 
 # make everything compatible for the time being
 COMPATIBLE_MACHINE:$MACHINE = "$MACHINE"
 
 # Enable dm-verity
 DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' dm-verity.cfg', '', d)}"
-SRC_URI:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' file://build/dm-verity.cfg', '', d)}"
+SRC_URI:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', ' file://dm-verity.cfg', '', d)}"
 
 # Enable support for pcie demos
-SRC_URI:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', ' file://build/pcie_demos.config', '', d)}"
+SRC_URI:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', ' file://pcie_demos.config', '', d)}"
 DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', ' pcie_demos.config', '', d)}"
 
-SRC_URI:append:s32g = "${@ ' file://build/0001-linux-s32g-Update-.dtsi-to-configure-UART1-on-EVB3.patch' if '1' in d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] else ''}"
+SRC_URI:append:s32g = "${@ ' file://0001-linux-s32g-Update-.dtsi-to-configure-UART1-on-EVB3.patch' if '1' in d.getVar("SERIAL_CONSOLES", True).split(" ")[0].split(";")[1][-1] else ''}"

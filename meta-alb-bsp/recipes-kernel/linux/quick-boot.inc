@@ -1,10 +1,10 @@
 # Apply Quick Boot configuration
 SRC_URI:append:s32cc = " \
-	${@ 'file://build/quickboot-generic.cfg' if d.getVar('QUICK_BOOT_CONFIG', True) else ''} \
-	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skippcie', 'file://build/quickboot-skippcie.cfg', '', d)} \
-	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'kernelextmodules', 'file://build/quickboot-kernelextmodules.cfg', '', d)} \
-	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'systemd-debug', 'file://build/quickboot-systemd-debug.cfg', '', d)} \
-	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'hserng', 'file://build/quickboot-hse-rng.cfg', '', d)} \
+	${@ 'file://quickboot-generic.cfg' if d.getVar('QUICK_BOOT_CONFIG', True) else ''} \
+	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skippcie', 'file://quickboot-skippcie.cfg', '', d)} \
+	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'kernelextmodules', 'file://quickboot-kernelextmodules.cfg', '', d)} \
+	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'systemd-debug', 'file://quickboot-systemd-debug.cfg', '', d)} \
+	${@bb.utils.contains('QUICK_BOOT_CONFIG', 'hserng', 'file://quickboot-hse-rng.cfg', '', d)} \
 "
 DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@ ' quickboot-generic.cfg' if d.getVar('QUICK_BOOT_CONFIG', True) else ''}"
 DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skippcie', ' quickboot-skippcie.cfg', '', d)}"

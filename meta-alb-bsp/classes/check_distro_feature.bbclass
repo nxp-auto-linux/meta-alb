@@ -5,8 +5,8 @@ python() {
     if "skip-uboot" not in features:
         return
 
-    if "verifiedboot" in features or "secboot" in features or "xen" in features:
-        raise SystemExit("DISTRO_FEATURES 'skip-uboot' and 'verifiedboot or secboot or xen' cannot be enabled at the same time.")
+    if "verifiedboot" in features or "xen" in features:
+        raise SystemExit("DISTRO_FEATURES 'skip-uboot' and 'verifiedboot or xen' cannot be enabled at the same time.")
 
     machine = d.getVar('MACHINE') or ''
 

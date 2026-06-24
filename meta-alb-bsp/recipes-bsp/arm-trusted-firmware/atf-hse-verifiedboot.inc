@@ -23,7 +23,7 @@ do_generate_fit_keys () {
         openssl req -batch -new -x509 -key  ${FIT_KEYS_DIR}/${RSA_PRIV_FIT} -out ${FIT_KEYS_DIR}/${RSA_PUB_FIT}
 
         # creating TFA dtbs
-        make -C "${S}" CROSS_COMPILE=${TARGET_PREFIX} ARCH=${TARGET_ARCH} BUILD_BASE=${B} PLAT=${TFA_PLAT} ${DTB_DEBUG} dtbs
+        oe_runmake -C "${S}" CROSS_COMPILE=${TARGET_PREFIX} ARCH=${TARGET_ARCH} BUILD_BASE=${B} PLAT=${TFA_PLAT} ${DTB_DEBUG} dtbs
 
         # workaround: using an empty file as kernel and dtb because mkimage does not allow only updating atf dtb with public key
         touch ${WORKDIR}/empty_image

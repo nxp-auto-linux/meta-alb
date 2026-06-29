@@ -72,9 +72,14 @@ SRC_URI:append:s32g399ardb3 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', 'file://build/pfe-slave_config.cfg', '', d)} \
 "
 
-DELTA_UBOOT_DEFCONFIG:append:s32g399ardb3 = "${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', ' cdma.cfg', '', d)}"
+DELTA_UBOOT_DEFCONFIG:append:s32g399ardb3 = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', ' cdma.cfg', '', d)}"
 SRC_URI:append:s32g399ardb3 = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'cdma-demo', 'file://build/cdma.cfg', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', 'file://build/cdma.cfg', '', d)} \
+"
+
+# PCIe Services Demos: append extra kernel bootargs (maxcpus, pci) via EXTRA_BOOT_ARGS
+SRC_URI:append:s32g399ardb3 = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', 'file://0001-s32g399ardb3-append-pcie-services-bootargs.patch', '', d)} \
 "
 
 # FIXME: Allow linking of 'tools' binaries with native libraries

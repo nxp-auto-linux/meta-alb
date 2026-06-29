@@ -29,6 +29,9 @@ IMAGE_INSTALL:append:s32cc = " perf"
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demos', \
 	' kernel-pcitest demo-pcie-shared-mem', '', d)}"
 
+# NVMe management tool for devices connected to the PCIe-RC port
+IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', \
+	' nvme-cli', '', d)}"
 
 # Userspace support for QSPI Flash under Linux for S32CC platforms
 IMAGE_INSTALL:append:s32cc = " mtd-utils "

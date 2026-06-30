@@ -12,6 +12,7 @@ Ubuntu 16.04.5 host. If SO_PEERGROUPS is not known, we just
 silently report it as unsupported. If it is known on the host at
 build time, we try a translation.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---

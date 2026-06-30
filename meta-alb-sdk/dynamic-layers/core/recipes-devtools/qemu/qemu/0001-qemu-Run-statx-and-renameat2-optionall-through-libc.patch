@@ -10,6 +10,7 @@ optional libc wrapper.
 If we didn't, then pseudo wouldn't pick up the accesses and qemu
 would get to see the wrong results.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  linux-user/syscall.c | 16 ++++++++++++----

@@ -6,6 +6,7 @@ Subject: [PATCH 3/7] qemu-user: seccomp handling could crash
  While it is not implemented properly still, it is now checked for
 and rejected properly.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  linux-user/syscall.c | 7 ++++---
@@ -23,19 +24,28 @@ index 113c7e24e..6a4fc96cc 100644
  #include <sys/resource.h>
  #include <sys/swap.h>
  #include <linux/capability.h>
-@@ -10991,9 +10992,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #endif /* AARCH64 */
-         case PR_GET_SECCOMP:
-         case PR_SET_SECCOMP:
--            /* Disable seccomp to prevent the target disabling syscalls we
--             * need. */
--            return -TARGET_EINVAL;
-+            if (arg2 == SECCOMP_MODE_FILTER)
-+                return -TARGET_EINVAL;
-+            return get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
-         default:
-             /* Most prctl options have no pointer arguments */
-             return get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
+@@ -6548,8 +6548,6 @@
+     case PR_GET_FPEMU:
+     case PR_SET_FPEMU:
+     case PR_SET_MM:
+-    case PR_GET_SECCOMP:
+-    case PR_SET_SECCOMP:
+     case PR_SET_SYSCALL_USER_DISPATCH:
+     case PR_GET_THP_DISABLE:
+     case PR_SET_THP_DISABLE:
+@@ -6558,6 +6556,12 @@
+         /* Disable to prevent the target disabling stuff we need. */
+         return -TARGET_EINVAL;
+ 
++    case PR_GET_SECCOMP:
++    case PR_SET_SECCOMP:
++        if (arg2 == SECCOMP_MODE_FILTER)
++            return -TARGET_EINVAL;
++        return get_errno(prctl(option, arg2, arg3, arg4, arg5));
++
+     default:
+         qemu_log_mask(LOG_UNIMP, "Unsupported prctl: " TARGET_ABI_FMT_ld "\n",
+                       option);
 -- 
 2.34.1
 

@@ -3,6 +3,7 @@ From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Date: Wed, 9 Nov 2022 09:22:54 +0100
 Subject: [PATCH 7/7] qemu-user: strace didn't print faccessat() correctly
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 

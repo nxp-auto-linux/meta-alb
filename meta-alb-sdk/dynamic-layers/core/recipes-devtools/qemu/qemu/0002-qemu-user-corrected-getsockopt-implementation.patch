@@ -8,6 +8,7 @@ passed in, innocent memory could have been overwritten.
 When SO_PEERSEC failed to work properly it turned out that
 the length arg/result method was not properly implemented.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
 ---
@@ -61,7 +62,7 @@ index d78366dcb..113c7e24e 100644
              break;
          }
          case TARGET_SO_PEERSEC: {
-@@ -2799,24 +2803,40 @@ get_timeout:
+@@ -2795,29 +2795,45 @@
              return -TARGET_EFAULT;
          if (len < 0)
              return -TARGET_EINVAL;
@@ -80,11 +81,21 @@ index d78366dcb..113c7e24e 100644
 +        }
          if (ret < 0)
              return ret;
--        if (optname == SO_TYPE) {
+-        switch (optname) {
+-        case SO_TYPE:
 -            val = host_to_target_sock_type(val);
+-            break;
+-        case SO_ERROR:
+-            val = host_to_target_errno(val);
+-            break;
 +        if (addr == &val) {
-+            if (optname == SO_TYPE) {
++            switch (optname) {
++            case SO_TYPE:
 +                val = host_to_target_sock_type(val);
++                break;
++            case SO_ERROR:
++                val = host_to_target_errno(val);
++                break;
 +            }
 +            if (len == 4) {
 +                if (put_user_u32(val, optval_addr))

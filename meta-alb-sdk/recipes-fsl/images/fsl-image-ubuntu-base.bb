@@ -17,7 +17,11 @@ inherit nativeaptinstall
 do_rootfs[network] = "1"
 
 APTGET_CHROOT_DIR = "${IMAGE_ROOTFS}"
-APTGET_SKIP_UPGRADE = "1"
+# Run apt-get upgrade during do_rootfs so every package from the base
+# tarball is refreshed to the latest available security/bug-fix
+# version, matching what users get from a "fresh install + apt upgrade"
+# on a real Ubuntu system.
+APTGET_SKIP_UPGRADE = "0"
 
 ROOTFS_POSTPROCESS_COMMAND:append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager; do_systemd_service_fixup; do_getty_fixup; "
 

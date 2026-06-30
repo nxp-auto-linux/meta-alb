@@ -73,6 +73,7 @@ APTGET_EXTRA_PACKAGES += "\
 # names therefore. Stuff is grouped for easier updates
 RPROVIDES:${PN}:ubuntu += " \
 /bin/sh \
+/bin/sed \
 flex \
 "
 RPROVIDES:${PN}:ubuntu += " \

@@ -5,19 +5,27 @@ require fsl-image-ubuntu-base.bb
 # also show how to do a VNC alternative.
 APTGET_EXTRA_PPA += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "", \
     "unsupportedubuntuversion" \
+    , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "python-dev-is-python3 x2goserver x2goserver-xsession", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "python-dev-is-python3 x2goserver x2goserver-xsession", \
     "unsupportedubuntuversion" \
+    , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "", \
     "unsupportedubuntuversion" \
+    , d) \
     , d)}'
 IMAGE_INSTALL += '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "", \
     "unsupportedubuntuversion" \
+    , d) \
     , d)}'
 
 APTGET_EXTRA_PACKAGES += "xfce4 xfce4-terminal"
@@ -42,6 +50,12 @@ fakeroot do_make_x2go_safe() {
 }
 
 require kernel-source-debian.inc
+
+# The chroot+qemu precompile of kernel scripts/modules_prepare trips on
+# uapi-asm-generic under scarthgap. Defer it to a systemd oneshot at first
+# boot — same end result, runs natively on the target.
+KERNEL_DEVSRC_DEFER_TO_SYSTEMD = "1"
+
 APTGET_EXTRA_PACKAGES += " \
     libssl-dev \
 "
@@ -89,9 +103,7 @@ APTGET_EXTRA_PACKAGES += " \
     libmeschach-dev \
     libproj-dev \
 \
-    libglademm-2.4-dev \
     libglew-dev \
-    libgtkglextmm-x11-1.2-dev \
     libx264-dev \
     freeglut3-dev \
     libraw1394-11 \
@@ -124,12 +136,16 @@ APTGET_EXTRA_PACKAGES += " \
 # dependent. We default to the Java version based on the Ubuntu version
 JAVAVERSION = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "11", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "21", \
    "unknownjavaversion" \
+    , d) \
     , d)}'
 JAVALIBPATHSUFFIX = '${@ \
     oe.utils.conditional("JAVAVERSION", "8", "jre/lib/${TRANSLATED_TARGET_ARCH}/jli", \
     oe.utils.conditional("JAVAVERSION", "11", "lib/jli", \
+    oe.utils.conditional("JAVAVERSION", "21", "lib/jli", \
    "unsupportedjavaversion" \
+    , d) \
     , d) \
     , d)}'
 APTGET_EXTRA_PACKAGES += " \
@@ -141,8 +157,6 @@ APTGET_EXTRA_LIBRARY_PATH += "/usr/lib/jvm/java-${JAVAVERSION}-openjdk-${UBUNTU_
 
 # bluez must not be allowed to (re)start any services, otherwise install will fail
 APTGET_EXTRA_PACKAGES_SERVICES_DISABLED += "bluez libbluetooth3 libusb-dev avahi-daemon rtkit"
-
-APTGET_SKIP_UPGRADE = "0"
 
 # 2GB of free space to root fs partition (at least 1.5 GB needed during the Bazel build)
 IMAGE_ROOTFS_EXTRA_SPACE = "2000000"

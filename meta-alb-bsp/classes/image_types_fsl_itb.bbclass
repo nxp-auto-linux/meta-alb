@@ -138,7 +138,19 @@ configure_and_generate_itb() {
                 echo >>${IIF} "        };"
                 echo >>${IIF} "        fdt@1 {"
                 echo >>${IIF} "            description = \"Flattened Device Tree blob\";"
-                DTS_BASE_NAME=`printf "${KERNEL_DEVICETREE}" | awk -F "." '{print $1}' | xargs basename`
+                # When hw-partition layers rename the deployed DTB via
+                # KERNEL_DEVICETREE_EXT, the actual deployed file is
+                # named e.g. "s32n79-rdb-hw-partition-1.2.1.dtb" rather
+                # than the basename of KERNEL_DEVICETREE. Honor
+                # KERNEL_DEVICETREE_EXT when set so the .itb references
+                # the file that was actually deployed.
+                if [ -n "${KERNEL_DEVICETREE_EXT}" ]; then
+                    # Strip only the .dtb suffix - the basename may itself contain dots
+                    # (e.g. s32n79-rdb-hw-partition-1.2.1.dtb)
+                    DTS_BASE_NAME=`basename "${KERNEL_DEVICETREE_EXT}" .dtb`
+                else
+                    DTS_BASE_NAME=`basename "${KERNEL_DEVICETREE}" .dtb`
+                fi
                 echo >>${IIF} "            data = /incbin/(\"$deployDir/${DTS_BASE_NAME}.dtb\");"
                 echo >>${IIF} "            type = \"flat_dt\";"
                 echo >>${IIF} "            arch = \"${ITB_ARCH}\";"

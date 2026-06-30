@@ -654,9 +654,21 @@ END_USER
         # Before we can play with the package manager in any
         # meaningful way, we need to sync the database.
         if [ -n "${APTGET_EXTRA_SOURCE_PACKAGES}" ]; then
-                if grep '# deb-src' ${APTGET_CHROOT_DIR}/etc/apt/sources.list; then
+                # Legacy /etc/apt/sources.list format: uncomment "# deb-src" lines.
+                if grep -q '# deb-src' ${APTGET_CHROOT_DIR}/etc/apt/sources.list 2>/dev/null; then
                         chroot "${APTGET_CHROOT_DIR}" /bin/sed -i 's/# deb-src/deb-src/g' /etc/apt/sources.list
                 fi
+                # Noble (Ubuntu 24.04+) and Debian 12+ moved to the deb822
+                # format under /etc/apt/sources.list.d/*.sources. Source URIs
+                # are enabled by adding "deb-src" to the "Types:" field.
+                for f in ${APTGET_CHROOT_DIR}/etc/apt/sources.list.d/*.sources; do
+                        [ -e "$f" ] || continue
+                        if grep -q '^Types: deb$' "$f"; then
+                                chroot "${APTGET_CHROOT_DIR}" /bin/sed -i \
+                                        's/^Types: deb$/Types: deb deb-src/' \
+                                        /etc/apt/sources.list.d/"$(basename "$f")"
+                        fi
+                done
         fi
 
         # Prepare apt to be generically usable
@@ -906,7 +918,7 @@ fakeroot aptget_update_end() {
         # and only remove inside the chroot environment.
         # The insane.bbclass implementation of the empty-dirs check
         # gets that wrong and resolves softlinks, suddenly pointing into
-        # the host root on kirkstone and complaining about irrelevant
+        # the host root on scarthgap and complaining about irrelevant
         # content.
         if [ -e "${APTGET_CHROOT_DIR}"/bin/sh ]; then
                 for dir in /run /var/run /var/log
@@ -1020,7 +1032,7 @@ APTGET_ALL_PACKAGES = "\
 # complain if needed!
 python() {
     lc = d.getVar("LAYERSERIES_CORENAMES")
-    if ("kirkstone" not in lc):
+    if ("scarthgap" not in lc):
         bb.error("nativeaptinstall.bbclass is incompatible to the current layer set")
         bb.error("You must check APTGET_YOCTO_TRANSLATION and update the anonymous python() function!")
 }

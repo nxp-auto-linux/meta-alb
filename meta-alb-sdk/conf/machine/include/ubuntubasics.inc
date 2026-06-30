@@ -1,6 +1,7 @@
 # We currently support recipies for:
-# - 22.04.1
-UBUNTU_TARGET_VERSION ?= "22.04.1"
+# - 24.04.4
+#UBUNTU_TARGET_VERSION ?= "22.04.1"
+UBUNTU_TARGET_VERSION ?= "24.04.4"
 
 UBUNTU_TARGET_MAJORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[0]}"
 UBUNTU_TARGET_MINORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[1]}"
@@ -46,13 +47,16 @@ IMAGE_TYPES_MASKED += "cpio cpio.gz cpio.gz.u-boot"
 # It remains a glibc that works for Yocto, which is good enough for
 # our purposes.
 # Ubuntu 22.x: max glibc 2.35...
+# Ubuntu 24.x: max glibc 2.39... (matches poky scarthgap default)
 GLIBCVERSION = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.35", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "2.39%", \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
 BINUVERSION='${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.38", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "2.42", \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
@@ -61,6 +65,7 @@ BINUVERSION='${@ \
 # management
 APTGET_PYTHON_VER = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "3.10", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "3.12", \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
@@ -70,9 +75,35 @@ APTGET_PYTHON_VER = '${@ \
 # directories. We can't refer to symlink based files
 DISTRO_FEATURES:append = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", " usrmerge", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", " usrmerge", \
    "unsupportedubuntuversion" \
     , d) \
     , d)}'
+
+# Suppress harmless do_rootfs log_check matches caused by installing
+# certain packages inside the pseudo+qemu chroot:
+#
+#   - NetworkManager postinst calls nmcli to reload connections via
+#     D-Bus, but the NM daemon isn't running in the chroot. Noble's
+#     NM 1.46 prints
+#         "Error: Could not create NMClient object: ..."
+#         "WARNING: NetworkManager could not reload connections ..."
+#     which trips Yocto's rpm-rootfs error/warning regexes. On jammy
+#     (NM 1.36) the same failure logs softer text that doesn't match.
+#
+#   - logger(1) prints
+#         "logger: send message failed: Operation not permitted"
+#     because syslogd isn't running in the chroot during install.
+#
+# All of these are post-install warnings about chroot-only limitations,
+# not real failures: on the booted target each service starts normally.
+#
+# IMAGE_LOG_CHECK_EXCLUDES values are space-separated regexes; we use
+# \s+ for whitespace since a literal space would be treated as a
+# token separator.
+IMAGE_LOG_CHECK_EXCLUDES = "Could\s+not\s+create\s+NMClient \
+                            NetworkManager\s+could\s+not\s+reload \
+                            logger:\s+send\s+message\s+failed"
 
 # This is to be able to pull in the prebuilt Ubuntu rootfs
 MACHINEOVERRIDES =. "ubuntu:"

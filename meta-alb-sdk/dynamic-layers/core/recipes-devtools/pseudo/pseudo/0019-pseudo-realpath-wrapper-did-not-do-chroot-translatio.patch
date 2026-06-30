@@ -4,6 +4,7 @@ Date: Tue, 8 Nov 2022 14:00:01 +0100
 Subject: [PATCH 19/20] pseudo: realpath wrapper did not do chroot translation
  properly
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  ports/unix/guts/realpath.c | 4 +++-

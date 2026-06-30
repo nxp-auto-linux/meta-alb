@@ -7,6 +7,7 @@ More recent code actually uses it to implement, e.g., redirects.
 Without dup3(), the database gets messed up and we get weird aborts
 then because suddenly paths no longer match expectations.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  ports/unix/guts/dup3.c  | 30 ++++++++++++++++++++++++++++++

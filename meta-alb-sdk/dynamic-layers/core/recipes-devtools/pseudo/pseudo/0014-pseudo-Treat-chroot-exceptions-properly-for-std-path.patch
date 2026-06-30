@@ -7,6 +7,7 @@ The problem to solve is that our pseudo_path_exec() gets called through
 the exec functions from shell code which did its own path search.
 So "normal" searches need
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 18 ++++++++++++++----

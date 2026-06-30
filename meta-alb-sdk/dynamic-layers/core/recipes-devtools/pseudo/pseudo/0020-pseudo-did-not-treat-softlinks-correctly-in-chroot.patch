@@ -14,6 +14,7 @@ is slightly different.
 This patch fixes running systemctl in image.bbclass for a
 complex rootfs and likely some other things.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 75 +++++++++++++++++++++++++++++++++++++++++++------

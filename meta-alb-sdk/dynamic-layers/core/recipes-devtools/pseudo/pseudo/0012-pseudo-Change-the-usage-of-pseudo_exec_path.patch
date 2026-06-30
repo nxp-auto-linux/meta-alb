@@ -6,6 +6,7 @@ Subject: [PATCH 12/20] pseudo: Change the usage of pseudo_exec_path()
 To support chroot exec paths properly, we need to modify the use
 of pseudo_exec_path().
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Costea Ciprian <ciprianmarian.costea@nxp.com>
 ---

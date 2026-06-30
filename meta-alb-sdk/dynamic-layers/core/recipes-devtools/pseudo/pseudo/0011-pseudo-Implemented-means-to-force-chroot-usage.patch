@@ -13,6 +13,7 @@ the chroot because neither host nor sysroot provides it properly. You
 are asking about the difference in architecture for scripts and target
 binaries? Just wait for a subsequent commit
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 55 +++++++++++++++++++++++++++++++++++++++++++------

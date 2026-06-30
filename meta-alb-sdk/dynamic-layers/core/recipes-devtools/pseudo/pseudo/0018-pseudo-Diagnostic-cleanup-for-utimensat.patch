@@ -6,6 +6,7 @@ Subject: [PATCH 18/20] pseudo: Diagnostic cleanup for utimensat()
 The pseudo diagnostics didn't print dirfd. This patch attempts to
 generate a bit more useful output
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 3 ++-

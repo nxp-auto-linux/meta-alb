@@ -9,6 +9,7 @@ an output from within the chroot space into a full path. This however
 requires us to change the function prototypes and invocation to pass
 the readlink pointer that we want to use.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo.h        |  3 ++-

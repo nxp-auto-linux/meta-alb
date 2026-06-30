@@ -9,6 +9,7 @@ So when resolving a path, this needs to be taken account or the
 chroot path appears twice suddenly in the resulting path, leading
 to failure.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_util.c | 13 +++++++++----

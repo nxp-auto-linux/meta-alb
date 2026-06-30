@@ -11,6 +11,7 @@ that interpreter is not searching PATH ... which most don't.
 This patch also adds in a buffer size correction and check that
 Catalin provided.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Signed-off-by: Catalin Udma <catalin-dan.udma@nxp.com>
 Signed-off-by: Costea Ciprian <ciprianmarian.costea@nxp.com>

@@ -28,6 +28,7 @@ checked 0 paths earlier even.
 All in all, I am not really happy with this patch, but it will do the
 job and while ugly at least it isn't overly obscure or clever.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  ports/linux/guts/__fxstatat.c   | 26 ++++++++++++++++++---

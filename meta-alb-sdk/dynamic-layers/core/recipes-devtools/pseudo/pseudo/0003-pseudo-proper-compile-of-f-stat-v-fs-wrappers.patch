@@ -6,6 +6,7 @@ Subject: [PATCH 03/20] pseudo: proper compile of [f]stat[v]fs() wrappers.
 Ensure by adding the right headers that the [f]stat[v]fs() wrappers
 compile properly
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_wrappers.c | 2 ++

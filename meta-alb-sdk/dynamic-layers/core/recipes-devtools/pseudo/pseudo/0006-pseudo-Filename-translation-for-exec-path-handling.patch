@@ -6,12 +6,13 @@ Subject: [PATCH] pseudo: Filename translation for exec path handling
 This is required to map between host and chroot exe paths in somewhat
 arbitrary ways. We need it later.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 
 ---
- pseudo_client.c | 17 +++++++++++++++++
+ pseudo_client.c | 19 +++++++++++++++++++
  pseudo_util.c   |  1 +
- 2 files changed, 18 insertions(+)
+ 2 files changed, 20 insertions(+)
 
 diff --git a/pseudo_client.c b/pseudo_client.c
 index 355b4ef..d4541ae 100644
@@ -34,10 +35,10 @@ index 355b4ef..d4541ae 100644
  
  	if (!filename)
  		return NULL;
-@@ -2251,6 +2254,20 @@ pseudo_exec_path(const char *filename, int search_path) {
+@@ -2251,6 +2254,22 @@ pseudo_exec_path(const char *filename, int search_path) {
  		populate_path_segs();
  	}
- 
+
 +	/* We check a precise path translation first and fall back to
 +	 * the base name only. This permits generic aliasing of basenames
 +	 */
@@ -48,7 +49,9 @@ index 355b4ef..d4541ae 100644
 +			s = patternlistmatchespath(xtranslation, basename(filenamecopy), &aliasbuf[0], sizeof(aliasbuf), 1);
 +			free(filenamecopy);
 +		}
-+	} else {
++	}
++	/* Apply the translation regardless of which path produced the match. */
++	if (s) {
 +		filename = s;
 +	}
 +

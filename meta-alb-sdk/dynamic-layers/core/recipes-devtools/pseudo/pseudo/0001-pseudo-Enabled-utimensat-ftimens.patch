@@ -5,6 +5,7 @@ Subject: [PATCH 01/20] pseudo: Enabled utimensat/ftimens
 
 This required a makewrappers change to permit array arguments to wrappers
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  makewrappers            | 18 ++++++++++--------
@@ -26,8 +27,8 @@ index cf5ad60..a1d0aef 100755
              self.vararg = False
  
          # try for a function pointer
--        match = re.match('(.*)\(\*([a-zA-Z0-9$_]*)\)\((.*)\)', text)
-+        match = re.match('(.*)\(\*([a-zA-Z0-9$_]*)\)\((.*)\)(\[[0-9]+\])?', text)
+-        match = re.match(r'(.*)\(\*([a-zA-Z0-9$_]*)\)\((.*)\)', text)
++        match = re.match(r'(.*)\(\*([a-zA-Z0-9$_]*)\)\((.*)\)(\[[0-9]+\])?', text)
          if match:
              self.function_pointer = True
              self.args = match.group(3)
@@ -36,8 +37,8 @@ index cf5ad60..a1d0aef 100755
 +            self.array = match.group(4)
          else:
              # plain declaration
--            match = re.match('(.*[ *])\(?\*?([a-zA-Z0-9$_]*)\)?', text)
-+            match = re.match('(.*[ *])\(?\*?([a-zA-Z0-9$_]*)(\[[0-9]+\])?\)?', text)
+-            match = re.match(r'(.*[ *])\(?\*?([a-zA-Z0-9$_]*)\)?', text)
++            match = re.match(r'(.*[ *])\(?\*?([a-zA-Z0-9$_]*)(\[[0-9]+\])?\)?', text)
              # there may not be a match, say in the special case
              # where an arg is '...'
              if match:

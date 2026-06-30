@@ -4,6 +4,7 @@ Date: Tue, 8 Nov 2022 11:29:03 +0100
 Subject: [PATCH 02/20] pseudo: The stat[v]fs() functions were not wrapped
  properly
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  ports/linux/wrapfuncs.in | 8 ++++++++
@@ -14,7 +15,7 @@ index 97b16c2..241cf52 100644
 --- a/ports/linux/wrapfuncs.in
 +++ b/ports/linux/wrapfuncs.in
 @@ -22,12 +22,20 @@ int openat64(int dirfd, const char *path, int flags, ...{mode_t mode}); /* flags
- int __openat64_2(int dirfd, const char *path, int flags); /* flags=flags&O_NOFOLLOW, noignore_path=1 */
+ int __openat64_2(int dirfd, const char *path, int flags); /* flags=((flags&O_NOFOLLOW)||((flags&(O_CREAT|O_EXCL))==(O_CREAT|O_EXCL))), noignore_path=1 */
  int creat64(const char *path, mode_t mode);
  int stat(const char *path, struct stat *buf); /* real_func=pseudo_stat */
 +int statfs(const char *path, struct statfs *buf);

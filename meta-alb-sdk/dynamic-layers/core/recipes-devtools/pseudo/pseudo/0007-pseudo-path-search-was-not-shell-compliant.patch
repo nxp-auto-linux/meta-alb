@@ -3,6 +3,7 @@ From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Date: Tue, 8 Nov 2022 11:40:15 +0100
 Subject: [PATCH 07/20] pseudo: path search was not shell compliant
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 2 +-

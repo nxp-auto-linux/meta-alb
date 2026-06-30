@@ -5,6 +5,7 @@ Subject: [PATCH 10/20] pseudo: Clean up executable check
 
 We need this also as subfunction for later use
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 36 +++++++++++++++++++++++++++++++++++-

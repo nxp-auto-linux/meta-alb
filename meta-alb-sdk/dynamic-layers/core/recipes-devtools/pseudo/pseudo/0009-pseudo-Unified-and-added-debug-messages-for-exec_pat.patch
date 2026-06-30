@@ -3,6 +3,7 @@ From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Date: Tue, 8 Nov 2022 11:47:00 +0100
 Subject: [PATCH 09/20] pseudo: Unified and added debug messages for exec_path
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 5 ++++-

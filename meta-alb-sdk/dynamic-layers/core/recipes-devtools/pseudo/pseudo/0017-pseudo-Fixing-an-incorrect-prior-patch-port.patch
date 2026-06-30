@@ -6,6 +6,7 @@ Subject: [PATCH 17/20] pseudo: Fixing an incorrect prior patch port
 One indent was misleading and a key functional change when to use
 chroot was done incorrectly and needed to be swapped in the first place.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 6 +++---

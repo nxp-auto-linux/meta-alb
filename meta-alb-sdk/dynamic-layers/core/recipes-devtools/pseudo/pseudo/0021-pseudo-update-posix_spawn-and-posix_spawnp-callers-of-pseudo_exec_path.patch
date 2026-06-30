@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
+Date: Mon, 25 May 2026 15:00:00 +0200
+Subject: [PATCH] pseudo: update posix_spawn/posix_spawnp callers of
+ pseudo_exec_path
+
+Upstream pseudo added ports/common/guts/posix_spawn.c and
+ports/common/guts/posix_spawnp.c after NXP's patch series was written.
+These two new files call pseudo_exec_path() with the original
+two-argument signature.
+
+NXP patch 0012 ("pseudo: Change the usage of pseudo_exec_path") changed
+the signature from
+    pseudo_exec_path(const char *, int)
+to
+    pseudo_exec_path(const char **filenamep, int, char *const **argvp)
+so that the function can chroot-resolve the filename and adjust argv
+for script handlers. The patch updated execv.c/execve.c/execvp.c but
+did not (and could not) know about the future posix_spawn additions.
+
+This patch updates the two new files to use the new three-argument
+signature, fixing the do_compile failure on scarthgap.
+
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
+Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@nxp.com>
+---
+ ports/common/guts/posix_spawn.c  | 2 +-
+ ports/common/guts/posix_spawnp.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ports/common/guts/posix_spawn.c b/ports/common/guts/posix_spawn.c
+--- a/ports/common/guts/posix_spawn.c
++++ b/ports/common/guts/posix_spawn.c
+@@ -15,7 +15,7 @@
+ 	 * design will likely be revisited.
+ 	 */
+         if (antimagic == 0) {
+-		const char *path_guess = pseudo_exec_path(path, 0);
++		const char *path_guess = pseudo_exec_path(&path, 0, &argv);
+                 pseudo_client_op(OP_EXEC, PSA_EXEC, -1, -1, path_guess, 0);
+         }
+
+diff --git a/ports/common/guts/posix_spawnp.c b/ports/common/guts/posix_spawnp.c
+--- a/ports/common/guts/posix_spawnp.c
++++ b/ports/common/guts/posix_spawnp.c
+@@ -15,7 +15,7 @@
+ 	 * design will likely be revisited.
+ 	 */
+         if (antimagic == 0) {
+-		const char *path_guess = pseudo_exec_path(file, 1);
++		const char *path_guess = pseudo_exec_path(&file, 1, &argv);
+                 pseudo_client_op(OP_EXEC, PSA_EXEC, -1, -1, path_guess, 0);
+         }
+
+--
+2.34.1

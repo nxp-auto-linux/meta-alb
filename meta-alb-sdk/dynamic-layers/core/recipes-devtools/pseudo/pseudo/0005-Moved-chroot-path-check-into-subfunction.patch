@@ -6,6 +6,7 @@ Subject: [PATCH 05/20] Moved chroot path check into subfunction
 This is to support subsequent changes that require a lot of the same
 checks.
 
+Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
  pseudo_client.c | 17 ++++++++++++-----

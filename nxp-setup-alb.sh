@@ -51,7 +51,7 @@ UBUNTUMACHINE=".+ubuntu"
 YOCTOVERSION="scarthgap"
 
 # Default hw-partition for specific machines
-HW_PART_MACHINES_RE="s32n79rdb|s32n79sim"
+HW_PART_MACHINES_RE="s32n79rdb(ubuntu)?|s32n79sim"
 DEFAULT_HWPART_NAME="hw-partition-1.2.1"
 
 # Error codes

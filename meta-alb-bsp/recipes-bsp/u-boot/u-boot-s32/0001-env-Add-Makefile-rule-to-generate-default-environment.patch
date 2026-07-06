@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Date: Wed, 15 Feb 2023 15:02:05 +0200
+Subject: [PATCH] env: Add Makefile rule to generate default environment
+
+Add new rule `env-default` to dump the default environment to a file
+named `env-default.txt`. The rule depends on the `env` directory being
+built (a phony target from $(u-boot-dirs)) rather than on a specific
+object/archive, so it is independent of the Kbuild built-in.o vs
+built-in.a layout and applies unchanged across U-Boot releases.
+
+Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
+Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
+Signed-off-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+---
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index baeafb0c286..db4f1a064c2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1200,2 +1200,7 @@ endif
+ INPUTS-y += u-boot.srec u-boot.bin u-boot.sym System.map binary_size_check
++INPUTS-y += env-default
++
++# Extract default environment to a file
++env-default: env FORCE
++	$(shell $(CONFIG_SHELL) $(srctree)/scripts/get_default_envs.sh $(build-dir) > $@.txt)
+ 

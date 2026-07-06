@@ -3,7 +3,7 @@ PV = "6.12.92"
 require recipes-kernel/linux/linux-s32.inc
 
 BRANCH ?= "${RELEASE_BASE}-${PV}"
-SRCREV = "14c81fa20e5ae5db752546999cdfb06a7bb430e1"
+SRCREV = "957543179a8b5c8a1f7d2b6f6e80fa7951904b01"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 

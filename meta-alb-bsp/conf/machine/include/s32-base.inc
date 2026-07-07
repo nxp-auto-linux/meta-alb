@@ -46,7 +46,7 @@ SSTATE_EXCLUDEDEPS_SYSROOT:remove = ".*->bison-native"
 
 UBOOT_BOOTSPACE_SEEK ?= "8"
 UBOOT_KERNEL_IMAGETYPE ?= "Image"
-UBOOT_ENTRYPOINT ?= "80080000"
+UBOOT_ENTRYPOINT ?= "0x80080000"
 # Comment next line to prevent writing the environment to sdcard
 UBOOT_ENV_SDCARD_OFFSET ??= "0x00100000"
 

@@ -2,15 +2,15 @@
 
 SUMMARY = "Firmware binaries for LLCE"
 LICENSE = "NXP-S32-PLATFORM-SOFTWARE"
-LIC_FILES_CHKSUM = "file://license-llce.rtf;md5=97a0abc6fb5eb52a8cd1e99205caa71b"
-NO_GENERIC_LICENSE[NXP-S32-PLATFORM-SOFTWARE] = "license-llce.rtf"
+LIC_FILES_CHKSUM = "file://license.txt;md5=96b2b32a4c530209b2127d9973875e9a"
+NO_GENERIC_LICENSE[NXP-S32-PLATFORM-SOFTWARE] = "license.txt"
 FILESEXTRAPATHS:prepend := "${NXP_FIRMWARE_LOCAL_DIR}:"
 
 LLCE_DTE_FILE     ?= "dte.bin"
 LLCE_FRPE_FILE    ?= "frpe.bin"
 LLCE_PPETX_FILE   ?= "ppe_tx.bin"
 LLCE_PPERX_FILE   ?= "ppe_rx.bin"
-LLCE_LICENSE_FILE ?= "license-llce.rtf"
+LLCE_LICENSE_FILE ?= "license.txt"
 FW_INSTALL_DEPLOY  = "nxp_fw"
 
 SRC_URI = " \

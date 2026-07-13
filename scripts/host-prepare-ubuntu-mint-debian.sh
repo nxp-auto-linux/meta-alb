@@ -4,11 +4,12 @@ NEW_LIB32_LINUX=""
 UPDATE_FLAG=''
 if test $force_update; then UPDATE_FLAG='-y --force-yes';fi
 
-# pkgs listed in yocto doc
-# https://www.yoctoproject.org/docs/2.4.2/ref-manual/ref-manual.html#intro-requirements
+# pkgs listed in yocto doc (Scarthgap 5.0 "Required Packages for the Build Host")
+# https://docs.yoctoproject.org/5.0/ref-manual/system-requirements.html
 PKGS=" curl gawk wget git-core diffstat unzip texinfo \
      build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
-     xz-utils debianutils iputils-ping \
+     python3-git python3-jinja2 python3-subunit \
+     xz-utils debianutils iputils-ping file libacl1 locales \
      libsdl1.2-dev xterm libncurses5-dev lz4 zstd"
 # pkgs required for fsl use
 PKGS="$PKGS make vim-common tofrodos libstring-crc32-perl screen parted \

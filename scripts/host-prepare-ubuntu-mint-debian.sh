@@ -15,13 +15,6 @@ PKGS=" curl gawk wget git-core diffstat unzip texinfo \
 PKGS="$PKGS make vim-common tofrodos libstring-crc32-perl screen parted \
      dosfstools mtools udev gdb"
 
-if [ "$distro" = "Ubuntu" ]; then
-	if [ "$release" = "16.04" -o "$release" = "18.04" ]; then
-		# add pks for Ubuntu target: Ubuntu 16.04 or 18.04 toolchain
-		PKGS="$PKGS gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross"
-	fi
-fi
-
 echo "Now we're going to install all the other development packages needed to build Yocto, please wait"
 
 sudo apt-get $UPDATE_FLAG install $PKGS

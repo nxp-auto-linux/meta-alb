@@ -2,7 +2,7 @@ Yocto BSP layer for UC1.2
 ==========================================================================
 
 hw-partition-1.2 contains one cohort layer:
-* meta-alb-hw-partition-1.1.2 - generates Linux images for Cohort 2 which:
+* meta-alb-hw-partition-1.2 - generates Linux images for Cohort 2 which:
   - owns uSDHC and UFS,
   - owns SMMU
   - uses UART0 as console.

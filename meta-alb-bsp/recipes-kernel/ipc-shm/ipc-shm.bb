@@ -9,6 +9,10 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
 
 inherit module
+inherit remove-kernel-runtime-deps
+
+# Avoid pulling kernel-image and versioned kernel packages into the rootfs
+REMOVE_KERNEL_DEPS_PREFIXES = "kernel-module-ipc-shm"
 
 IPC-SHM_INCLUDE_PATH = "recipes-kernel/ipc-shm"
 IPC-SHM_INCLUDE:s32g2  = "${IPC-SHM_INCLUDE_PATH}/ipc-shm-s32g2-defs.inc"

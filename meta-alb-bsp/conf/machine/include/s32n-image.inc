@@ -22,8 +22,13 @@ IMAGE_ROOTFS_ALIGNMENT ?= "1024"
 
 SDCARD_ROOTFS = "ext4"
 UFS_ROOTFS = "ext4"
-UBOOT_BOOTSPACE_OFFSET = "1024"
 UBOOT_SUFFIX_SDCARD = "${UBOOT_SUFFIX}"
+
+# U-Boot boots from the FIP as BL33, so the raw copy the sdcard class would write
+# is unused duplication (and a large one would overrun the BL2 partition at 1 MiB).
+# Empty name => nothing is written; UBOOT_BOOTSPACE_OFFSET only placed that copy,
+# so it is dropped too.
+UBOOT_NAME_SDCARD = ""
 
 # remove the ".rootfs" that is added in the image output file names
 IMAGE_NAME_SUFFIX = ""

@@ -4,11 +4,36 @@ Date: Wed, 15 Feb 2023 15:02:05 +0200
 Subject: [PATCH] env: Add Makefile rule to generate default environment
 
 Add new rule `env-default` to dump the default
-environment from env/built-in.o to a file named
+environment from env/common.o to a file named
 `env-default.txt`
+
+The rule depends on `env` (the env/ subdir descend) rather than on
+`env/built-in.o`. Because of the Kbuild rule
+
+    $(sort $(u-boot-init) $(u-boot-main)): $(u-boot-dirs) ;
+
+every built-in.o (including env/built-in.o) transitively depends on
+*all* $(u-boot-dirs). Making env-default depend on env/built-in.o
+therefore made it become ready at the same instant as the final `u-boot`
+link, so under `make -j` the two ran concurrently. scripts/get_default_envs.sh
+extracts the environment with
+
+    objcopy --dump-section .rodata.default_environment=copy env/common.o
+
+which, having no output file, rewrites env/common.o in place. Since
+env/built-in.o is a thin archive that references env/common.o by path,
+the concurrent link intermittently read a half-rewritten env/common.o
+and failed with:
+
+    ld.bfd: env/built-in.o: member env/common.o in archive is not an object
+
+Depending on `env` alone makes env-default run right after the small
+env/ descend, well before the link (which waits for every descend),
+removing the overlap.
 
 Signed-off-by: Vicovan Ionut-Valentin <Ionut.Vicovan@nxp.com>
 Signed-off-by: Ciprian Costea <ciprianmarian.costea@nxp.com>
+Signed-off-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
 ---
  Makefile | 5 +++++
  1 file changed, 5 insertions(+)
@@ -30,7 +55,7 @@ index ee55957e9a..d4b244cb17 100644
  		$(BOARD_SIZE_CHECK)
  
 +# Extract default environment to a file
-+env-default: env/built-in.o FORCE
++env-default: env FORCE
 +	$(shell $(CONFIG_SHELL) $(srctree)/scripts/get_default_envs.sh $(build-dir) > $@.txt)
 +
  # binman

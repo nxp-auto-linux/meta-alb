@@ -130,6 +130,7 @@
 			clocks = <&clks 0x90>, <&clks 0x9a>,
 				<&clks 0x90>, <&clks 0x9a>;
 			clock-names = "dmamux0", "dmamux1", "dmamux2", "dmamux3";
+			dma-coherent;
 		};
 
 		irqsteer_coss: interrupt-controller@4ed50000 {

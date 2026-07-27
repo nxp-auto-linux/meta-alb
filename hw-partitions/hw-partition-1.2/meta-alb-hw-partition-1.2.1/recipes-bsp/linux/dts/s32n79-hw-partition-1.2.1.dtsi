@@ -84,7 +84,7 @@
 
 		dma_pool: dma-pool@80000000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x80000000 0x0 0x80000>;
+			reg = <0x0 0x80000000 0x0 0x100000>; /* 1 MB */
 			no-map;
 		};
 
@@ -200,6 +200,7 @@
 				     <393>;
 			clocks = <&clks 0xf8>, <&clks 0xf9>;
 			clock-names = "dmamux0", "dmamux1";
+			memory-region = <&dma_pool>;
 		};
 	};
 };

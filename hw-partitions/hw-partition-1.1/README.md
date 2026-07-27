@@ -17,7 +17,7 @@ Each cohort has 0x1c000000 bytes assigned space in Low memory, split as follows:
 | Region/Component           | Start                            | End                              | Note                              |
 |----------------------------|----------------------------------|----------------------------------|-----------------------------------|
 | DDR_START                  | 0x00000000                       |                                  |                                   |
-| Linux CMA                  | 0x00000000                       | 0x0FFFFFFF                       | 256 MB                            |
+| Reserved DMA Pool          | 0x00000000                       | 0x000FFFFF                       | 1 MB (Cohort 6: 512 KB)           |
 | HSE Reserved               | 0x10000000                       | 0x12FFFFFF                       | 48 MB                             |
 | SCMI Shared Memory         | 0x13000000                       | 0x13000FFF                       | 4 KB                              |
 | TLV Shared Memory          | 0x13002000                       | 0x13003FFF                       | 8 KB                              |

@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Vero Coder <vero@example.com>
+Date: Wed, 30 Jul 2026 20:00:00 +0000
+Subject: [PATCH] pseudo: recover base path for O_PATH dirfds via /proc/self/fd
+
+GNU tar >= 1.35 opens its working directory with O_PATH|O_DIRECTORY,
+then calls openat(opath_fd, ".", O_RDONLY|...) to get a normal dir fd.
+pseudo's normal openat path calls fxstatat() on the returned fd before
+registering it; fxstatat fails on O_PATH fds so the fd is never stored
+in fd_paths[], and the subsequent openat(opath_fd, ".") sees an unknown
+base path, causing every *at() call inside do_package to fail with
+"unknown base path for fd N".
+
+Fix in base_path(): when fd_path(dirfd) returns NULL for a known-valid
+fd, recover the real path with readlink("/proc/self/fd/<dirfd>") and
+cache it via pseudo_client_path() for subsequent calls. readlink always
+yields a canonical absolute path, so no trailing-slash / double-slash
+artefacts are introduced into pseudo's path database.
+
+Upstream-Status: Pending
+Signed-off-by: Vero Coder <vero@example.com>
+---
+ pseudo_client.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/pseudo_client.c b/pseudo_client.c
+--- a/pseudo_client.c
++++ b/pseudo_client.c
+@@ -1524,6 +1524,23 @@
+ 			if (dirfd >= 0) {
+ 				basepath = fd_path(dirfd);
+ 			}
++			/* Fallback: O_PATH fds may not have been registered in fd_paths[]
++			 * (e.g. GNU tar >= 1.35 opens dirs with O_PATH|O_DIRECTORY, which
++			 * pseudo cannot fxstatat, so they never get stored).  Recover the
++			 * real path from /proc/self/fd and cache it for later calls.
++			 */
++			if (!basepath && dirfd >= 0) {
++				char proc_path[32];
++				static char resolved[PATH_MAX];
++				ssize_t rlen;
++				snprintf(proc_path, sizeof(proc_path), "/proc/self/fd/%d", dirfd);
++				rlen = readlink(proc_path, resolved, sizeof(resolved) - 1);
++				if (rlen > 0) {
++					resolved[rlen] = '\0';
++					basepath = resolved;
++					pseudo_client_path(dirfd, resolved);
++				}
++			}
+ 			if (basepath) {
+ 				baselen = strlen(basepath);
+ 			} else {
+-- 
+2.43.0

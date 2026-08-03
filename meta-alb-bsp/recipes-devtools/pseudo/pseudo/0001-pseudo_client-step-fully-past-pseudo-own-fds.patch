@@ -1,0 +1,72 @@
+From 8907027d4d0c6cd5c215f73f5dfc20a7ca3e76ac Mon Sep 17 00:00:00 2001
+From: Babanpreet Singh <bbnpreetsingh@gmail.com>
+Date: Sat, 18 Jul 2026 04:37:48 +0000
+Subject: [PATCH] pseudo_client: step fully past pseudo's own fds when
+ computing startfd
+Upstream-Status: Backport [https://git.yoctoproject.org/pseudo/commit/8907027d4d0c6cd5c215f73f5dfc20a7ca3e76ac]
+
+OP_CLOSEFROM computes startfd, the first descriptor the caller may
+hand to the kernel wholesale, by stepping past each descriptor
+pseudo needs to keep:
+
+	if (connect_fd > startfd)
+		startfd = connect_fd + 1;
+
+A protected descriptor exactly equal to the running startfd fails that
+test and ends up protected by nothing: the close-by-hand loop stops
+below startfd, the kernel sweep starts at startfd, and the descriptor
+is closed even though it is on the protect list.
+
+The default descriptor layout hits this. Client init opens the local
+state directory fd and then connects to the server, so the two sit on
+consecutive numbers, say 21 and 22: the local state fd raises startfd
+to 22, connect_fd == 22 fails the > test, and closefrom(3) or
+close_range(3, ~0U, 0) hands 22 straight to the kernel. The server
+connection is closed out from under the client.
+
+The client transparently reconnects on the next operation, which is
+why this has gone unnoticed, but until that reconnect the stale
+descriptor number is free for the process to reuse, and anything
+pseudo believes about the connection is attached to the wrong
+descriptor.
+
+Use >= so startfd always ends up above every protected descriptor.
+
+Present since the startfd computation was introduced in 21ff2fb
+("ports/linux/guts: Add closefrom support for glibc 2.34").
+
+AI-Generated: Uses Claude (claude-sonnet-5)
+Signed-off-by: Babanpreet Singh <bbnpreetsingh@gmail.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ pseudo_client.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/pseudo_client.c b/pseudo_client.c
+index 7041366..d70ede0 100644
+--- a/pseudo_client.c
++++ b/pseudo_client.c
+@@ -1936,15 +1936,15 @@ pseudo_client_op(pseudo_op_t op, int access, int fd, int dirfd, const char *path
+ 	case OP_CLOSEFROM:
+ 		/* no request needed */
+ 		startfd = fd;
+-		if (pseudo_util_debug_fd > startfd)
++		if (pseudo_util_debug_fd >= startfd)
+ 			startfd = pseudo_util_debug_fd + 1;
+-		if (pseudo_localstate_dir_fd > startfd)
++		if (pseudo_localstate_dir_fd >= startfd)
+ 			startfd = pseudo_localstate_dir_fd + 1;
+-		if (pseudo_pwd_fd > startfd)
++		if (pseudo_pwd_fd >= startfd)
+ 			startfd = pseudo_pwd_fd + 1;
+-		if (pseudo_grp_fd > startfd)
++		if (pseudo_grp_fd >= startfd)
+ 			startfd = pseudo_grp_fd + 1;
+-		if (connect_fd > startfd)
++		if (connect_fd >= startfd)
+ 			startfd = connect_fd + 1;
+ 		for (i = fd; i < startfd; ++i) {
+ 			if (i == pseudo_util_debug_fd || i == pseudo_localstate_dir_fd || i == pseudo_pwd_fd ||
+-- 
+2.43.0
+

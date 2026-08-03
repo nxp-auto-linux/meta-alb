@@ -1,0 +1,90 @@
+From f2b420c1ed09dd8120f926f9a200098b3e85a9e0 Mon Sep 17 00:00:00 2001
+From: Babanpreet Singh <bbnpreetsingh@gmail.com>
+Date: Sat, 18 Jul 2026 04:37:49 +0000
+Subject: [PATCH] pseudo_client: step around all of pseudo's own fds in
+ closefrom
+Upstream-Status: Backport [https://git.yoctoproject.org/pseudo/commit/f2b420c1ed09dd8120f926f9a200098b3e85a9e0]
+
+OP_CLOSEFROM steps around five descriptors pseudo keeps for itself
+(debug output, the local state directory, passwd, group, and the
+server connection), but pseudo can hold three more, and a sweep
+will close those:
+
+- pseudo_util_evlog_fd is where pseudo_evlog_dump() writes the
+  in-memory event log at the moment the client gives up on the server
+  connection for good. It defaults to 2, so stepping around it matches the existing
+  treatment of pseudo_util_debug_fd, which also defaults to 2 and is
+  already protected. A closed (or worse, silently reused) descriptor
+  here would misdirect exactly the diagnostics needed to debug a dead
+  server.
+
+- pseudo_pwd_lck_fd is open between lckpwdf() and ulckpwdf(), which is
+  precisely the window in which a caller works on the passwd files and
+  may sweep descriptors. Once the sweep has closed it, ulckpwdf()'s
+  close() can land on an unrelated descriptor that reused the number.
+
+- pseudo_prefix_dir_fd is opened at client init and stays open for
+  the life of the process.
+
+pseudo_pwd_lck_fd is -1 while no lock is held, which the existing
+pattern already copes with: -1 never raises startfd and never matches
+a descriptor the close-by-hand loop visits.
+
+pseudo_util_evlog_fd had no declaration outside pseudo_util.c, so give
+it one in pseudo.h next to pseudo_util_debug_fd.
+
+[YOCTO #16339]
+
+AI-Generated: Uses Claude (claude-sonnet-5)
+Signed-off-by: Babanpreet Singh <bbnpreetsingh@gmail.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ pseudo.h        |  1 +
+ pseudo_client.c | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/pseudo.h b/pseudo.h
+index 93a1cea..3e98c0b 100644
+--- a/pseudo.h
++++ b/pseudo.h
+@@ -29,6 +29,7 @@ extern void pseudo_debug_flags_finalize(void);
+ extern unsigned long pseudo_util_debug_flags;
+ extern unsigned long pseudo_util_evlog_flags;
+ extern int pseudo_util_debug_fd;
++extern int pseudo_util_evlog_fd;
+ extern int pseudo_disabled;
+ extern int pseudo_allow_fsync;
+ extern int pseudo_diag(char *, ...) __attribute__ ((format (printf, 1, 2)));
+diff --git a/pseudo_client.c b/pseudo_client.c
+index d70ede0..5af3f00 100644
+--- a/pseudo_client.c
++++ b/pseudo_client.c
+@@ -1938,16 +1938,24 @@ pseudo_client_op(pseudo_op_t op, int access, int fd, int dirfd, const char *path
+ 		startfd = fd;
+ 		if (pseudo_util_debug_fd >= startfd)
+ 			startfd = pseudo_util_debug_fd + 1;
++		if (pseudo_util_evlog_fd >= startfd)
++			startfd = pseudo_util_evlog_fd + 1;
++		if (pseudo_prefix_dir_fd >= startfd)
++			startfd = pseudo_prefix_dir_fd + 1;
+ 		if (pseudo_localstate_dir_fd >= startfd)
+ 			startfd = pseudo_localstate_dir_fd + 1;
+ 		if (pseudo_pwd_fd >= startfd)
+ 			startfd = pseudo_pwd_fd + 1;
++		if (pseudo_pwd_lck_fd >= startfd)
++			startfd = pseudo_pwd_lck_fd + 1;
+ 		if (pseudo_grp_fd >= startfd)
+ 			startfd = pseudo_grp_fd + 1;
+ 		if (connect_fd >= startfd)
+ 			startfd = connect_fd + 1;
+ 		for (i = fd; i < startfd; ++i) {
+-			if (i == pseudo_util_debug_fd || i == pseudo_localstate_dir_fd || i == pseudo_pwd_fd ||
++			if (i == pseudo_util_debug_fd || i == pseudo_util_evlog_fd ||
++					i == pseudo_prefix_dir_fd || i == pseudo_localstate_dir_fd ||
++					i == pseudo_pwd_fd || i == pseudo_pwd_lck_fd ||
+ 					i == pseudo_grp_fd || i == connect_fd)
+ 				continue;
+ 			pseudo_client_close(i);
+-- 
+2.43.0
+

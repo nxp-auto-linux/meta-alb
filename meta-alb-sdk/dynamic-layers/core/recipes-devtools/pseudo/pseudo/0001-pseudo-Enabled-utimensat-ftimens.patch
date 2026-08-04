@@ -3,70 +3,20 @@ From: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 Date: Tue, 8 Nov 2022 10:55:16 +0100
 Subject: [PATCH 01/20] pseudo: Enabled utimensat/ftimens
 
-This required a makewrappers change to permit array arguments to wrappers
+This required a makewrappers change to permit array arguments to wrappers.
+
+Note: as of pseudo 1.9.8 the makewrappers script already supports array
+arguments natively (self.array handling and the array regex are present
+upstream), so the original makewrappers hunk has been dropped to avoid a
+patch conflict after the Yocto subminor update. Only the wrapfuncs.in
+change that declares the utimensat/futimens wrappers remains necessary.
 
 Upstream-Status: Inappropriate [NXP S32 / ubuntu rootfs support only]
 Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
 ---
- makewrappers            | 18 ++++++++++--------
  ports/unix/wrapfuncs.in |  2 ++
- 2 files changed, 12 insertions(+), 8 deletions(-)
+ 1 file changed, 2 insertions(+)
 
-diff --git a/makewrappers b/makewrappers
-index cf5ad60..a1d0aef 100755
---- a/makewrappers
-+++ b/makewrappers
-@@ -121,27 +121,28 @@ class Argument:
-             else:
-                 # nothing to do.
-                 self.vararg_wraps = None
--                self.type, self.name = None, None
-+                self.type, self.name, self.array = None, None, None
-                 return
-         else:
-             self.vararg = False
- 
-         # try for a function pointer
--        match = re.match(r'(.*)\(\*([a-zA-Z0-9$_]*)\)\((.*)\)', text)
-+        match = re.match(r'(.*)\(\*([a-zA-Z0-9$_]*)\)\((.*)\)(\[[0-9]+\])?', text)
-         if match:
-             self.function_pointer = True
-             self.args = match.group(3)
-             self.type = match.group(1)
-             self.name = match.group(2).rstrip()
-+            self.array = match.group(4)
-         else:
-             # plain declaration
--            match = re.match(r'(.*[ *])\(?\*?([a-zA-Z0-9$_]*)\)?', text)
-+            match = re.match(r'(.*[ *])\(?\*?([a-zA-Z0-9$_]*)(\[[0-9]+\])?\)?', text)
-             # there may not be a match, say in the special case
-             # where an arg is '...'
-             if match:
--                self.type, self.name = match.group(1).rstrip(), match.group(2)
-+                self.type, self.name, self.array = match.group(1).rstrip(), match.group(2), match.group(3)
-             else:
--                self.type, self.name = None, None
-+                self.type, self.name, self.array = None, None, None
- 
-         # spacing between type and name, needed if type ends with a character
-         # which could be part of an identifier
-@@ -149,12 +150,13 @@ class Argument:
-             self.spacer = ' '
- 
-     def decl(self, comment=False, wrap=False):
-+        xstr = lambda s: s or ""
-         """Produce the declaration form of this argument."""
-         if self.function_pointer:
--            decl = "%s%s(*%s)(%s)" % \
--                   (self.type, self.spacer, self.name, self.args)
-+            decl = "%s%s(*%s)(%s)%s" % \
-+                   (self.type, self.spacer, self.name, self.args, xstr(self.array))
-         else:
--            decl = "%s%s%s" % (self.type, self.spacer, self.name)
-+            decl = "%s%s%s%s" % (self.type, self.spacer, self.name, xstr(self.array))
- 
-         if self.vararg:
-             if self.vararg_wraps:
 diff --git a/ports/unix/wrapfuncs.in b/ports/unix/wrapfuncs.in
 index 7724fc7..4d7a887 100644
 --- a/ports/unix/wrapfuncs.in
@@ -82,4 +32,3 @@ index 7724fc7..4d7a887 100644
  int fclose(FILE *fp);  /* noignore_path=1 */
 -- 
 2.34.1
-

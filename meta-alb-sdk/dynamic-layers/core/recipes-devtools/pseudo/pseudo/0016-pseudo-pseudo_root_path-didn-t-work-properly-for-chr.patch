@@ -18,11 +18,9 @@ Signed-off-by: Heinz Wrobel <Heinz.Wrobel@nxp.com>
  pseudo_util.c   | 25 ++++++++++++++-----------
  4 files changed, 50 insertions(+), 22 deletions(-)
 
-diff --git a/pseudo.h b/pseudo.h
-index 4b5eaab..7fa3557 100644
 --- a/pseudo.h
 +++ b/pseudo.h
-@@ -64,7 +64,8 @@ extern void pseudo_dump_data(char *, const void *, size_t);
+@@ -65,7 +65,8 @@
  void pseudo_new_pid(void);
  /* pseudo_fix_path resolves symlinks up to this depth */
  #define PSEUDO_MAX_LINK_RECURSION 16
@@ -32,11 +30,9 @@ index 4b5eaab..7fa3557 100644
  extern void pseudo_dropenv(void);
  extern char **pseudo_dropenvp(char * const *);
  extern void pseudo_setupenv(void);
-diff --git a/pseudo_client.c b/pseudo_client.c
-index d1bd32f..1a773f3 100644
 --- a/pseudo_client.c
 +++ b/pseudo_client.c
-@@ -1552,8 +1552,8 @@ static char *patternlistmatchespath(const char *patternlist, const char *path, c
+@@ -1546,8 +1546,8 @@
  	return foundpath;
  }
  
@@ -47,7 +43,7 @@ index d1bd32f..1a773f3 100644
  		strlen(basepath) >= pseudo_chroot_len &&
  		!memcmp(basepath, pseudo_chroot, pseudo_chroot_len) &&
  		(basepath[pseudo_chroot_len] == '\0' || basepath[pseudo_chroot_len] == '/')) {
-@@ -1563,6 +1563,29 @@ static int ischrootpath(const char *basepath) {
+@@ -1557,6 +1557,29 @@
  	return 0;
  }
  
@@ -77,7 +73,7 @@ index d1bd32f..1a773f3 100644
  static char *
  base_path(int dirfd, const char *path, int leave_last) {
  	char *basepath = 0;
-@@ -1619,7 +1642,7 @@ base_path(int dirfd, const char *path, int leave_last) {
+@@ -1630,7 +1653,7 @@
  		}
  	}
  
@@ -86,7 +82,7 @@ index d1bd32f..1a773f3 100644
  	pseudo_debug(PDBGF_PATH, "base_path[%s]: %s</>%s => %s\n",
  		leave_last ? "nofollow" : "follow",
  		basepath ? basepath : "<nil>",
-@@ -2532,7 +2555,7 @@ pseudo_exec_path(const char **filenamep, int search_path, char * const**argvp) {
+@@ -2579,7 +2602,7 @@
  		if (forcechroot)
  			candidate = pseudo_root_path(__func__, __LINE__, AT_FDCWD, filename, 0);
  		else
@@ -95,7 +91,7 @@ index d1bd32f..1a773f3 100644
  
  		if (pseudo_chroot_len) {
  			checkscript = exec_chroot_scriptcheck(filenamep, argvp, filename, candidate);
-@@ -2550,7 +2573,7 @@ pseudo_exec_path(const char **filenamep, int search_path, char * const**argvp) {
+@@ -2597,7 +2620,7 @@
  		if (forcechroot)
  			candidate = pseudo_root_path(__func__, __LINE__, AT_FDCWD, filename, 0);
  		else
@@ -104,7 +100,7 @@ index d1bd32f..1a773f3 100644
  
  		if (pseudo_chroot_len) {
  			checkscript = exec_chroot_scriptcheck(filenamep, argvp, filename, candidate);
-@@ -2584,20 +2607,20 @@ pseudo_exec_path(const char **filenamep, int search_path, char * const**argvp) {
+@@ -2631,20 +2654,20 @@
  			if (forcechroot || pforcechroot)
  				candidate = pseudo_root_path(__func__, __LINE__, AT_FDCWD, filename, 0);
  			else
@@ -128,7 +124,7 @@ index d1bd32f..1a773f3 100644
  			pseudo_debug(PDBGF_CLIENT, "exec_path: got %s\n", candidate);
  		} else {
  			/* oh you jerk, making me do extra work */
-@@ -2609,9 +2632,9 @@ pseudo_exec_path(const char **filenamep, int search_path, char * const**argvp) {
+@@ -2656,9 +2679,9 @@
  					len = strlen(dir);
  			}
  			else
@@ -140,11 +136,9 @@ index d1bd32f..1a773f3 100644
  				pseudo_debug(PDBGF_CLIENT, "exec_path: got %s for non-absolute path\n", candidate);
  			} else {
  				pseudo_diag("couldn't allocate intermediate path.\n");
-diff --git a/pseudo_client.h b/pseudo_client.h
-index 7170fb6..9b1b0b1 100644
 --- a/pseudo_client.h
 +++ b/pseudo_client.h
-@@ -61,6 +61,7 @@ extern int (*pseudo_real_execv)(const char *, char * const *);
+@@ -61,6 +61,7 @@
  /* support related to chroot/getcwd/etc. */
  extern int pseudo_client_getcwd(void);
  extern int pseudo_client_chroot(const char *);
@@ -152,8 +146,6 @@ index 7170fb6..9b1b0b1 100644
  extern char *pseudo_root_path(const char *, int, int, const char *, int);
  extern const char *pseudo_exec_path(const char **filenamep, int, char * const**argvp);
  #define PSEUDO_ROOT_PATH(x, y, z) pseudo_root_path(__func__, __LINE__, (x), (y), (z));
-diff --git a/pseudo_util.c b/pseudo_util.c
-index 0ce9095..4dc1215 100644
 --- a/pseudo_util.c
 +++ b/pseudo_util.c
 @@ -28,6 +28,7 @@
@@ -164,7 +156,7 @@ index 0ce9095..4dc1215 100644
  
  struct pseudo_variables {
  	char *key;
-@@ -259,8 +260,8 @@ int pseudo_util_evlog_fd = 2;
+@@ -260,8 +261,8 @@
  static int debugged_newline = 1;
  static char pid_text[32];
  static size_t pid_len;
@@ -175,7 +167,7 @@ index 0ce9095..4dc1215 100644
  extern char **environ;
  static ssize_t pseudo_max_pathlen = -1;
  static ssize_t pseudo_sys_max_pathlen = -1;
-@@ -612,7 +613,7 @@ pseudo_new_pid() {
+@@ -616,7 +617,7 @@
   * the symlink, appending each element in turn the same way.
   */
  static int
@@ -184,7 +176,7 @@ index 0ce9095..4dc1215 100644
  	static int link_recursion = 0;
  	size_t curlen;
  	int is_dir = S_ISDIR(buf->st_mode);
-@@ -680,7 +681,7 @@ pseudo_append_element(char *newpath, char *root, size_t allocated, char **pcurre
+@@ -712,7 +713,7 @@
  	 * were appending to. we don't want to actually try to do this when
  	 * we're appending names to a regular file.
  	 */
@@ -193,7 +185,7 @@ index 0ce9095..4dc1215 100644
  		int is_link = S_ISLNK(buf->st_mode);
  		if (link_recursion >= PSEUDO_MAX_LINK_RECURSION && is_link) {
  			pseudo_debug(PDBGF_PATH, "link recursion too deep, not expanding path '%s'.\n", newpath);
-@@ -691,7 +692,7 @@ pseudo_append_element(char *newpath, char *root, size_t allocated, char **pcurre
+@@ -723,7 +724,7 @@
  			ssize_t linklen;
  			int retval;
  
@@ -202,16 +194,16 @@ index 0ce9095..4dc1215 100644
  			if (linklen == -1) {
  				pseudo_debug(PDBGF_PATH, "uh-oh!  '%s' seems to be a symlink, but I can't read it.  Ignoring.\n", newpath);
  				*pcurrent = current;
-@@ -717,7 +718,7 @@ pseudo_append_element(char *newpath, char *root, size_t allocated, char **pcurre
+@@ -790,7 +791,7 @@
  			buf->st_mode = S_IFDIR;
  			/* append all the elements in series */
  			++link_recursion;
 -			retval = pseudo_append_elements(newpath, root, allocated, pcurrent, linkbuf, linklen, 0, buf);
 +			retval = pseudo_append_elements(newpath, root, allocated, pcurrent, linkbuf, linklen, 0, buf, readlinkp);
  			--link_recursion;
- 			return retval;
- 		}
-@@ -730,7 +731,7 @@ pseudo_append_element(char *newpath, char *root, size_t allocated, char **pcurre
+ 
+ #ifdef PSEUDO_PORT_LINUX
+@@ -816,7 +817,7 @@
  }
  
  static int
@@ -220,7 +212,7 @@ index 0ce9095..4dc1215 100644
  	int retval = 1;
  	/* a shareable buffer so we can cache stat results while walking the path */
  	PSEUDO_STATBUF buf;
-@@ -778,7 +779,7 @@ pseudo_append_elements(char *newpath, char *root, size_t allocated, char **curre
+@@ -864,7 +865,7 @@
  		 */
  		pseudo_debug(PDBGF_PATH | PDBGF_VERBOSE, "element to add: '%.*s'\n",
  			(int) this_elen, path);
@@ -229,7 +221,7 @@ index 0ce9095..4dc1215 100644
  			retval = -1;
  			break;
  		}
-@@ -801,13 +802,15 @@ static int pathbuf = 0;
+@@ -887,13 +888,15 @@
   * is that path may contain symlinks, which must be resolved.
   */
  char *
@@ -246,7 +238,7 @@ index 0ce9095..4dc1215 100644
  	if (!path) {
  		pseudo_diag("can't fix empty path.\n");
  		return 0;
-@@ -868,7 +871,7 @@ pseudo_fix_path(const char *base, const char *path, size_t rootlen, size_t basel
+@@ -958,7 +961,7 @@
  	 * (current - newpath) is the used length of newpath
  	 */
  	int save_errno = errno;
@@ -255,7 +247,7 @@ index 0ce9095..4dc1215 100644
  		/* if we are expecting a trailing slash, or the path ended up being completely
  		 * empty (meaning it's pointing at either effective_root or the beginning of
  		 * the path), we need a slash here.
-@@ -1268,7 +1271,7 @@ pseudo_get_prefix(char *pathname) {
+@@ -1381,7 +1384,7 @@
  			s += snprintf(s, pseudo_path_max() - (s - mypath), "/%s",
  				pathname);
  		}
@@ -266,4 +258,3 @@ index 0ce9095..4dc1215 100644
  			pseudo_diag("Can't expand path '%s' -- expansion exceeds %d.\n",
 -- 
 2.34.1
-

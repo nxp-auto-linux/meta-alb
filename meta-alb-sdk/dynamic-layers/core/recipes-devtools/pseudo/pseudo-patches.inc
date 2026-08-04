@@ -17,10 +17,7 @@ SRC_URI += " \
     file://0016-pseudo-pseudo_root_path-didn-t-work-properly-for-chr.patch \
     file://0017-pseudo-Fixing-an-incorrect-prior-patch-port.patch \
     file://0018-pseudo-Diagnostic-cleanup-for-utimensat.patch \
-    file://0019-pseudo-realpath-wrapper-did-not-do-chroot-translatio.patch \
     file://0020-pseudo-did-not-treat-softlinks-correctly-in-chroot.patch \
-\
-    file://0001-pseudo-Critical-chroot-readlink-fix.patch \
 \
     file://0001-pseudo-Added-dup3-support.patch \
     file://0002-pseudo-Fix-fxstatat-calls-for-non-fs-file-handles.patch \

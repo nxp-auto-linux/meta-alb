@@ -84,11 +84,13 @@ BBMASK += "u-boot-qoriq linux-qoriq"
 
 # Xen Examples support variables
 DOM0LESS_ROOTFS ?= "fsl-image-domu"
+DOMU_ROOTFS ?= "fsl-image-domu"
 XEN_EXAMPLE ?= "xen-examples-default"
 
 # Xen Rootfs Partitions support
-SDCARD_ROOTFS_EXTRA1_FILE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}', '', d)}"
-SDCARD_ROOTFS_EXTRA1_SIZE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${ROOTFS_SIZE}', '0', d)}"
+SDCARD_ROOTFS_EXTRA1_FILE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${DEPLOY_DIR_IMAGE}/${DOMU_ROOTFS}-${MACHINE}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}', '', d)}"
+# Size to the actual DomU ext4 at build time (KiB, rounded up)
+SDCARD_ROOTFS_EXTRA1_SIZE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '$(expr $(stat -L -c%s ${DEPLOY_DIR_IMAGE}/${DOMU_ROOTFS}-${MACHINE}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}) / 1024 + 1)', '0', d)}"
 
 # Disable NFS server service
 DISTRO_FEATURES:remove = " nfs"

@@ -19,6 +19,9 @@ IMAGE_ROOTFS_IMAGELIST = " \
        bb.utils.contains('XEN_EXAMPLE', 'xen-examples-dom0less-passthrough-pfe', '${DOM0LESS_ROOTFS_IMAGE}', '', d), d), d), d)} \
 "
 
+# Build the DomU rootfs so its ext4 is used as the SD card extra partition
+do_image_sdcard[depends] += "${DOMU_ROOTFS}:do_image_complete"
+
 # Install binaries needed by xen example on EXT partition
 IMAGE_INSTALL += "${XEN_EXAMPLE}"
 

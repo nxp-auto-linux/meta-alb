@@ -5,7 +5,9 @@ SUMMARY = "Image that generates a customizable rootfs to be used for Xen DomU VM
 BASE_CORE_IMAGE ?= "recipes-core/images/core-image-minimal.bb"
 include ${BASE_CORE_IMAGE}
 
-IMAGE_FSTYPES = "cpio.gz"
+IMAGE_FSTYPES = "cpio.gz ext4"
+# Custom packaging is not needed (.sdcard, .ufs.*), only the rootfs itself is used
+IMAGE_FSTYPES:remove = "sdcard ufs"
 
 IMAGE_INSTALL += " \
     kernel-modules \

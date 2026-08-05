@@ -83,7 +83,7 @@ INHERIT += "fsl-dynamic-packagearch"
 BBMASK += "u-boot-qoriq linux-qoriq"
 
 # Xen Examples support variables
-DOM0LESS_ROOTFS ?= "fsl-image-dom0less"
+DOM0LESS_ROOTFS ?= "fsl-image-domu"
 XEN_EXAMPLE ?= "xen-examples-default"
 
 # Xen Rootfs Partitions support

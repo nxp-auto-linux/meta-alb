@@ -1,6 +1,6 @@
-# Copyright 2021,2025 NXP
+# Copyright 2021,2025-2026 NXP
 
-SUMMARY = "Image that generates a customizable rootfs to be used for Xen Dom0less VMs"
+SUMMARY = "Image that generates a customizable rootfs to be used for Xen DomU VMs"
 
 BASE_CORE_IMAGE ?= "recipes-core/images/core-image-minimal.bb"
 include ${BASE_CORE_IMAGE}

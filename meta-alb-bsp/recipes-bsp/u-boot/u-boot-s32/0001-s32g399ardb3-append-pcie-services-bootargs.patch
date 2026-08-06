@@ -3,7 +3,7 @@ From: Valentin Ciocoi Radulescu <valentin.ciocoiradulescu@nxp.com>
 Date: Mon, 29 Jun 2026 17:19:33 +0300
 Subject: [PATCH] s32g399ardb3: append bootargs for pcie-services-demos
 
-Append 'maxcpus=6 pci=pcie_bus_safe' to the kernel command line via the
+Append 'pci=pcie_bus_safe' to the kernel command line via the
 EXTRA_BOOT_ARGS hook, which s32.h concatenates onto mmcargs (and the
 other bootargs variants). Enabled for the pcie-services-demos build
 only, wired through the Yocto u-boot recipe.
@@ -22,7 +22,7 @@ index 42c8ed8ba8e..d563d7ecae8 100644
  #include <configs/s32g3.h>
  
 -#define EXTRA_BOOT_ARGS			""
-+#define EXTRA_BOOT_ARGS			" maxcpus=6 pci=pcie_bus_safe"
++#define EXTRA_BOOT_ARGS			" pci=pcie_bus_safe"
  
  #ifndef CONFIG_NXP_PFENG_SLAVE
  #define FDT_FILE			CONFIG_DTB_FILE

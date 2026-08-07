@@ -269,3 +269,49 @@
 &ufshc {
 	status = "okay";
 };
+
+&hscs_cdma_iep {
+	reg = <0x3 0x00300000 0x0 0x100000>;
+	status = "okay";
+
+	/*
+	 * Per-SI cross-SI pipe configuration.
+	 *
+	 * Each child node binds to one PCI function of the HSCS CDMA RCiEP
+	 * (i.e. one Station Interface). 'reg' encodes the BDF using the
+	 * standard OpenFirmware PCI binding: phys.hi = (dev<<11) | (fn<<8).
+	 *
+	 * IERB on PBUS 3 (LDID 3 = Linux 1) exposes four SIs:
+	 *
+	 *   IERB slot   PBUS  RID   PCI BDF             Authorized pipes (PIDaAUR)
+	 *   ---------   ----  ----  -----------------   --------------------------
+	 *   SI 3          3     0   0001:00:00.0        6 (<->SI2), 3 (<->SI11), 4 (<->SI12), 5 (<->SI13)
+	 *   SI 11         3     1   0001:00:00.1        3 (<->SI3)
+	 *   SI 12         3     2   0001:00:00.2        4 (<->SI3)
+	 *   SI 13         3     3   0001:00:00.3        5 (<->SI3)
+	 *
+	 * The current driver uses a single 'nxp,pipe-id' per cdev (one TX
+	 * ring + one RX ring per SI).
+	 * For CDMA communication between the Linux cohorts, default is pipe 6
+	 * (SI 2 Linux 0 <-> SI 3 Linux 1).
+	 */
+	cdma_si3: cdma@0,0 {
+		reg = <0x0000 0 0 0 0>;
+		nxp,pipe-id = <6>;
+	};
+
+	cdma_si11: cdma@0,1 {
+		reg = <0x0100 0 0 0 0>;
+		nxp,pipe-id = <3>;
+	};
+
+	cdma_si12: cdma@0,2 {
+		reg = <0x0200 0 0 0 0>;
+		nxp,pipe-id = <4>;
+	};
+
+	cdma_si13: cdma@0,3 {
+		reg = <0x0300 0 0 0 0>;
+		nxp,pipe-id = <5>;
+	};
+};

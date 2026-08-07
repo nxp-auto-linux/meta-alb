@@ -8,7 +8,6 @@ include ${BASE_CORE_IMAGE}
 IMAGE_FSTYPES = "cpio.gz"
 
 IMAGE_INSTALL += " \
-    kernel-image \
     kernel-modules \
     setserial \
     iputils \

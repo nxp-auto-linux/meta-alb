@@ -1,5 +1,7 @@
 inherit image_types_fsl
 inherit rawimageutils
+inherit image_extra_parts_utils
+inherit gpt_image_utils
 
 IMAGE_TYPES += "sdcard"
 
@@ -136,13 +138,17 @@ SDCARDIMAGE_EXTRA9_OFFSET ?= "${FLASHIMAGE_EXTRA9_OFFSET}"
 # should be deployed in ${DEPLOY_DIR_IMAGE}
 SDCARDIMAGE_BOOT_EXTRA_FILES ?= ""
 
-SDCARD_ROOTFS_EXTRA1_FILE ?= ""
-SDCARD_ROOTFS_EXTRA1_SIZE ?= "0"
-SDCARD_ROOTFS_EXTRA2_FILE ?= ""
-SDCARD_ROOTFS_EXTRA2_SIZE ?= "0"
 
-# Make the two extra rootfs partitions logical
 SDCARD_ROOTFS_LOGICAL_EXTRA ?= "0"
+
+do_image_sdcard[depends] += "${@get_image_extra_parts_deps(d, 'ROOTFS_EXTRA_PARTS')}"
+do_image_sdcard[vardeps] += "ROOTFS_EXTRA_PARTS"
+
+python () {
+    extra = get_image_extra_parts(d, 'ROOTFS_EXTRA_PARTS')
+    if extra:
+        d.setVar('SDCARD_EXTRA_PARTS', extra)
+}
 
 TFA_IMAGE ?= ""
 TFA_IMAGE_FILE ?= ""
@@ -482,7 +488,7 @@ _burn_fip() {
 
 # External variables needed:
 #   ${SDCARD_ROOTFS}    - the rootfs image type to incorporate, e.g., ext3
-#   ${SDCARD_ROOTFS_EXTRA1_*} - Optional additional partition definition
+#   ${ROOTFS_EXTRA_PARTS} - Optional additional rootfs partitions (varflag list of <label>:<filename>)
 #   ${SDCARD_RCW_NAME}  - RCW for Layerscape devices
 #   ${IMAGE_BOOTLOADER} - bootloader to use {u-boot, barebox}
 #
@@ -540,9 +546,8 @@ _burn_fip() {
 generate_nxp_sdcard () {
 	# Get partitions' start offsets passed as parameters
 	SDCARD_ROOTFS_REAL_START="$1"
-	SDCARD_ROOTFS_EXTRA1_START="$2"
-	SDCARD_ROOTFS_EXTRA2_START="$3"
-	SDCARD_EXTENDED_PART_START="$4"
+	SDCARD_EXTRA_START="$2"
+	SDCARD_EXTENDED_PART_START="$3"
 
 	# Create partition table
 	export PARTED_SECTOR_SIZE=${SDCARD_SECTOR_SIZE}
@@ -569,18 +574,44 @@ generate_nxp_sdcard () {
 
 	create_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}" "${SDCARD_ROOTFS_PARTITION_NAME}"
 
-	if [ ${SDCARD_ROOTFS_EXTRA1_START} -ne 0 ] && [ ${SDCARD_ROOTFS_EXTRA2_START} -ne 0 ] && [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 0 ]; then
+	# Count the extra rootfs partitions requested.
+	num_extra_parts=0
+	for entry in ${SDCARD_EXTRA_PARTS}; do
+		num_extra_parts=$(expr ${num_extra_parts} + 1)
+	done
+
+	# On msdos more than one extra rootfs partition (beside the boot,
+	# fip and rootfs primaries) can only live inside an extended
+	# partition as logical partitions.
+	if [ ${num_extra_parts} -gt 1 ] && [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 0 ]; then
 		bberror "Need to select SDCARD_ROOTFS_LOGICAL_EXTRA=1 when having two extra rootfs partitions"
 	fi
 
 	if [ ${SDCARD_ROOTFS_LOGICAL_EXTRA} -eq 1 ]; then
 		rootfs_extra_part_type="logical"
-		parted -s "${SDCARD}" unit KiB mkpart extended ${SDCARD_EXTENDED_PART_START} 100%
+		if [ ${num_extra_parts} -gt 0 ]; then
+			parted -s "${SDCARD}" unit KiB mkpart extended ${SDCARD_EXTENDED_PART_START} 100%
+		fi
 	else
 		rootfs_extra_part_type="primary"
 	fi
-	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} "${SDCARD_ROOTFS_EXTRA1_FILE}" "${rootfs_extra_part_type}"
-	create_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} "${SDCARD_ROOTFS_EXTRA2_FILE}" "${rootfs_extra_part_type}"
+
+	# Create every extra rootfs partition.
+	start=${SDCARD_EXTRA_START}
+	for entry in ${SDCARD_EXTRA_PARTS}; do
+		label=$(echo "${entry}" | cut -d: -f1)
+		rootfs_image=$(echo "${entry}"  | cut -d: -f2)
+
+		rootfs_size=$(compute_artifact_size_kib "${rootfs_image}")
+
+		if [ "${SDCARD_PARTITIONING_SCHEME}" = "gpt" ]; then
+			create_rootfs_partition "${start}" "${rootfs_size}" "${rootfs_image}" "${label}"
+		else
+			create_rootfs_partition "${start}" "${rootfs_size}" "${rootfs_image}" "${rootfs_extra_part_type}"
+		fi
+
+		start=$(printf "%u + %u + %u\n" "${start}" "${rootfs_size}" "${ALIGNMENT_SIZE}" | bc)
+	done
 	parted "${SDCARD}" print
 
 	# Fill optional Layerscape RCW into the boot block
@@ -611,8 +642,18 @@ generate_nxp_sdcard () {
 	generate_sdcardimage_entry_raw "${WORKDIR}/boot.img" "" $(printf "%u * 1024\n" ${SD_FAT_START_OFFSET} | bc)
 
 	write_rootfs_partition ${SDCARD_ROOTFS_REAL_START} ${ROOTFS_SIZE} "${SDCARD_ROOTFS_REAL}"
-	write_rootfs_partition ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA1_SIZE} "${SDCARD_ROOTFS_EXTRA1_FILE}"
-	write_rootfs_partition ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_ROOTFS_EXTRA2_SIZE} "${SDCARD_ROOTFS_EXTRA2_FILE}"
+
+	# Burn each extra rootfs partition.
+	start=${SDCARD_EXTRA_START}
+	for entry in ${SDCARD_EXTRA_PARTS}; do
+		rootfs_image=$(echo "${entry}" | cut -d: -f2)
+
+		rootfs_size=$(compute_artifact_size_kib "${rootfs_image}")
+
+		write_rootfs_partition "${start}" "${rootfs_size}" "${rootfs_image}"
+
+		start=$(printf "%u + %u + %u\n" "${start}" "${rootfs_size}" "${ALIGNMENT_SIZE}" | bc)
+	done
 }
 
 IMAGE_CMD:sdcard () {
@@ -662,18 +703,12 @@ IMAGE_CMD:sdcard () {
 		SDCARD_EXTENDED_PART_START="0"
 	fi
 
-	if [ -n "${SDCARD_ROOTFS_EXTRA1_FILE}" ]; then
-		SDCARD_ROOTFS_EXTRA1_START=${sd_size}
-		sd_size=$(printf "%u + %u + %u\n"  ${sd_size} ${SDCARD_ROOTFS_EXTRA1_SIZE} ${ALIGNMENT_SIZE} | bc)
-	else
-		SDCARD_ROOTFS_EXTRA1_START="0"
-	fi
-	if [ -n "${SDCARD_ROOTFS_EXTRA2_FILE}" ]; then
-		SDCARD_ROOTFS_EXTRA2_START=${sd_size}
-		sd_size=$(printf "%u + %u + %u\n"  ${sd_size} ${SDCARD_ROOTFS_EXTRA2_SIZE} ${ALIGNMENT_SIZE} | bc)
-	else
-		SDCARD_ROOTFS_EXTRA2_START="0"
-	fi
+	SDCARD_EXTRA_START=${sd_size}
+	for entry in ${SDCARD_EXTRA_PARTS}; do
+		eart=$(echo "${entry}" | cut -d: -f2)
+		eart_kib=$(compute_artifact_size_kib "${eart}")
+		sd_size=$(printf "%u + %u + %u\n" "${sd_size}" "${eart_kib}" "${ALIGNMENT_SIZE}" | bc)
+	done
 
 	cd "${IMGDEPLOYDIR}"
 
@@ -694,7 +729,7 @@ IMAGE_CMD:sdcard () {
 	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA8_FILE}" "SDCARDIMAGE_EXTRA8_OFFSET" "${SDCARDIMAGE_EXTRA8_OFFSET}"
 	generate_sdcardimage_entry "${SDCARDIMAGE_EXTRA9_FILE}" "SDCARDIMAGE_EXTRA9_OFFSET" "${SDCARDIMAGE_EXTRA9_OFFSET}"
 
-	generate_nxp_sdcard ${SDCARD_ROOTFS_REAL_START} ${SDCARD_ROOTFS_EXTRA1_START} ${SDCARD_ROOTFS_EXTRA2_START} ${SDCARD_EXTENDED_PART_START}
+	generate_nxp_sdcard "${SDCARD_ROOTFS_REAL_START}" "${SDCARD_EXTRA_START}" "${SDCARD_EXTENDED_PART_START}"
 	cd -
 
 	if [ "${SDCARD_PARTITIONING_SCHEME}" = "gpt" ]; then

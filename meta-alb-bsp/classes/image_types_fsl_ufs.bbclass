@@ -1,4 +1,5 @@
 inherit gpt_image_utils
+inherit image_extra_parts_utils
 
 IMAGE_TYPES += "ufs"
 
@@ -26,6 +27,15 @@ do_image_ufs[depends] += " \
 	${@d.getVar('TFA_IMAGE_FILE_UFS', True) and d.getVar('TFA_IMAGE', True) + ':do_deploy' or ''} \
 	${@d.getVar('UFS_ROOTFS_EXT', True) and d.getVar('UFS_ROOTFS_PKG', True) + ':do_image_${UFS_ROOTFS_EXT}' or ''} \
 "
+
+do_image_ufs[depends] += "${@get_image_extra_parts_deps(d, 'ROOTFS_EXTRA_PARTS')}"
+do_image_ufs[vardeps] += "ROOTFS_EXTRA_PARTS"
+
+python () {
+    extra = get_image_extra_parts(d, 'ROOTFS_EXTRA_PARTS')
+    if extra:
+        d.setVar('UFS_EXTRA_PARTS', extra)
+}
 
 UFS_SECTOR_SIZE = "4096"
 
@@ -123,6 +133,31 @@ generate_nxp_ufs_lun0 () {
 # UFS LUN1 settings
 ########################################################
 
+
+#                                                            Extra Linux rootfs partitions (1..N)
+#                                                            1MiB aligned
+#                                                           <------------------------------------------------>
+#
+#           1MiB        kernel + 2MiB    rootfs (primary)   extra rootfs 1   extra rootfs 2     extra rootfs N
+#      <----------->   <-------------->  <-------------->   <------------>   <------------>     <------------>
+#       ------------   ----------------  ----------------   --------------   --------------     --------------   ----------
+#      | pMBR + GPT | | ESP (FAT16)    | | linux-rootfs  | | linux-rootfs | | linux-rootfs |...| linux-rootfs | | alt. GPT |
+#      | (primary)  | | esp on; Image  | | ext4          | | ext4         | | ext4         |   | ext4         | | (backup) |
+#       ------------   ----------------  ----------------   --------------   --------------     --------------   ----------
+#      ^             ^                  ^                 ^                ^                 ^                             ^
+#      |             |                  |                 |                |                 |                             |
+#      0            1MiB         ESP_START +       ROOTFS_START +     EXTRA2_START      EXTRAN_START    			 LUN1_TOTAL_SIZE
+#                (ESP_START)     ESP_ROUND         ROOTFS_ROUND           
+#                                (ROOTFS_START)    (EXTRA1_START)         
+#
+#
+#      LUN1_TOTAL_SIZE = FIRST_PARTITION_START_KIB
+#                      + ESP_PARTITION_ROUND_SIZE_KIB
+#                      + ROOTFS_PARTITION_ROUND_SIZE_KIB
+#                      + EXTRA_TOTAL_ROUND_SIZE_KIB      (sum of all extra rootfs, rounded)
+#                      + gpt_round_size_kib              (backup GPT)
+
+
 # ESP partition
 ESP_PARTITION_NAME = "EFI-System-Partition"
 ESP_PARTITION_START_ADDRESS_SECTOR = "$(get_first_partition_start_sector "${UFS_SECTOR_SIZE}")"
@@ -132,7 +167,6 @@ ESP_ARTIFACT_SIZE_KIB = "$(compute_artifact_size_kib "${ESP_ARTIFACT_NAME}")"
 ESP_PARTITION_EXTRA_SPACE_MIB ?= "2"
 ESP_PARTITION_SIZE_KIB = "$(echo "${ESP_ARTIFACT_SIZE_KIB} + ${ESP_PARTITION_EXTRA_SPACE_MIB} * 1024" | bc)"
 ESP_PARTITION_SIZE_SECTORS = "$(convert_kib_to_sectors "${ESP_PARTITION_SIZE_KIB}" "${UFS_SECTOR_SIZE}")"
-
 
 # ROOTFS partition
 ROOTFS_PARTITION_NAME = "linux-rootfs"
@@ -151,11 +185,23 @@ generate_nxp_ufs_lun1 () {
 
 	# when computing the total size of the LUN, we should consider that after the end of the last 
 	# partition, there is also the alternate GPT header + partition entry array
+
 	gpt_size_kib=$(get_gpt_size_kib ${UFS_SECTOR_SIZE})
 	gpt_round_size_kib=$(roundup_size_kib ${gpt_size_kib} ${OPTIMAL_ALIGNMENT_KIB})
 	FIRST_PARTITION_START_KIB=$(get_first_partition_start_kib ${UFS_SECTOR_SIZE})
 
-	LUN1_TOTAL_SIZE=$(echo "${FIRST_PARTITION_START_KIB} + ${ESP_PARTITION_ROUND_SIZE_KIB} + ${ROOTFS_PARTITION_ROUND_SIZE_KIB} + ${gpt_round_size_kib}" | bc)
+	# sum the rounded size of every extra linux rootfs partition
+	EXTRA_TOTAL_ROUND_SIZE_KIB=0
+	for entry in ${UFS_EXTRA_PARTS}; do
+		rootfs_image=$(echo "${entry}" | cut -d: -f2)
+
+		rootfs_size=$(compute_artifact_size_kib "${rootfs_image}")
+		rootfs_size_round=$(roundup_size_kib "${rootfs_size}" "${OPTIMAL_ALIGNMENT_KIB}")
+
+		EXTRA_TOTAL_ROUND_SIZE_KIB="$(echo "${EXTRA_TOTAL_ROUND_SIZE_KIB} + ${rootfs_size_round}" | bc)"
+	done
+
+	LUN1_TOTAL_SIZE=$(echo "${FIRST_PARTITION_START_KIB} + ${ESP_PARTITION_ROUND_SIZE_KIB} + ${ROOTFS_PARTITION_ROUND_SIZE_KIB} + ${EXTRA_TOTAL_ROUND_SIZE_KIB} + ${gpt_round_size_kib}" | bc)
 
 	dd if=/dev/zero of="${UFS_LUN1_NAME}" bs=1K count=${LUN1_TOTAL_SIZE}
 
@@ -174,6 +220,24 @@ generate_nxp_ufs_lun1 () {
 
 	write_partition "${UFS_LUN_DEPLOYDIR}/kernel.part" ${UFS_LUN1_NAME} ${ESP_PARTITION_SIZE_KIB} ${ESP_PARTITION_START_ADDRESS_KIB}
 	write_partition ${ROOTFS_EXT4_ARTIFACT_NAME} ${UFS_LUN1_NAME} ${ROOTFS_PARTITION_SIZE_KIB} ${ROOTFS_PARTITION_START_ADDRESS}
+
+	# append each extra linux rootfs partition on LUN1
+	for entry in ${UFS_EXTRA_PARTS}; do
+		label=$(echo "${entry}" | cut -d: -f1)
+		rootfs_image=$(echo "${entry}"  | cut -d: -f2)
+
+		rootfs_size=$(compute_artifact_size_kib "${rootfs_image}")
+
+		rootfs_sectors=$(convert_kib_to_sectors "${rootfs_size}" "${UFS_SECTOR_SIZE}")
+
+		create_partition "${UFS_LUN1_NAME}" "${UFS_SECTOR_SIZE}" "${label}" "${rootfs_sectors}" "${UFS_ROOTFS_EXT}"
+
+		# read the placed start offset back from the table
+		start_sector=$(parted -s "${UFS_LUN1_NAME}" unit s print | grep " ${label}" | xargs | cut -d' ' -f2 | sed 's/s//')
+		start_kib=$(convert_sectors_to_kib "${start_sector}" "${UFS_SECTOR_SIZE}")
+
+		write_partition "${rootfs_image}" "${UFS_LUN1_NAME}" "${rootfs_size}" "${start_kib}"
+	done
 
 	rm -f "${UFS_LUN_DEPLOYDIR}/kernel.part"
 }

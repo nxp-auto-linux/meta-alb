@@ -87,10 +87,8 @@ DOM0LESS_ROOTFS ?= "fsl-image-domu"
 DOMU_ROOTFS ?= "fsl-image-domu"
 XEN_EXAMPLE ?= "xen-examples-default"
 
-# Xen Rootfs Partitions support
-SDCARD_ROOTFS_EXTRA1_FILE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${DEPLOY_DIR_IMAGE}/${DOMU_ROOTFS}-${MACHINE}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}', '', d)}"
-# Size to the actual DomU ext4 at build time (KiB, rounded up)
-SDCARD_ROOTFS_EXTRA1_SIZE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '$(expr $(stat -L -c%s ${DEPLOY_DIR_IMAGE}/${DOMU_ROOTFS}-${MACHINE}${IMAGE_NAME_SUFFIX}.${SDCARD_ROOTFS_EXT}) / 1024 + 1)', '0', d)}"
+# Xen extra rootfs partitions support
+ROOTFS_EXTRA_PARTS[domu1-rootfs] ?= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${DOMU_ROOTFS}:${DEPLOY_DIR_IMAGE}/${DOMU_ROOTFS}-${MACHINE}${IMAGE_NAME_SUFFIX}.ext4', '', d)}"
 
 # Disable NFS server service
 DISTRO_FEATURES:remove = " nfs"

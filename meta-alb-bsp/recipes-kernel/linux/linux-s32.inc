@@ -286,6 +286,9 @@ SRC_URI += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen virtio', 'file://xen_virtio.cfg', '', d)} \
     "
 
+DELTA_KERNEL_DEFCONFIG:append:s32n = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' xen_s32n7.cfg', '', d)}"
+SRC_URI:append:s32n = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' file://xen_s32n7.cfg', '', d)}"
+
 # Enable Trusted Execution Environment (TEE) support and add the OP-TEE driver
 DELTA_KERNEL_DEFCONFIG:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee.cfg', '', d)}"
 SRC_URI:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' file://optee.cfg', '', d)}"

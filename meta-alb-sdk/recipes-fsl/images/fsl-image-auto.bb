@@ -33,6 +33,10 @@ IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-demo
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', \
 	' nvme-cli', '', d)}"
 
+# Add io_uring package required by CDMA async testcases
+IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', \
+	' liburing-dev', '', d)}"
+
 # Userspace support for QSPI Flash under Linux for S32CC platforms
 IMAGE_INSTALL:append:s32cc = " mtd-utils "
 

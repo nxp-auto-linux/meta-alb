@@ -979,13 +979,36 @@ fakeroot do_aptget_user_finalupdate:append() {
                         else
                                 services=`systemctl --root=/ --type=service --no-pager --no-legend list-unit-files`
                         fi
-                        services=`printf %s "$services" | grep -v masked | cut -d\  -f1`
-                        if [ -e "${APTGET_CHROOT_DIR}${root_prefix}/bin/systemctl" ]; then
-                                printf %s "$services" | xargs chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/bin/systemctl --root=/ --preset-mode=enable-only preset
-                        else
-                                # Fall back to the image.bbclass systemd_preset_all method
-                                # using the fake systemctl script
-                                printf %s "$services" | xargs systemctl --root="${APTGET_CHROOT_DIR}" --preset-mode=enable-only preset
+                        # 'list-unit-files' enumerates every unit systemd knows
+                        # about, including SysV-init compatibility units that are
+                        # synthesized on the fly by systemd-sysv-generator (e.g.
+                        # cryptdisks-early.service, provided by 'cryptsetup').
+                        # Those units have STATE "generated" and are not backed by
+                        # a real unit file on disk, so running 'systemctl preset'
+                        # on them fails with "unit ... does not exist" and aborts
+                        # the whole do_rootfs task (xargs propagates the non-zero
+                        # exit code). Only units whose STATE is "enabled",
+                        # "disabled" or "indirect" are backed by an installable
+                        # unit file and can actually be preset; "static",
+                        # "generated", "alias", "masked" and "transient" units
+                        # cannot. "indirect" units must be kept as well, since
+                        # they carry an [Install] section (enabled indirectly via
+                        # Also=/Alias= of another unit) and omitting them can
+                        # leave services unpreset and failing on boot. We
+                        # therefore keep only the presettable units, using
+                        # systemd's own classification instead of guessing
+                        # filesystem paths. This preserves a meaningful return
+                        # code so that genuine preset errors still fail the build.
+                        services=`printf %s "$services" | awk '$2 == "enabled" || $2 == "disabled" || $2 == "indirect" { print $1 }'`
+
+                        if [ -n "$services" ]; then
+                                if [ -e "${APTGET_CHROOT_DIR}${root_prefix}/bin/systemctl" ]; then
+                                        printf %s "$services" | xargs chroot "${APTGET_CHROOT_DIR}" ${root_prefix}/bin/systemctl --root=/ --preset-mode=enable-only preset
+                                else
+                                        # Fall back to the image.bbclass systemd_preset_all method
+                                        # using the fake systemctl script
+                                        printf %s "$services" | xargs systemctl --root="${APTGET_CHROOT_DIR}" --preset-mode=enable-only preset
+                                fi
                         fi
                         bbnote "Done presetting systemd services via systemctl"
                 fi

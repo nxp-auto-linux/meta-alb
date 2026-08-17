@@ -1,1 +1,1 @@
-PACKAGECONFIG:remove:s32cc = "x11 gtkgui"
+PACKAGECONFIG:remove:s32 = "x11 gtkgui"

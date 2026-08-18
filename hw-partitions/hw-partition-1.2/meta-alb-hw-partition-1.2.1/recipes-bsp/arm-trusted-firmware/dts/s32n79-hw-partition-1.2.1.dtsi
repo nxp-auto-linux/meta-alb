@@ -236,6 +236,10 @@
 	};
 };
 
+&misc_scmi {
+	nxp,ddr-regions = <&ddr_high0>, <&ddr_high1>;
+};
+
 &smmu {
 	status = "okay";
 };

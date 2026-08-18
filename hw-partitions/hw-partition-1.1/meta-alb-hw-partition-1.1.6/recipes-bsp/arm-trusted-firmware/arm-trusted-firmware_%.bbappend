@@ -1,12 +1,14 @@
 # Copyright 2025-2026 NXP
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/dts:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/../dts-ddr/${DDR_ECC_VARIANT}:"
 
 TFA_DTS_FILE = "${@ (d.getVar('KERNEL_DEVICETREE_OVERRIDE') or '').replace('.dtb', '.dts') }"
 
 SRC_URI:append = "\
     file://s32n79-hw-partition-1.1.6.dtsi \
     file://${TFA_DTS_FILE} \
+    file://s32n79-hw-partition-1.1.6-ddr.dtsi \
     "
 
 EXTRA_OEMAKE:append = " \

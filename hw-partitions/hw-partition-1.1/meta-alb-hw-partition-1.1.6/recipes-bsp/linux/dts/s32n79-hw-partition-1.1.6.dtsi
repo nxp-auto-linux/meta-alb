@@ -3,6 +3,8 @@
  * Copyright 2025-2026 NXP
  */
 
+#include "s32n79-hw-partition-1.1.6-ddr.dtsi"
+
 /delete-node/ &gic;
 /delete-node/ &cpu4;
 /delete-node/ &cpu5;
@@ -47,23 +49,6 @@
 				};
 			};
 		};
-	};
-
-	memory@9c000000 {
-		device_type = "memory";
-		reg = <0x0 0x9c000000 0 0x1c000000>;
-	};
-
-	ddr_high0: memory@89c0000000 {
-		device_type = "memory";
-		reg = <0x89 0xc0000000 0x1 0x80000000>; /* 6GB */
-		status = "disabled";
-	};
-
-	ddr_high1: memory@c1c0000000 {
-		device_type = "memory";
-		reg = <0xc1 0xc0000000 0x1 0x80000000>; /* 6GB */
-		status = "disabled";
 	};
 
 	reserved-memory {

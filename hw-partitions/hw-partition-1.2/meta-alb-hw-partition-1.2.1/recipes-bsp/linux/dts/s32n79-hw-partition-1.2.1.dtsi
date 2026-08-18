@@ -3,6 +3,8 @@
  * Copyright 2024-2026 NXP
  */
 
+#include "s32n79-hw-partition-1.2.1-ddr.dtsi"
+
 /delete-node/ &irqsteer_coss;
 /delete-node/ &irqsteer_rcu;
 /delete-node/ &edma_coss;
@@ -58,23 +60,6 @@
 				};
 			};
 		};
-	};
-
-	memory@800000000 {
-		device_type = "memory";
-		reg = <0x0 0x80000000 0x0 0x80000000>;
-	};
-
-	ddr_high0: memory@8800000000 {
-		device_type = "memory";
-		reg = <0x88 0x00000000 0x3 0x40000000>; /* 13GB */
-		status = "disabled";
-	};
-
-	ddr_high1: memory@c000000000 {
-		device_type = "memory";
-		reg = <0xc0 0x00000000 0x3 0x40000000>; /* 13GB */
-		status = "disabled";
 	};
 
 	reserved-memory {

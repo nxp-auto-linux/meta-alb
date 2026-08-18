@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+/*
+ * Copyright 2026 NXP
+ */
+
+/ {
+	memory@800000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x80000000>; /* 2GB */
+	};
+
+	ddr_high0: memory@8800000000 {
+		device_type = "memory";
+		reg = <0x88 0x00000000 0x3 0xc0000000>; /* 15GB */
+		status = "disabled";
+	};
+
+	ddr_high1: memory@c000000000 {
+		device_type = "memory";
+		reg = <0xc0 0x00000000 0x3 0xc0000000>; /* 15GB */
+		status = "disabled";
+	};
+};

@@ -40,5 +40,11 @@ SERIAL_CONSOLES_CHECK ?= "ttyAMA0:ttyAMA0 ttyAMA1:ttyAMA1 ttyAMA2:ttyAMA2 " \
 # be found in the TF-A ${WORKDIR}.
 TFA_DTB_EXT ?= "0"
 
+# DDR ECC support: "1" (default) selects the ECC-on DDR memory map, "0" the
+# ECC-off map. DDR_ECC_VARIANT names the S32N cohort DDR fragment variant
+# used by the hw-partition linux-s32/arm-trusted-firmware bbappends.
+DDR_ECC_SUPPORT ?= "1"
+DDR_ECC_VARIANT = "${@ 'ecc-off' if d.getVar('DDR_ECC_SUPPORT') == '0' else 'ecc-on'}"
+
 # Enable FIP Authentication
 require ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'conf/machine/include/hse-secboot.inc', '', d)}

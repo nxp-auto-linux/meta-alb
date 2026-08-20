@@ -7,7 +7,7 @@ PV = "${@d.getVar('PREFERRED_VERSION_ubuntu-base', True) or '1.0'}"
 
 IMAGE_LINGUAS = ""
 IMAGE_INSTALL = ""
-DEPENDS += "shadow-native"
+DEPENDS += "shadow-native libcap-native"
 inherit image
 export PACKAGE_INSTALL = "${IMAGE_INSTALL}"
 
@@ -24,6 +24,13 @@ APTGET_CHROOT_DIR = "${IMAGE_ROOTFS}"
 APTGET_SKIP_UPGRADE = "0"
 
 ROOTFS_POSTPROCESS_COMMAND:append = "do_aptget_update; do_update_host; do_update_dns; do_enable_network_manager; do_systemd_service_fixup; do_getty_fixup; "
+
+IMAGE_PREPROCESS_COMMAND:append = " do_restore_ping_capability; "
+fakeroot do_restore_ping_capability() {
+	if [ -x "${APTGET_CHROOT_DIR}/usr/bin/ping" ]; then
+		${STAGING_SBINDIR_NATIVE}/setcap cap_net_raw+ep "${APTGET_CHROOT_DIR}/usr/bin/ping"
+	fi
+}
 
 # This must be added first as it provides the foundation for
 # subsequent modifications to the rootfs

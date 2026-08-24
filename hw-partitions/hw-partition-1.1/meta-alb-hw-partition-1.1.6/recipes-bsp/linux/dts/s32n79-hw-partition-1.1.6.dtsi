@@ -98,6 +98,11 @@
 			reg = <0x0 0xaf002000 0x0 0x2000>;
 			no-map;
 		};
+
+		ipc_shm_mem: shm@24800000 {
+			reg = <0x0 0x24800000 0x0 0x40000>;
+			no-map;
+		};
 	};
 
 	cis_subsys {
@@ -262,5 +267,23 @@
 
 &hscs_cdma_iep {
 	reg = <0x3 0x00300000 0x0 0x100000>;
+	status = "okay";
+};
+
+&ipc_shm {
+	memory-region = <&ipc_shm_mem>;
+	/* mailbox_node channel mailbox_id direction */
+	mboxes = <&aps2_mru6 0 0 0>, <&aps2_mru7 0 0 1>,
+		 <&aps2_mru6 1 0 0>, <&aps2_mru7 1 0 1>,
+		 <&aps3_mru0 0 0 0>, <&aps3_mru1 0 0 1>,
+		 <&aps3_mru1 2 0 0>, <&aps3_mru1 1 0 1>,
+		 <&aps3_mru2 0 0 0>, <&aps3_mru3 0 0 1>,
+		 <&aps3_mru2 1 0 0>, <&aps3_mru3 1 0 1>;
+	mbox-names = "tx_0",  "rx_0",
+		     "tx_1",  "rx_1",
+		     "tx_2",  "rx_2",
+		     "tx_3",  "rx_3",
+		     "tx_4",  "rx_4",
+		     "tx_5",  "rx_5";
 	status = "okay";
 };

@@ -1,6 +1,14 @@
-# We currently support recipies for:
-# - 24.04.4
-#UBUNTU_TARGET_VERSION ?= "22.04.1"
+# Ubuntu userland version selection.
+#
+# The primary/default image is Ubuntu 24.04.4 (matches the poky scarthgap
+# toolchain). To build the SECONDARY Ubuntu 22.04 image instead, override this
+# in conf/local.conf:
+#
+#     UBUNTU_TARGET_VERSION = "22.04.1"
+#
+# Everything version-sensitive below (and in the image recipes) derives from
+# UBUNTU_TARGET_VERSION / UBUNTU_TARGET_BASEVERSION, so that single line flips
+# the whole stack.
 UBUNTU_TARGET_VERSION ?= "24.04.4"
 
 UBUNTU_TARGET_MAJORVERSION ?= "${@d.getVar('UBUNTU_TARGET_VERSION', True).rsplit('.')[0]}"
@@ -37,25 +45,43 @@ VOLATILE_LOG_DIR = "no"
 IMAGE_FSTYPES:remove = "flashimage"
 IMAGE_TYPES_MASKED += "cpio cpio.gz cpio.gz.u-boot"
 
-# The Yocto glibc version must not exceed the Ubuntu glibc version
-# or Yocto-created executables will fail on the Ubuntu image.
-# We want to be as close as possible to the respective Ubuntu glibc
-# version to avoid compatibility issues.
-# The glibc version for a given Ubuntu release is a-priori knowledge,
-# so the suitable Yocto version can be selected here.
-# Note that the glibc is not compiled in Ubuntu identical fashion.
-# It remains a glibc that works for Yocto, which is good enough for
-# our purposes.
-# Ubuntu 22.x: max glibc 2.35...
-# Ubuntu 24.x: max glibc 2.39... (matches poky scarthgap default)
+# Selects the Yocto (build-time) glibc/binutils versions used for the few
+# Yocto-native recipes that get merged into the Ubuntu image. This does NOT
+# set the toolchain on the Ubuntu rootfs itself (that is Ubuntu's own .debs).
+#
+# General rule: the Yocto glibc version should not exceed the Ubuntu glibc
+# version, or Yocto-built executables shipped into the rootfs will fail on
+# the Ubuntu image. Ideally track the target release's Ubuntu glibc as
+# closely as the available recipes allow (the per-release glibc is a-priori
+# knowledge). Note the Yocto glibc is not built identically to Ubuntu's; it
+# only has to work for the Yocto-built binaries, which is good enough here.
+#
+#   Ubuntu 24.04: glibc 2.35 -> n/a; glibc 2.39 -> Yocto 2.39% (rule honoured,
+#                 matches the poky scarthgap default)
+#   Ubuntu 22.04: Ubuntu glibc is 2.35, but see the exception below.
+#
+# Exception (Ubuntu 22.04 secondary on scarthgap): this BSP is built on poky
+# "scarthgap", which only ships glibc 2.39 / binutils 2.42 (no 2.35 / 2.38
+# recipes exist here). Ubuntu 22.04 was the kirkstone-matched distro (glibc
+# 2.35 / binutils 2.38), so those old pins would dangle on scarthgap. For the
+# 22.04 secondary image we therefore deliberately use the scarthgap toolchain
+# (2.39 / 2.42), identical to the 24.04 branch, knowingly exceeding the Ubuntu
+# 2.35 and breaking the "do not exceed" rule above. The tradeoff: Yocto-built
+# *target* ELFs are glibc-2.39 and must NOT be shipped on the 22.04
+# (glibc-2.35) rootfs. This is safe because the image recipes exclude those
+# Yocto-native target packages (aquantia-firmware-utility, optee-*) for the
+# 22.04 variant, and everything else on the rootfs is an Ubuntu 22.04 .deb
+# (glibc 2.35). The runtime toolchain (gcc, libc6, libc6-dev, apt) is thus
+# fully self-consistent 22.04.
+
 GLIBCVERSION = '${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.35", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.39%", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "2.39%", \
     "unsupportedubuntuversion" \
     , d) \
     , d)}'
 BINUVERSION='${@ \
-    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.38", \
+    oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.42", \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "24.04", "2.42", \
     "unsupportedubuntuversion" \
     , d) \

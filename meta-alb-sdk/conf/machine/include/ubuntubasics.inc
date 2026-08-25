@@ -68,11 +68,23 @@ IMAGE_TYPES_MASKED += "cpio cpio.gz cpio.gz.u-boot"
 # (2.39 / 2.42), identical to the 24.04 branch, knowingly exceeding the Ubuntu
 # 2.35 and breaking the "do not exceed" rule above. The tradeoff: Yocto-built
 # *target* ELFs are glibc-2.39 and must NOT be shipped on the 22.04
-# (glibc-2.35) rootfs. This is safe because the image recipes exclude those
-# Yocto-native target packages (aquantia-firmware-utility, optee-*) for the
-# 22.04 variant, and everything else on the rootfs is an Ubuntu 22.04 .deb
-# (glibc 2.35). The runtime toolchain (gcc, libc6, libc6-dev, apt) is thus
-# fully self-consistent 22.04.
+# (glibc-2.35) rootfs. This is safe because those Yocto-native target packages
+# are centrally excluded from the 22.04 variant via UBUNTU_2204_NATIVE_EXCLUDE
+# / PACKAGE_EXCLUDE below, and everything else on the rootfs is an Ubuntu
+# 22.04 .deb (glibc 2.35). The runtime toolchain (gcc, libc6, libc6-dev, apt)
+# is thus fully self-consistent 22.04.
+
+# Single place to keep Yocto-native target userspace packages off the 22.04
+# rootfs. Add new native userspace packages here rather than gating each recipe
+# line individually. Kernel modules (pfe, sja1110, ...) do not belong here,
+# they are independent of the rootfs and must keep installing. PACKAGE_EXCLUDE
+# is a no-op for the 24.04 image and for non-Ubuntu machines.
+UBUNTU_2204_NATIVE_EXCLUDE ?= "\
+    aquantia-firmware-utility \
+    optee-client optee-examples optee-test \
+    libfci-cli \
+"
+PACKAGE_EXCLUDE:append = "${@oe.utils.conditional('UBUNTU_TARGET_BASEVERSION', '22.04', ' ${UBUNTU_2204_NATIVE_EXCLUDE}', '', d)}"
 
 GLIBCVERSION = '${@ \
     oe.utils.conditional("UBUNTU_TARGET_BASEVERSION", "22.04", "2.39%", \

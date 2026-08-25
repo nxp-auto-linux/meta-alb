@@ -68,6 +68,8 @@ IMAGE_INSTALL:append:ls2084abbmini = " \
     kvaser \
 "
 
+# Native target package; not shipped on the 22.04 image (see
+# UBUNTU_2204_NATIVE_EXCLUDE in ubuntubasics.inc).
 IMAGE_INSTALL:append:s32cc = " \
    aquantia-firmware-utility \
 "

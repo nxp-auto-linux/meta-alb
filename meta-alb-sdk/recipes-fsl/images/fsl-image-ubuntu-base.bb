@@ -245,6 +245,8 @@ IMAGE_INSTALL:append:s32g274ardb2 = " sja1110"
 IMAGE_INSTALL:append:s32g399ardb3 = " sja1110"
 
 # optee
+# Native target packages; not shipped on the 22.04 image (see
+# UBUNTU_2204_NATIVE_EXCLUDE in ubuntubasics.inc).
 IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'optee', ' optee-client optee-examples optee-test ', '', d)}"
 
 COMPATIBLE_MACHINE ="(.*ubuntu)"

@@ -70,6 +70,24 @@ APTGET_PYTHON_VER = '${@ \
     , d) \
     , d)}'
 
+# Build-time qemu-user workaround for the Ubuntu 22.04 (jammy, glibc 2.35)
+# rootfs. Two of jammy's arm64 maintainer-script helpers fail when
+# nativeaptinstall runs the target dpkg/apt under the scarthgap qemu-user:
+#
+#   - /usr/sbin/ldconfig.real (a static-pie ELF) crashes with SIGSEGV when
+#     the libc-bin ldconfig trigger execs it under qemu, aborting the apt run.
+#   - /usr/bin/py3compile and /usr/bin/py3clean spawn a nested python3
+#     subprocess to probe the ABI tag; that nested exec-under-emulation is
+#     unreliable on the jammy interpreter and intermittently fails, aborting
+#     the python3 package postinst.
+#
+# Redirect the affected execs to /bin/true via pseudo's chroot exec
+# translation. Both skipped steps (ld.so.cache, .pyc bytecode caches) are
+# regenerated natively on the target, so this is safe. glibc 2.39 (24.04)
+# does not hit either issue, so this is gated to 22.04 and is a no-op for
+# the default 24.04 build.
+PSEUDO_CHROOT_XTRANSLATION:append = "${@oe.utils.conditional('UBUNTU_TARGET_BASEVERSION', '22.04', ':ldconfig.real=/bin/true:py3compile=/bin/true:py3clean=/bin/true', '', d)}"
+
 
 # More recent Ubuntu versions work with symlinks for the base
 # directories. We can't refer to symlink based files

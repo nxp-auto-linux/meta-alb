@@ -87,6 +87,34 @@ tcl8.6 tzdata ubuntu-keyring ucf udev udhcpc unattended-upgrades \
 usrmerge util-linux whiptail xdg-user-dirs xz-utils zlib1g \
 "
 
+# Translations from Ubuntu/Debian package names to Yocto names. Jammy
+# (22.04) predates the noble time_t-64 ABI transition, so the library
+# packages keep their historical (non-"t64") names. The Yocto recipe
+# names are the same across releases, so we map the jammy package names
+# to them here. Without these, ubuntu-base-22.04.1 would not RPROVIDE
+# the Yocto names (libtirpc, readline, ...) and, because REQUIRED_VERSION
+# pins ubuntu-base to 22.04.1, bitbake would fall back to building the
+# native poky recipes (libtirpc, readline, ...) and then fail on their
+# -dev/python3 runtime chains.
+APTGET_YOCTO_TRANSLATION += "\
+    libdb5.3:db \
+    libapt-pkg6.0:apt \
+    libssl3:libssl3 \
+    libext2fs2:libext2fs \
+    libgnutls30:libgnutls \
+    libhogweed6:libnettle \
+    libnettle8:libnettle \
+    libnpth0:libnpth \
+    libtirpc3:libtirpc \
+    libpsl5:libpsl \
+    libcurl3-gnutls:curl \
+    libdw1:elfutils \
+    libelf1:elfutils \
+    libglib2.0-0:glib-2.0 \
+    libreadline8:readline \
+    libsqlite3-0:sqlite3 \
+"
+
 # This is a really ugly one for us because Yocto does a very fine
 # grained split of libc. Note how we avoid spaces in the wrong places!
 APTGET_YOCTO_TRANSLATION += "\

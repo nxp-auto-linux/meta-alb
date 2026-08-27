@@ -28,10 +28,10 @@
 /delete-node/ &sec_jr9;
 /delete-node/ &sec_jr10;
 /delete-node/ &sec_jr11;
+/delete-node/ &ufshc;
 /delete-node/ &ufshci0;
 /delete-node/ &ufshci1;
 /delete-node/ &ufshci2;
-/delete-node/ &ufshci3;
 
 / {
 	chosen {
@@ -228,7 +228,7 @@
 	nxp,ddr-regions = <&ddr_high0>, <&ddr_high1>;
 };
 
-&ufshc {
+&ufshci3 {
 	status = "okay";
 };
 

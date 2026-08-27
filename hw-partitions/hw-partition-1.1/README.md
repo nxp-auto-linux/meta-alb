@@ -5,9 +5,10 @@ hw-partition-1.1 contains two cohort layers:
 * meta-alb-hw-partition-1.1.5 - generates Linux images for Cohort 5 which:
   - boots from uSDHC,
   - owns SMMU,
+  - owns UFS HCI2,
   - uses UART0 as console.
 * meta-alb-hw-partition-1.1.6 - generates Linux images for Cohort 6 which:
-  - boots from UFS,
+  - boots from UFS using HCI3,
   - uses UART7 as console.
 
 ## Low Memory Layout:

@@ -16,7 +16,6 @@
 /delete-node/ &ufshc;
 /delete-node/ &ufshci0;
 /delete-node/ &ufshci1;
-/delete-node/ &ufshci2;
 /delete-node/ &ufshci3;
 /delete-node/ &dma_pool;
 
@@ -220,6 +219,10 @@
 };
 
 &usdhc0 {
+	status = "okay";
+};
+
+&ufshci2 {
 	status = "okay";
 };
 

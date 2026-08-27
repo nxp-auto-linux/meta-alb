@@ -28,8 +28,19 @@ hw-partition-1.2 contains one cohort layer:
 | DDR_END                    |                                  | 0xFFFFFFFF                       |                                   |
 
 ## High Memory Layout:
-> **NOTE:** The DDR ranges listed below are dynamically initialized at runtime through the Linux kernel memory hotplug functionality
+> **NOTE:** The DDR ranges listed below are dynamically initialized at runtime through the Linux kernel memory hotplug functionality.
+>
+> The exact ranges depend on the DDR ECC configuration selected through the `DDR_ECC_SUPPORT` build variable.
+> The two configurations map to the `ecc-on` and `ecc-off` DDR device tree fragments under `meta-alb-hw-partition-1.2.1/recipes-bsp/dts-ddr/`.
+
+### ECC enabled (`DDR_ECC_SUPPORT = "1"`, default):
 | DDR Range                  | Start                            | End                              | Note                              |
 |----------------------------|----------------------------------|----------------------------------|-----------------------------------|
 | Region 0                   | 0x8800000000                     | 0x8B3FFFFFFF                     | 13 GB                             |
 | Region 1                   | 0xC000000000                     | 0xC33FFFFFFF                     | 13 GB                             |
+
+### ECC disabled (`DDR_ECC_SUPPORT = "0"`):
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x8800000000                     | 0x8BBFFFFFFF                     | 15 GB                             |
+| Region 1                   | 0xC000000000                     | 0xC3BFFFFFFF                     | 15 GB                             |

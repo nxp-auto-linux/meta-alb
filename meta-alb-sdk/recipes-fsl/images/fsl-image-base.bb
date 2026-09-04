@@ -81,8 +81,8 @@ IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'hse', ' p
 # Add secboot public key
 IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', ' arm-trusted-firmware-secboot', '', d)}"
 
-# carvnet firmware
-IMAGE_INSTALL:append:s32n = "${@bb.utils.contains('DISTRO_FEATURES', 'carvnet-fw-load', ' carvnet-firmware', '', d)}"
+# carvnet firmware and command line client (carv-cli)
+IMAGE_INSTALL:append:s32n = "${@bb.utils.contains('DISTRO_FEATURES', 'carvnet-fw-load', ' carvnet-firmware carvnet-cli', '', d)}"
 
 # Quick-boot image support
 require ${@ 'recipes-fsl/images/fsl-image-quick-boot.inc' if d.getVar('QUICK_BOOT_CONFIG', True) else ''}

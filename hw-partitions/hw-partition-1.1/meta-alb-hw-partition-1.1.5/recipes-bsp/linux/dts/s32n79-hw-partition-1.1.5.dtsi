@@ -194,7 +194,7 @@
 	};
 };
 
-&nxp_misc {
+&nxp_ddr {
 	nxp,ddr-regions = <&ddr_high0>, <&ddr_high1>;
 };
 

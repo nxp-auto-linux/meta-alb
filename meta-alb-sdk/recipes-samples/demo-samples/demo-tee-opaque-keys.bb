@@ -8,7 +8,7 @@ BRANCH ?= "${RELEASE_BASE}"
 SRC_URI = "${URL};branch=${BRANCH}"
 
 S = "${WORKDIR}/git"
-SRCREV = "b166ca4b3c73a1d3e72aed5c75a0e4e76e420311"
+SRCREV = "86395aad40ae1271bacd8e1932e915ffa3306f04"
 
 CA_DESTDIR= "${D}${bindir}"
 TA_DESTDIR = "${D}${nonarch_base_libdir}/optee_armtz"

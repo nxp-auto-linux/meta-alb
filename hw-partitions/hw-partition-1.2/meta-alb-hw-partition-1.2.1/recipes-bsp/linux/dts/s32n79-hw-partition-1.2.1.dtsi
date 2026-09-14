@@ -12,6 +12,9 @@
 /delete-node/ &netc_iep14;
 /delete-node/ &netc_iep19;
 /delete-node/ &dma_pool;
+/delete-node/ &carv0_partition0_user1;
+/delete-node/ &carv0_partition0_user2;
+/delete-node/ &carv0_partition0_user3;
 
 / {
 	chosen {
@@ -258,18 +261,6 @@
 };
 
 &carv0_partition0_user0 {
-	status = "okay";
-};
-
-&carv0_partition0_user1 {
-	status = "okay";
-};
-
-&carv0_partition0_user2 {
-	status = "okay";
-};
-
-&carv0_partition0_user3 {
 	status = "okay";
 };
 

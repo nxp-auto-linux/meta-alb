@@ -1,52 +1,39 @@
 # A more complex image with ROS elements
 require fsl-image-ubuntu.bb
 
-# Add the Bazel tool. Maybe we should install it directly from the
-# custom apt repository?
-IMAGE_INSTALL += "\
-    bazel \
-"
-
-# ROS packages go at the end, since there is some 
-# Install dependencies for building ROS packages
+# Install dependencies for building ROS packages.
+#
+# The ROS distribution is selected from the Ubuntu base version:
+#   - Ubuntu 24.04 (noble) -> ROS 2 Jazzy (packages.ros.org/ros2)
+# ROS 2 Jazzy only targets noble; this layer's other supported base
+# (22.04/jammy) has no ROS 2 support implemented here, so warn instead
+# of silently installing nothing.
 def get_rosversion(d):
-    if d.getVar('UBUNTU_TARGET_BASEVERSION', True) == '20.04':
-        return 'noetic'
+    baseversion = d.getVar('UBUNTU_TARGET_BASEVERSION')
+    if baseversion == '24.04':
+        return 'jazzy'
+    bb.warn("ROS 2 is not supported for Ubuntu %s; no ROS packages will be installed." % baseversion)
     return 'undefined'
 ROS_VERSION = "${@get_rosversion(d)}"
 
-ROS_PPA = "http://packages.ros.org/ros/ubuntu;hkp://keyserver.ubuntu.com:80;C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654;deb;ros-latest.list"
+# ROS 2 is published from the ros2/ubuntu apt archive, signed with the
+# Open Robotics key (C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654).
+ROS_PPA_JAZZY = "http://packages.ros.org/ros2/ubuntu;hkp://keyserver.ubuntu.com:80;C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654;deb;ros2-latest.list"
 
-ROS_PACKAGES_KINETIC_MELODIC = " \
-    python-catkin-tools \
-    python-rosinstall \
-    python-rosinstall-generator \
-    python-wstool \
-"
+ROS_PPA = ""
+ROS_PPA += "${@bb.utils.contains('ROS_VERSION', 'jazzy', '${ROS_PPA_JAZZY}', '', d)}"
 
-# ROS packages, to be installed after ROS setup
-ROS_PACKAGES_KINETIC_MELODIC += " \
-    ros-${ROS_VERSION}-camera-calibration-parsers \
+# ros-jazzy-desktop-full pulls in the Gazebo simulation stack (+213
+# packages, mostly 'universe'); to keep the image lean, we ship the
+# lighter 'desktop' variant (ros-base + visualization/demo tooling)
+# instead.
+ROS_PACKAGES_JAZZY = " \
     ros-${ROS_VERSION}-desktop \
-    ros-${ROS_VERSION}-geographic-msgs \
-    ros-${ROS_VERSION}-gps-common \
-    ros-${ROS_VERSION}-joy \
-    ros-${ROS_VERSION}-ps3joy \
-    ros-${ROS_VERSION}-rosapi \
-    ros-${ROS_VERSION}-rosbridge-server \
-    ros-${ROS_VERSION}-tf2-web-republisher \
-    ros-${ROS_VERSION}-robot \
 "
 
-ROS_PACKAGES_NOETIC = "  \
-    ros-${ROS_VERSION}-desktop-full \
-"
+ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'jazzy', '${ROS_PACKAGES_JAZZY}', '', d)}"
 
-ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'kinetic', '${ROS_PACKAGES_KINETIC_MELODIC}', '', d)}"
-ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'kinetic', 'ros-${ROS_VERSION}-web-video-server', '', d)}"
-ROS_PACKAGES += "${@bb.utils.contains('ROS_VERSION', 'noetic', '${ROS_PACKAGES_NOETIC}', '', d)}"
-
-PYTHON_ROSDEP_PACKAGE = "${@bb.utils.contains('ROS_VERSION', 'kinetic', 'python-rosdep', 'python3-rosdep', d)}"
+PYTHON_ROSDEP_PACKAGE = "python3-rosdep"
 
 ADD_ROS_PACKAGES ?= "${ROS_PACKAGES}"
 APTGET_EXTRA_PACKAGES_LAST += " \

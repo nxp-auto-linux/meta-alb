@@ -12,6 +12,8 @@ SRC_URI:append = " \
 EXTRA_OECONF:remove = " --with-system-qemu=${bindir}/qemu-system-i386"
 EXTRA_OECONF += "--with-system-qemu=${bindir}/qemu-system-aarch64"
 
+DEPENDS += " dtc-native"
+
 RDEPENDS:${PN} += " \
     ${PN}-libxenmanage \
 "
@@ -22,6 +24,13 @@ PACKAGES += " \
 "
 
 FILES:${PN}-scripts-common += " ${sysconfdir}/xen/*.cfg"
+FILES:${PN}-scripts-common += " ${sysconfdir}/xen/*.dtb"
+# Per-SoC subdir example configs and their compiled device trees
+# (e.g. ${sysconfdir}/xen/s32n7/*.cfg, *.dtb).
+FILES:${PN}-scripts-common += " ${sysconfdir}/xen/*/*.cfg"
+FILES:${PN}-scripts-common += " ${sysconfdir}/xen/*/*.dtb"
+
+
 
 FILES:${PN}-xl += " \
     ${libdir}/xen/bin/init-dom0less \
@@ -65,10 +74,26 @@ SYSTEMD_SERVICE:${PN}-xencommons:remove = " \
 # libxenmanage is only in xen-4.21+
 ALLOW_EMPTY:${PN}-libxenmanage = "1"
 
+XEN_EXAMPLES_SRCDIR = "${S}/tools/examples"
+
+do_compile:append() {
+    for dts in $(find "${XEN_EXAMPLES_SRCDIR}" -name '*.dts'); do
+        dtc -I dts -O dtb -o "${dts%.dts}.dtb" "${dts}"
+    done
+}
+
 do_install:append() {
-    if [ -e ${D}${systemd_unitdir}/system/xen-qemu-dom0-disk-backend.service ]; then
+    cd "${XEN_EXAMPLES_SRCDIR}"
+    for dtb in $(find . -name '*.dtb'); do
+        rel=$(dirname "${dtb}")
+        install -d "${D}${sysconfdir}/xen/${rel}"
+        install -m 0644 "${dtb}" "${D}${sysconfdir}/xen/${rel}/"
+    done
+    cd -
+
+    if [ -e "${D}${systemd_unitdir}/system/xen-qemu-dom0-disk-backend.service" ]; then
         sed -i 's#ExecStart=.*qemu-system-aarch64\(.*\)$#ExecStart=/usr/bin/qemu-system-aarch64\1#' \
-            ${D}${systemd_unitdir}/system/xen-qemu-dom0-disk-backend.service
+            "${D}${systemd_unitdir}/system/xen-qemu-dom0-disk-backend.service"
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then

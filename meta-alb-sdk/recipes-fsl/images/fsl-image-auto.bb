@@ -23,6 +23,12 @@ IMAGE_INSTALL += " \
 # Benchmark tools
 IMAGE_INSTALL += "dhrystone fio"
 
+# ENETC4 network diagnostics/configuration tooling
+ENETC_NET_TOOLS = "iproute2-tc iproute2-devlink"
+
+IMAGE_INSTALL:append:s32n = " ${ENETC_NET_TOOLS}"
+IMAGE_INSTALL:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', ' ${ENETC_NET_TOOLS}', '', d)}"
+
 IMAGE_INSTALL:append:s32cc = " perf"
 
 # PCIe demos

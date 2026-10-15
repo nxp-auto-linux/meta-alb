@@ -64,18 +64,6 @@
 		reg = <0x0 0x80000000 0x0 0x1c000000>;
 	};
 
-	ddr_high0: memory@8800000000 {
-		device_type = "memory";
-		reg = <0x88 0x00000000 0x1 0xc0000000>; /* 7 GB */
-		status = "disabled";
-	};
-
-	ddr_high1: memory@c000000000 {
-		device_type = "memory";
-		reg = <0xc0 0x00000000 0x1 0xc0000000>; /* 7 GB */
-		status = "disabled";
-	};
-
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -238,10 +226,6 @@
 			clock-names = "dmamux0", "dmamux1";
 		};
 	};
-};
-
-&ddr_scmi {
-	nxp,ddr-regions = <&ddr_high0>, <&ddr_high1>;
 };
 
 &smmu {

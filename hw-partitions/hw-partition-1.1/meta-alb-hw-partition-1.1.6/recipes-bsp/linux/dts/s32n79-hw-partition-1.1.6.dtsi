@@ -3,8 +3,6 @@
  * Copyright 2025-2026 NXP
  */
 
-#include "s32n79-hw-partition-1.1.6-ddr.dtsi"
-
 /delete-node/ &gic;
 /delete-node/ &cpu4;
 /delete-node/ &cpu5;
@@ -49,6 +47,11 @@
 				};
 			};
 		};
+	};
+
+	memory@9c000000 {
+		device_type = "memory";
+		reg = <0x0 0x9c000000 0x0 0x1c000000>; /* 448MB */
 	};
 
 	reserved-memory {
@@ -191,10 +194,6 @@
 			dma-channels = <16>;
 		};
 	};
-};
-
-&nxp_ddr {
-	nxp,ddr-regions = <&ddr_high0>, <&ddr_high1>;
 };
 
 &uart7 {

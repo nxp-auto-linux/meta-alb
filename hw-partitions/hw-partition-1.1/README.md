@@ -35,28 +35,28 @@ Each cohort has 0x1c000000 bytes assigned space in Low memory, split as follows:
 ## High Memory Layout:
 > **NOTE:** The DDR ranges listed below are dynamically initialized at runtime through the Linux kernel memory hotplug functionality.
 >
-> The Cohort 6 ranges depend on the DDR ECC configuration selected through the `DDR_ECC_SUPPORT`.
-> The extra memory gained by disabling ECC is entirely assigned to Cohort 6, so the Cohort 5 layout is identical in
-> both configurations. The two Cohort 6 configurations map to the `ecc-on` and `ecc-off` DDR device tree fragments
-> under `meta-alb-hw-partition-1.1.6/recipes-bsp/dts-ddr/`.
+> The exact ranges are discovered dynamically from FSS, and depend on the DDR ECC and Interleaving configurations.
 
 ### Cohort 5 (hw-partition-1.1.5):
-> **NOTE:** Unaffected by `DDR_ECC_SUPPORT`.
+#### Interleaving enabled (default):
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x8800000000                     | 0x8B7FFFFFFF                     | 14 GB                             |
 
+#### Interleaving disabled:
 | DDR Range                  | Start                            | End                              | Note                              |
 |----------------------------|----------------------------------|----------------------------------|-----------------------------------|
 | Region 0                   | 0x8800000000                     | 0x89BFFFFFFF                     | 7 GB                              |
 | Region 1                   | 0xC000000000                     | 0xC1BFFFFFFF                     | 7 GB                              |
 
 ### Cohort 6 (hw-partition-1.1.6):
-#### ECC enabled (`DDR_ECC_SUPPORT = "1"`, default):
+#### Interleaving enabled (default):
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x8B80000000                     | 0x8E7FFFFFFF                     | 12 GB                             |
+
+#### Interleaving disabled:
 | DDR Range                  | Start                            | End                              | Note                              |
 |----------------------------|----------------------------------|----------------------------------|-----------------------------------|
 | Region 0                   | 0x89C0000000                     | 0x8B3FFFFFFF                     | 6 GB                              |
 | Region 1                   | 0xC1C0000000                     | 0xC33FFFFFFF                     | 6 GB                              |
-
-#### ECC disabled (`DDR_ECC_SUPPORT = "0"`):
-| DDR Range                  | Start                            | End                              | Note                              |
-|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
-| Region 0                   | 0x89C0000000                     | 0x8BBFFFFFFF                     | 8 GB                              |
-| Region 1                   | 0xC1C0000000                     | 0xC3BFFFFFFF                     | 8 GB                              |

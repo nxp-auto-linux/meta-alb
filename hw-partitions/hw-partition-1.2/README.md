@@ -30,16 +30,25 @@ hw-partition-1.2 contains one cohort layer:
 ## High Memory Layout:
 > **NOTE:** The DDR ranges listed below are dynamically initialized at runtime through the Linux kernel memory hotplug functionality.
 >
-> The exact ranges depend on the DDR ECC configuration selected through the `DDR_ECC_SUPPORT` build variable.
-> The two configurations map to the `ecc-on` and `ecc-off` DDR device tree fragments under `meta-alb-hw-partition-1.2.1/recipes-bsp/dts-ddr/`.
+> The exact ranges are discovered dynamically from FSS, and depend on the DDR ECC and Interleaving configurations.
 
-### ECC enabled (`DDR_ECC_SUPPORT = "1"`, default):
+### ECC enabled, interleaving enabled (default):
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x8800000000                     | 0x8E7FFFFFFF                     | 26 GB                             |
+
+### ECC enabled, interleaving disabled:
 | DDR Range                  | Start                            | End                              | Note                              |
 |----------------------------|----------------------------------|----------------------------------|-----------------------------------|
 | Region 0                   | 0x8800000000                     | 0x8B3FFFFFFF                     | 13 GB                             |
 | Region 1                   | 0xC000000000                     | 0xC33FFFFFFF                     | 13 GB                             |
 
-### ECC disabled (`DDR_ECC_SUPPORT = "0"`):
+### ECC disabled, interleaving enabled:
+| DDR Range                  | Start                            | End                              | Note                              |
+|----------------------------|----------------------------------|----------------------------------|-----------------------------------|
+| Region 0                   | 0x8800000000                     | 0x8F7FFFFFFF                     | 30 GB                             |
+
+### ECC disabled, interleaving disabled:
 | DDR Range                  | Start                            | End                              | Note                              |
 |----------------------------|----------------------------------|----------------------------------|-----------------------------------|
 | Region 0                   | 0x8800000000                     | 0x8BBFFFFFFF                     | 15 GB                             |

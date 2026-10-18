@@ -249,6 +249,10 @@
 	status = "okay";
 };
 
+&sec_jr15 {
+	secure-status = "okay";
+};
+
 &aps2_mru0 {
 	status = "okay";
 };

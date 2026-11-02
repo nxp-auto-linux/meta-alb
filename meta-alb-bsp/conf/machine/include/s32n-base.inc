@@ -40,5 +40,11 @@ SERIAL_CONSOLES_CHECK ?= "ttyAMA0:ttyAMA0 ttyAMA1:ttyAMA1 ttyAMA2:ttyAMA2 " \
 # be found in the TF-A ${WORKDIR}.
 TFA_DTB_EXT ?= "0"
 
+# DDR offsets, relative to the start of the DDR, of the Linux Kernel image and of its
+# device tree. U-Boot uses them to load the OS and TF-A uses them when U-Boot is skipped,
+# so the OS memory layout does not depend on the boot flow.
+S32N_KERNEL_DDR_OFFSET ?= "0x13200000"
+S32N_DTB_DDR_OFFSET ?= "0x13100000"
+
 # Enable FIP Authentication
 require ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', 'conf/machine/include/hse-secboot.inc', '', d)}

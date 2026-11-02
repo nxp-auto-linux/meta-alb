@@ -72,6 +72,15 @@ SRC_URI:append:s32g399ardb3 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pfe-slave', 'file://build/pfe-slave_config.cfg', '', d)} \
 "
 
+# Load the OS images at the same DDR offsets that TF-A uses when U-Boot is skipped
+S32N_DDR_LAYOUT_CFG = "${B}/s32n_ddr_layout.cfg"
+DELTA_UBOOT_DEFCONFIG:append:s32n = " ${S32N_DDR_LAYOUT_CFG}"
+
+do_merge_delta_config:prepend:s32n() {
+    printf 'CONFIG_SYS_LOAD_RAM_OFFSET=%s\nCONFIG_DTB_RAM_OFFSET=%s\n' \
+        "${S32N_KERNEL_DDR_OFFSET}" "${S32N_DTB_DDR_OFFSET}" > "${S32N_DDR_LAYOUT_CFG}"
+}
+
 # PCIe Services Demos: append extra kernel bootargs (maxcpus, pci) via EXTRA_BOOT_ARGS
 SRC_URI:append:s32g399ardb3 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pcie-services-demos', 'file://0001-s32g399ardb3-append-pcie-services-bootargs.patch', '', d)} \

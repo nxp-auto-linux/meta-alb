@@ -1,13 +1,21 @@
-# Apply Quick Boot configs
-DELTA_UBOOT_DEFCONFIG:append:s32cc = "${@ " quickboot_generic.cfg" if d.getVar('QUICK_BOOT_CONFIG', True) else ''}"
-DELTA_UBOOT_DEFCONFIG:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'nokernellog', ' quickboot_nokernellog.cfg', '', d)}"
-DELTA_UBOOT_DEFCONFIG:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'noubootlog', ' quickboot_noubootlog.cfg', '', d)}"
-DELTA_UBOOT_DEFCONFIG:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skipubootnet', ' quickboot_skipubootnet.cfg', '', d)}"
-DELTA_UBOOT_DEFCONFIG:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skippcie', ' quickboot_skippcie.cfg', '', d)}"
-SRC_URI:append:s32cc = " \
-	${@ "file://build/quickboot_generic.cfg" if d.getVar('QUICK_BOOT_CONFIG', True) else ''} \
-    ${@bb.utils.contains('QUICK_BOOT_CONFIG', 'nokernellog', 'file://build/quickboot_nokernellog.cfg', '', d)} \
-    ${@bb.utils.contains('QUICK_BOOT_CONFIG', 'noubootlog', 'file://build/quickboot_noubootlog.cfg', '', d)} \
-    ${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skipubootnet', 'file://build/quickboot_skipubootnet.cfg', '', d)} \
-    ${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skippcie', 'file://build/quickboot_skippcie.cfg', '', d)} \
-"
+# Quick boot U-Boot configuration fragments.
+#
+# QB_UBOOT_FEATURES lists the fragments that a SoC family provides. An entry is
+# either <feature>, for the fragment quickboot_<feature>.cfg, or
+# <feature>:<soc>, for the fragment quickboot_<feature>-<soc>.cfg. A feature
+# can therefore have a common fragment and one fragment for each SoC family.
+# Every entry is listed explicitly, so a SoC family picks the ones it needs.
+#
+# An entry is used when its feature is set in QUICK_BOOT_CONFIG. The feature
+# 'generic' is used whenever QUICK_BOOT_CONFIG is not empty. The fragments are
+# applied in the order of the list, so <feature>:<soc> can override <feature>
+# when it is listed after it. A fragment that does not exist stops the build
+# in do_fetch.
+QB_UBOOT_FEATURES ?= ""
+QB_UBOOT_FEATURES:append:s32cc = " generic generic:s32cc nokernellog noubootlog skipubootnet skippcie"
+
+QB_UBOOT_ENABLED = "${@'generic ' + d.getVar('QUICK_BOOT_CONFIG') if d.getVar('QUICK_BOOT_CONFIG') else ''}"
+QB_UBOOT_FRAGMENTS = "${@' '.join('quickboot_%s.cfg' % f.replace(':', '-') for f in d.getVar('QB_UBOOT_FEATURES').split() if f.split(':')[0] in d.getVar('QB_UBOOT_ENABLED').split())}"
+
+SRC_URI:append = "${@''.join(' file://build/' + f for f in d.getVar('QB_UBOOT_FRAGMENTS').split())}"
+DELTA_UBOOT_DEFCONFIG:append = " ${QB_UBOOT_FRAGMENTS}"

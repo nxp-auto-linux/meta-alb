@@ -54,6 +54,12 @@ UBOOT_TYPE_SDCARD ?= "sdcard"
 UBOOT_BASENAME_SDCARD ?= "u-boot"
 UBOOT_NAME_SDCARD ?= "${UBOOT_BASENAME_SDCARD}-${MACHINE}${UBOOT_REALSUFFIX_SDCARD}-${UBOOT_TYPE_SDCARD}"
 UBOOT_KERNEL_IMAGETYPE ?= "${KERNEL_IMAGETYPE}"
+# Kernel image types, besides UBOOT_KERNEL_IMAGETYPE, that go to the boot
+# partition of the SD card image. Each one is read from DEPLOY_DIR_IMAGE as
+# <type>-${MACHINE}.bin, the link name the kernel recipe gives to the images it
+# deploys, and a missing file stops the build. The UFS image does not use this
+# list.
+UBOOT_KERNEL_IMAGETYPE_EXTRA ?= ""
 UBOOT_KERNEL_RECIPE ?= "virtual/kernel"
 UBOOT_BOOTSPACE_SEEK ?= "2"
 
@@ -350,6 +356,12 @@ _generate_boot_image() {
 	FAT_BOOT_DEST="::/${SD_FAT_BOOT_DIR}/${UBOOT_KERNEL_IMAGETYPE}"
 
 	mcopy -i "${WORKDIR}/boot.img" -s "${DEPLOY_DIR_IMAGE}/${UBOOT_KERNEL_IMAGETYPE}-${MACHINE}.bin" "${FAT_BOOT_DEST}"
+
+	for type in ${UBOOT_KERNEL_IMAGETYPE_EXTRA}; do
+		[ -e "${DEPLOY_DIR_IMAGE}/${type}-${MACHINE}.bin" ] || \
+			bbfatal "UBOOT_KERNEL_IMAGETYPE_EXTRA: ${type}-${MACHINE}.bin is not in DEPLOY_DIR_IMAGE"
+		mcopy -i "${WORKDIR}/boot.img" -s "${DEPLOY_DIR_IMAGE}/${type}-${MACHINE}.bin" "::/${SD_FAT_BOOT_DIR}/${type}"
+	done
 
 	# Copy boot scripts
 	for item in ${BOOT_SCRIPTS}; do

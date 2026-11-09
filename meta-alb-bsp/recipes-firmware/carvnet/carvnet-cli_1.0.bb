@@ -5,8 +5,8 @@ DESCRIPTION = "Standalone Arm64 Linux user-space demo tool that talks to the \
 CARV networking co-processor char device to run INSERT/ENUM/LOOKUP/DELETE \
 commands on CARV tables. Built from the CARVNET FDK 'carv-cli' sources."
 LICENSE = "LA-OPT-NXP-SOFTWARE-LICENSE-V64.2"
-LIC_FILES_CHKSUM = "file://license.txt;md5=96b2b32a4c530209b2127d9973875e9a"
-NO_GENERIC_LICENSE[LA-OPT-NXP-SOFTWARE-LICENSE-V64.2] = "license.txt"
+LIC_FILES_CHKSUM = "file://license.txt;md5=a2e331f33daad98c26b74359a3e16159"
+NO_GENERIC_LICENSE[LA-OPT-NXP-SOFTWARE-LICENSE-V65] = "license.txt"
 FILESEXTRAPATHS:prepend := "${NXP_FIRMWARE_LOCAL_DIR}/SW32N7_CARVNET:"
 
 #

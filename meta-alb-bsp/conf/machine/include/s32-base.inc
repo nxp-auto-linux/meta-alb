@@ -15,6 +15,12 @@ BOOT_SPACE ?= "65536"
 # required for u-boot
 HOSTTOOLS += "comm"
 
+# Quick boot is enabled by the 'quick-boot' DISTRO_FEATURE, which applies the
+# generic quick boot settings. The features in QUICK_BOOT_CONFIG add more
+# specific settings on top and are ignored without the DISTRO_FEATURE, so
+# QB_CONFIG is the list to test for a feature.
+QB_CONFIG = "${@(d.getVar('QUICK_BOOT_CONFIG') or '') if bb.utils.contains('DISTRO_FEATURES', 'quick-boot', True, False, d) else ''}"
+
 # S32 BSP default providers
 PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"

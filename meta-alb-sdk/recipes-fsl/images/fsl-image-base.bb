@@ -85,8 +85,6 @@ IMAGE_INSTALL:append:s32 = "${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '
 IMAGE_INSTALL:append:s32n = "${@bb.utils.contains('DISTRO_FEATURES', 'carvnet-fw-load', ' carvnet-firmware carvnet-cli', '', d)}"
 
 # Quick-boot image support
-require ${@ 'recipes-fsl/images/fsl-image-quick-boot.inc' if d.getVar('QUICK_BOOT_CONFIG', True) else ''}
-
 require ${@bb.utils.contains('DISTRO_FEATURES', 'quick-boot', 'recipes-fsl/images/fsl-image-quick-boot.inc', '', d)}
 
 DEPLOY_UBOOT_SIM_ROOTFS = ''

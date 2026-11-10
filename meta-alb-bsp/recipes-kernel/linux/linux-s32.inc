@@ -257,7 +257,7 @@ SRC_URI += "\
     file://mmc_test.cfg \
 "
 
-require quick-boot.inc
+require ${@bb.utils.contains('DISTRO_FEATURES', 'quick-boot', 'quick-boot.inc', '', d)}
 require vnet-s32.inc
 require llce.inc
 require ${@bb.utils.contains('DISTRO_FEATURES', 'verifiedboot', 'recipes-kernel/linux/verifiedboot.inc', '', d)}

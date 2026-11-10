@@ -1,5 +1,5 @@
 require recipes-bsp/u-boot/u-boot.inc
-require recipes-bsp/u-boot/u-boot-quick-boot.inc
+require ${@bb.utils.contains('DISTRO_FEATURES', 'quick-boot', 'recipes-bsp/u-boot/u-boot-quick-boot.inc', '', d)}
 
 inherit fsl-u-boot-localversion
 

@@ -6,9 +6,9 @@ IMAGE_INSTALL:remove = "setserial \
     linux-qspi-tool \
 "
 
-IMAGE_INSTALL:remove = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'skippcie', 'pciutils', '', d)}"
+IMAGE_INSTALL:remove = "${@bb.utils.contains('QB_CONFIG', 'skippcie', 'pciutils', '', d)}"
 
-IMAGE_INSTALL:append = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'systemd-debug', ' systemd-analyze systemd-bootchart', '', d)}"
+IMAGE_INSTALL:append = "${@bb.utils.contains('QB_CONFIG', 'systemd-debug', ' systemd-analyze systemd-bootchart', '', d)}"
 
 # Remove syslog from busybox
 PACKAGE_EXCLUDE = " busybox-syslog"

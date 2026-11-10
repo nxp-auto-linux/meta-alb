@@ -146,8 +146,8 @@ EXTRA_OEMAKE:append:s32g = " ${@bb.utils.contains('DISTRO_FEATURES', 'scprt', '$
 EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'hse', '${HSE_ARGS}', '', d)}"
 EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'secboot', '${SECBOOT_ARGS}', '', d)}"
 EXTRA_OEMAKE:append:s32cc = " ${@bb.utils.contains('DISTRO_FEATURES', 'rpsecboot', '${RP_SECBOOT_ARGS}', '', d)}"
-EXTRA_OEMAKE:append:s32cc = "${@bb.utils.contains('QUICK_BOOT_CONFIG', 'nodramecc', '${NO_DRAM_ECC_ARGS}', '', d)}"
-EXTRA_OEMAKE:append:s32cc = "${@ "${QUICK_BOOT_ARGS}" if d.getVar('QUICK_BOOT_CONFIG', True) else ''}"
+EXTRA_OEMAKE:append:s32cc = "${@bb.utils.contains('QB_CONFIG', 'nodramecc', '${NO_DRAM_ECC_ARGS}', '', d)}"
+EXTRA_OEMAKE:append:s32cc = "${@bb.utils.contains('DISTRO_FEATURES', 'quick-boot', '${QUICK_BOOT_ARGS}', '', d)}"
 #
 # Switch to SCMI versions for pinctrl and NVMEM if it's the case
 EXTRA_OEMAKE:append:s32cc = " S32CC_USE_SCMI_PINCTRL=${SCMI_USE_SCMI_PINCTRL}"

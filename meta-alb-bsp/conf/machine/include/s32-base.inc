@@ -21,6 +21,9 @@ HOSTTOOLS += "comm"
 # QB_CONFIG is the list to test for a feature.
 QB_CONFIG = "${@(d.getVar('QUICK_BOOT_CONFIG') or '') if bb.utils.contains('DISTRO_FEATURES', 'quick-boot', True, False, d) else ''}"
 
+# OE-Core 932be19f48 backport; to be dropped once in poky scarthgap
+STAMPCLEAN = "${STAMPS_DIR}/${MULTIMACH_TARGET_SYS}/${PN}/*"
+
 # S32 BSP default providers
 PREFERRED_PROVIDER_u-boot ?= "u-boot-s32"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-s32"

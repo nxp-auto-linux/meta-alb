@@ -19,7 +19,7 @@
 #
 # Add options for the script
 # Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
-# Copyright 2016-2018, 2020, 2024-2025 NXP
+# Copyright 2016-2018, 2020, 2024-2026 NXP
 #  Modifications by:
 #          Heinz Wrobel <heinz.wrobel@nxp.com>
 #          Ionut Vicovan <ionut.vicovan@nxp.com>
@@ -175,7 +175,7 @@ You can now run 'bitbake <target>'
 clean_up()
 {
    unset PROGNAME ROOTDIR OEROOTDIR FSLROOTDIR PROJECT_DIR \
-         EULA EULA_FILE LAYER_LIST MACHINE FSLDISTRO \
+         LAYER_LIST MACHINE FSLDISTRO \
          OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES DISTRO \
          setup_flag setup_h setup_j setup_t setup_l setup_builddir \
          setup_download setup_sstate setup_error setup_hwpart layer append_layer \
@@ -426,8 +426,6 @@ if [ -n "$setup_hwpart" ]; then
     "
 fi
 
-EULA_FILE="$ALBROOTDIR/EULA"
-
 # check the "-h" and other not supported options
 if test $setup_error || test $setup_h; then
     usage && clean_up && return
@@ -490,49 +488,6 @@ else
     else
         PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
     fi
-fi
-
-# Handle EULA setting
-if [ -z "$EULA" ] && ! grep -q '^ACCEPT_FSL_EULA\s*=' ${PROJECT_DIR}/conf/local.conf 2>/dev/null; then
-    EULA='ask'
-fi
-
-if [ "$EULA" = "ask" ]; then
-    cat <<EOF
-
-Proprietary and third party software is subject to agreement and compliance
-with, ${COMPANY}'s End User License Agreement. To have the right to use these
-binaries in your images, you must read and accept the following terms.  If
-there are conflicting terms embedded in the software, the terms embedded in
-the Software will control.
-
-In all cases,  open source software is licensed under the terms of the
-applicable open source license(s), such as the BSD License, Apache License or
-the GNU Lesser General Public License.  Your use of the open source software
-is subject to the terms of each applicable license.  You must agree to the
-terms of each applicable license, or you cannot use the open source software.
-
-EOF
-
-    sleep 5
-
-    more -d $EULA_FILE
-    echo
-    while [ "$EULA" = "ask" ]; do
-        echo -n "Do you accept the EULA you just read? (y/n) "
-        read REPLY
-        case "$REPLY" in
-            y|Y)
-            echo "EULA has been accepted."
-            EULA="1"
-            ;;
-            n|N)
-            echo "EULA has not been accepted."
-            clean_up
-            return;
-            ;;
-        esac
-    done
 fi
 
 mkdir -p $PROJECT_DIR
@@ -647,12 +602,6 @@ fi
 if echo "$MACHINE" |egrep -q "^(b4|p5|t1|t2|t4)"; then
     # disable prelink (for multilib scenario) for now
     sed -i s/image-mklibs.image-prelink/image-mklibs/g conf/local.conf
-fi
-
-if grep -q '^ACCEPT_FSL_EULA\s*=' conf/local.conf; then
-    sed -i "s/^#*ACCEPT_FSL_EULA\s*=.*/ACCEPT_FSL_EULA = \"$EULA\"/g" conf/local.conf
-else
-    echo "ACCEPT_FSL_EULA = \"$EULA\"" >> conf/local.conf
 fi
 
 # make a SOURCE_THIS file
